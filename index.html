@@ -51,8 +51,8 @@
     <link rel="icon" href="/img/favicon.png">
 
     <meta name="format-detection" content="telephone=no"/>
-    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海。">
-    <meta name="keywords" content="">
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,seanthefish">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -78,6 +78,8 @@
         <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
+        
+            
         
 
     
@@ -159,12 +161,12 @@
 <!-- Theme Background Related-->
 
     <style>
-      body{
+      body {
         background-color: #F5F5F5;
       }
 
       /* blog_info bottom background */
-      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text {
         background-color: #fff;
       }
     </style>
@@ -213,7 +215,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="https://shanyouyu-sean.github.io/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -226,13 +228,17 @@
 
     <!-- RSS -->
     
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="https://shanyouyu-sean.github.io/">
+    <meta property="og:url" content="http://seanthefish.com/">
     <meta property="og:type" content="blog">
     <meta property="og:title" content="小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
-    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海。">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
     
 
     
@@ -242,7 +248,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="https://shanyouyu-sean.github.io" />
+        <link rel="canonical" href="http://seanthefish.com" />
     
 
     <!-- Structured-data for SEO -->
@@ -257,16 +263,16 @@
         "name": "小鱼肖恩",
         "logo": "/img/favicon.png"
     },
-    "url": "https://shanyouyu-sean.github.io",
+    "url": "http://seanthefish.com",
     "image": {
         "@type": "ImageObject",
         "url": "/img/favicon.png"
     },
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://shanyouyu-sean.github.io"
+        "@id": "http://seanthefish.com"
     },
-    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海。"
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
 }
 </script>
 
@@ -277,6 +283,15 @@
 
     <!-- Analytics -->
     
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?UA-111600306-1';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
     
     
 
@@ -316,7 +331,7 @@
         <p class="index-top-block-slogan"><a href="#">
         
             
-                Hi, nice to meet you
+                我知道，是流星赞美了黑夜，鲸鱼安慰了大海
             
         
         </a></p>
@@ -339,23 +354,22 @@
 
     <!-- Search -->
     
-    <!-- Google -->
+
+
+
+
+    <!-- Local -->
     <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable" method="post" action="">
         <label id="search-label" class="mdl-button mdl-js-ripple-effect mdl-js-button mdl-button--fab mdl-color--accent mdl-shadow--4dp" for="search">
             <i class="material-icons mdl-color-text--white" role="presentation">search</i>
         </label>
 
-        <form autocomplete="off" id="search-form" method="get" action="//google.com/search" accept-charset="UTF-8" class="mdl-textfield__expandable-holder" target="_blank">
-            <input class="mdl-textfield__input search-input" type="search" name="q" id="search" placeholder="">
+        <form autocomplete="off" id="search-form" class="mdl-textfield__expandable-holder">
+            <input type="text" id="search" class="form-control mdl-textfield__input search-input" name="q" results="0" placeholder=""/>
             <label id="search-form-label" class="mdl-textfield__label" for="search"></label>
-
-            <input type="hidden" name="sitesearch" value="https://shanyouyu-sean.github.io">
         </form>
     </div>
-
-
-
-
+    <div id="local-search-result"></div>
 
 
 
@@ -381,6 +395,12 @@
         </button>
         <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="show-pages-button">
             
+                <a class="index_share-link" href="/about" title="About">
+                    <li class="mdl-menu__item mdl-js-ripple-effect">
+                        About
+                    </li>
+                </a>
+            
         </ul>
 
         <!-- Menu -->
@@ -392,9 +412,15 @@
             
 
             
+                <a class="index_share-link" href="#">
+                    <li class="mdl-menu__item mdl-js-ripple-effect">
+                        Article RSS
+                    </li>
+                </a>
+            
 
             
-                <a class="index_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=小鱼肖恩&url=https://shanyouyu-sean.github.io&pic=https://shanyouyu-sean.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+                <a class="index_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=小鱼肖恩&url=http://seanthefish.com&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
                     <li class="mdl-menu__item mdl-js-ripple-effect">
                         Share to Weibo
                     </li>
@@ -402,23 +428,11 @@
             
 
             
-                <a class="index_share-link" href="https://twitter.com/intent/tweet?text=小鱼肖恩&url=https://shanyouyu-sean.github.io&via=Sean Yu" target="_blank">
-                    <li class="mdl-menu__item mdl-js-ripple-effect">
-                        Share to Twitter
-                    </li>
-                </a>
+
             
 
             
-                <a class="index_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://shanyouyu-sean.github.io" target="_blank">
-                    <li class="mdl-menu__item mdl-js-ripple-effect">
-                        Share to Facebook
-                    </li>
-                </a>
-            
-
-            
-                <a class="index_share-link" href="https://plus.google.com/share?url=https://shanyouyu-sean.github.io" target="_blank">
+                <a class="index_share-link" href="https://plus.google.com/share?url=http://seanthefish.com" target="_blank">
                     <li class="mdl-menu__item mdl-js-ripple-effect">
                         Share to Google+
                     </li>
@@ -427,6 +441,12 @@
 
             
 
+            
+                <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=小鱼肖恩&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com" target="_blank">
+                    <li class="mdl-menu__item">
+                        Share to QQ
+                    </li>
+                </a>
             
 
             
@@ -438,6 +458,8 @@
     <div class="locate-thumbnail-symbol"></div>
 
     <!-- Pin on top -->
+    
+        
     
 
     <!-- Normal Post -->
@@ -562,7 +584,7 @@
         <ul id="settings-dropdown" class="dropdown-menu">
             
                 <li>
-                    <a href="#" target="_blank" title="Email Me">
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
                         
                             <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
                         
@@ -606,8 +628,33 @@
 
     <!-- Categories  -->
     
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                
+            </ul>
+        </li>
+        
+    
 
     <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
     
 
     <!-- Article Number  -->
@@ -700,6 +747,12 @@ It will not impact the appearance and can give developers a lot of support :)
 
     <!-- Github -->
     
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
 
     <!-- LinkedIn -->
     
@@ -780,11 +833,17 @@ It will not impact the appearance and can give developers a lot of support :)
 
 
 
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
 
 
 
 
 
+
+
+   <!-- Gitment -->
 
 
 
@@ -793,6 +852,25 @@ It will not impact the appearance and can give developers a lot of support :)
     
 
     <!-- Local Search-->
+    
+        <script type="text/ls-javascript" id="search-local-js-script">
+    var searchFunc=function(c,a,b){$.ajax({url:c,dataType:"xml",success:function(e){var d=$("entry",e).map(function(){return{title:$("title",this).text(),content:$("content",this).text(),url:$("url",this).text()}}).get();var g=document.getElementById(a);var f=document.getElementById(b);g.addEventListener("input",function(){var i='<ul class="search-result-list">';var h=this.value.trim().toLowerCase().split(/[\s\-]+/);f.innerHTML="";if(this.value.trim().length<=0){return}d.forEach(function(o){var n=true;var s=[];var t=o.title.trim().toLowerCase();var m=o.content.trim().replace(/<[^>]+>/g,"").toLowerCase();var j=o.url;var u=-1;var q=-1;var p=-1;if(t!==""&&m!==""){h.forEach(function(w,x){u=t.indexOf(w);q=m.indexOf(w);if(u<0&&q<0){n=false}else{if(q<0){q=0}if(x===0){p=q}}})}if(n){i+='<li><a href="'+j+'" class="search-result-title" target="_blank">'+t;var r=o.content.trim().replace(/<[^>]+>/g,"");if(p>=0){var k=p-6;var l=p+6;if(k<0){k=0}if(k===0){l=10}if(l>r.length){l=r.length}var v=r.substr(k,l);h.forEach(function(w){var x=new RegExp(w,"gi");v=v.replace(x,'<em class="search-keyword">'+w+"</em>")});i+='<p class="search-result">'+v+"...</p></a>"}}});f.innerHTML=i})}})};
+</script>
+
+
+        <script type="text/ls-javascript" id="search-input-script">
+            var inputArea = document.querySelector('#search');
+            var getSearchFile = function() {
+                var path = 'search.xml';
+                searchFunc(path, 'search', 'local-search-result');
+            }
+
+            if(inputArea) {
+                inputArea.onfocus = function() {
+                    getSearchFile();
+                }
+            }
+        </script>
     
 
 
@@ -807,6 +885,8 @@ It will not impact the appearance and can give developers a lot of support :)
 
 <!-- Import prettify js  -->
 
+    
+
 
 
 <!-- Window Load -->
@@ -818,6 +898,8 @@ It will not impact the appearance and can give developers a lot of support :)
     });
 
     
+        
+    
     
 </script>
 
@@ -825,6 +907,12 @@ It will not impact the appearance and can give developers a lot of support :)
 
 
 <!-- Bing Background -->
+
+<script type="text/ls-javascript" id="Bing-Background-script">
+    queue.offer(function(){
+        $('body').attr('data-original', 'https://api.i-meto.com/bing?[object Object]');
+    });
+</script>
 
 
 <script type="text/ls-javascript" id="lazy-load">
