@@ -778,6 +778,7 @@
 <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
 
 <script>
+    import md5 from 'md5';
     var gitalk = new Gitalk({
             clientID: '37e3045f7495549e8e8f',
             clientSecret: '7f01ca7a36dbfefe6abbb00c66c37d8d8559e8b2',
@@ -785,7 +786,8 @@
             owner: 'ShanyouYu-Sean',
             admin: ['ShanyouYu-Sean'],
             // facebook-like distraction free mode
-            distractionFreeMode: false
+            distractionFreeMode: false,
+            id: md5(location.href)
         })
    gitalk.render('gitalk-container')
 </script>
