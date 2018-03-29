@@ -3,7 +3,7 @@
   
     
     <entry>
-      <title><![CDATA[模块系统综述]]></title>
+      <title><![CDATA[Java模块系统综述]]></title>
       <url>/2018/03/29/module-system/</url>
       <content type="html"><![CDATA[<p><strong>本文是Mark Reinhold的The State of the Module System最新版的翻译。（<a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
 <p>这份文档略有过时。其基本概念没有任何改变，但requires public关键字已被重新命名为requires transitive，并增加了几项附加功能。更新正在准备中，准备就绪后会在这里发布。</p>
@@ -20,7 +20,7 @@
 </li>
 <li><a href="#使用模块">使用模块</a><ul>
 <li><a href="#模块路径">模块路径</a></li>
-<li><a href="#"></a></li>
+<li><a href="#解决依赖">解决依赖</a></li>
 <li><a href="#可读性">可读性</a></li>
 <li><a href="#可访问性">可访问性</a></li>
 <li><a href="#隐含的可读性">隐含的可读性</a></li>
@@ -104,6 +104,38 @@ com/foo/bar/alpha/Alpha.class
 <p>基本模块始终存在。每个其他模块都隐式的建立在基本模块之上，而基本模块则不依赖于其他模块。</p>
 <p>其余的平台模块将共享“ java.”名称前缀，并有可能包括，例如，模块java.sql用于数据库连接， 模块java.xml用于XML处理，模块java.logging进行记录日志。按照惯例，尽管没有在Java SE 9平台规范中定义，但是专用于JDK的模块将共享“ jdk.”名称前缀。</p>
 <h3 id="使用模块"><a href="#使用模块" class="headerlink" title="使用模块"></a>使用模块</h3><p>单个模块可以在模块包中定义，或者内嵌于编译时或运行时环境。要在任一阶段使用它们，模块系统必须定位它们，然后确定它们如何相互关联的，并以此提供可靠的配置和强大的封装。</p>
+<h4 id="模块路径"><a href="#模块路径" class="headerlink" title="模块路径"></a>模块路径</h4><p>为了定位包中定义的模块，模块系统搜索由系统定义的模块路径（module path）。模块路径是一个序列，其中的每个元素都是模块包或包含模块包的目录。系统会按顺序搜索模块路径的元素，以找到定义合适的第一个模块包。</p>
+<p>模块路径（module path）与类路径（class path）有着很大的不同，它更加健壮。类路径的固有脆弱性是基于这样一个事实：即它是一种在所有包中通过路径来定位各个类型的工作方式，它不会在不同的包文件本身之间进行区分。这使得它无法预先知道程序什么时候缺少了某个包。它还允许不同的程序包（artifacts）在相同的包（package）中定义类型，即使这些程序包是只是版本不同，或者就是完全不同的组件（jar hell）。</p>
+<p>相反，模块路径是定位整个模块、而不是某个类型的一种手段。如果模块系统无法满足来自模块路径的模块包的特定依赖性，或者如果在同一目录中遇到定义相同名称模块的两个模块包，则编译器或虚拟机将报告错误并退出。</p>
+<p>内置于编译时或运行时环境的模块以及模块路径中的模块包定义的模块统称为可观察模块的范围。</p>
+<h4 id="解决依赖"><a href="#解决依赖" class="headerlink" title="解决依赖"></a>解决依赖</h4><p>假设我们有一个使用上述com.foo.bar模块和平台java.sql模块的应用程序。包含应用程序核心的模块声明如下：</p>
+<pre><code class="java">module com.foo.app {
+    requires com.foo.bar;
+    requires java.sql;
+}
+</code></pre>
+<p>鉴于这种初始应用程序模块，该模块系统可通过表达依赖性的requires来定位额外观察到的模块，以满足这些依赖关系，然后解决这些模块的依赖关系，并依此类推，直到每个模块的每一个的依赖都被满足。这个传递闭包计算的结果是一个模块图，对于每个依赖其他模块的模块，它包含从第一个模块到第二个模块的有向边。</p>
+<p>要为模块com.foo.app构建模块图，模块系统将检查模块的声明java.sql，即：</p>
+<pre><code class="java">module java.sql {
+    requires java.logging;
+    requires java.xml;
+    exports java.sql;
+    exports javax.sql;
+    exports javax.transaction.xa;
+}
+</code></pre>
+<p>它还会循环检查其声明的com.foo.bar模块（上面的模块定义中已经示出），包括org.baz.qux模块，java.logging模块和 java.xml模块; 为简洁起见，最后三个这里没有显示，因为它们没有声明对任何其他模块的依赖。</p>
+<p>根据所有这些模块声明，为com.foo.app模块画出的模块图，包含以下节点和边：</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/jdk-module.png" alt="module-pic"></p>
+<p>在该图中，深蓝色线条表示显式依赖关系，如requires，而浅蓝色线条表示每个模块对基本模块的隐式依赖关系。</p>
+<h4 id="可读性"><a href="#可读性" class="headerlink" title="可读性"></a>可读性</h4><p>当一个模块直接依赖于模块图中的另一个模块时，则第一个模块中的代码将能够引用第二个模块中的类型。因此，我们说第一个模块读取第二个模块，或者等同地，第二个模块可以被第一个模块读取。因此，在上述的曲线图中，com.foo.app模块读取com.foo.bar和 java.sql模块，但并不读取org.baz.qux模块，java.xml模块或 java.logging模块。java.logging模块可由java.sql模块读取，但不能被其他模块读取。（根据定义，每个模块都会自行读取自己本身。）</p>
+<p>在模块图中定义的可读性关系是可靠配置的基础 ：模块系统能确保每个依赖是由另一个模块完成的，模块图是非循环的，每个模块最多只能读取一个包含制定包的模块，这样定义相同名称包的模块就不会相互干扰。</p>
+<p>这样的配置不仅更可靠，也可以更快。当模块中的代码引用包中的某个类型时，那么该包将保证在该模块中定义，或者只在该模块读取的模块中定义一个。因此，在寻找特定类型的定义时，不需要在多个模块中搜索它，或者更糟糕的，沿着整个路径搜索它。</p>
+<h4 id="可访问性"><a href="#可访问性" class="headerlink" title="可访问性"></a>可访问性</h4><p>在模块图中定义的可读性关系与exports模块声明中的子句相结合，是强封装的基础：只有当某个模块被另一个模块读取时，Java编译器和虚拟机才会将这个模块中的包中的公共类型视为只能被另一个模块所访问，同时还需要这个模块导出该包。即，如果两种类型的S和T在不同的模块中定义的，并且T是 public，则如果代码S 可以存取 T，必须满足以下条件：</p>
+<ol>
+<li>S的模块读取T的模块，</li>
+<li>T的模块导出T包。</li>
+</ol>
 ]]></content>
       
         <categories>
@@ -485,21 +517,14 @@ java --patch-module java.base=mypatches/java.base ...
 <p>我知道，是流星赞美了黑夜</p>
 <p>鲸鱼安慰了大海</p>
 <hr>
-<p>“天天下雨，自从你走了。”</p>
-<p>“自从你来了，天天下雨。”</p>
-<p>两地友人雨，我乐意负责。</p>
-<p>第三处没消息，寄一把伞去？</p>
-<p>我的忧愁随草绿天涯：</p>
-<p>鸟安于巢吗？人安于客枕？</p>
-<p>想在天井里盛一只玻璃杯，</p>
-<p>明朝看天下雨今夜落几寸。</p>
+<p><strong>Sean the Fish</strong></p>
+<p>Java码农，目前供职于IBM。</p>
+<p>博客刚刚建立，希望自己能坚持写下去。</p>
+<p>Email：a728976009@hotmail.com</p>
 <hr>
-<p>十觞亦不醉，</p>
-<p>感子故意长。</p>
-<p>明日隔山岳，</p>
-<p>世事两茫茫。</p>
+<p>想在天井里盛一只玻璃杯</p>
+<p>明朝看天下雨今夜落几寸</p>
 <hr>
-<p>Sean the Fish</p>
 ]]></content>
     </entry>
     
