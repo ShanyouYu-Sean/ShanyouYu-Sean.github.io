@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-03-29T06:09:43.533Z</updated>
+  <updated>2018-03-29T06:45:40.100Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://seanthefish.com/2018/03/29/java9-quick-guide/"/>
     <id>http://seanthefish.com/2018/03/29/java9-quick-guide/</id>
     <published>2018-03-29T02:12:00.000Z</published>
-    <updated>2018-03-29T06:09:43.533Z</updated>
+    <updated>2018-03-29T06:45:40.100Z</updated>
     
     <summary type="html">
     
@@ -35,9 +35,9 @@
     
     </summary>
     
-      <category term="Java 基础" scheme="http://seanthefish.com/categories/Java-%E5%9F%BA%E7%A1%80/"/>
+      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
     
-      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-%E5%9F%BA%E7%A1%80/Java-9/"/>
+      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
     
     
       <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
@@ -51,7 +51,7 @@
     <link href="http://seanthefish.com/2018/01/11/classloader-classpath-hell/"/>
     <id>http://seanthefish.com/2018/01/11/classloader-classpath-hell/</id>
     <published>2018-01-11T04:14:47.000Z</published>
-    <updated>2018-03-29T05:53:24.274Z</updated>
+    <updated>2018-03-29T06:45:33.617Z</updated>
     
     <summary type="html">
     
@@ -65,12 +65,10 @@
     
     </summary>
     
-      <category term="Java 基础" scheme="http://seanthefish.com/categories/Java-%E5%9F%BA%E7%A1%80/"/>
+      <category term="classLoader" scheme="http://seanthefish.com/categories/classLoader/"/>
     
     
-      <category term="classLader" scheme="http://seanthefish.com/tags/classLader/"/>
-    
-      <category term="classPath Hell" scheme="http://seanthefish.com/tags/classPath-Hell/"/>
+      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
     
   </entry>
   

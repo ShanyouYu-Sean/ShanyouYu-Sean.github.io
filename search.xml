@@ -262,9 +262,9 @@
       
         <categories>
             
-            <category> Java 基础 </category>
-            
             <category> Java 9 </category>
+            
+            <category> Java module </category>
             
         </categories>
         
@@ -293,16 +293,14 @@
       
         <categories>
             
-            <category> Java 基础 </category>
+            <category> classLoader </category>
             
         </categories>
         
         
         <tags>
             
-            <tag> classLader </tag>
-            
-            <tag> classPath Hell </tag>
+            <tag> classLoader </tag>
             
         </tags>
         
