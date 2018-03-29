@@ -43,7 +43,7 @@
     
     <title>
         
-            问题 | 
+            也来谈谈classloader和classpath hell问题 | 
         
         小鱼肖恩
     </title>
@@ -54,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩">
+    <meta name="keywords" content="小鱼肖恩,classLader,classPath Hell">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -215,7 +215,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/01/11/问题/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/01/11/classloader&amp;classpath-hell/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -234,16 +234,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2018/01/11/问题/">
+    <meta property="og:url" content="http://seanthefish.com/2018/01/11/classloader&amp;classpath-hell/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="问题 | 小鱼肖恩">
+    <meta property="og:title" content="也来谈谈classloader和classpath hell问题 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    
+    <meta property="og:article:tag" content="classLader"> <meta property="og:article:tag" content="classPath Hell"> 
 
     
         <meta property="article:published_time" content="Thu Jan 11 2018 12:14:47 GMT+0800">
-        <meta property="article:modified_time" content="Thu Jan 11 2018 12:14:47 GMT+0800">
+        <meta property="article:modified_time" content="Mon Jan 15 2018 10:00:40 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -251,7 +251,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2018/01/11/问题/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2018/01/11/classloader&classpath-hell/index.html" />
     
 
     <!-- Structured-data for SEO -->
@@ -263,10 +263,10 @@
 {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2018/01/11/问题/index.html",
-    "headline": "问题",
+    "mainEntityOfPage": "http://seanthefish.com/2018/01/11/classloader&classpath-hell/index.html",
+    "headline": "也来谈谈classloader和classpath hell问题",
     "datePublished": "Thu Jan 11 2018 12:14:47 GMT+0800",
-    "dateModified": "Thu Jan 11 2018 12:14:47 GMT+0800",
+    "dateModified": "Mon Jan 15 2018 10:00:40 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -284,7 +284,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": "小鱼肖恩",
+    "keywords": ",classLader,classPath Hell小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -381,7 +381,7 @@
         
     
             <p class="article-headline-p">
-                问题
+                也来谈谈classloader和classpath hell问题
             </p>
         </div>
 
@@ -422,13 +422,22 @@
 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
     <li class="mdl-menu__item">在其它设备中阅读本文章</li>
     
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACY0lEQVR42u3aQW7DMAwEwPz/0+21QAp7SUqKEYxPQVq4Gh9MltzXz1dfLzw8PDw8PDw8vIfxXvH19/ffP19/836f95/+c9Di2fDw8PBO8m5etUVectze/a/PhoeHh3eelxeD6rWKen02PDw8vGfyJsUjadbx8PDwvo+XvNCT9jpvwfHw8PCezCv8w5/8mWKZmRckPDw8vJO8+QJs3+dH7Pfw8PDw5sGm4uGqL/dloSs8PDy8DbykFU4Gr5OhQ28x1gxd4eHh4Y15Cay32p88oHxtVqh7eHh4eBt4c3a1pd4eHcDDw8Pbxustn/LBRNIuz7/Hw8PD+xRvEgKoxqeSwpNHDfDw8PDO8PKVfD54zUfDyUC5PAjGw8PD28yrNq/VV3zSas/baDw8PLyTvLwk9AYWvbhA0ppHY1w8PDy847xJuzwfavQafTw8PLzdvOqav9cc90JU1RgBHh4e3hleb3i6NrSaHLowDsbDw8M7wmuumgZrszxeUA0W4OHh4e3m9VZZvRjWpAXP74aHh4e3m7cqXFVlVNvoQoHBw8PDO87rtbO9GEF1qLFsjIuHh4e3gXfTtsbN9ySCkD8CPDw8vPO83kBhUhiqK65RYcDDw8NbyuutqarhgF4ZaI6D8fDw8DbzJgdNXtzzoUPeTOPh4eGd5PVa4SRoNXlMyfgDDw8P77O83qJrVdnIi9NN842Hh4f3SF5SEvKx7PVYOS82eHh4eM/k3aztF4WooogAHh4e3gN4yTAiX1PlL/3JGfDw8PA+xVu1AOvFpJIhRSHcgIeHh7eZ930XHh4eHh4eHh7eA65fdiUWETxplXIAAAAASUVORK5CYII=">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAAC2UlEQVR42u3aQXIbMQwEQP//08kDEq9nALksk70nV2lFsnEQDIAff658PrCxsbGxsbGxsbHfkv0RP/++/5+lP3n/+dPn1Z53Sc6MjY2NfQP7i5/+Txjt4Tbfej5DEjJsbGzsG9jtls/ffT5cniafQ5acGRsbGxs72fiL5BEEaLYjNjY2NvarEljb7skbT9jY2NjYr20qJS2hfDDwqnB/ey8NGxsb++3Zm2TzU3//wHwbGxsb+y3Z+2d/rSfHrM6JjY2NfSh70xjKi5BkfDsbHhfjYWxsbOyj2ZsNkoZO3qiataKiU2FjY2Mfym5b+a8aHsyu8swChI2NjX02u23fJMODNnB5ukrCuipFsLGxsX8he9NaSrZM0ltbugx3wcbGxj6anSeJvMHUXv3J02Ge9rCxsbFvYLeXLGfNoA3mZa0obGxs7EPZbVtn1khqP83HDNjY2NjYm0Qyu4iTJ8h80ButiY2NjX0oe9MGygPXFiTtuDcaUWNjY2NfwN4UJ7Nx76y8mQ2PsbGxsW9jz7bMx8Ob3fMrRNjY2Ng3sGclRD4q3hQb7S5fhBIbGxv7UHb9D32cSGbfTZJTUiZhY2Nj38bO08N3NINmo4gkxNjY2Ng3sPM2UJventdpW/xtcLGxsbHvYbcj27qVExQVmyZXUVZhY2NjH8pum0RtOGblR7taNDzGxsbGvoadJ552SJCvmQc6ScbY2NjYN7A36acd0M7KiTb0xU0lbGxs7EPZ7Zh21mzK209toIcJDBsbG/sXstsnLzM2jf68eVS8iY2NjX0oe5YY8qs5beCSomh4AQgbGxv7aHabtPLQtEPiHJaPh7GxsbHvYbfD2nbU2hYwm1EENjY2NnZeBswKjyjljEogbGxsbOz84s6sMdSmq6RMwsbGxsZur9c8b5/j2yHubKSBjY2NfQN7dakxfrO9BpTssipFsLGxsY9g3/NgY2NjY2NjY2Njv83zF0yezYA0e9ZKAAAAAElFTkSuQmCC">
     
 </ul>
 
     
 
     <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/classLader/">classLader</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/classPath-Hell/">classPath Hell</a>
+    </ul>
     
 
     <!-- Share -->
@@ -444,7 +453,7 @@
 
     <!-- Share Weibo -->
     
-        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=问题&url=http://seanthefish.com/2018/01/11/问题/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=也来谈谈classloader和classpath hell问题&url=http://seanthefish.com/2018/01/11/classloader&amp;classpath-hell/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
             <li class="mdl-menu__item">
                 分享到微博
             </li>
@@ -459,7 +468,7 @@
 
     <!-- Share Google+ -->
     
-        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/01/11/问题/index.html" target="_blank">
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/01/11/classloader&amp;classpath-hell/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 Google+
             </li>
@@ -471,7 +480,7 @@
 
     <!-- Share QQ -->
     
-        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=问题&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/01/11/问题/index.html" target="_blank">
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=也来谈谈classloader和classpath hell问题&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/01/11/classloader&classpath-hell/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 QQ
             </li>
@@ -490,7 +499,14 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        
+        <p>classpath hell, 也叫 <a href="https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell" target="_blank" rel="noopener">jar hell</a>。<br>先来简单翻译一下wiki：<br>Java Classloader 是 Java Runtime Environment 的一部分，它动态地将 Java 类加载到 jvm 中。类通常是按需加载的（即只有在需要实例化这个类时才会被加载）。因为有了 classloader 的存在，java runtime 不再需要知道有哪些文件。一个 java 类通常只会被加载一次。<br>当jvm启动时，会用到三个 classloader：</p>
+<ol>
+<li>Bootstrap class loader</li>
+<li>Extensions class loader</li>
+<li>System class loader</li>
+</ol>
+<p>bootstrap class loader是 jvm 的一部分，会加载 <java_home>/jre/lib 下的所有类。</java_home></p>
+
         
     
 
@@ -538,6 +554,14 @@
             <!-- Post Prev & Next Nav -->
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
+    
+        <a href="/2018/03/29/java9-quickguide/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
     
 
     <!-- Section Spacer -->
@@ -637,7 +661,7 @@
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+                <a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
             </ul>
         </li>
         
@@ -655,7 +679,7 @@
             </a>
             <ul class="dropdown-menu">
                 <li>
-                
+                <a class="sidebar_archives-link" href="/categories/Java-基础/">Java 基础<span class="sidebar_archives-count">2</span></a>
             </ul>
         </li>
         
