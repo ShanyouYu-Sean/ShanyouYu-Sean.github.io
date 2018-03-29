@@ -43,7 +43,7 @@
     
     <title>
         
-            归档 | 
+            模块系统综述 | 
         
         小鱼肖恩
     </title>
@@ -54,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩">
+    <meta name="keywords" content="小鱼肖恩,Java 9,Java module">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -81,6 +81,9 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/atelier-lakeside-dark.min.css?9I/Zjtj37Yqln7V8hyR7Iw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -216,7 +219,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/archives/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/03/29/module-system/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -235,13 +238,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/archives/">
+    <meta property="og:url" content="http://seanthefish.com/2018/03/29/module-system/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="归档 | 小鱼肖恩">
+    <meta property="og:title" content="模块系统综述 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    
+    <meta property="og:article:tag" content="Java 9"> <meta property="og:article:tag" content="Java module"> 
 
+    
+        <meta property="article:published_time" content="Thu Mar 29 2018 16:28:00 GMT+0800">
+        <meta property="article:modified_time" content="Thu Mar 29 2018 20:20:27 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -249,13 +255,43 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/archives/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2018/03/29/module-system/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2018/03/29/module-system/index.html",
+    "headline": "模块系统综述",
+    "datePublished": "Thu Mar 29 2018 16:28:00 GMT+0800",
+    "dateModified": "Thu Mar 29 2018 20:20:27 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",Java 9,Java module小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
 
 
     
@@ -391,27 +427,29 @@
 
                     
 
-                    <!-- Index Module -->
-<div class="material-index mdl-grid">
-    
-    <div class="locate-thumbnail-symbol"></div>
+                    <!-- Post TOC -->
 
-    <!-- Pin on top -->
-    
-        
     
 
-    <!-- Normal Post -->
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+
+
+    <!-- Isolation Post Header -->
+    <!-- Post thumbnail -->
     
         <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
+        <div class="post-header_info without-thumbnail">
             <!-- Author Avatar & Name -->
             <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
             <span class="name-span">Sean Yu</span>
@@ -422,228 +460,238 @@
     
         </div>
 
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/03/29/module-system/">模块系统综述</a>
-        </p>
 
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是Mark Reinhold的The State of the Module System最新版的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/03/29/module-system/" target="_self">阅读全文</a>
-            </span>
-        </p>
 
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-9/">Java 9</a></li><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-module/">Java module</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                3月 29, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
-                
-            </div>
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+
+    
+        <div class="post-content_wrapper">
+            <p class="post-title">
+                模块系统综述
+            </p>
+            <p><strong>本文是Mark Reinhold的The State of the Module System最新版的翻译。（<a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>这份文档略有过时。其基本概念没有任何改变，但requires public关键字已被重新命名为requires transitive，并增加了几项附加功能。更新正在准备中，准备就绪后会在这里发布。</p>
+<p>本文是对<a href="http://openjdk.java.net/projects/jigsaw/" target="_blank" rel="noopener">Jigsaw项目</a>中对Java SE平台所做的增强的一个非正式的概述，并针对<a href="http://openjdk.java.net/projects/jigsaw/spec/" target="_blank" rel="noopener">JSR 376：Java平台模块系统</a>所提出。有<a href="http://openjdk.java.net/jeps/261" target="_blank" rel="noopener">相关的文档</a>描述了对特定于JDK工具和API的增强，这些超出了JSR的范围。</p>
+<p>正如JSR所述，模块系统是为了提供可靠的配置，使程序组件相互显式的声明依赖，配合其强大的封装能力，使组件允许声明其中哪些公共类型可供其他组件访问，哪些不可以，并以此来替换脆弱，容易出错的类路径机制。</p>
+<p>这些功能将直接对Java SE平台本身、Java应用程序开发人员，Java类库开发人员有利，而且也会间接地实现可伸缩平台、更高的平台完整性和更高的性能。</p>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
+<li><a href="#定义模块">定义模块</a><ul>
+<li><a href="#模块声明">模块声明</a></li>
+<li><a href="#模块打包">模块打包</a></li>
+<li><a href="#模块描述符">模块描述符</a></li>
+<li><a href="#平台模块">平台模块</a></li>
+</ul>
+</li>
+<li><a href="#使用模块">使用模块</a><ul>
+<li><a href="#模块路径">模块路径</a></li>
+<li><a href="#"></a></li>
+<li><a href="#可读性">可读性</a></li>
+<li><a href="#可访问性">可访问性</a></li>
+<li><a href="#隐含的可读性">隐含的可读性</a></li>
+</ul>
+</li>
+<li><a href="#兼容性和迁移">兼容性和迁移</a><ul>
+<li><a href="#未命名模块">未命名模块</a></li>
+<li><a href="#自下而上的迁移">自下而上的迁移</a></li>
+<li><a href="#自动模块">自动模块</a></li>
+<li><a href="#与类路径建立联系">与类路径建立联系</a></li>
+</ul>
+</li>
+<li><a href="#服务">服务</a></li>
+<li><a href="#高级特性">高级特性</a><ul>
+<li><a href="#反射">反射</a></li>
+<li><a href="#反射的可读性">反射的可读性</a></li>
+<li><a href="#classloader">classloader</a></li>
+<li><a href="#未命名模块">未命名模块</a></li>
+<li><a href="#"></a></li>
+<li><a href="#限制性导出">限制性导出</a></li>
+</ul>
+</li>
+<li><a href="#总结">总结</a></li>
+</ul>
+<p>这是本文档的第二版。相对于<a href="#http://openjdk.java.net/projects/jigsaw/spec/sotms/2015-09-08">最初版本</a>，本版引入了兼容性和迁移的解释，修改了反射可读性的描述，进行了重新排序以改善叙述的流程，并且组织了更容易定位的目录。</p>
+<p>文中仍然存在许多未解决的问题，其解决方案将反映在本文档的未来版本中。</p>
+<h3 id="定义模块"><a href="#定义模块" class="headerlink" title="定义模块"></a>定义模块</h3><p>为了提供可靠的配置和强大的封装，使其既能接近开发人员，又能被现有工具链支持，我们将模块视为一种基本的新型Java程序组件。一个模块是一个命名的，能自我描述的代码和数据的集合。其代码被组织为一组包（package），包中包含Java类和接口。</p>
+<h4 id="模块声明"><a href="#模块声明" class="headerlink" title="模块声明"></a>模块声明</h4><p>模块的自我描述体现在它的声明中，这是一种Java编程语言的新构造。最简单的模块声明只是指定其模块的名称：</p>
+<pre><code>module com.foo.bar { }
+</code></pre><p>可以添加一个或多个require子句来声明该模块在编译时和运行时依赖于其他名称的某些模块：</p>
+<pre><code>module com.foo.bar {
+    requires org.baz.qux;
+}
+</code></pre><p>最后，可以添加exports子句来声明该模块中仅有特定包中的公共类型可供其他模块使用：</p>
+<pre><code>module com.foo.bar {
+    requires org.baz.qux;
+    exports com.foo.bar.alpha;
+    exports com.foo.bar.beta;
+}
+</code></pre><p>如果一个模块的声明不包含任何exports子句，那么它将不会导出任何类型到其他模块。</p>
+<p>按照惯例，模块声明的源代码放置在名为module-info.java的文件中，该文件位于模块的源文件层次结构的根目录下。 com.foo.bar模块的源文件可能包括：</p>
+<pre><code>module-info.java
+com/foo/bar/alpha/AlphaFactory.java
+com/foo/bar/alpha/Alpha.java
+...
+</code></pre><p>按照惯例，模块声明被编译成名为module-info.class的文件，并放置在类文件输出目录中。</p>
+<p>模块名称跟包名称一样，不得相互冲突。命名模块的推荐方法是使用长期用于命名软件包的反向域名模式。因此，模块的名称通常就是其导出包名称的前缀，但这种关系不是强制性的。</p>
+<p>模块的声明不包括其版本号，也不包括它所依赖的子模块的版本号。这样做是故意为之的：模块系统的目标不是解决版本选择问题，这最好留给构建工具和容器应用程序来做。</p>
+<p>模块声明是Java编程语言的一部分，这其中的原因有几个。其中最重要的一点是，模块必须在编译时和运行时都可用，以实现各个阶段的确定性，即确保模块系统在编译时和运行时都以相同的方式工作。这反过来又能防止多种错误的发生，或者至少在编译时更早地报告错误使其更容易诊断和修复。</p>
+<p>源文件中的模块声明文件和模块中的其他源文件，将会一起编译为.class文件供Java虚拟机使用，这是建立确定性的自然方式。这种方法将立即为开发人员所熟悉，并且IDE和构建工具也会很容易支持。尤其是IDE，可以依照依赖需要为现有组件提供模块声明的提示。</p>
+<h4 id="模块打包"><a href="#模块打包" class="headerlink" title="模块打包"></a>模块打包</h4><p>现有工具已经可以创建，操作和使用JAR包，因此为了便于使用和迁移，我们定义了模块化JAR包。除了根目录中还包含了一个module-info.class文件之外，模块化的JAR包就像普通的JAR包一样。上述com.foo.bar模块的模块化JAR包（例如）可能具有以下内容：</p>
+<pre><code>META-INF/
+META-INF/MANIFEST.MF
+module-info.class
+com/foo/bar/alpha/AlphaFactory.class
+com/foo/bar/alpha/Alpha.class
+...
+</code></pre><p>模块化的JAR包可以被当作模块，在这种情况下，它的module-info.class文件被用来作为模块的声明。它也可以被放在普通的类路径上，在这种情况下，它的module-info.class文件将被忽略。模块化JAR包允许库的维护者在所有版本上发布包，该工件既可作为Java SE 9及更高版本的模块，也可作为类路径上的常规JAR包。我们期望包含jar工具的Java SE 9的实现将增强该工具，以便轻松创建模块化JAR包。</p>
+<p>为了模块化Java SE平台的JDK，我们将引入一种新的打包机制，它将超越JAR包来容纳原生代码、配置文件和其他类型的数据（如果这种数据真的存在）。这种机制利用了在源文件中的模块声明并将它们编译成.class文件，此.class文件与其他的打包方式都不同。这种被临时命名为“JMOD”的新格式是否应该成为标准化仍旧是一个悬而未决的问题。</p>
+<h4 id="模块描述符"><a href="#模块描述符" class="headerlink" title="模块描述符"></a>模块描述符</h4><p>将模块声明编译到.class文件中的最后一个优点是.class文件已经具有精确定义和可扩展的格式。因此，我们可以将module-info.class文件视为更通用的模块描述符，其中包括源代码级模块声明的编译形式，还包括在声明最初编译之后插入的.class文件中的附加信息。</p>
+<p>例如，IDE、或者记录打包时间的工具，可以插入包含文档信息的属性，例如模块的版本、标题、说明和许可证。这些信息可以在编译时和运行时通过模块系统的反射来读取，以用于写文档，程序诊断和调试。它也可以被下游工具用于构建跨操作系统的程序包。特定的属性将被标准化，但由于Java类文件格式是可扩展的，所以其他工具和框架将能够根据需要来定义附加属性。非标准的属性不会影响模块系统本身的行为。</p>
+<h3 id="平台模块"><a href="#平台模块" class="headerlink" title="平台模块"></a>平台模块</h3><p>Java SE 9的平台规范，使用模块系统将平台划分为一组模块。Java SE 9平台的实现可能包含所有的平台模块，或者可能仅包含其中的一部分。</p>
+<p>在任何情况下，模块系统专用的唯一模块是已命名的基础模块java.base。基本模块定义并导出所有平台的核心软件包，包括模块系统本身：</p>
+<pre><code>module java.base {
+    exports java.io;
+    exports java.lang;
+    exports java.lang.annotation;
+    exports java.lang.invoke;
+    exports java.lang.module;
+    exports java.lang.ref;
+    exports java.lang.reflect;
+    exports java.math;
+    exports java.net;
+    ...
+}
+</code></pre><p>基本模块始终存在。每个其他模块都隐式的建立在基本模块之上，而基本模块则不依赖于其他模块。</p>
+<p>其余的平台模块将共享“ java.”名称前缀，并有可能包括，例如，模块java.sql用于数据库连接， 模块java.xml用于XML处理，模块java.logging进行记录日志。按照惯例，尽管没有在Java SE 9平台规范中定义，但是专用于JDK的模块将共享“ jdk.”名称前缀。</p>
+<h3 id="使用模块"><a href="#使用模块" class="headerlink" title="使用模块"></a>使用模块</h3><p>单个模块可以在模块包中定义，或者内嵌于编译时或运行时环境。要在任一阶段使用它们，模块系统必须定位它们，然后确定它们如何相互关联的，并以此提供可靠的配置和强大的封装。</p>
+
+            
         </div>
-    </div>
+    
 </div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/03/29/java9-quick-guide/">Project Jigsaw:Java模块系统快速入门指南</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文为openjdk官方java模块入门指南的翻译。(
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/03/29/java9-quick-guide/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-9/">Java 9</a></li><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-module/">Java module</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                3月 29, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
+                    <!-- Paradox Post Info -->
+                    
                 
-            </div>
-        </div>
-    </div>
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
 </div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2018/03/29/module-system/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2018/03/29/module-system/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
 
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/01/11/classloader-classpath-hell/">也来谈谈classloader和classpath hell问题</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                classpath hell, 也叫 
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/01/11/classloader-classpath-hell/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/classLoader/">classLoader</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                1月 11, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
 </div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2017/12/22/hello-world/">Hello World</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                Welcome to Hexo
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2017/12/22/hello-world/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                12月 22, 2017
-            </div>
-            <div class="post_entry-footer-comment">
-                
                 
             </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/03/29/java9-quick-guide/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
         </div>
     </div>
-</div>
 
-            
-        
-    
-
-    
-
-    
-</div>
 
 
                     
@@ -721,6 +769,10 @@
 <!-- Import prettify js  -->
 
     
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
 
 
 
@@ -733,6 +785,11 @@
     });
 
     
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
         
     
     

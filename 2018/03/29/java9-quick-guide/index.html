@@ -43,7 +43,7 @@
     
     <title>
         
-            Java模块系统快速入门指南 | 
+            Project Jigsaw:Java模块系统快速入门指南 | 
         
         小鱼肖恩
     </title>
@@ -240,14 +240,14 @@
     <!-- The Open Graph protocol -->
     <meta property="og:url" content="http://seanthefish.com/2018/03/29/java9-quick-guide/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Java模块系统快速入门指南 | 小鱼肖恩">
+    <meta property="og:title" content="Project Jigsaw:Java模块系统快速入门指南 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
     <meta property="og:article:tag" content="Java 9"> <meta property="og:article:tag" content="Java module"> 
 
     
         <meta property="article:published_time" content="Thu Mar 29 2018 10:12:00 GMT+0800">
-        <meta property="article:modified_time" content="Thu Mar 29 2018 14:45:40 GMT+0800">
+        <meta property="article:modified_time" content="Thu Mar 29 2018 16:31:26 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -268,9 +268,9 @@
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "mainEntityOfPage": "http://seanthefish.com/2018/03/29/java9-quick-guide/index.html",
-    "headline": "Java模块系统快速入门指南",
+    "headline": "Project Jigsaw:Java模块系统快速入门指南",
     "datePublished": "Thu Mar 29 2018 10:12:00 GMT+0800",
-    "dateModified": "Thu Mar 29 2018 14:45:40 GMT+0800",
+    "dateModified": "Thu Mar 29 2018 16:31:26 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -471,9 +471,9 @@
     
         <div class="post-content_wrapper">
             <p class="post-title">
-                Java模块系统快速入门指南
+                Project Jigsaw:Java模块系统快速入门指南
             </p>
-            <h2 id="Project-Jigsaw-Java模块系统快速上手"><a href="#Project-Jigsaw-Java模块系统快速上手" class="headerlink" title="Project Jigsaw: Java模块系统快速上手"></a>Project Jigsaw: Java模块系统快速上手</h2><p><strong>本文为openjdk官方java模块入门指南的翻译。(<a href="http://openjdk.java.net/projects/jigsaw/quick-start" target="_blank" rel="noopener">原文地址</a>)</strong></p>
+            <p><strong>本文为openjdk官方java模块入门指南的翻译。(<a href="http://openjdk.java.net/projects/jigsaw/quick-start" target="_blank" rel="noopener">原文地址</a>)</strong></p>
 <p>本文档提供了一些让开发者快速上手Java模块系统的简单例子。<br>例子中的文件路径用/划分，文件分隔符是：，windows开发者请用\和；替换以上分隔符。</p>
 <h3 id="Greetings"><a href="#Greetings" class="headerlink" title="Greetings"></a>Greetings</h3><p>第一个例子展示了一个打印”Greetings!”字符串的简单模块。这个模块由两个源文件组成（module-info.java和Main.java）。按照惯例，模块的源文件应该在一个以模块名字为命名的目录中。</p>
 <pre><code>    src/com.greetings/com/greetings/Main.java
@@ -722,7 +722,7 @@
 
     java --patch-module java.base=mypatches/java.base ...
 </code></pre><h3 id="更多链接"><a href="#更多链接" class="headerlink" title="更多链接"></a>更多链接</h3><ul>
-<li><a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/2016-03-08" target="_blank" rel="noopener">The State of the Module System</a></li>
+<li><a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/" target="_blank" rel="noopener">The State of the Module System</a></li>
 <li><a href="http://openjdk.java.net/jeps/261" target="_blank" rel="noopener">JEP 261: Module System</a></li>
 <li><a href="http://openjdk.java.net/projects/jigsaw/" target="_blank" rel="noopener">Project Jigsaw</a></li>
 </ul>
@@ -831,6 +831,14 @@
             <!-- Post Prev & Next Nav -->
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
+    
+        <a href="/2018/03/29/module-system/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
     
 
     <!-- Section Spacer -->
