@@ -507,8 +507,7 @@ java --patch-module java.base=mypatches/java.base ...
     <entry>
       <title></title>
       <url>/about/index.html</url>
-      <content type="html"><![CDATA[<hr>
-<p>不是所有的树</p>
+      <content type="html"><![CDATA[<p>不是所有的树</p>
 <p>都能在自己的家乡终老</p>
 <p>不是所有的轨道</p>
 <p>都通往春暖花开的地方</p>
@@ -524,7 +523,6 @@ java --patch-module java.base=mypatches/java.base ...
 <hr>
 <p>想在天井里盛一只玻璃杯</p>
 <p>明朝看天下雨今夜落几寸</p>
-<hr>
 ]]></content>
     </entry>
     
