@@ -3,9 +3,10 @@
   
     
     <entry>
-      <title><![CDATA[Java模块化系统快速入门指南]]></title>
-      <url>/2018/03/29/java9/</url>
-      <content type="html"><![CDATA[<h2 id="Project-Jigsaw-java-模块系统快速上手-原文地址"><a href="#Project-Jigsaw-java-模块系统快速上手-原文地址" class="headerlink" title="Project Jigsaw: java 模块系统快速上手(原文地址)"></a>Project Jigsaw: java 模块系统快速上手(<a href="http://openjdk.java.net/projects/jigsaw/quick-start" target="_blank" rel="noopener">原文地址</a>)</h2><p>本文档提供了一些让开发者快速上手Java模块系统的简单例子。<br>例子中的文件路径用/划分，文件分隔符是：，windows开发者请用\和；替换以上分隔符。</p>
+      <title><![CDATA[Java模块系统快速入门指南]]></title>
+      <url>/2018/03/29/java9-quick-guide/</url>
+      <content type="html"><![CDATA[<h2 id="Project-Jigsaw-Java模块系统快速上手"><a href="#Project-Jigsaw-Java模块系统快速上手" class="headerlink" title="Project Jigsaw: Java模块系统快速上手"></a>Project Jigsaw: Java模块系统快速上手</h2><p><strong>本文为openjdk官方java模块入门指南的翻译。(<a href="http://openjdk.java.net/projects/jigsaw/quick-start" target="_blank" rel="noopener">原文地址</a>)</strong></p>
+<p>本文档提供了一些让开发者快速上手Java模块系统的简单例子。<br>例子中的文件路径用/划分，文件分隔符是：，windows开发者请用\和；替换以上分隔符。</p>
 <h3 id="Greetings"><a href="#Greetings" class="headerlink" title="Greetings"></a>Greetings</h3><p>第一个例子展示了一个打印”Greetings!”字符串的简单模块。这个模块由两个源文件组成（module-info.java和Main.java）。按照惯例，模块的源文件应该在一个以模块名字为命名的目录中。</p>
 <pre><code>    src/com.greetings/com/greetings/Main.java
     src/com.greetings/module-info.java
@@ -252,11 +253,18 @@
         src/java.base/java/util/concurrent/ConcurrentHashMap.java
 
     java --patch-module java.base=mypatches/java.base ...
-</code></pre>]]></content>
+</code></pre><h3 id="更多链接"><a href="#更多链接" class="headerlink" title="更多链接"></a>更多链接</h3><ul>
+<li><a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/2016-03-08" target="_blank" rel="noopener">The State of the Module System</a></li>
+<li><a href="http://openjdk.java.net/jeps/261" target="_blank" rel="noopener">JEP 261: Module System</a></li>
+<li><a href="http://openjdk.java.net/projects/jigsaw/" target="_blank" rel="noopener">Project Jigsaw</a></li>
+</ul>
+]]></content>
       
         <categories>
             
             <category> Java 基础 </category>
+            
+            <category> Java 9 </category>
             
         </categories>
         
@@ -273,7 +281,7 @@
     
     <entry>
       <title><![CDATA[也来谈谈classloader和classpath hell问题]]></title>
-      <url>/2018/01/11/classloader/</url>
+      <url>/2018/01/11/classloader-classpath-hell/</url>
       <content type="html"><![CDATA[<p>classpath hell, 也叫 <a href="https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell" target="_blank" rel="noopener">jar hell</a>。<br>先来简单翻译一下wiki：<br>Java Classloader 是 Java Runtime Environment 的一部分，它动态地将 Java 类加载到 jvm 中。类通常是按需加载的（即只有在需要实例化这个类时才会被加载）。因为有了 classloader 的存在，java runtime 不再需要知道有哪些文件。一个 java 类通常只会被加载一次。<br>当jvm启动时，会用到三个 classloader：</p>
 <ol>
 <li>Bootstrap class loader</li>

@@ -43,7 +43,7 @@
     
     <title>
         
-            也来谈谈classloader和classpath hell问题 | 
+            分类: Java 9 | 
         
         小鱼肖恩
     </title>
@@ -54,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,classLader,classPath Hell">
+    <meta name="keywords" content="小鱼肖恩">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -81,9 +81,6 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
-            
-                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
-                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/atelier-lakeside-dark.min.css?9I/Zjtj37Yqln7V8hyR7Iw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -219,7 +216,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/01/11/classloader/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/categories/Java-基础/Java-9/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -238,16 +235,13 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2018/01/11/classloader/">
+    <meta property="og:url" content="http://seanthefish.com/categories/Java-基础/Java-9/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="也来谈谈classloader和classpath hell问题 | 小鱼肖恩">
+    <meta property="og:title" content="分类: Java 9 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="classLader"> <meta property="og:article:tag" content="classPath Hell"> 
-
     
-        <meta property="article:published_time" content="Thu Jan 11 2018 12:14:47 GMT+0800">
-        <meta property="article:modified_time" content="Thu Mar 29 2018 11:52:16 GMT+0800">
+
     
 
     <!-- The Twitter Card protocol -->
@@ -255,43 +249,13 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2018/01/11/classloader/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/categories/Java-基础/Java-9/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2018/01/11/classloader/index.html",
-    "headline": "也来谈谈classloader和classpath hell问题",
-    "datePublished": "Thu Jan 11 2018 12:14:47 GMT+0800",
-    "dateModified": "Thu Mar 29 2018 11:52:16 GMT+0800",
-    "author": {
-        "@type": "Person",
-        "name": "Sean Yu",
-        "image": {
-            "@type": "ImageObject",
-            "url": "/img/avatar.png"
-        },
-        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "小鱼肖恩",
-        "logo": {
-            "@type":"ImageObject",
-            "url": "/img/favicon.png"
-        }
-    },
-    "keywords": ",classLader,classPath Hell小鱼肖恩",
-    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
-}
-</script>
 
 
     
@@ -427,29 +391,27 @@
 
                     
 
-                    <!-- Post TOC -->
+                    <!-- Index Module -->
+<div class="material-index mdl-grid">
+    
+    <div class="locate-thumbnail-symbol"></div>
 
+    <!-- Pin on top -->
+    
+        
     
 
-
-
-<!-- Layouts -->
-
-    <!-- Post Module -->
-    <div class="material-post_container">
-
-        <div class="material-post mdl-grid">
-            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
-
-                <!-- Post Header(Thumbnail & Title) -->
-                
-
-
-    <!-- Isolation Post Header -->
-    <!-- Post thumbnail -->
+    <!-- Normal Post -->
+    
+        
+            
+            
+                <!-- Isolation Thumbnail -->
+                <div class="post_entry-module mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col fade out">
+    <!-- Post_entry Header -->
     
         <!-- Post Header Info -->
-        <div class="post-header_info without-thumbnail">
+        <div class="post_entry-header_info without-thumbnail">
             <!-- Author Avatar & Name -->
             <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
             <span class="name-span">Sean Yu</span>
@@ -460,159 +422,51 @@
     
         </div>
 
+    <!-- Post_entry Content -->
+    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
+        <!-- Post Title -->
+        <p class="post_entry-title">
+            <a href="/2018/03/29/java9-quick-guide/">Java模块系统快速入门指南</a>
+        </p>
 
-
-                
-
-                <!-- Post Content -->
-                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
-    
-
-    
-        <div class="post-content_wrapper">
-            <p class="post-title">
-                也来谈谈classloader和classpath hell问题
-            </p>
-            <p>classpath hell, 也叫 <a href="https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell" target="_blank" rel="noopener">jar hell</a>。<br>先来简单翻译一下wiki：<br>Java Classloader 是 Java Runtime Environment 的一部分，它动态地将 Java 类加载到 jvm 中。类通常是按需加载的（即只有在需要实例化这个类时才会被加载）。因为有了 classloader 的存在，java runtime 不再需要知道有哪些文件。一个 java 类通常只会被加载一次。<br>当jvm启动时，会用到三个 classloader：</p>
-<ol>
-<li>Bootstrap class loader</li>
-<li>Extensions class loader</li>
-<li>System class loader</li>
-</ol>
-<p>bootstrap class loader是 jvm 的一部分，会加载 <java_home>/jre/lib 下的所有类。</java_home></p>
-
+        <!-- Post Excerpt -->
+        <p class="post_entry-excerpt">
             
-        </div>
-    
-</div>
-
-
                 
-                    <!-- Paradox Post Info -->
-                    
-                
+            
+            &nbsp;&nbsp;&nbsp;
+            <span>
+                <a href="/2018/03/29/java9-quick-guide/" target="_self">阅读全文</a>
+            </span>
+        </p>
 
-                <!-- Post Comments -->
-                
-                    
-    <!-- 使用 DISQUS_CLICK -->
-<div id="disqus-comment">
-    <div id="disqus_thread"></div>
-
-<!-- add animation -->
-<style>
-	.disqus_click_btn {
-            line-height: 30px;
-            margin: 0;
-            min-width: 50px;
-            padding: 0 14px;
-            display: inline-block;
-            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0;
-            overflow: hidden;
-            will-change: box-shadow;
-            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
-            outline: 0;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            vertical-align: middle;
-            border: 0;
-            background: rgba(158, 158, 158, .2);
-            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
-            color: #fff;
-            background-color: #757575;
-            text-shadow: 0;
-            display: none
-        }
-</style>
-	
-<div class="btn_click_load"> 
-    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
-</div>
-
-<script type="text/javascript">
-    var disqus_config = function () {
-        this.page.url = 'http://seanthefish.com/2018/01/11/classloader/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://seanthefish.com/2018/01/11/classloader/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-    };
-</script>
-
-<script type="text/ls-javascript" id="disqus-lazy-load-script">
-    $.ajax({
-        url: 'https://disqus.com/next/config.json',
-        timeout: 4000,
-        type: 'GET',
-        success: (function() {
-            var d = document;
-            var s = d.createElement('script');
-            s.src = '//seanthefish.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', + new Date());
-            (d.head || d.body).appendChild(s);
-            $('.disqus_click_btn').css('display','none');
-        })(),
-        error: function() {
-          $('.disqus_click_btn').css('display','block');
-        }
-    });
-    $('.btn_click_load').click(function() {  //click to load comments
-        (function() { // DON'T EDIT BELOW THIS LINE
-            var d = document;
-            var s = d.createElement('script');
-            s.src = '//seanthefish.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', + new Date());
-            (d.head || d.body).appendChild(s);
-        })();
-        $('.disqus_click_btn').css('display','none');
-    });
-</script>
-  	
-
-</div>
-<style>
-    #disqus-comment{
-        background-color: #eee;
-        padding: 2pc;
-    }
-</style>
-
-                
-            </div>
-
-            <!-- Post Prev & Next Nav -->
-            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
-    <!-- Prev Nav -->
-    
-        <a href="/2018/03/29/java9/" id="post_nav-newer" class="prev-content">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                <i class="material-icons">arrow_back</i>
-            </button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            新篇
-        </a>
-    
-
-    <!-- Section Spacer -->
-    <div class="section-spacer"></div>
-
-    <!-- Next Nav -->
-    
-        <a href="/2017/12/22/hello-world/" id="post_nav-older" class="next-content">
-            旧篇
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                <i class="material-icons">arrow_forward</i>
-            </button>
-        </a>
-    
-</nav>
-
-        </div>
+        <!-- Post Tags -->
+        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-9/">Java 9</a></li><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-module/">Java module</a></li></ul>
     </div>
 
+    <!-- Post_entry Footer -->
+    <div class="post_entry-footer">
+        <div class="post_entry-footer-border"></div>
+        <div class="post_entry-footer-info">
+            <div class="post_entry-footer-date">
+                3月 29, 2018
+            </div>
+            <div class="post_entry-footer-comment">
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            
+        
+    
+
+    
+
+    
+</div>
 
 
                     
@@ -690,10 +544,6 @@
 <!-- Import prettify js  -->
 
     
-        
-            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
-        
-    
 
 
 
@@ -706,11 +556,6 @@
     });
 
     
-        
-            $(function() {
-                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
-                prettyPrint();
-                })
         
     
     

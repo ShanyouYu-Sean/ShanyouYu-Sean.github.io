@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-03-29T03:52:27.431Z</updated>
+  <updated>2018-03-29T06:09:43.533Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Java模块化系统快速入门指南</title>
-    <link href="http://seanthefish.com/2018/03/29/java9/"/>
-    <id>http://seanthefish.com/2018/03/29/java9/</id>
+    <title>Java模块系统快速入门指南</title>
+    <link href="http://seanthefish.com/2018/03/29/java9-quick-guide/"/>
+    <id>http://seanthefish.com/2018/03/29/java9-quick-guide/</id>
     <published>2018-03-29T02:12:00.000Z</published>
-    <updated>2018-03-29T03:52:27.431Z</updated>
+    <updated>2018-03-29T06:09:43.533Z</updated>
     
     <summary type="html">
     
@@ -29,13 +29,15 @@
       
         
         
-          &lt;h2 id=&quot;Project-Jigsaw-java-模块系统快速上手-原文地址&quot;&gt;&lt;a href=&quot;#Project-Jigsaw-java-模块系统快速上手-原文地址&quot; class=&quot;headerlink&quot; title=&quot;Project Jigsaw: java
+          &lt;h2 id=&quot;Project-Jigsaw-Java模块系统快速上手&quot;&gt;&lt;a href=&quot;#Project-Jigsaw-Java模块系统快速上手&quot; class=&quot;headerlink&quot; title=&quot;Project Jigsaw:
         
       
     
     </summary>
     
       <category term="Java 基础" scheme="http://seanthefish.com/categories/Java-%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-%E5%9F%BA%E7%A1%80/Java-9/"/>
     
     
       <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
@@ -46,10 +48,10 @@
   
   <entry>
     <title>也来谈谈classloader和classpath hell问题</title>
-    <link href="http://seanthefish.com/2018/01/11/classloader/"/>
-    <id>http://seanthefish.com/2018/01/11/classloader/</id>
+    <link href="http://seanthefish.com/2018/01/11/classloader-classpath-hell/"/>
+    <id>http://seanthefish.com/2018/01/11/classloader-classpath-hell/</id>
     <published>2018-01-11T04:14:47.000Z</published>
-    <updated>2018-03-29T03:52:16.969Z</updated>
+    <updated>2018-03-29T05:53:24.274Z</updated>
     
     <summary type="html">
     
