@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Thu Mar 29 2018 16:28:00 GMT+0800">
-        <meta property="article:modified_time" content="Fri Mar 30 2018 21:29:40 GMT+0800">
+        <meta property="article:modified_time" content="Sat Mar 31 2018 00:14:36 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/03/29/module-system/index.html",
     "headline": "Java模块系统综述",
     "datePublished": "Thu Mar 29 2018 16:28:00 GMT+0800",
-    "dateModified": "Fri Mar 30 2018 21:29:40 GMT+0800",
+    "dateModified": "Sat Mar 31 2018 00:14:36 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -507,7 +507,7 @@
 <li><a href="#反射的可读性">反射的可读性</a></li>
 <li><a href="#类加载器">类加载器</a></li>
 <li><a href="#未命名模块与类加载器">未命名模块与类加载器</a></li>
-<li><a href="#"></a></li>
+<li><a href="#层（layer）">层（layer）</a></li>
 <li><a href="#限制性导出">限制性导出</a></li>
 </ul>
 </li>
@@ -540,7 +540,7 @@ com/foo/bar/alpha/Alpha.java
 </code></pre>
 <p>按照惯例，模块声明被编译成名为module-info.class的文件，并放置在.class文件输出目录中。</p>
 <p>模块名称跟包名称一样，不得相互冲突。命名模块的推荐方法是使用长期用于命名软件包的反向域名模式。因此，模块的名称通常就是其导出包名称的前缀，但这种关系不是强制性的。</p>
-<p>模块的声明不包括其版本号，也不包括它所依赖的子模块的版本号。这样做是故意为之的：模块系统的目标不是解决版本选择问题，这最好留给构建工具和容器应用程序来做。</p>
+<p>模块的声明不包括其版本号，也不包括它所依赖的子模块的版本号。这样做是<a href="http://openjdk.java.net/projects/jigsaw/spec/reqs/02#version-selection" target="_blank" rel="noopener">故意为之</a>的：模块系统的目标不是解决版本选择问题，这最好留给构建工具和容器应用程序来做。</p>
 <p>模块声明是Java编程语言的一部分，这其中的原因有几个。其中最重要的一点是，模块必须在编译时和运行时都可用，以实现各个阶段的确定性，即确保模块系统在编译时和运行时都以相同的方式工作。这反过来又能防止多种错误的发生，或者至少在编译时更早地报告错误使其更容易诊断和修复。</p>
 <p>源文件中的模块声明文件和模块中的其他源文件，将会一起编译为.class文件供Java虚拟机使用，这是建立确定性的自然方式。这种方法将立即为开发人员所熟悉，并且IDE和构建工具也会很容易支持。尤其是IDE，可以依照依赖需要为现有组件提供模块声明的提示。</p>
 <h4 id="模块打包"><a href="#模块打包" class="headerlink" title="模块打包"></a>模块打包</h4><p>现有工具已经可以创建，操作和使用JAR文件，因此为了便于使用和迁移，我们定义了模块化JAR文件。除了根目录中还包含了一个module-info.class文件之外，模块化的JAR文件就像普通的JAR文件一样。上述com.foo.bar模块的模块化JAR文件可能具有以下内容：</p>
@@ -746,6 +746,53 @@ if (providerName != null) {
 </blockquote>
 <h4 id="未命名模块与类加载器"><a href="#未命名模块与类加载器" class="headerlink" title="未命名模块与类加载器"></a>未命名模块与类加载器</h4><p>我们之前了解到，如果某个类型未在命名模块中定义，那么它将被视为未命名模块的成员，但与未命名模块相关的是哪个类加载器呢？</p>
 <p>事实证明，每个类加载器都有自己独特的未命名模块，它是由新ClassLoader::getUnnamedModule方法返回的。如果一个类加载器加载了一个没有在命名模块中定义的类型，那么该类型就被认为是在该加载器的未命名模块中。例如，Class类中的getModule方法将返回其加载器的未命名模块。应用加载器（application classloader）的未命名模块，会从类路径中加载不在任何模块下定义的包中的类型。</p>
+<h4 id="层（layer）"><a href="#层（layer）" class="headerlink" title="层（layer）"></a>层（layer）</h4><p>模块系统并不指定模块和类加载器之间的关系，但为了加载特定的类型，它必须以某种方式能够找到合适的加载器。因此，在运行时，模块图的实例化会生成一个层，这个层将图中的每个模块映射到负责加载该模块中的类型的唯一类加载器上。与可被发现的模块相反，引导层（boot layer）是由Java虚拟机在启动时通过解析应用程序的初始模块所创建的。</p>
+<p>大多数应用程序以及几乎当前所有的应用程序都不会使用引导层以外的层。然而，多个层可用于带有插件的复杂应用程序或容器体系结构（如应用程序服务器，IDE和测试框架）。这样的应用程序可以使用动态的类加载和模块系统的反射API，来加载和运行由一个或多个模块组成的应用程序。然而，这通常需要添加两种额外的灵活性：</p>
+<ol>
+<li><p>使用模块的应用程序可能需要不同版本的已存在的模块。例如，Java EE Web应用程序可能需要java.xml.ws模块中的不同版本的JAX-WS，而不是内置于运行时环境的版本。</p>
+</li>
+<li><p>使用模块的应用程序可能需要已经被发现的服务提供者以外的服务提供者。应用程序甚至可能嵌入自己的首选服务提供者。Web应用程序，可能包含一个它所期望的<a href="https://github.com/FasterXML/woodstox" target="_blank" rel="noopener">Woodstox XML解析器</a>版本，在这种情况下，ServiceLoader类应优先返回它需要的服务提供者而不是任何其他的服务提供者。</p>
+</li>
+</ol>
+<blockquote>
+<p>(改)一个容器应用程序可以通过解析该应用程序的初始模块，针对不同的可观察模块Universe，在现有层上为托管应用程序创建一个新层。这样的Universe可以包含可升级平台模块的替代版本以及其他已存在于较低层的非平台模块; 解析器会给这些备用模块优先。这样的一个宇宙也可以包含不同于在较低层中已经发现的服务提供者; 的ServiceLoader类将加载并将其返回从下层提供商之前返回这些提供者。</p>
+<p>（改）可以堆叠图层：可以在引导层之上构建新图层，然后可以在其上创建另一个图层。作为正常解析过程的结果，给定层中的模块可以读取该层中或下层中的模块。因此，层的模块图可以被视为通过引用包括其下的每个层的模块图。</p>
+<p>上面这一节翻译的不太好，事实上我也不太理解这一节的内容。</p>
+</blockquote>
+<h4 id="限制性导出"><a href="#限制性导出" class="headerlink" title="限制性导出"></a>限制性导出</h4><p>偶尔有必要安排某些类型在一组模块中可访问，但其他模块无法访问。</p>
+<p>在标准JDK的java.sql模块和 java.xml模块的代码实现中，使用了java.base模块中的sun.reflect包下定义的类型 。为了让代码访问sun.reflect包中的类型，我们可以简单地从java.base模块中导出该包：</p>
+<pre><code class="java">module java.base {
+    ...
+    exports sun.reflect;
+}
+</code></pre>
+<p>然而，这将使得每个sun.reflect包中的类型对所有模块都可见（因为每个模块都读取java.base），而这是不合理的，因为该包中的一些类定义了有特权的，安全敏感的方法。</p>
+<p>因此，我们扩展了模块声明以允许将包导出到一个或多个特定命名的模块，而不被其他模块可见。java.base模块的声明实际上只将sun.reflect包导出到特定的一组JDK模块：</p>
+<pre><code class="java">module java.base {
+    ...
+    exports sun.reflect to
+        java.corba,
+        java.logging,
+        java.sql,
+        java.sql.rowset,
+        jdk.scripting.nashorn;
+}
+</code></pre>
+<p>通过在模块图中添加另一种类型的边缘（此处为彩色金色），可以将这些限制性的导出显示在模块图中：</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/java%20module%20system/example-module-12.png" alt="module-pic-12"></p>
+<p>前面提到的可访问性规则如下所述：如果两种类型S并且T在不同模块中定义，并且T是public，则代码S可以在以下情况下访问T：</p>
+<ol>
+<li>S的模块读取T的模块，和</li>
+<li>T的模块直接导出T的包到S的模块，亦或是导出到所有模块。</li>
+</ol>
+<p>我们为用于反射的Module类提供了一种方法，来确定是否将包导出到特定模块，而非所有模块：</p>
+<pre><code class="java">public final class Module {
+    ...
+    public boolean isExported(String packageName, Module target);
+}
+</code></pre>
+<p>限制性的导出可能会意外地将内部的类型到处到预期之外的模块，因此我们必须小心使用它们。例如命名一个名为java.corba的模块以访问sun.reflect包中的类型。为了防止这种情况，我们可以在构建时分析相关模块，并在每个模块的描述符中记录允许依赖它的模块内容的哈希值，并使用限制性导出。在分析期间，我们需要验证，那些使用限制性导出到其他命名模块的模块，其模块内容的哈希值，与引用该模块的模块中记录的该模块的哈希值匹配。只要声明和使用限制性的导出的模块以这种方式绑定在一起，限制性的导出就可以安全地在不受信任的环境中使用。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这里描述了模块系统的很多方面，但大多数开发人员只需要使用其中的一部分。我们期望在未来几年内，大多数Java开发人员都会熟悉模块声明，模块化JAR文件，模块路径，可读性，可访问性，未命名模块，自动模块和模块化服务等基本概念。相比之下，反射可读性，层和限制性的导出等更高级功能可能被使用的可能性比较小。</p>
 
             
         </div>
