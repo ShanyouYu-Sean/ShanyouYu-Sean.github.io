@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Thu Mar 29 2018 16:28:00 GMT+0800">
-        <meta property="article:modified_time" content="Mon Apr 02 2018 10:28:21 GMT+0800">
+        <meta property="article:modified_time" content="Mon Apr 02 2018 22:28:06 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/03/29/module-system/index.html",
     "headline": "Java模块系统综述",
     "datePublished": "Thu Mar 29 2018 16:28:00 GMT+0800",
-    "dateModified": "Mon Apr 02 2018 10:28:21 GMT+0800",
+    "dateModified": "Mon Apr 02 2018 22:28:06 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -720,7 +720,7 @@ public final class Module {
 </code></pre>
 <p>其中ModuleDescriptor是java.lang.module包中的类，它的实例表示模块描述符; getClassLoader方法返回模块的类加载器; canRead方法告诉模块是否可以读取目标模块; isExported方法告诉模块是否导出给定的包。</p>
 <p>java.lang.reflect包并不是平台上唯一的反射工具。相似的工具也被添加到javax.lang.model模块，为了支持编译时的注释处理和文档生成工具。</p>
-<h4 id="反射可读性"><a href="#反射可读性" class="headerlink" title="反射可读性"></a>反射可读性</h4><p>框架是使用反射来加载，检查，并在运行时实例化的其他类的工具。Java SE平台本身的框架示例是服务加载器，资源包，动态代理和序列化，当然还有许多流行的外部框架库，用于数据库持久性，依赖注入和测试等多种用途。</p>
+<h4 id="反射的可读性"><a href="#反射的可读性" class="headerlink" title="反射的可读性"></a>反射的可读性</h4><p>框架是使用反射来加载，检查，并在运行时实例化的其他类的工具。Java SE平台本身的框架示例是服务加载器，资源包，动态代理和序列化，当然还有许多流行的外部框架库，用于数据库持久性，依赖注入和测试等多种用途。</p>
 <p>鉴于需要在运行时发现类，框架必须能够访问其构造函数之一以实例化它。但事实表明，情况通常不会如此。</p>
 <p>Java平台的<a href="https://docs.oracle.com/javase/8/docs/api/javax/xml/stream/package-summary.html" target="_blank" rel="noopener">XML解析器</a>，如果<a href="https://docs.oracle.com/javase/8/docs/api/javax/xml/stream/XMLInputFactory.html#newFactory--" target="_blank" rel="noopener">加载和实例化</a>由系统配置命名为javax.xml.stream.XMLInputFactory的<a href="https://docs.oracle.com/javase/8/docs/api/javax/xml/stream/XMLInputFactory.html" target="_blank" rel="noopener">XMLInputFactory</a>的服务实现，它就将通过ServiceLoader类，优先于所有服务提供者发现被发现。忽略异常处理和安全检查的代码大致如下所示：</p>
 <pre><code class="java">String providerName
