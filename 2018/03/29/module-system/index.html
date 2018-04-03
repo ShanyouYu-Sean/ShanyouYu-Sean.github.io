@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Thu Mar 29 2018 16:28:00 GMT+0800">
-        <meta property="article:modified_time" content="Mon Apr 02 2018 22:28:06 GMT+0800">
+        <meta property="article:modified_time" content="Tue Apr 03 2018 14:22:02 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/03/29/module-system/index.html",
     "headline": "Java模块系统综述",
     "datePublished": "Thu Mar 29 2018 16:28:00 GMT+0800",
-    "dateModified": "Mon Apr 02 2018 22:28:06 GMT+0800",
+    "dateModified": "Tue Apr 03 2018 14:22:02 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -553,7 +553,7 @@ com/foo/bar/alpha/AlphaFactory.class
 com/foo/bar/alpha/Alpha.class
 ...
 </code></pre><p>模块化的JAR文件可以被当作模块，在这种情况下，它的module-info.class文件被用来作为模块的声明。它也可以被放在普通的类路径上，在这种情况下，它的module-info.class文件将被忽略。模块化JAR文件允许库的维护者在所有版本上发布工件（artifacts），该工件既可作为Java SE 9及更高版本的模块，也可作为类路径上的常规JAR文件。我们期望包含jar工具的Java SE 9的实现将增强该工具，以便轻松创建模块化JAR文件。</p>
-<p>为了模块化Java SE平台的JDK，我们将引入一种新的打包机制（artifact format），它将超越JAR文件来容纳原生代码、配置文件和其他类型的数据（如果这种数据真的存在）。这种机制利用了在源文件中的模块声明并将它们编译成.class文件，此.class文件与其他的打包方式都不同。这种被临时命名为“JMOD”的新格式是否应该成为标准化仍旧是一个悬而未决的问题。</p>
+<p>为了模块化Java SE平台的JDK，我们将引入一种新的打包机制（artifact format），它将超越JAR文件来容纳原生代码、配置文件和其他类型的数据（如果这种数据真的存在）。这种机制利用了在源文件中的模块声明并将它们编译成.class文件，此.class文件与其他的打包方式都不同。这种被临时命名为“JMOD”的新格式是否应该成为标准化仍旧是一个悬而未决的问题。（已成为Java9的标准格式之一，请查看<a href="https://docs.oracle.com/javase/9/tools/jmod.htm" target="_blank" rel="noopener">oracle官方文档</a>）</p>
 <h4 id="模块描述符"><a href="#模块描述符" class="headerlink" title="模块描述符"></a>模块描述符</h4><p>将模块声明编译到.class文件中的最后一个优点是.class文件已经具有精确定义和可扩展的格式。因此，我们可以将module-info.class文件视为更通用的模块描述符，其中包括源代码级模块声明的编译形式，还包括在声明最初编译之后插入的.class文件中的附加信息。</p>
 <p>例如，IDE、或者记录打包时间的工具，可以插入包含文档信息的属性，例如模块的版本、标题、说明和许可证。这些信息可以在编译时和运行时通过模块系统的反射来读取，以用于写文档，程序诊断和调试。它也可以被下游工具用于构建跨操作系统的程序包。特定的属性将被标准化，但由于Java类文件格式是可扩展的，所以其他工具和框架将能够根据需要来定义附加属性。非标准的属性不会影响模块系统本身的行为。</p>
 <h3 id="平台模块"><a href="#平台模块" class="headerlink" title="平台模块"></a>平台模块</h3><p>Java SE 9的平台规范，使用模块系统将平台划分为一组模块。Java SE 9平台的实现可能包含所有的平台模块，或者可能仅包含其中的一部分。</p>
