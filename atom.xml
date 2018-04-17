@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-04-03T06:22:02.705Z</updated>
+  <updated>2018-04-17T14:27:41.124Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,40 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>用gradle构建Java 9模块化系统快速指南</title>
+    <link href="http://seanthefish.com/2018/04/11/gradle-guide-java9/"/>
+    <id>http://seanthefish.com/2018/04/11/gradle-guide-java9/</id>
+    <published>2018-04-11T08:28:00.000Z</published>
+    <updated>2018-04-17T14:27:41.124Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是gradle官方的构建Java 9模块化系统的入门指南的翻译。（&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
+    
+      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
+    
+      <category term="gradle" scheme="http://seanthefish.com/categories/Java-9/Java-module/gradle/"/>
+    
+    
+      <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
+    
+      <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
+    
+      <category term="gradle" scheme="http://seanthefish.com/tags/gradle/"/>
+    
+  </entry>
   
   <entry>
     <title>Java模块系统综述</title>
