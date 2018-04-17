@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Wed Apr 11 2018 16:28:00 GMT+0800">
-        <meta property="article:modified_time" content="Tue Apr 17 2018 22:32:25 GMT+0800">
+        <meta property="article:modified_time" content="Tue Apr 17 2018 22:40:32 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/04/11/gradle-guide-java9/index.html",
     "headline": "用gradle构建Java 9模块化系统快速指南",
     "datePublished": "Wed Apr 11 2018 16:28:00 GMT+0800",
-    "dateModified": "Tue Apr 17 2018 22:32:25 GMT+0800",
+    "dateModified": "Tue Apr 17 2018 22:40:32 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -498,7 +498,7 @@
 <li>一个命令提示符</li>
 <li>Java开发工具包（JDK），版本1.9（版本174）+</li>
 </ol>
-<h3 id="了解示例项目"><a href="#了解示例项目" class="headerlink" title="了解示例项目"></a>了解示例项目</h3><p>本指南逐步说明，如何将不使用任何Java 9功能的Java应用程序，转换为完全模块化的Java 9应用程序。原始版本的应用程序的源代码位于src/0-original目录中。它被组织为由六个子项目组成的多项目Gradle构建：</p>
+<h3 id="了解示例项目"><a href="#了解示例项目" class="headerlink" title="了解示例项目"></a>了解示例项目</h3><p>本指南逐步说明，如何将不使用任何Java 9功能的Java应用程序，转换为完全模块化的Java 9应用程序。原始版本的应用程序的源代码位于src/0-original目录中。它是由六个子项目组成的gradle多项目程序：</p>
 <ol>
 <li>fairy - java应用程序storyteller的入口点。</li>
 <li>tale - 公共Tale接口的库。</li>
@@ -526,7 +526,7 @@ And they all lived happily ever after.
 
 BUILD SUCCESSFUL
 </code></pre>
-<p>在开始修改此项目以使其使用Java 9模块之前，您需要了解项目结构的两个重要细节，就是，它使用 ServiceLoader API来在运行时加载fairy tale，并且它包含一个测试类来显示在使用Java 9之前，软件模块化是如何被破坏的。</p>
+<p>在开始修改此项目以使其使用Java 9模块之前，您需要了解项目结构的两个重要细节，就是，它使用 ServiceLoader API来在运行时加载fairy tale，并且它包含一个测试类来显示在使用Java 9之前，软件的模块封装是多么的脆弱。</p>
 <h4 id="ServiceLoader的用法"><a href="#ServiceLoader的用法" class="headerlink" title="ServiceLoader的用法"></a>ServiceLoader的用法</h4><p>Java 1.6引入了一种简单的机制，用于在运行时将一些接口（“Service”）的一组实现绑定到一个消费类。有关该特性的<a href="https://docs.oracle.com/javase/tutorial/ext/basics/spi.html" target="_blank" rel="noopener">Oracle教程</a>有点冗长，下面是它在示例应用程序中的使用方式：</p>
 <pre><code class="java">public static void main(String[] args) {
         ServiceLoader&lt;Tale&gt; loader = ServiceLoader.load(Tale.class);
