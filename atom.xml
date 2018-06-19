@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-04-17T14:40:32.887Z</updated>
+  <updated>2018-06-19T10:24:32.083Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>什么是OAuth？</title>
+    <link href="http://seanthefish.com/2018/06/19/what-is-oauth/"/>
+    <id>http://seanthefish.com/2018/06/19/what-is-oauth/</id>
+    <published>2018-06-19T06:00:00.000Z</published>
+    <updated>2018-06-19T10:24:32.083Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是Matt Raible的What the Heck is OAuth?的翻译。（&lt;a href=&quot;https://developer.okta.com/blog/2017/06/21/what-the-heck-is-oauth&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+      <category term="OIDC" scheme="http://seanthefish.com/categories/OAuth/OIDC/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+      <category term="OIDC" scheme="http://seanthefish.com/tags/OIDC/"/>
+    
+  </entry>
   
   <entry>
     <title>用gradle构建Java 9模块化系统快速指南</title>
