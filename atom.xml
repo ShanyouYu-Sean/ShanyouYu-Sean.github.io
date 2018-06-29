@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-06-29T07:07:20.362Z</updated>
+  <updated>2018-06-29T07:11:34.578Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>OAuth教程--定义</title>
-    <link href="http://seanthefish.com/2018/06/29/oauth-guide/"/>
-    <id>http://seanthefish.com/2018/06/29/oauth-guide/</id>
+    <link href="http://seanthefish.com/2018/06/29/oauth-guide-1/"/>
+    <id>http://seanthefish.com/2018/06/29/oauth-guide-1/</id>
     <published>2018-06-29T06:00:00.000Z</published>
-    <updated>2018-06-29T07:07:20.362Z</updated>
+    <updated>2018-06-29T07:11:34.578Z</updated>
     
     <summary type="html">
     
@@ -32,6 +32,24 @@
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/definitions/&quot; target=&quot;_blank&quot;
         
       
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--OAuth 2.0客户端</title>
+    <link href="http://seanthefish.com/2018/06/29/oauth-guide-2/"/>
+    <id>http://seanthefish.com/2018/06/29/oauth-guide-2/</id>
+    <published>2018-06-29T06:00:00.000Z</published>
+    <updated>2018-06-29T07:11:34.578Z</updated>
+    
+    <summary type="html">
     
     </summary>
     
