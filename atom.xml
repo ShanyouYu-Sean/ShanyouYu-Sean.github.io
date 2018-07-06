@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-06-29T10:14:39.963Z</updated>
+  <updated>2018-07-06T07:14:20.511Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,37 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>OAuth教程--单页应用</title>
+    <link href="http://seanthefish.com/2018/07/02/oauth-guide-4/"/>
+    <id>http://seanthefish.com/2018/07/02/oauth-guide-4/</id>
+    <published>2018-07-02T02:00:00.000Z</published>
+    <updated>2018-07-06T07:14:20.511Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/oauth2-clients/single-page-apps/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
     <title>OAuth教程--服务器端应用程序</title>
     <link href="http://seanthefish.com/2018/06/29/oauth-guide-3/"/>
     <id>http://seanthefish.com/2018/06/29/oauth-guide-3/</id>
     <published>2018-06-29T08:00:00.000Z</published>
-    <updated>2018-06-29T10:14:39.963Z</updated>
+    <updated>2018-07-02T02:18:50.894Z</updated>
     
     <summary type="html">
     
