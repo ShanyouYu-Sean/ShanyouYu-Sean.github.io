@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-07-09T06:26:55.280Z</updated>
+  <updated>2018-07-09T06:54:55.966Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OAuth教程--客户端ID和密钥</title>
+    <link href="http://seanthefish.com/2018/07/08/oauth-guide-8/"/>
+    <id>http://seanthefish.com/2018/07/08/oauth-guide-8/</id>
+    <published>2018-07-08T09:00:00.000Z</published>
+    <updated>2018-07-09T06:54:55.966Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
   
   <entry>
     <title>OAuth教程--注册新的应用程序</title>
