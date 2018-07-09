@@ -3,16 +3,46 @@
   
     
     <entry>
-      <title><![CDATA[OAuth教程--删除应用程序和撤消秘钥]]></title>
+      <title><![CDATA[OAuth教程--授权]]></title>
+      <url>/2018/07/08/oauth-guide-10/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>授权界面是用户在授予应用程序访问其帐户时看到的页面。以下部分介绍如何构建授权页面，界面中包含哪些组件以及如何最好地向用户显示界面。</p>
+<p>在实施OAuth服务器时，您正在使开发人员能够构建利用您的平台的应用程序，允许应用程序访问并可能修改私有用户内容，或代表用户行事。因此，您需要确保为用户提供尽可能多的信息以保护其帐户，并确保他们了解应用程序对其帐户执行的操作。</p>
+<ul>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">授权请求</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">要求用户登录</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">授权接口</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">安全考虑因素</a></li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--删除应用程序和撤消密钥]]></title>
       <url>/2018/07/08/oauth-guide-9/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
 <p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
 <h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
 <p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
-<h3 id="撤销秘密"><a href="#撤销秘密" class="headerlink" title="撤销秘密"></a>撤销秘密</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在秘钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧秘钥。撤销秘钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端秘钥提示"><br>GitHub要求确认重置应用程序的秘钥</p>
-<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧秘钥的任何已部署应用程序将无法使用旧秘钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其秘钥。</p>
+<h3 id="撤销密钥"><a href="#撤销密钥" class="headerlink" title="撤销密钥"></a>撤销密钥</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在密钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧密钥。撤销密钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端密钥提示"><br>GitHub要求确认重置应用程序的密钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧密钥的任何已部署应用程序将无法使用旧密钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其密钥。</p>
 ]]></content>
       
         <categories>
@@ -34,7 +64,7 @@
       <title><![CDATA[OAuth教程--客户端ID和密钥]]></title>
       <url>/2018/07/08/oauth-guide-8/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>此时，您已构建了应用程序注册页面，您已准备好让开发人员注册该应用程序。当开发人员注册应用程序时，您需要生成客户端ID和可选的秘钥。在生成这些字符串时，在安全性和美学方面需要考虑一些重要的事项。</p>
+<p>此时，您已构建了应用程序注册页面，您已准备好让开发人员注册该应用程序。当开发人员注册应用程序时，您需要生成客户端ID和可选的密钥。在生成这些字符串时，在安全性和美学方面需要考虑一些重要的事项。</p>
 <h3 id="客户ID"><a href="#客户ID" class="headerlink" title="客户ID"></a>客户ID</h3><p>client_id是应用程序的公共标识符。即使它是公开的，最好是第三方无法猜测，因此许多实现使用类似32字符的十六进制字符串。它在授权服务器处理的所有客户端中也必须是唯一的。如果客户端ID是可猜测的，则可以更轻松地针对任意应用程序进行网络钓鱼攻击。</p>
 <p>以下是来自支持OAuth 2.0的服务的客户端ID的一些示例：</p>
 <ul>
@@ -46,7 +76,7 @@
 <li>Windows Live： 00000000400ECB04</li>
 </ul>
 <p>如果开发人员正在创建“公共”应用程序（移动或单页应用程序），那么您根本不应该向应用程序发出client_secret。这是确保开发人员不会意外地将其包含在应用程序中的唯一方法。如果它不存在，它就不会泄露！</p>
-<p>因此，您应该询问开发人员在启动时创建的应用程序类型。您可以向他们提供以下选项，并仅为“Web服务器”应用程序发出秘钥。</p>
+<p>因此，您应该询问开发人员在启动时创建的应用程序类型。您可以向他们提供以下选项，并仅为“Web服务器”应用程序发出密钥。</p>
 <ul>
 <li>Web服务器应用程序</li>
 <li>基于浏览器的应用</li>
@@ -54,7 +84,7 @@
 <li>移动应用</li>
 </ul>
 <p>当然，没有什么可以阻止开发人员选择错误的选项，但是通过主动询问开发人员将使用哪种类型的应用程序，您可以帮助减少泄露秘密的可能性。了解正在创建哪种类型的应用程序的另一个原因是您需要注册公共客户端的重定向URL，但是对于私有客户端，重定向URL的注册在技术上是可选的。有关详细信息，请参阅<a href="https://www.oauth.com/oauth2-servers/redirect-uris/redirect-uri-registration/" target="_blank" rel="noopener">重定向URI注册</a>。</p>
-<h3 id="客户秘钥"><a href="#客户秘钥" class="headerlink" title="客户秘钥"></a>客户秘钥</h3><p>client_secret是只有应用程序和授权服务器知道的秘钥。它必须足够随机以至于无法猜测，这意味着您应该避免使用常见的UUID库，这些库通常会考虑生成它的服务器的时间戳或MAC地址。生成安全秘钥的一个好方法是使用加密安全库生成256位值并将其转换为十六进制表示。</p>
+<h3 id="客户密钥"><a href="#客户密钥" class="headerlink" title="客户密钥"></a>客户密钥</h3><p>client_secret是只有应用程序和授权服务器知道的密钥。它必须足够随机以至于无法猜测，这意味着您应该避免使用常见的UUID库，这些库通常会考虑生成它的服务器的时间戳或MAC地址。生成安全密钥的一个好方法是使用加密安全库生成256位值并将其转换为十六进制表示。</p>
 <p>在PHP中，您可以使用OpenSSL函数生成随机字节并转换为十六进制字符串：</p>
 <pre><code class="php">bin2hex(openssl_random_pseudo_bytes(32));
 </code></pre>
@@ -63,14 +93,14 @@
 <pre><code class="ruby">require &#39;securerandom&#39;
 SecureRandom.hex(32)
 </code></pre>
-<p>开发人员永远不要将其client_secret公开（基于移动或基于浏览器的）应用程序包含在内是至关重 为了帮助开发人员避免意外地执行此操作，最好使客户端秘钥在视觉上与ID不同。这种方式当开发人员复制并粘贴ID和秘钥时，很容易识别哪个是哪个。通常使用较长的字符串来表示秘钥是一种很好的方式来表明这一点，或者在秘钥前加上“秘钥”或“私密”。</p>
+<p>开发人员永远不要将其client_secret公开（基于移动或基于浏览器的）应用程序包含在内是至关重 为了帮助开发人员避免意外地执行此操作，最好使客户端密钥在视觉上与ID不同。这种方式当开发人员复制并粘贴ID和密钥时，很容易识别哪个是哪个。通常使用较长的字符串来表示密钥是一种很好的方式来表明这一点，或者在密钥前加上“密钥”或“私密”。</p>
 <h3 id="存储和显示客户端ID和密钥"><a href="#存储和显示客户端ID和密钥" class="headerlink" title="存储和显示客户端ID和密钥"></a>存储和显示客户端ID和密钥</h3><p>对于每个注册的应用程序，您需要存储公共client_id和私有client_secret。因为这些本质上等同于用户名和密码，所以不应以纯文本格式存储密钥，而应仅存储加密或散列版本，以帮助降低秘密泄露的可能性。</p>
-<p>当您发出客户端ID和密钥时，您需要将它们显示给开发人员。大多数服务为开发人员提供了一种检索现有应用程序秘钥的方法，尽管有些服务只显示一次秘钥并要求开发人员立即自行存储。如果您只显示一次秘钥，则可以存储它的散列版本以避免存储明文密码。</p>
-<p>如果您选择稍后可以向开发人员显示的方式存储密钥，则在披露秘钥时应采取额外的预防措施。保护秘钥的常用方法是在开发人员尝试检索秘钥时插入“重新授权”提示。</p>
+<p>当您发出客户端ID和密钥时，您需要将它们显示给开发人员。大多数服务为开发人员提供了一种检索现有应用程序密钥的方法，尽管有些服务只显示一次密钥并要求开发人员立即自行存储。如果您只显示一次密钥，则可以存储它的散列版本以避免存储明文密码。</p>
+<p>如果您选择稍后可以向开发人员显示的方式存储密钥，则在披露密钥时应采取额外的预防措施。保护密钥的常用方法是在开发人员尝试检索密钥时插入“重新授权”提示。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_confirm_password.png" alt="GitHub重新授权提示"><br>GitHub在进行敏感更改时要求确认您的密码</p>
 <p>该服务要求开发人员在泄密之前确认其密码。当您尝试查看或更新敏感信息时，这在Amazon或GitHub的网站中很常见。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/dropbox_show_secret.png" alt="Dropbox&#39;显示秘密&#39;确认"><br>Dropbox会隐藏秘密，直到被点击为止</p>
-<p>此外，在开发人员点击“显示”之前模糊应用程序详细信息页面上的秘钥是防止意外泄露秘密的好方法。</p>
+<p>此外，在开发人员点击“显示”之前模糊应用程序详细信息页面上的密钥是防止意外泄露秘密的好方法。</p>
 ]]></content>
       
         <categories>
@@ -108,7 +138,7 @@ SecureRandom.hex(32)
 <p>最好向开发人员展示您从中收集的信息是显示给最终用户，还是仅供内部使用。</p>
 <p>Foursquare的应用程序注册页面要求提供类似的信息，但他们还要求提供简短的标语和隐私政策URL。这些在授权提示中显示给用户。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/foursquare_create_new_application.png" alt="在Foursquare上创建一个新的应用程序"><br>在Foursquare上创建一个新的应用程序</p>
-<p>由于使用隐式授权类型的安全性考虑因素，某些服务（例如Instagram）默认情况下会禁用新应用程序的此授权类型，并要求开发人员在应用程序的设置中明确启用它，如下所示。或者，该服务可以使开发人员选择他们正在创建的应用程序类型（公共或私有），并仅向私有应用程序发出秘钥。</p>
+<p>由于使用隐式授权类型的安全性考虑因素，某些服务（例如Instagram）默认情况下会禁用新应用程序的此授权类型，并要求开发人员在应用程序的设置中明确启用它，如下所示。或者，该服务可以使开发人员选择他们正在创建的应用程序类型（公共或私有），并仅向私有应用程序发出密钥。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/instagram_create_new_application.png" alt="在Instagram上创建一个新的应用程序"><br>在Instagram上创建一个新的应用程序</p>
 <p>Instagram还提供了一个说明，指示开发人员不要用可能使应用程序看起来来自Instagram的单词命名他们的应用程序。这也是包含API使用条款链接的优势。</p>
 ]]></content>
@@ -216,7 +246,7 @@ access_token=RsT5OjbzRn430zqMLgV3Ia
       <title><![CDATA[OAuth教程--单页应用]]></title>
       <url>/2018/07/02/oauth-guide-4/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/oauth2-clients/single-page-apps/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>从网页加载Javascript和HTML源代码后，单页应用程序（或基于浏览器的应用程序）将会完全在浏览器中运行。由于浏览器可以使用所有源代码，因此无法保持客户端秘钥的机密性，因此这些应用程序不会使用该秘钥。该流程与授权代码流完全相同，但在最后一步，授权码在不使用客户端密钥的情况下交换访问令牌。</p>
+<p>从网页加载Javascript和HTML源代码后，单页应用程序（或基于浏览器的应用程序）将会完全在浏览器中运行。由于浏览器可以使用所有源代码，因此无法保持客户端密钥的机密性，因此这些应用程序不会使用该密钥。该流程与授权代码流完全相同，但在最后一步，授权码在不使用客户端密钥的情况下交换访问令牌。</p>
 <p>下图是用户与浏览器进行交互的示例，该浏览器直接向服务发出API请求。在首次从客户端下载Javascript和HTML源代码之后，浏览器会直接向服务发出API请求。在这种情况下，应用程序的服务器永远不会向服务发出API请求，因为所有事情都是直接在浏览器中处理的。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams.png" alt="用户的浏览器直接与API服务器通信"></p>
 <h3 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h3><p>授权码是客户端交换访问令牌的临时代码。代码本身从授权服务器获得，用户可以查看客户端请求的信息，并批准或拒绝该请求。</p>
@@ -254,7 +284,7 @@ access_token=RsT5OjbzRn430zqMLgV3Ia
 <p><strong>grant_type （需要）</strong><br>该grant_type参数必须设置为“authorization_code”。</p>
 <p><strong>code （需要）</strong><br>此参数用于从授权服务器接收的授权代码，该授权代码将位于此请求中的查询字符串参数“code”中。</p>
 <p><strong>redirect_uri （可能需要）</strong><br>如果重定向URL包含在初始授权请求中，则它也必须包含在令牌请求中，并且必须相同。某些服务支持注册多个重定向URL，有些服务需要在每个请求上指定重定向URL。请查看服务的文档以了解具体信息。</p>
-<p><strong>客户端识别ID（必填）</strong><br>尽管客户端秘钥未在此流程中使用，但该请求需要发送客户端ID以识别发出请求的应用程序。这意味着客户端必须将客户端ID包含为POST主体参数，而不是像包含客户端密钥时那样使用HTTP基本认证。</p>
+<p><strong>客户端识别ID（必填）</strong><br>尽管客户端密钥未在此流程中使用，但该请求需要发送客户端ID以识别发出请求的应用程序。这意味着客户端必须将客户端ID包含为POST主体参数，而不是像包含客户端密钥时那样使用HTTP基本认证。</p>
 </blockquote>
 <pre><code class="bash">POST /oauth/token HTTP/1.1
   Host: authorization-endpoint.com
@@ -263,7 +293,7 @@ access_token=RsT5OjbzRn430zqMLgV3Ia
   &amp;redirect_uri=https://example-app.com/cb
   &amp;client_id=mRkZGFjM
 </code></pre>
-<h4 id="安全考虑"><a href="#安全考虑" class="headerlink" title="安全考虑"></a>安全考虑</h4><p>通过使用“state”参数并将重定向URL限制为可认证客户端，这是授权代码授予无客户端秘钥的客户端的唯一安全方法。由于没有使用秘钥，除了使用注册的重定向URL之外，没有办法验证客户的身份。这就是为什么您需要使用OAuth 2.0服务预先注册您的重定向网址。</p>
+<h4 id="安全考虑"><a href="#安全考虑" class="headerlink" title="安全考虑"></a>安全考虑</h4><p>通过使用“state”参数并将重定向URL限制为可认证客户端，这是授权代码授予无客户端密钥的客户端的唯一安全方法。由于没有使用密钥，除了使用注册的重定向URL之外，没有办法验证客户的身份。这就是为什么您需要使用OAuth 2.0服务预先注册您的重定向网址。</p>
 <p>尽管OAuth 2.0规范并不特别要求重定向URL使用TLS加密，但强烈建议您使用它。不需要的唯一原因是因为部署SSL网站对许多开发人员来说仍然是一个障碍，这将阻碍规范的广泛采用。有些API确实需要https作为重定向端点，但许多API仍然没有。</p>
 ]]></content>
       
@@ -286,7 +316,7 @@ access_token=RsT5OjbzRn430zqMLgV3Ia
       <title><![CDATA[OAuth教程--服务器端应用程序]]></title>
       <url>/2018/06/29/oauth-guide-3/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/oauth2-clients/server-side-apps/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>服务器端应用程序是处理OAuth 2服务器时遇到的最常见的应用程序类型。这些应用程序在Web服务器上运行，其中应用程序的源代码不可供公众使用，因此他们可以保持其客户端秘钥的机密性。<br>下图说明了用户与正在与客户端通信的浏览器进行交互的典型示例。客户端和API服务器之间具有单独的安全通信通道。用户的浏览器从不直接向API服务器发出请求，所有内容都先通过客户端。</p>
+<p>服务器端应用程序是处理OAuth 2服务器时遇到的最常见的应用程序类型。这些应用程序在Web服务器上运行，其中应用程序的源代码不可供公众使用，因此他们可以保持其客户端密钥的机密性。<br>下图说明了用户与正在与客户端通信的浏览器进行交互的典型示例。客户端和API服务器之间具有单独的安全通信通道。用户的浏览器从不直接向API服务器发出请求，所有内容都先通过客户端。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-flow.png" alt="应用程序的服务器与API通信"></p>
 <p>服务器端应用程序使用authorization_code授权类型。在此流程中，在用户授权应用程序后，应用程序会收到一个“授权码”，然后它可以交换访问令牌。</p>
 <h3 id="授权码授予"><a href="#授权码授予" class="headerlink" title="授权码授予"></a>授权码授予</h3><p>授权码是客户端将为访问令牌交换的临时代码。代码本身从授权服务器获得，其中用户有机会查看客户端请求的信息，并批准或拒绝该请求。</p>
@@ -485,7 +515,7 @@ if(isset($_GET[&#39;code&#39;])) {
 <h3 id="下载示例代码"><a href="#下载示例代码" class="headerlink" title="下载示例代码"></a>下载示例代码</h3><p>您可以在GitHub上<a href="https://github.com/aaronpk/sample-oauth2-client" target="_blank" rel="noopener">下载完整的示例代码</a>。</p>
 <h3 id="用户体验考虑事项"><a href="#用户体验考虑事项" class="headerlink" title="用户体验考虑事项"></a>用户体验考虑事项</h3><p>为了使授权代码授权生效，授权页面必须出现在用户熟悉的Web浏览器中，并且不得嵌入到iframe弹出窗口或移动到应用程序中的嵌入式浏览器中。因此，对于传统的“Web应用程序”来说，用户已经在Web浏览器中并且重定向到服务器的授权页面的这种操作，是最适用的。</p>
 <h3 id="安全考虑"><a href="#安全考虑" class="headerlink" title="安全考虑"></a>安全考虑</h3><p>授权码授权是为可以保护其客户端ID和密钥的客户端设计的。因此，最适合不提供其源代码的在服务器上运行的网络应用程序。</p>
-<p>如果应用程序想要使用授权代码授权但无法保护其秘钥（即本机移动应用程序），则在请求交换访问令牌的授权代码时就不需要客户端密钥。但是，某些服务不接受没有客户端密钥的授权码交换，因此本机应用程序可能需要为这些服务使用备用方法。</p>
+<p>如果应用程序想要使用授权代码授权但无法保护其密钥（即本机移动应用程序），则在请求交换访问令牌的授权代码时就不需要客户端密钥。但是，某些服务不接受没有客户端密钥的授权码交换，因此本机应用程序可能需要为这些服务使用备用方法。</p>
 <p>尽管OAuth 2.0规范并不特别要求重定向URL使用TLS加密，但我强烈建议您使用它。不需要的唯一原因是因为部署SSL网站对许多开发人员来说仍然是一个障碍，这将阻碍规范的广泛采用。有些API确实需要https作为重定向端点，但许多API仍然没有这样要求。</p>
 ]]></content>
       
@@ -515,9 +545,9 @@ if(isset($_GET[&#39;code&#39;])) {
 <h3 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h3><p>在您的“Account Settings”页面中，点击边栏中的“Applications”链接。您将前往<a href="https://github.com/settings/applications" target="_blank" rel="noopener">https://github.com/settings/applications</a>。从那里，单击“注册新应用程序”，您将看到一个简短的表单，如下所示。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application.png" alt="在GitHub上注册一个新的应用程序"></p>
 <p>填写所需信息，包括回调URL。如果您在本地开发应用程序，则必须使用本地地址作为回调URL。由于GitHub每个应用程序只允许一个注册的回调URL，因此创建两个应用程序非常有用，一个用于开发，另一个用于生产。</p>
-<p>完成此表单后，您将进入一个页面，您可以在其中看到发给您应用程序的客户ID和秘钥，如下所示。</p>
+<p>完成此表单后，您将进入一个页面，您可以在其中看到发给您应用程序的客户ID和密钥，如下所示。</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_application_created.png" alt="GitHub应用程序已创建"></p>
-<p>客户端ID被视为公共信息，用于构建登录URL，或者可以包含在网页的Javascript源代码中。客户端秘钥必须保密。如果部署的应用程序无法保密，例如Javascript或本机应用程序，则在授权期间不会使用该秘钥。</p>
+<p>客户端ID被视为公共信息，用于构建登录URL，或者可以包含在网页的Javascript源代码中。客户端密钥必须保密。如果部署的应用程序无法保密，例如Javascript或本机应用程序，则在授权期间不会使用该密钥。</p>
 <h3 id="重定向网址和state"><a href="#重定向网址和state" class="headerlink" title="重定向网址和state"></a>重定向网址和state</h3><p>OAuth 2.0 API仅将用户重定向到已注册的URL，以防止攻击者可以获取授权代码或访问令牌的重定向攻击。某些服务可能允许您注册多个重定向URL，这可以在为Web应用程序和移动应用程序使用相同的客户端ID时，或者在开发和生产服务中使用相同的客户端ID时提供帮助。</p>
 <p>为了安全起见，重定向URL必须是https端点，以防止在授权过程中拦截令牌。如果您的重定向URL不是https，则攻击者可能能够拦截授权代码并使用它来劫持会话。如果服务允许使用非https重定向，则必须采取额外的预防措施以确保无法进行此类攻击。</p>
 <p>大多数服务将重定向URL验证视为完全匹配。这意味着重定向网址 <a href="https://example.com/auth" target="_blank" rel="noopener">https://example.com/auth</a> 不匹配 <a href="https://example.com/auth?destination=account" target="_blank" rel="noopener">https://example.com/auth?destination=account</a> 。最佳做法是避免在重定向URL中使用查询字符串参数，并使其仅包含路径。</p>
@@ -559,8 +589,8 @@ if(isset($_GET[&#39;code&#39;])) {
 <h4 id="API"><a href="#API" class="headerlink" title="API"></a>API</h4><p>规范指的是您通常认为的主要API作为“资源服务器”。资源服务器是包含用户信息的服务器，用于第三方应用程序的访问。资源服务器必须能够接受并验证访问令牌，并在用户允许的情况下授予请求。资源服务器不一定需要了解第三方的应用程序。</p>
 <h4 id="授权服务器"><a href="#授权服务器" class="headerlink" title="授权服务器"></a>授权服务器</h4><p>授权服务器是用户在请求访问其帐户时与之交互的内容。这是显示OAuth提示的服务器，以及用户批准或拒绝访问请求的位置。授权服务器还负责在用户授权应用程序后授予访问令牌。因此，授权服务器通常具有两个主URL，一个用于授权请求，一个用于用于授予访问令牌的应用程序。这些通常是这样的：<br><a href="https://authorization-server.com/authorize" target="_blank" rel="noopener">https://authorization-server.com/authorize</a><br><a href="https://authorization-server.com/token" target="_blank" rel="noopener">https://authorization-server.com/token</a></p>
 <h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><p>客户端是试图代表用户行动或访问用户资源的应用程序。在客户端可以访问用户的帐户之前，它需要获得许可。客户端通过将用户引导至授权服务器或通过直接与授权服务器断言权限，来实现无需用户交互来获得许可。</p>
-<h5 id="私密客户端（Confidential-Clients）"><a href="#私密客户端（Confidential-Clients）" class="headerlink" title="私密客户端（Confidential Clients）"></a>私密客户端（Confidential Clients）</h5><p>私密客户端是能够保持client_secret（客户端秘钥）机密性的客户端。通常，这些客户端只是在开发人员控制下的服务器上运行的应用程序，用户无法访问源代码。这些类型的应用程序通常称为“Web应用程序”，因为它们通常由Web浏览器访问。</p>
-<h5 id="公共客户端（Public-Clients）"><a href="#公共客户端（Public-Clients）" class="headerlink" title="公共客户端（Public Clients）"></a>公共客户端（Public Clients）</h5><p>公共客户端无法保持client_secret（客户端秘钥）的机密性，因此秘钥不会用于这些应用程序。移动应用和Javascript应用都被视为公共客户端。由于运行Javascript应用程序的任何人都可以轻松查看应用程序的源代码，因此可以轻松地看到秘钥。对于移动应用程序，用户通常更难发现应用程序的秘钥，但这已经是过去式，这表明移动应用程序也必须被视为公共客户端。</p>
+<h5 id="私密客户端（Confidential-Clients）"><a href="#私密客户端（Confidential-Clients）" class="headerlink" title="私密客户端（Confidential Clients）"></a>私密客户端（Confidential Clients）</h5><p>私密客户端是能够保持client_secret（客户端密钥）机密性的客户端。通常，这些客户端只是在开发人员控制下的服务器上运行的应用程序，用户无法访问源代码。这些类型的应用程序通常称为“Web应用程序”，因为它们通常由Web浏览器访问。</p>
+<h5 id="公共客户端（Public-Clients）"><a href="#公共客户端（Public-Clients）" class="headerlink" title="公共客户端（Public Clients）"></a>公共客户端（Public Clients）</h5><p>公共客户端无法保持client_secret（客户端密钥）的机密性，因此密钥不会用于这些应用程序。移动应用和Javascript应用都被视为公共客户端。由于运行Javascript应用程序的任何人都可以轻松查看应用程序的源代码，因此可以轻松地看到密钥。对于移动应用程序，用户通常更难发现应用程序的密钥，但这已经是过去式，这表明移动应用程序也必须被视为公共客户端。</p>
 <h5 id="访问令牌（Access-Token）"><a href="#访问令牌（Access-Token）" class="headerlink" title="访问令牌（Access Token）"></a>访问令牌（Access Token）</h5><p>访问令牌是向API发出经过身份验证的请求时使用的字符串。令牌表示用户已授权第三方应用程序访问该用户的帐户。令牌具有相应的访问持续时间，范围和可能的其他信息。令牌可以是自包含的（服务器可以从令牌字符串中检索所有必要的信息），也可以是数据库中的密钥。令牌对使用它们的客户端是不透明的，并且仅对授权和/或API服务器有意义。</p>
 <h5 id="刷新令牌（Refresh-Token）"><a href="#刷新令牌（Refresh-Token）" class="headerlink" title="刷新令牌（Refresh Token）"></a>刷新令牌（Refresh Token）</h5><p>刷新令牌是一个字符串，用于在访问令牌过期时获取新的访问令牌。并非所有API都使用刷新令牌。</p>
 <h5 id="授权码（Authorization-Code）"><a href="#授权码（Authorization-Code）" class="headerlink" title="授权码（Authorization Code）"></a>授权码（Authorization Code）</h5><p>授权码是服务器端应用程序流中使用的中间令牌，在<a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>中有更详细的描述。授权码在授权步骤后返回给客户端，然后客户端将其交换为访问令牌。</p>

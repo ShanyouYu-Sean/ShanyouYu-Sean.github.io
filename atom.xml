@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-07-09T07:06:13.561Z</updated>
+  <updated>2018-07-09T07:27:37.222Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,37 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>OAuth教程--删除应用程序和撤消秘钥</title>
+    <title>OAuth教程--授权</title>
+    <link href="http://seanthefish.com/2018/07/08/oauth-guide-10/"/>
+    <id>http://seanthefish.com/2018/07/08/oauth-guide-10/</id>
+    <published>2018-07-08T10:00:00.000Z</published>
+    <updated>2018-07-09T07:27:37.222Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--删除应用程序和撤消密钥</title>
     <link href="http://seanthefish.com/2018/07/08/oauth-guide-9/"/>
     <id>http://seanthefish.com/2018/07/08/oauth-guide-9/</id>
     <published>2018-07-08T10:00:00.000Z</published>
-    <updated>2018-07-09T07:06:13.561Z</updated>
+    <updated>2018-07-09T07:11:00.788Z</updated>
     
     <summary type="html">
     
@@ -47,7 +73,7 @@
     <link href="http://seanthefish.com/2018/07/08/oauth-guide-8/"/>
     <id>http://seanthefish.com/2018/07/08/oauth-guide-8/</id>
     <published>2018-07-08T09:00:00.000Z</published>
-    <updated>2018-07-09T06:54:55.966Z</updated>
+    <updated>2018-07-09T07:10:51.998Z</updated>
     
     <summary type="html">
     
@@ -73,7 +99,7 @@
     <link href="http://seanthefish.com/2018/07/08/oauth-guide-7/"/>
     <id>http://seanthefish.com/2018/07/08/oauth-guide-7/</id>
     <published>2018-07-08T08:00:00.000Z</published>
-    <updated>2018-07-09T06:26:55.280Z</updated>
+    <updated>2018-07-09T07:11:53.789Z</updated>
     
     <summary type="html">
     
@@ -151,7 +177,7 @@
     <link href="http://seanthefish.com/2018/07/02/oauth-guide-4/"/>
     <id>http://seanthefish.com/2018/07/02/oauth-guide-4/</id>
     <published>2018-07-02T02:00:00.000Z</published>
-    <updated>2018-07-06T07:14:20.511Z</updated>
+    <updated>2018-07-09T07:11:40.521Z</updated>
     
     <summary type="html">
     
@@ -177,7 +203,7 @@
     <link href="http://seanthefish.com/2018/06/29/oauth-guide-3/"/>
     <id>http://seanthefish.com/2018/06/29/oauth-guide-3/</id>
     <published>2018-06-29T08:00:00.000Z</published>
-    <updated>2018-07-02T02:18:50.894Z</updated>
+    <updated>2018-07-09T07:11:35.842Z</updated>
     
     <summary type="html">
     
@@ -203,7 +229,7 @@
     <link href="http://seanthefish.com/2018/06/29/oauth-guide-2/"/>
     <id>http://seanthefish.com/2018/06/29/oauth-guide-2/</id>
     <published>2018-06-29T07:00:00.000Z</published>
-    <updated>2018-06-29T10:05:53.736Z</updated>
+    <updated>2018-07-09T07:11:29.467Z</updated>
     
     <summary type="html">
     
@@ -229,7 +255,7 @@
     <link href="http://seanthefish.com/2018/06/29/oauth-guide-1/"/>
     <id>http://seanthefish.com/2018/06/29/oauth-guide-1/</id>
     <published>2018-06-29T06:00:00.000Z</published>
-    <updated>2018-06-29T07:11:34.578Z</updated>
+    <updated>2018-07-09T07:11:21.660Z</updated>
     
     <summary type="html">
     
