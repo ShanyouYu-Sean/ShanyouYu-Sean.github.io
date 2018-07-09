@@ -3,6 +3,34 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--删除应用程序和撤消秘钥]]></title>
+      <url>/2018/07/08/oauth-guide-9/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
+<h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
+<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
+<h3 id="撤销秘密"><a href="#撤销秘密" class="headerlink" title="撤销秘密"></a>撤销秘密</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在秘钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧秘钥。撤销秘钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端秘钥提示"><br>GitHub要求确认重置应用程序的秘钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧秘钥的任何已部署应用程序将无法使用旧秘钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其秘钥。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--客户端ID和密钥]]></title>
       <url>/2018/07/08/oauth-guide-8/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
