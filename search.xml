@@ -3,41 +3,20 @@
   
     
     <entry>
-      <title><![CDATA[OAuth教程--授权请求]]></title>
-      <url>/2018/07/10/oauth-guide-11/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
-<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
-<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
-<pre><code class="html">https://authorization-server.com/auth?response_type=code
-&amp;client_id=29352735982374239857
-&amp;redirect_uri=https://example-app.com/callback
-&amp;scope=create+delete
-&amp;state=xcoivjuywkdkhvusuye3kch
-</code></pre>
-<blockquote>
-<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
-<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
-<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
-<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
-<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
-</blockquote>
-<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
-<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
-<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
-<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
-<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
-<ul>
-<li>缺少重定向URL参数</li>
-<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
-<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
-</ul>
-<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
-<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
-<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
-<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
-<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
-<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
+      <title><![CDATA[OAuth教程--用户登录]]></title>
+      <url>/2018/07/10/oauth-guide-12/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>用户在单击应用程序的“登录”或“连接”按钮后将看到的第一件事是您的授权服务器UI。由授权服务器决定是否在每次访问授权屏幕时要求用户登录，或者让用户登录一段时间。如果授权服务器要在请求之间记住用户，那么它将需要请求用户在将来访问时授权该应用程序。</p>
+<p>通常像Twitter或Facebook这样的网站希望他们的用户在大多数时间都是签名的，因此他们为他们的授权屏幕提供了一种方式，通过不要求他们每次登录来为用户提供简化的体验。但是，根据服务以及第三方应用程序的安全要求，可能需要或允许开发人员选择要求用户在每次访问授权屏幕时登录。</p>
+<p>在Google的API中，应用程序可以添加prompt=login到授权请求，这会导致授权服务器在显示授权提示之前强制用户再次登录。</p>
+<p>在任何情况下，如果用户已退出，或者在您的服务上还没有帐户，则需要为他们提供在此屏幕上登录或创建帐户的方法。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/twitter_logged_out_auth_screen.png" alt="Twitter的授权屏幕的退出视图"></p>
+<p>因为OAuth 2.0规范中未指定，您可以按照您希望的方式对用户进行身份验证。大多数服务使用传统的用户名/密码登录来验证其用户，但这绝不是解决问题的唯一方法。在企业环境中，常见的技术是使用SAML（一种基于XML的身份验证标准）来利用组织中的现有身份验证机制，同时避免创建另一个用户名/密码数据库。</p>
+<p>一旦用户使用授权服务器进行身份验证，它就可以继续处理授权请求并将用户重定向回应用程序。通常，服务器将认为成功登录也意味着用户授权该应用程序。在这种情况下，具有登录提示的授权页面将需要包括描述以下事实的文本：通过登录，用户正在批准该授权请求。这将导致以下用户流程。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="登录和未登录的用户流程"></p>
+<p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
+<p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
 ]]></content>
       
         <categories>
@@ -56,20 +35,62 @@
     </entry>
     
     <entry>
-      <title><![CDATA[OAuth教程--用户登录]]></title>
-      <url>/2018/07/10/oauth-guide-12/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>用户在单击应用程序的“登录”或“连接”按钮后将看到的第一件事是您的授权服务器UI。由授权服务器决定是否在每次访问授权屏幕时要求用户登录，或者让用户登录一段时间。如果授权服务器要在请求之间记住用户，那么它将需要请求用户在将来访问时授权该应用程序。</p>
-<p>通常像Twitter或Facebook这样的网站希望他们的用户在大多数时间都是签名的，因此他们为他们的授权屏幕提供了一种方式，通过不要求他们每次登录来为用户提供简化的体验。但是，根据服务以及第三方应用程序的安全要求，可能需要或允许开发人员选择要求用户在每次访问授权屏幕时登录。</p>
-<p>在Google的API中，应用程序可以添加prompt=login到授权请求，这会导致授权服务器在显示授权提示之前强制用户再次登录。</p>
-<p>在任何情况下，如果用户已退出，或者在您的服务上还没有帐户，则需要为他们提供在此屏幕上登录或创建帐户的方法。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/twitter_logged_out_auth_screen.png" alt="Twitter的授权屏幕的退出视图"></p>
-<p>因为OAuth 2.0规范中未指定，您可以按照您希望的方式对用户进行身份验证。大多数服务使用传统的用户名/密码登录来验证其用户，但这绝不是解决问题的唯一方法。在企业环境中，常见的技术是使用SAML（一种基于XML的身份验证标准）来利用组织中的现有身份验证机制，同时避免创建另一个用户名/密码数据库。</p>
-<p>一旦用户使用授权服务器进行身份验证，它就可以继续处理授权请求并将用户重定向回应用程序。通常，服务器将认为成功登录也意味着用户授权该应用程序。在这种情况下，具有登录提示的授权页面将需要包括描述以下事实的文本：通过登录，用户正在批准该授权请求。这将导致以下用户流程。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="登录和未登录的用户流程"></p>
-<p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
-<p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
+      <title><![CDATA[OAuth教程--授权响应]]></title>
+      <url>/2018/07/10/oauth-guide-14/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>根据授权类型，授权服务器将使用授权码或访问令牌进行响应。</p>
+<h3 id="授权码响应"><a href="#授权码响应" class="headerlink" title="授权码响应"></a>授权码响应</h3><p>如果请求有效并且用户授予授权请求，则授权服务器生成授权码并将用户重定向回应用程序，将代码和先前的“state”值添加到重定向URL。</p>
+<h3 id="生成授权码"><a href="#生成授权码" class="headerlink" title="生成授权码"></a>生成授权码</h3><p>授权码必须在颁发后不久到期。OAuth 2.0规范建议最长生命周期为10分钟，但实际上，大多数服务设置的到期时间要短得多，大约30-60秒。授权代码本身可以是任意长度，但应记录代码的长度。</p>
+<p>因为授权代码是短暂的并且是单次使用的，所以它们是实现自编码的很好的候选者。使用此技术，您可以避免将授权代码存储在数据库中，而是将所有必要的信息编码到代码本身中。您可以使用服务器端环境的内置加密库，也可以使用JSON Web Signature（JWS）等标准。由于此字符串只需要您的授权服务器可以理解，因此不需要使用JWS等标准来实现此字符串。也就是说，如果您没有可以轻松访问的已经可用的加密库，JWS是一个很好的候选者，因为有许多语言的库可用。</p>
+<p>需要与授权代码关联的信息如下。</p>
+<blockquote>
+<p><strong>client_id</strong><br>请求此代码的客户端ID（或其他客户端标识符）</p>
+<p><strong>redirect_uri</strong><br>使用的重定向网址。需要存储，因为访问令牌请求必须包含相同的重定向URL，以便在发出访问令牌时进行验证。</p>
+<p><strong>用户信息(User info)</strong><br>用于标识此授权代码所针对的用户的某种方式，例如用户ID。</p>
+<p><strong>到期日期(Expiration Date)</strong><br>代码需要包含到期日期，以便使它能只持续很短的时间。</p>
+<p><strong>唯一ID(Unique ID)</strong><br>代码需要其自己的某种ID，以便能够检查代码之前是否已被使用过。数据库ID或随机字符串就足够了。</p>
+</blockquote>
+<p>通过创建JWS令牌或生成随机字符串并将关联信息存储在数据库中生成授权码后，您需要将用户重定向到指定的应用程序重定向URL。要添加到重定向URL的查询字符串的参数如下：</p>
+<blockquote>
+<p><strong>code</strong><br>此参数包含客户端稍后将为访问令牌交换的授权码。</p>
+<p><strong>state</strong><br>如果初始请求包含state参数，则响应还必须包含请求中的确切值。客户端将使用此将此响应与初始请求相关联。</p>
+</blockquote>
+<p>例如，授权服务器通过发送以下HTTP响应来重定向用户。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://oauth2client.com/redirect?code=g0ZGZmNjVmOWI&amp;state=dkZmYxMzE2
+</code></pre>
+<h3 id="隐式授权类型响应"><a href="#隐式授权类型响应" class="headerlink" title="隐式授权类型响应"></a>隐式授权类型响应</h3><p>使用隐式授权，授权服务器立即生成访问令牌，并使用令牌和其他参数重定向到回调URL。有关生成访问令牌的详细信息以及响应中所需参数的详细信息，请参阅访问<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/" target="_blank" rel="noopener">令牌响应</a>。</p>
+<p>例如，授权服务器通过发送以下HTTP响应来重定向用户（出于显示目的，需要额外的换行符）。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://example-app.com/redirect#access_token=MyMzFjNTk2NTk4ZTYyZGI3
+ &amp;state=dkZmYxMzE2
+ &amp;token_type=bearer
+ &amp;expires_in=86400
+</code></pre>
+<h3 id="错误响应"><a href="#错误响应" class="headerlink" title="错误响应"></a>错误响应</h3><p>在两种情况下，授权服务器应直接显示错误消息，而不是将用户重定向到应用程序：如果client_id无效，或者redirect_uri无效。在所有其他情况下，可以将用户重定向到应用程序的重定向URL以及描述错误的查询字符串参数。</p>
+<p>重定向到应用程序时，服务器会将以下参数添加到重定向URL：</p>
+<blockquote>
+<p><strong>error</strong><br>通常是以下列表中的一个ASCII错误代码：</p>
+<ul>
+<li><em>invalid_request</em> - 请求缺少参数，包含无效参数，多次包含参数，或者无效。</li>
+<li><em>access_denied</em> - 用户或授权服务器拒绝该请求</li>
+<li><em>unauthorized_client</em> - 不允许客户端使用此方法请求授权码，例如，如果机密客户端尝试使用隐式授权类型。</li>
+<li><em>unsupported_response_type8</em> - 服务器不支持使用此方法获取授权代码，例如，如果授权服务器从未实现隐式授权类型。</li>
+<li><em>invalid_scope</em> - 请求的范围无效或未知。</li>
+<li><em>server_error</em> - 服务器可以使用此错误代码重定向，而不是向用户显示500内部服务器错误页面。</li>
+<li><em>temporarily_unavailable</em> - 如果服务器正在进行维护或不可用，则可以返回此错误代码，而不是使用503 Service Unavailable状态代码进行响应。</li>
+</ul>
+<p><strong>error_description</strong><br>授权服务器可以可选地包括错误的描述。此参数旨在供开发人员理解错误，而不是要向最终用户显示。除双引号和反斜杠外，此参数的有效字符是ASCII字符集，特别是十六进制代码20-21,23-5B和5D-7E。</p>
+<p><strong>error_uri</strong><br>服务器还可以将URL返回到人类可读的网页，其中包含有关错误的信息。这是为了让开发人员获得有关错误的更多信息，而不是要向最终用户显示。</p>
+<p><strong>state</strong><br>如果请求包含状态参数，则错误响应还必须包含请求中的确切值。客户端可以使用它将此响应与初始请求相关联。</p>
+</blockquote>
+<p>例如，如果用户拒绝授权请求，服务器将构造以下URL并发送HTTP重定向响应（如下所示）（URL中的换行符用于说明目的）。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://example-app.com/redirect?error=access_denied
+ &amp;error_description=The+user+denied+the+request
+ &amp;error_uri=https%3A%2F%2Foauth2server.com%2Ferror%2Faccess_denied
+ &amp;state=wxyz1234
+</code></pre>
 ]]></content>
       
         <categories>
@@ -124,16 +145,41 @@
     </entry>
     
     <entry>
-      <title><![CDATA[OAuth教程--删除应用程序和撤消密钥]]></title>
-      <url>/2018/07/08/oauth-guide-9/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
-<h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
-<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
-<h3 id="撤销密钥"><a href="#撤销密钥" class="headerlink" title="撤销密钥"></a>撤销密钥</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在密钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧密钥。撤销密钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端密钥提示"><br>GitHub要求确认重置应用程序的密钥</p>
-<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧密钥的任何已部署应用程序将无法使用旧密钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其密钥。</p>
+      <title><![CDATA[OAuth教程--授权请求]]></title>
+      <url>/2018/07/10/oauth-guide-11/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
+<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
+<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
+<pre><code class="html">https://authorization-server.com/auth?response_type=code
+&amp;client_id=29352735982374239857
+&amp;redirect_uri=https://example-app.com/callback
+&amp;scope=create+delete
+&amp;state=xcoivjuywkdkhvusuye3kch
+</code></pre>
+<blockquote>
+<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
+<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
+<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
+<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
+<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
+</blockquote>
+<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
+<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
+<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
+<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
+<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
+<ul>
+<li>缺少重定向URL参数</li>
+<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
+<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
+</ul>
+<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
+<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
+<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
+<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
+<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
+<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
 ]]></content>
       
         <categories>
@@ -164,6 +210,34 @@
 <li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a></li>
 <li><a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">安全考虑因素</a></li>
 </ul>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--删除应用程序和撤消密钥]]></title>
+      <url>/2018/07/08/oauth-guide-9/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
+<h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
+<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
+<h3 id="撤销密钥"><a href="#撤销密钥" class="headerlink" title="撤销密钥"></a>撤销密钥</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在密钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧密钥。撤销密钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端密钥提示"><br>GitHub要求确认重置应用程序的密钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧密钥的任何已部署应用程序将无法使用旧密钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其密钥。</p>
 ]]></content>
       
         <categories>
