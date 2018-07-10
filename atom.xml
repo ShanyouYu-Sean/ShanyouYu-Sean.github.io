@@ -69,6 +69,32 @@
   </entry>
   
   <entry>
+    <title>OAuth教程--授权接口</title>
+    <link href="http://seanthefish.com/2018/07/10/oauth-guide-13/"/>
+    <id>http://seanthefish.com/2018/07/10/oauth-guide-13/</id>
+    <published>2018-07-10T10:00:00.000Z</published>
+    <updated>2018-07-10T07:15:46.115Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
     <title>OAuth教程--删除应用程序和撤消密钥</title>
     <link href="http://seanthefish.com/2018/07/08/oauth-guide-9/"/>
     <id>http://seanthefish.com/2018/07/08/oauth-guide-9/</id>
