@@ -3,74 +3,6 @@
   
     
     <entry>
-      <title><![CDATA[OAuth教程--授权接口]]></title>
-      <url>/2018/07/10/oauth-guide-13/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/oauth_authorization_screen.png" alt="示例OAuth授权屏幕"></p>
-<p>授权界面是用户在收到来自第三方应用程序的授权请求时将看到的屏幕。由于第三方应用程序会要求用户授予某种级别的访问权限，因此您需要确保用户在授权应用程序权限时做出明智决策所需的所有信息。授权接口通常具有以下组件：</p>
-<h3 id="网站名称和logo"><a href="#网站名称和logo" class="headerlink" title="网站名称和logo"></a>网站名称和logo</h3><p>该服务应该易于用户识别，因为他们需要知道他们授予哪些服务访问权限。但是，您确定主页上的网站应与授权界面一致。通常，这通过在屏幕的一定的位置显示应用程序名称和logo，或在整个网站上使用一致的颜色方案来完成。</p>
-<h3 id="用户识别"><a href="#用户识别" class="headerlink" title="用户识别"></a>用户识别</h3><p>如果用户已登录，则应向用户指明。这可能就像在屏幕的右上角显示他们的名字和照片一样，就像在网站的其他部分一样。</p>
-<p>重要的是，用户知道他们当前登录的帐户，以防他们管理多个帐户，以便他们不会错误地授权不同的用户帐户。</p>
-<h3 id="申请细节"><a href="#申请细节" class="headerlink" title="申请细节"></a>申请细节</h3><p>授权接口应清楚地标识发出请求的应用程序。除了开发人员提供的应用程序名称之外，通常还应该显示网站和应用程序的logo，这是开发人员注册应用程序时收集的信息。我们在<a href="http://seanthefish.com/2018/07/08/oauth-guide-7/">客户端注册</a>中详细讨论了这一点。</p>
-<h3 id="要求的范围"><a href="#要求的范围" class="headerlink" title="要求的范围"></a>要求的范围</h3><p>应该向用户清楚地显示授权请求中提供的范围值。范围值通常是表示特定访问的短字符串，因此应向用户显示更易于阅读的版本。</p>
-<p>例如，如果服务将“私有”范围定义为对私有配置文件数据的读取访问权限，则授权服务器应该说“此应用程序将能够查看您的私有配置文件数据”。如果范围明确允许写入访问，也应该在描述中标识，例如“此应用程序将能够编辑您的配置文件数据”。</p>
-<p>如果没有范围，但您的服务仍然授予对用户帐户的一些基本访问级别，则应该包含描述应用程序将访问的内容的消息。如果省略范围意味着应用程序获得的唯一内容是用户标识，则可以包含一条消息，以表示“此应用程序希望您登录”。</p>
-<p>有关如何在服务中有效使用范围的更多信息，请参阅<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">范围</a>。</p>
-<h3 id="请求的或有效的生命周期"><a href="#请求的或有效的生命周期" class="headerlink" title="请求的或有效的生命周期"></a>请求的或有效的生命周期</h3><p>授权服务器必须决定授权的有效期，访问令牌的持续时间以及刷新令牌的持续时间。</p>
-<p>大多数服务不会自动使授权失效，而是希望用户定期查看和撤消对他们不再想要使用的应用的访问权限。但是，默认情况下，某些服务提供有限的令牌生存期，并允许应用程序请求更长的持续时间，或强制用户在授权过期后重新授权应用程序。</p>
-<p>无论您对授权的有效期做出何种决定，都应该向用户明确说明应用程序能够代表用户执行多长时间。这可能是一个句子，加单的表明：“这个应用程序将能够访问您的帐户，直到您撤销访问”或者“这个应用程序将能够访问您的帐户，时效为一个星期。”关于令牌生命周期的更多信息请参见<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-lifetime/" target="_blank" rel="noopener">访问令牌生命周期</a>。</p>
-<h3 id="允许否认"><a href="#允许否认" class="headerlink" title="允许否认"></a>允许否认</h3><p>最后，授权服务器应该向用户提供两个按钮，以允许或拒绝该请求。如果用户未登录，则应提供登录提示而不是“允许”按钮。</p>
-<p>如果用户批准该请求，则授权服务器将生成访问令牌并使用令牌信息重定向到应用程序。如果用户单击“拒绝”，则服务器会重定向到应用程序，并在URL中显示错误代码。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> OAuth </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> OAuth </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[OAuth教程--用户登录]]></title>
-      <url>/2018/07/10/oauth-guide-12/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>用户在单击应用程序的“登录”或“连接”按钮后将看到的第一件事是您的授权服务器UI。由授权服务器决定是否在每次访问授权屏幕时要求用户登录，或者让用户登录一段时间。如果授权服务器要在请求之间记住用户，那么它将需要请求用户在将来访问时授权该应用程序。</p>
-<p>通常像Twitter或Facebook这样的网站希望他们的用户在大多数时间都是签名的，因此他们为他们的授权屏幕提供了一种方式，通过不要求他们每次登录来为用户提供简化的体验。但是，根据服务以及第三方应用程序的安全要求，可能需要或允许开发人员选择要求用户在每次访问授权屏幕时登录。</p>
-<p>在Google的API中，应用程序可以添加prompt=login到授权请求，这会导致授权服务器在显示授权提示之前强制用户再次登录。</p>
-<p>在任何情况下，如果用户已退出，或者在您的服务上还没有帐户，则需要为他们提供在此屏幕上登录或创建帐户的方法。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/twitter_logged_out_auth_screen.png" alt="Twitter的授权屏幕的退出视图"></p>
-<p>因为OAuth 2.0规范中未指定，您可以按照您希望的方式对用户进行身份验证。大多数服务使用传统的用户名/密码登录来验证其用户，但这绝不是解决问题的唯一方法。在企业环境中，常见的技术是使用SAML（一种基于XML的身份验证标准）来利用组织中的现有身份验证机制，同时避免创建另一个用户名/密码数据库。</p>
-<p>一旦用户使用授权服务器进行身份验证，它就可以继续处理授权请求并将用户重定向回应用程序。通常，服务器将认为成功登录也意味着用户授权该应用程序。在这种情况下，具有登录提示的授权页面将需要包括描述以下事实的文本：通过登录，用户正在批准该授权请求。这将导致以下用户流程。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="登录和未登录的用户流程"></p>
-<p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
-<p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> OAuth </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> OAuth </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[OAuth教程--授权请求]]></title>
       <url>/2018/07/10/oauth-guide-11/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
@@ -180,6 +112,110 @@ Location: https://example-app.com/redirect?error=access_denied
  &amp;error_uri=https%3A%2F%2Foauth2server.com%2Ferror%2Faccess_denied
  &amp;state=wxyz1234
 </code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--授权接口]]></title>
+      <url>/2018/07/10/oauth-guide-13/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/oauth_authorization_screen.png" alt="示例OAuth授权屏幕"></p>
+<p>授权界面是用户在收到来自第三方应用程序的授权请求时将看到的屏幕。由于第三方应用程序会要求用户授予某种级别的访问权限，因此您需要确保用户在授权应用程序权限时做出明智决策所需的所有信息。授权接口通常具有以下组件：</p>
+<h3 id="网站名称和logo"><a href="#网站名称和logo" class="headerlink" title="网站名称和logo"></a>网站名称和logo</h3><p>该服务应该易于用户识别，因为他们需要知道他们授予哪些服务访问权限。但是，您确定主页上的网站应与授权界面一致。通常，这通过在屏幕的一定的位置显示应用程序名称和logo，或在整个网站上使用一致的颜色方案来完成。</p>
+<h3 id="用户识别"><a href="#用户识别" class="headerlink" title="用户识别"></a>用户识别</h3><p>如果用户已登录，则应向用户指明。这可能就像在屏幕的右上角显示他们的名字和照片一样，就像在网站的其他部分一样。</p>
+<p>重要的是，用户知道他们当前登录的帐户，以防他们管理多个帐户，以便他们不会错误地授权不同的用户帐户。</p>
+<h3 id="申请细节"><a href="#申请细节" class="headerlink" title="申请细节"></a>申请细节</h3><p>授权接口应清楚地标识发出请求的应用程序。除了开发人员提供的应用程序名称之外，通常还应该显示网站和应用程序的logo，这是开发人员注册应用程序时收集的信息。我们在<a href="http://seanthefish.com/2018/07/08/oauth-guide-7/">客户端注册</a>中详细讨论了这一点。</p>
+<h3 id="要求的范围"><a href="#要求的范围" class="headerlink" title="要求的范围"></a>要求的范围</h3><p>应该向用户清楚地显示授权请求中提供的范围值。范围值通常是表示特定访问的短字符串，因此应向用户显示更易于阅读的版本。</p>
+<p>例如，如果服务将“私有”范围定义为对私有配置文件数据的读取访问权限，则授权服务器应该说“此应用程序将能够查看您的私有配置文件数据”。如果范围明确允许写入访问，也应该在描述中标识，例如“此应用程序将能够编辑您的配置文件数据”。</p>
+<p>如果没有范围，但您的服务仍然授予对用户帐户的一些基本访问级别，则应该包含描述应用程序将访问的内容的消息。如果省略范围意味着应用程序获得的唯一内容是用户标识，则可以包含一条消息，以表示“此应用程序希望您登录”。</p>
+<p>有关如何在服务中有效使用范围的更多信息，请参阅<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">范围</a>。</p>
+<h3 id="请求的或有效的生命周期"><a href="#请求的或有效的生命周期" class="headerlink" title="请求的或有效的生命周期"></a>请求的或有效的生命周期</h3><p>授权服务器必须决定授权的有效期，访问令牌的持续时间以及刷新令牌的持续时间。</p>
+<p>大多数服务不会自动使授权失效，而是希望用户定期查看和撤消对他们不再想要使用的应用的访问权限。但是，默认情况下，某些服务提供有限的令牌生存期，并允许应用程序请求更长的持续时间，或强制用户在授权过期后重新授权应用程序。</p>
+<p>无论您对授权的有效期做出何种决定，都应该向用户明确说明应用程序能够代表用户执行多长时间。这可能是一个句子，加单的表明：“这个应用程序将能够访问您的帐户，直到您撤销访问”或者“这个应用程序将能够访问您的帐户，时效为一个星期。”关于令牌生命周期的更多信息请参见<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-lifetime/" target="_blank" rel="noopener">访问令牌生命周期</a>。</p>
+<h3 id="允许否认"><a href="#允许否认" class="headerlink" title="允许否认"></a>允许否认</h3><p>最后，授权服务器应该向用户提供两个按钮，以允许或拒绝该请求。如果用户未登录，则应提供登录提示而不是“允许”按钮。</p>
+<p>如果用户批准该请求，则授权服务器将生成访问令牌并使用令牌信息重定向到应用程序。如果用户单击“拒绝”，则服务器会重定向到应用程序，并在URL中显示错误代码。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--用户登录]]></title>
+      <url>/2018/07/10/oauth-guide-12/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>用户在单击应用程序的“登录”或“连接”按钮后将看到的第一件事是您的授权服务器UI。由授权服务器决定是否在每次访问授权屏幕时要求用户登录，或者让用户登录一段时间。如果授权服务器要在请求之间记住用户，那么它将需要请求用户在将来访问时授权该应用程序。</p>
+<p>通常像Twitter或Facebook这样的网站希望他们的用户在大多数时间都是签名的，因此他们为他们的授权屏幕提供了一种方式，通过不要求他们每次登录来为用户提供简化的体验。但是，根据服务以及第三方应用程序的安全要求，可能需要或允许开发人员选择要求用户在每次访问授权屏幕时登录。</p>
+<p>在Google的API中，应用程序可以添加prompt=login到授权请求，这会导致授权服务器在显示授权提示之前强制用户再次登录。</p>
+<p>在任何情况下，如果用户已退出，或者在您的服务上还没有帐户，则需要为他们提供在此屏幕上登录或创建帐户的方法。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/twitter_logged_out_auth_screen.png" alt="Twitter的授权屏幕的退出视图"></p>
+<p>因为OAuth 2.0规范中未指定，您可以按照您希望的方式对用户进行身份验证。大多数服务使用传统的用户名/密码登录来验证其用户，但这绝不是解决问题的唯一方法。在企业环境中，常见的技术是使用SAML（一种基于XML的身份验证标准）来利用组织中的现有身份验证机制，同时避免创建另一个用户名/密码数据库。</p>
+<p>一旦用户使用授权服务器进行身份验证，它就可以继续处理授权请求并将用户重定向回应用程序。通常，服务器将认为成功登录也意味着用户授权该应用程序。在这种情况下，具有登录提示的授权页面将需要包括描述以下事实的文本：通过登录，用户正在批准该授权请求。这将导致以下用户流程。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="登录和未登录的用户流程"></p>
+<p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
+<p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--安全考虑因素]]></title>
+      <url>/2018/07/10/oauth-guide-15/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>以下是构建授权服务器时应考虑的一些已知问题。</p>
+<p>除了此处列出的注意事项外，<a href="https://tools.ietf.org/html/rfc6819" target="_blank" rel="noopener">OAuth 2.0线程模型和安全注意事项草案</a>中还提供了更多信息。</p>
+<h3 id="网络钓鱼攻击"><a href="#网络钓鱼攻击" class="headerlink" title="网络钓鱼攻击"></a>网络钓鱼攻击</h3><p>针对OAuth服务器的一种潜在攻击是网络钓鱼攻击。这是攻击者创建一个看起来与服务授权页面相同的网页的地方，该页面通常包含用户名和密码字段。然后，通过各种手段，攻击者可以诱骗用户访问该页面。除非用户可以检查浏览器的地址栏，否则该页面可能看起来与真正的授权页面相同，并且用户可以输入他们的用户名和密码。</p>
+<p>攻击者可以尝试诱骗用户访问伪造服务器的一种方法是将此网络钓鱼页面嵌入到本机应用程序中的嵌入式Web视图中。由于嵌入式Web视图不显示地址栏，因此用户无法直观地确认它们位于合法站点上。遗憾的是，这在移动应用程序中很常见，并且开发人员通常希望通过整个登录过程将用户保留在应用程序中来提供更好的用户体验。某些OAuth提供商鼓励第三方应用程序打开Web浏览器或启动提供程序的本机应用程序，而不是允许它们在Web视图中嵌入授权页面。</p>
+<h4 id="对策"><a href="#对策" class="headerlink" title="对策"></a>对策</h4><p>确保通过https提供授权服务器以避免DNS欺骗。</p>
+<p>授权服务器应该向开发人员介绍网络钓鱼攻击的风险，并且可以采取措施防止该页面嵌入到本机应用程序或iframe中。</p>
+<p>应该让用户了解网络钓鱼攻击的危险，并且应该教导用户最佳实践，例如只访问他们信任的应用程序，并定期查看应用程序列表，对不再使用的应用程序授权撤销的访问权限。</p>
+<p>该服务可能希望在允许其他用户使用该应用程序之前验证第三方应用程序。Instagram和Dropbox等服务目前都是这样做的，在初始创建应用程序时，该应用程序只能由开发人员或其他白名单用户帐户使用。应用程序提交审批并进行审核后，可以由该服务的整个用户群使用。这使服务有机会检查应用程序如何与服务交互。</p>
+<h3 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h3><p>在点击劫持攻击中，攻击者创建了一个恶意网站，在该网站中，攻击者网页上方的透明iframe中加载了授权服务器URL。攻击者的网页堆放在iframe下方，并且有一些看似无害的按钮或链接，非常小心地放在授权服务器的确认按钮下面。当用户单击误导性可见按钮时，他们实际上是单击授权页面上的隐藏按钮，从而授予对攻击者应用程序的访问权限。这允许攻击者欺骗用户在他们不知情的情况下授予访问权限。</p>
+<h4 id="对策-1"><a href="#对策-1" class="headerlink" title="对策"></a>对策</h4><p>通过确保授权URL始终直接在本机浏览器中加载，而不是嵌入在iframe中，可以防止这种攻击。较新的浏览器可以让授权服务器设置HTTP标头，X-Frame-Options旧版浏览器可以使用常见的Javascript“框架破坏”技术。</p>
+<h3 id="重定向URL操作"><a href="#重定向URL操作" class="headerlink" title="重定向URL操作"></a>重定向URL操作</h3><p>攻击者可以使用属于已知正常应用程序的客户端ID构建授权URL，将重定向URL设置为攻击者控制下的URL。如果授权服务器未验证重定向URL，并且攻击者使用“令牌”响应类型，则用户将使用URL中的访问令牌返回到攻击者的应用程序。如果客户端是公共客户端，并且攻击者拦截授权码，则攻击者还可以通过授权码交换访问令牌。</p>
+<p>另一个类似的攻击是攻击者可以欺骗用户的DNS，并且注册的重定向不是https URL。这将允许攻击者伪装成有效的重定向URL，并以这种方式窃取访问令牌。</p>
+<p>“打开重定向”攻击是指授权服务器不需要重定向URL的完全匹配，而是允许攻击者构建将重定向到攻击者网站的URL。无论这是否最终被用于窃取授权码或访问令牌，这也是一个危险，因为它可以用于发起其他无关的攻击。有关Open Redirect攻击的更多详细信息，请访问<code>https://oauth.net/advisories/2014-1-covert-redirect/</code>。</p>
+<h4 id="对策-2"><a href="#对策-2" class="headerlink" title="对策"></a>对策</h4><p>授权服务器必须要求应用程序注册一个或多个重定向URL，并且重定向到先前注册的URL必须完全匹配。</p>
+<p>授权服务器还应要求所有重定向URL均为https。由于这有时会给开发人员带来负担，特别是在应用程序运行之前，在应用程序处于“开发阶段”时允许非https重定向URL并且只能由开发人员访问，然后要求在发布应用程序之前，重定向URL应更改为https URL。</p>
 ]]></content>
       
         <categories>
