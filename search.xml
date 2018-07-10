@@ -3,6 +3,42 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--授权接口]]></title>
+      <url>/2018/07/10/oauth-guide-13/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/oauth_authorization_screen.png" alt="示例OAuth授权屏幕"></p>
+<p>授权界面是用户在收到来自第三方应用程序的授权请求时将看到的屏幕。由于第三方应用程序会要求用户授予某种级别的访问权限，因此您需要确保用户在授权应用程序权限时做出明智决策所需的所有信息。授权接口通常具有以下组件：</p>
+<h3 id="网站名称和logo"><a href="#网站名称和logo" class="headerlink" title="网站名称和logo"></a>网站名称和logo</h3><p>该服务应该易于用户识别，因为他们需要知道他们授予哪些服务访问权限。但是，您确定主页上的网站应与授权界面一致。通常，这通过在屏幕的一定的位置显示应用程序名称和logo，或在整个网站上使用一致的颜色方案来完成。</p>
+<h3 id="用户识别"><a href="#用户识别" class="headerlink" title="用户识别"></a>用户识别</h3><p>如果用户已登录，则应向用户指明。这可能就像在屏幕的右上角显示他们的名字和照片一样，就像在网站的其他部分一样。</p>
+<p>重要的是，用户知道他们当前登录的帐户，以防他们管理多个帐户，以便他们不会错误地授权不同的用户帐户。</p>
+<h3 id="申请细节"><a href="#申请细节" class="headerlink" title="申请细节"></a>申请细节</h3><p>授权接口应清楚地标识发出请求的应用程序。除了开发人员提供的应用程序名称之外，通常还应该显示网站和应用程序的logo，这是开发人员注册应用程序时收集的信息。我们在<a href="http://seanthefish.com/2018/07/08/oauth-guide-7/">客户端注册</a>中详细讨论了这一点。</p>
+<h3 id="要求的范围"><a href="#要求的范围" class="headerlink" title="要求的范围"></a>要求的范围</h3><p>应该向用户清楚地显示授权请求中提供的范围值。范围值通常是表示特定访问的短字符串，因此应向用户显示更易于阅读的版本。</p>
+<p>例如，如果服务将“私有”范围定义为对私有配置文件数据的读取访问权限，则授权服务器应该说“此应用程序将能够查看您的私有配置文件数据”。如果范围明确允许写入访问，也应该在描述中标识，例如“此应用程序将能够编辑您的配置文件数据”。</p>
+<p>如果没有范围，但您的服务仍然授予对用户帐户的一些基本访问级别，则应该包含描述应用程序将访问的内容的消息。如果省略范围意味着应用程序获得的唯一内容是用户标识，则可以包含一条消息，以表示“此应用程序希望您登录”。</p>
+<p>有关如何在服务中有效使用范围的更多信息，请参阅<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">范围</a>。</p>
+<h3 id="请求的或有效的生命周期"><a href="#请求的或有效的生命周期" class="headerlink" title="请求的或有效的生命周期"></a>请求的或有效的生命周期</h3><p>授权服务器必须决定授权的有效期，访问令牌的持续时间以及刷新令牌的持续时间。</p>
+<p>大多数服务不会自动使授权失效，而是希望用户定期查看和撤消对他们不再想要使用的应用的访问权限。但是，默认情况下，某些服务提供有限的令牌生存期，并允许应用程序请求更长的持续时间，或强制用户在授权过期后重新授权应用程序。</p>
+<p>无论您对授权的有效期做出何种决定，都应该向用户明确说明应用程序能够代表用户执行多长时间。这可能是一个句子，加单的表明：“这个应用程序将能够访问您的帐户，直到您撤销访问”或者“这个应用程序将能够访问您的帐户，时效为一个星期。”关于令牌生命周期的更多信息请参见<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-lifetime/" target="_blank" rel="noopener">访问令牌生命周期</a>。</p>
+<h3 id="允许否认"><a href="#允许否认" class="headerlink" title="允许否认"></a>允许否认</h3><p>最后，授权服务器应该向用户提供两个按钮，以允许或拒绝该请求。如果用户未登录，则应提供登录提示而不是“允许”按钮。</p>
+<p>如果用户批准该请求，则授权服务器将生成访问令牌并使用令牌信息重定向到应用程序。如果用户单击“拒绝”，则服务器会重定向到应用程序，并在URL中显示错误代码。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--用户登录]]></title>
       <url>/2018/07/10/oauth-guide-12/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
@@ -17,6 +53,59 @@
 <p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
 <p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
 <p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--授权请求]]></title>
+      <url>/2018/07/10/oauth-guide-11/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
+<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
+<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
+<pre><code class="html">https://authorization-server.com/auth?response_type=code
+&amp;client_id=29352735982374239857
+&amp;redirect_uri=https://example-app.com/callback
+&amp;scope=create+delete
+&amp;state=xcoivjuywkdkhvusuye3kch
+</code></pre>
+<blockquote>
+<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
+<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
+<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
+<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
+<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
+</blockquote>
+<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
+<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
+<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
+<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
+<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
+<ul>
+<li>缺少重定向URL参数</li>
+<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
+<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
+</ul>
+<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
+<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
+<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
+<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
+<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
+<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
 ]]></content>
       
         <categories>
@@ -91,95 +180,6 @@ Location: https://example-app.com/redirect?error=access_denied
  &amp;error_uri=https%3A%2F%2Foauth2server.com%2Ferror%2Faccess_denied
  &amp;state=wxyz1234
 </code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> OAuth </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> OAuth </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[OAuth教程--授权接口]]></title>
-      <url>/2018/07/10/oauth-guide-13/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/oauth_authorization_screen.png" alt="示例OAuth授权屏幕"></p>
-<p>授权界面是用户在收到来自第三方应用程序的授权请求时将看到的屏幕。由于第三方应用程序会要求用户授予某种级别的访问权限，因此您需要确保用户在授权应用程序权限时做出明智决策所需的所有信息。授权接口通常具有以下组件：</p>
-<h3 id="网站名称和logo"><a href="#网站名称和logo" class="headerlink" title="网站名称和logo"></a>网站名称和logo</h3><p>该服务应该易于用户识别，因为他们需要知道他们授予哪些服务访问权限。但是，您确定主页上的网站应与授权界面一致。通常，这通过在屏幕的一定的位置显示应用程序名称和logo，或在整个网站上使用一致的颜色方案来完成。</p>
-<h3 id="用户识别"><a href="#用户识别" class="headerlink" title="用户识别"></a>用户识别</h3><p>如果用户已登录，则应向用户指明。这可能就像在屏幕的右上角显示他们的名字和照片一样，就像在网站的其他部分一样。</p>
-<p>重要的是，用户知道他们当前登录的帐户，以防他们管理多个帐户，以便他们不会错误地授权不同的用户帐户。</p>
-<h3 id="申请细节"><a href="#申请细节" class="headerlink" title="申请细节"></a>申请细节</h3><p>授权接口应清楚地标识发出请求的应用程序。除了开发人员提供的应用程序名称之外，通常还应该显示网站和应用程序的logo，这是开发人员注册应用程序时收集的信息。我们在<a href="http://seanthefish.com/2018/07/08/oauth-guide-7/">客户端注册</a>中详细讨论了这一点。</p>
-<h3 id="要求的范围"><a href="#要求的范围" class="headerlink" title="要求的范围"></a>要求的范围</h3><p>应该向用户清楚地显示授权请求中提供的范围值。范围值通常是表示特定访问的短字符串，因此应向用户显示更易于阅读的版本。</p>
-<p>例如，如果服务将“私有”范围定义为对私有配置文件数据的读取访问权限，则授权服务器应该说“此应用程序将能够查看您的私有配置文件数据”。如果范围明确允许写入访问，也应该在描述中标识，例如“此应用程序将能够编辑您的配置文件数据”。</p>
-<p>如果没有范围，但您的服务仍然授予对用户帐户的一些基本访问级别，则应该包含描述应用程序将访问的内容的消息。如果省略范围意味着应用程序获得的唯一内容是用户标识，则可以包含一条消息，以表示“此应用程序希望您登录”。</p>
-<p>有关如何在服务中有效使用范围的更多信息，请参阅<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">范围</a>。</p>
-<h3 id="请求的或有效的生命周期"><a href="#请求的或有效的生命周期" class="headerlink" title="请求的或有效的生命周期"></a>请求的或有效的生命周期</h3><p>授权服务器必须决定授权的有效期，访问令牌的持续时间以及刷新令牌的持续时间。</p>
-<p>大多数服务不会自动使授权失效，而是希望用户定期查看和撤消对他们不再想要使用的应用的访问权限。但是，默认情况下，某些服务提供有限的令牌生存期，并允许应用程序请求更长的持续时间，或强制用户在授权过期后重新授权应用程序。</p>
-<p>无论您对授权的有效期做出何种决定，都应该向用户明确说明应用程序能够代表用户执行多长时间。这可能是一个句子，加单的表明：“这个应用程序将能够访问您的帐户，直到您撤销访问”或者“这个应用程序将能够访问您的帐户，时效为一个星期。”关于令牌生命周期的更多信息请参见<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-lifetime/" target="_blank" rel="noopener">访问令牌生命周期</a>。</p>
-<h3 id="允许否认"><a href="#允许否认" class="headerlink" title="允许否认"></a>允许否认</h3><p>最后，授权服务器应该向用户提供两个按钮，以允许或拒绝该请求。如果用户未登录，则应提供登录提示而不是“允许”按钮。</p>
-<p>如果用户批准该请求，则授权服务器将生成访问令牌并使用令牌信息重定向到应用程序。如果用户单击“拒绝”，则服务器会重定向到应用程序，并在URL中显示错误代码。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> OAuth </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> OAuth </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[OAuth教程--授权请求]]></title>
-      <url>/2018/07/10/oauth-guide-11/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
-<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
-<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
-<pre><code class="html">https://authorization-server.com/auth?response_type=code
-&amp;client_id=29352735982374239857
-&amp;redirect_uri=https://example-app.com/callback
-&amp;scope=create+delete
-&amp;state=xcoivjuywkdkhvusuye3kch
-</code></pre>
-<blockquote>
-<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
-<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
-<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
-<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
-<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
-</blockquote>
-<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
-<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
-<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
-<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
-<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
-<ul>
-<li>缺少重定向URL参数</li>
-<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
-<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
-</ul>
-<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
-<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
-<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
-<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
-<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
-<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
 ]]></content>
       
         <categories>
