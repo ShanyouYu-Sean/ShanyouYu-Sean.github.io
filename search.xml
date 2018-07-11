@@ -3,41 +3,85 @@
   
     
     <entry>
-      <title><![CDATA[OAuth教程--授权请求]]></title>
-      <url>/2018/07/10/oauth-guide-11/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
-<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
-<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
-<pre><code class="html">https://authorization-server.com/auth?response_type=code
-&amp;client_id=29352735982374239857
-&amp;redirect_uri=https://example-app.com/callback
-&amp;scope=create+delete
-&amp;state=xcoivjuywkdkhvusuye3kch
-</code></pre>
-<blockquote>
-<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
-<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
-<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
-<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
-<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
-</blockquote>
-<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
-<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
-<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
-<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
-<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
+      <title><![CDATA[OAuth教程--定义范围]]></title>
+      <url>/2018/07/11/oauth-guide-17/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/scope/defining-scopes/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>定义范围的好地方是分别定义读取与写入。这适用于Twitter，因为并非所有应用程序实际上都希望能够将内容发布到您的Twitter帐户，有些只需要访问您的个人资料信息。</p>
+<p>定义服务范围时的挑战是不要因定义太多范围而被忽略。用户需要能够理解他们授予的授权范围，并且这将在列表中呈现给用户。当呈现给用户时，他们需要真正了解正在发生的事情。如果您为用户设计的过度复杂，他们可能会单击“确定”直到应用程序正常工作，并忽略任何警告。</p>
+<h3 id="读与写"><a href="#读与写" class="headerlink" title="读与写"></a>读与写</h3><p>通常，在定义服务范围时，读取和写入访问是一个很好的起点。通常，对想要更新配置文件信息的应用程序，使用单独的访问控制来处理对用户的私有配置文件信息的读访问。</p>
+<p>需要能够代表用户创建内容的应用程序（例如，将推文发布到用户的时间线的第三方Twitter应用程序），与仅需要读取用户的公共数据的应用程序相比，需要获得不同级别的访问权限。</p>
+<h3 id="限制对敏感信息的访问"><a href="#限制对敏感信息的访问" class="headerlink" title="限制对敏感信息的访问"></a>限制对敏感信息的访问</h3><p>通常，对于不同安全级别的用户，服务将具有不同的配置。例如，GitHub有一个单独的范围，允许应用程序访问私有存储库。默认情况下，应用程序无权访问私有存储库，除非他们要求该范围，因此用户可以放心地知道他们选择的应用只能访问属于其组织的私有存储库。</p>
+<p>GitHub提供了一个单独的范围，允许应用程序删除repos，因此用户可以放心，随机应用程序无法绕过这个范围删除其存储库。</p>
+<p>Dropbox为应用程序提供了一种限制自己只能编辑单个文件夹中文件的方法。这为尝试使用Dropbox作为存储或同步机制的应用程序提供了一种方法，用户无需担心应用程序可能会读取其所有文件。</p>
+<h3 id="通过功能选择性地启用访问"><a href="#通过功能选择性地启用访问" class="headerlink" title="通过功能选择性地启用访问"></a>通过功能选择性地启用访问</h3><p>范围的一个很好的用途是根据所需的功能选择性地启用对用户帐户的访问。例如，Google为其各种服务提供了一组范围，例如Google云端硬盘，Gmail，YouTube等。这意味着需要访问YouTube API的应用程序也不一定能够访问用户的Gmail帐户。</p>
+<p>谷歌的API是有效使用范围的一个很好的例子。有关Google OAuth API支持的范围的完整列表，请访问<code>https://developers.google.com/oauthplayground/</code>上的 OAuth 2.0 Playground。</p>
+<h3 id="限制对可结算资源的访问"><a href="#限制对可结算资源的访问" class="headerlink" title="限制对可结算资源的访问"></a>限制对可结算资源的访问</h3><p>如果您的服务提供的API可能会导致用户产生费用，那么设定范围是防止滥用此功能的应用程序的好方法。</p>
+<p>例如，在提供使用许可内容的高级功能的情况下，提供用于聚合给定区域的人口统计数据的API。用户在使用服务时收取费用，费用取决于要查询的区域的大小。当用户登录使用完全不同的API部分的应用时，用户希望确保此应用无法使用人口统计信息API，因为这会导致该用户产生费用。在这种情况下，服务应定义一个特殊范围，例如“人口统计”。人口统计信息API应仅响应来自包含此范围的令牌的API请求。</p>
+<p>在此示例中，人口统计信息API可以使用<a href="https://www.oauth.com/oauth2-servers/token-introspection-endpoint/" target="_blank" rel="noopener">令牌自解析端点</a>来查找对此令牌有效的范围列表。如果响应在范围列表中不包含“人口统计数据”，则端点将使用HTTP 403响应拒绝该请求。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--范围(scope)]]></title>
+      <url>/2018/07/11/oauth-guide-16/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>范围(scope)是一种限制应用访问用户数据的方法。与授予对用户帐户的完全访问权限相比，为应用程序提供一种方式，来限制他们代表用户访问和操作的范围，通常是一种更有效的方式。</p>
+<p>某些应用仅使用OAuth来识别用户，因此他们只需要访问用户ID和基本配置文件信息。其他应用可能需要知道更敏感的信息，例如用户的生日，或者他们可能需要能够代表用户发布内容，或修改个人资料数据。如果用户确切知道应用程序可以和不能对他们的帐户做什么，他们将更愿意授权应用程序。范围是一种控制访问权限的方法，可帮助用户识别他们授予应用程序的权限。</p>
 <ul>
-<li>缺少重定向URL参数</li>
-<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
-<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
+<li><a href="https://www.oauth.com/oauth2-servers/scope/defining-scopes/" target="_blank" rel="noopener">定义范围</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/scope/user-interface/" target="_blank" rel="noopener">用户界面</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/scope/checkboxes/" target="_blank" rel="noopener">复选框</a></li>
 </ul>
-<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
-<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
-<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
-<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
-<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
-<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--安全考虑因素]]></title>
+      <url>/2018/07/10/oauth-guide-15/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>以下是构建授权服务器时应考虑的一些已知问题。</p>
+<p>除了此处列出的注意事项外，<a href="https://tools.ietf.org/html/rfc6819" target="_blank" rel="noopener">OAuth 2.0线程模型和安全注意事项草案</a>中还提供了更多信息。</p>
+<h3 id="网络钓鱼攻击"><a href="#网络钓鱼攻击" class="headerlink" title="网络钓鱼攻击"></a>网络钓鱼攻击</h3><p>针对OAuth服务器的一种潜在攻击是网络钓鱼攻击。这是攻击者创建一个看起来与服务授权页面相同的网页的地方，该页面通常包含用户名和密码字段。然后，通过各种手段，攻击者可以诱骗用户访问该页面。除非用户可以检查浏览器的地址栏，否则该页面可能看起来与真正的授权页面相同，并且用户可以输入他们的用户名和密码。</p>
+<p>攻击者可以尝试诱骗用户访问伪造服务器的一种方法是将此网络钓鱼页面嵌入到本机应用程序中的嵌入式Web视图中。由于嵌入式Web视图不显示地址栏，因此用户无法直观地确认它们位于合法站点上。遗憾的是，这在移动应用程序中很常见，并且开发人员通常希望通过整个登录过程将用户保留在应用程序中来提供更好的用户体验。某些OAuth提供商鼓励第三方应用程序打开Web浏览器或启动提供程序的本机应用程序，而不是允许它们在Web视图中嵌入授权页面。</p>
+<h4 id="对策"><a href="#对策" class="headerlink" title="对策"></a>对策</h4><p>确保通过https提供授权服务器以避免DNS欺骗。</p>
+<p>授权服务器应该向开发人员介绍网络钓鱼攻击的风险，并且可以采取措施防止该页面嵌入到本机应用程序或iframe中。</p>
+<p>应该让用户了解网络钓鱼攻击的危险，并且应该教导用户最佳实践，例如只访问他们信任的应用程序，并定期查看应用程序列表，对不再使用的应用程序授权撤销的访问权限。</p>
+<p>该服务可能希望在允许其他用户使用该应用程序之前验证第三方应用程序。Instagram和Dropbox等服务目前都是这样做的，在初始创建应用程序时，该应用程序只能由开发人员或其他白名单用户帐户使用。应用程序提交审批并进行审核后，可以由该服务的整个用户群使用。这使服务有机会检查应用程序如何与服务交互。</p>
+<h3 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h3><p>在点击劫持攻击中，攻击者创建了一个恶意网站，在该网站中，攻击者网页上方的透明iframe中加载了授权服务器URL。攻击者的网页堆放在iframe下方，并且有一些看似无害的按钮或链接，非常小心地放在授权服务器的确认按钮下面。当用户单击误导性可见按钮时，他们实际上是单击授权页面上的隐藏按钮，从而授予对攻击者应用程序的访问权限。这允许攻击者欺骗用户在他们不知情的情况下授予访问权限。</p>
+<h4 id="对策-1"><a href="#对策-1" class="headerlink" title="对策"></a>对策</h4><p>通过确保授权URL始终直接在本机浏览器中加载，而不是嵌入在iframe中，可以防止这种攻击。较新的浏览器可以让授权服务器设置HTTP标头，X-Frame-Options旧版浏览器可以使用常见的Javascript“框架破坏”技术。</p>
+<h3 id="重定向URL操作"><a href="#重定向URL操作" class="headerlink" title="重定向URL操作"></a>重定向URL操作</h3><p>攻击者可以使用属于已知正常应用程序的客户端ID构建授权URL，将重定向URL设置为攻击者控制下的URL。如果授权服务器未验证重定向URL，并且攻击者使用“令牌”响应类型，则用户将使用URL中的访问令牌返回到攻击者的应用程序。如果客户端是公共客户端，并且攻击者拦截授权码，则攻击者还可以通过授权码交换访问令牌。</p>
+<p>另一个类似的攻击是攻击者可以欺骗用户的DNS，并且注册的重定向不是https URL。这将允许攻击者伪装成有效的重定向URL，并以这种方式窃取访问令牌。</p>
+<p>“打开重定向”攻击是指授权服务器不需要重定向URL的完全匹配，而是允许攻击者构建将重定向到攻击者网站的URL。无论这是否最终被用于窃取授权码或访问令牌，这也是一个危险，因为它可以用于发起其他无关的攻击。有关Open Redirect攻击的更多详细信息，请访问<code>https://oauth.net/advisories/2014-1-covert-redirect/</code>。</p>
+<h4 id="对策-2"><a href="#对策-2" class="headerlink" title="对策"></a>对策</h4><p>授权服务器必须要求应用程序注册一个或多个重定向URL，并且重定向到先前注册的URL必须完全匹配。</p>
+<p>授权服务器还应要求所有重定向URL均为https。由于这有时会给开发人员带来负担，特别是在应用程序运行之前，在应用程序处于“开发阶段”时允许非https重定向URL并且只能由开发人员访问，然后要求在发布应用程序之前，重定向URL应更改为https URL。</p>
 ]]></content>
       
         <categories>
@@ -198,24 +242,41 @@ Location: https://example-app.com/redirect?error=access_denied
     </entry>
     
     <entry>
-      <title><![CDATA[OAuth教程--安全考虑因素]]></title>
-      <url>/2018/07/10/oauth-guide-15/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>以下是构建授权服务器时应考虑的一些已知问题。</p>
-<p>除了此处列出的注意事项外，<a href="https://tools.ietf.org/html/rfc6819" target="_blank" rel="noopener">OAuth 2.0线程模型和安全注意事项草案</a>中还提供了更多信息。</p>
-<h3 id="网络钓鱼攻击"><a href="#网络钓鱼攻击" class="headerlink" title="网络钓鱼攻击"></a>网络钓鱼攻击</h3><p>针对OAuth服务器的一种潜在攻击是网络钓鱼攻击。这是攻击者创建一个看起来与服务授权页面相同的网页的地方，该页面通常包含用户名和密码字段。然后，通过各种手段，攻击者可以诱骗用户访问该页面。除非用户可以检查浏览器的地址栏，否则该页面可能看起来与真正的授权页面相同，并且用户可以输入他们的用户名和密码。</p>
-<p>攻击者可以尝试诱骗用户访问伪造服务器的一种方法是将此网络钓鱼页面嵌入到本机应用程序中的嵌入式Web视图中。由于嵌入式Web视图不显示地址栏，因此用户无法直观地确认它们位于合法站点上。遗憾的是，这在移动应用程序中很常见，并且开发人员通常希望通过整个登录过程将用户保留在应用程序中来提供更好的用户体验。某些OAuth提供商鼓励第三方应用程序打开Web浏览器或启动提供程序的本机应用程序，而不是允许它们在Web视图中嵌入授权页面。</p>
-<h4 id="对策"><a href="#对策" class="headerlink" title="对策"></a>对策</h4><p>确保通过https提供授权服务器以避免DNS欺骗。</p>
-<p>授权服务器应该向开发人员介绍网络钓鱼攻击的风险，并且可以采取措施防止该页面嵌入到本机应用程序或iframe中。</p>
-<p>应该让用户了解网络钓鱼攻击的危险，并且应该教导用户最佳实践，例如只访问他们信任的应用程序，并定期查看应用程序列表，对不再使用的应用程序授权撤销的访问权限。</p>
-<p>该服务可能希望在允许其他用户使用该应用程序之前验证第三方应用程序。Instagram和Dropbox等服务目前都是这样做的，在初始创建应用程序时，该应用程序只能由开发人员或其他白名单用户帐户使用。应用程序提交审批并进行审核后，可以由该服务的整个用户群使用。这使服务有机会检查应用程序如何与服务交互。</p>
-<h3 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h3><p>在点击劫持攻击中，攻击者创建了一个恶意网站，在该网站中，攻击者网页上方的透明iframe中加载了授权服务器URL。攻击者的网页堆放在iframe下方，并且有一些看似无害的按钮或链接，非常小心地放在授权服务器的确认按钮下面。当用户单击误导性可见按钮时，他们实际上是单击授权页面上的隐藏按钮，从而授予对攻击者应用程序的访问权限。这允许攻击者欺骗用户在他们不知情的情况下授予访问权限。</p>
-<h4 id="对策-1"><a href="#对策-1" class="headerlink" title="对策"></a>对策</h4><p>通过确保授权URL始终直接在本机浏览器中加载，而不是嵌入在iframe中，可以防止这种攻击。较新的浏览器可以让授权服务器设置HTTP标头，X-Frame-Options旧版浏览器可以使用常见的Javascript“框架破坏”技术。</p>
-<h3 id="重定向URL操作"><a href="#重定向URL操作" class="headerlink" title="重定向URL操作"></a>重定向URL操作</h3><p>攻击者可以使用属于已知正常应用程序的客户端ID构建授权URL，将重定向URL设置为攻击者控制下的URL。如果授权服务器未验证重定向URL，并且攻击者使用“令牌”响应类型，则用户将使用URL中的访问令牌返回到攻击者的应用程序。如果客户端是公共客户端，并且攻击者拦截授权码，则攻击者还可以通过授权码交换访问令牌。</p>
-<p>另一个类似的攻击是攻击者可以欺骗用户的DNS，并且注册的重定向不是https URL。这将允许攻击者伪装成有效的重定向URL，并以这种方式窃取访问令牌。</p>
-<p>“打开重定向”攻击是指授权服务器不需要重定向URL的完全匹配，而是允许攻击者构建将重定向到攻击者网站的URL。无论这是否最终被用于窃取授权码或访问令牌，这也是一个危险，因为它可以用于发起其他无关的攻击。有关Open Redirect攻击的更多详细信息，请访问<code>https://oauth.net/advisories/2014-1-covert-redirect/</code>。</p>
-<h4 id="对策-2"><a href="#对策-2" class="headerlink" title="对策"></a>对策</h4><p>授权服务器必须要求应用程序注册一个或多个重定向URL，并且重定向到先前注册的URL必须完全匹配。</p>
-<p>授权服务器还应要求所有重定向URL均为https。由于这有时会给开发人员带来负担，特别是在应用程序运行之前，在应用程序处于“开发阶段”时允许非https重定向URL并且只能由开发人员访问，然后要求在发布应用程序之前，重定向URL应更改为https URL。</p>
+      <title><![CDATA[OAuth教程--授权请求]]></title>
+      <url>/2018/07/10/oauth-guide-11/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
+<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
+<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
+<pre><code class="html">https://authorization-server.com/auth?response_type=code
+&amp;client_id=29352735982374239857
+&amp;redirect_uri=https://example-app.com/callback
+&amp;scope=create+delete
+&amp;state=xcoivjuywkdkhvusuye3kch
+</code></pre>
+<blockquote>
+<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
+<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
+<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
+<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
+<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
+</blockquote>
+<h3 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h3><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
+<h3 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h3><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
+<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
+<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
+<h3 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h3><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
+<ul>
+<li>缺少重定向URL参数</li>
+<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
+<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
+</ul>
+<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
+<h3 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h3><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
+<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
+<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
+<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
+<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
 ]]></content>
       
         <categories>

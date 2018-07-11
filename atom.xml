@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-07-10T03:52:15.799Z</updated>
+  <updated>2018-07-11T09:41:16.482Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>OAuth教程--授权请求</title>
-    <link href="http://seanthefish.com/2018/07/10/oauth-guide-11/"/>
-    <id>http://seanthefish.com/2018/07/10/oauth-guide-11/</id>
-    <published>2018-07-10T10:00:00.000Z</published>
-    <updated>2018-07-10T03:52:15.799Z</updated>
+    <title>OAuth教程--定义范围</title>
+    <link href="http://seanthefish.com/2018/07/11/oauth-guide-17/"/>
+    <id>http://seanthefish.com/2018/07/11/oauth-guide-17/</id>
+    <published>2018-07-10T20:00:00.000Z</published>
+    <updated>2018-07-11T09:41:16.482Z</updated>
     
     <summary type="html">
     
@@ -29,7 +29,59 @@
       
         
         
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/&quot; target=&quot;_blank&quot;
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/scope/defining-scopes/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--范围(scope)</title>
+    <link href="http://seanthefish.com/2018/07/11/oauth-guide-16/"/>
+    <id>http://seanthefish.com/2018/07/11/oauth-guide-16/</id>
+    <published>2018-07-10T19:00:00.000Z</published>
+    <updated>2018-07-11T07:53:17.538Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/scope/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--安全考虑因素</title>
+    <link href="http://seanthefish.com/2018/07/10/oauth-guide-15/"/>
+    <id>http://seanthefish.com/2018/07/10/oauth-guide-15/</id>
+    <published>2018-07-10T14:00:00.000Z</published>
+    <updated>2018-07-11T07:27:01.252Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/security-considerations/&quot; target=&quot;_blank&quot;
         
       
     
@@ -46,8 +98,8 @@
     <title>OAuth教程--授权响应</title>
     <link href="http://seanthefish.com/2018/07/10/oauth-guide-14/"/>
     <id>http://seanthefish.com/2018/07/10/oauth-guide-14/</id>
-    <published>2018-07-10T10:00:00.000Z</published>
-    <updated>2018-07-10T07:36:30.308Z</updated>
+    <published>2018-07-10T13:00:00.000Z</published>
+    <updated>2018-07-11T07:26:54.971Z</updated>
     
     <summary type="html">
     
@@ -72,8 +124,8 @@
     <title>OAuth教程--授权接口</title>
     <link href="http://seanthefish.com/2018/07/10/oauth-guide-13/"/>
     <id>http://seanthefish.com/2018/07/10/oauth-guide-13/</id>
-    <published>2018-07-10T10:00:00.000Z</published>
-    <updated>2018-07-10T07:15:46.115Z</updated>
+    <published>2018-07-10T12:00:00.000Z</published>
+    <updated>2018-07-11T07:26:50.432Z</updated>
     
     <summary type="html">
     
@@ -98,8 +150,8 @@
     <title>OAuth教程--用户登录</title>
     <link href="http://seanthefish.com/2018/07/10/oauth-guide-12/"/>
     <id>http://seanthefish.com/2018/07/10/oauth-guide-12/</id>
-    <published>2018-07-10T10:00:00.000Z</published>
-    <updated>2018-07-10T06:51:23.957Z</updated>
+    <published>2018-07-10T11:00:00.000Z</published>
+    <updated>2018-07-11T07:26:44.958Z</updated>
     
     <summary type="html">
     
@@ -121,11 +173,11 @@
   </entry>
   
   <entry>
-    <title>OAuth教程--安全考虑因素</title>
-    <link href="http://seanthefish.com/2018/07/10/oauth-guide-15/"/>
-    <id>http://seanthefish.com/2018/07/10/oauth-guide-15/</id>
+    <title>OAuth教程--授权请求</title>
+    <link href="http://seanthefish.com/2018/07/10/oauth-guide-11/"/>
+    <id>http://seanthefish.com/2018/07/10/oauth-guide-11/</id>
     <published>2018-07-10T10:00:00.000Z</published>
-    <updated>2018-07-10T10:18:54.729Z</updated>
+    <updated>2018-07-10T03:52:15.799Z</updated>
     
     <summary type="html">
     
@@ -133,7 +185,7 @@
       
         
         
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/security-considerations/&quot; target=&quot;_blank&quot;
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/&quot; target=&quot;_blank&quot;
         
       
     
@@ -497,62 +549,6 @@
       <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
     
       <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Project Jigsaw:Java模块系统快速入门指南</title>
-    <link href="http://seanthefish.com/2018/03/29/java9-quick-guide/"/>
-    <id>http://seanthefish.com/2018/03/29/java9-quick-guide/</id>
-    <published>2018-03-29T02:12:00.000Z</published>
-    <updated>2018-03-30T16:15:16.990Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文为openjdk官方java模块入门指南的翻译。(&lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/quick-start&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
-    
-    
-      <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>也来谈谈classloader和classpath hell问题</title>
-    <link href="http://seanthefish.com/2018/01/11/classloader-classpath-hell/"/>
-    <id>http://seanthefish.com/2018/01/11/classloader-classpath-hell/</id>
-    <published>2018-01-11T04:14:47.000Z</published>
-    <updated>2018-03-29T06:45:33.617Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;classpath hell, 也叫 &lt;a href=&quot;https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;jar
-        
-      
-    
-    </summary>
-    
-      <category term="classLoader" scheme="http://seanthefish.com/categories/classLoader/"/>
-    
-    
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
     
   </entry>
   
