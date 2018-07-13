@@ -3,6 +3,39 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--用户界面]]></title>
+      <url>/2018/07/12/oauth-guide-18/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/scope/user-interface/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>用户在授权应用程序时看到的界面需要清楚地显示应用程序请求的范围列表。用户可能不知道服务提供的范围的所有可能性，因此最好使该文本尽可能清晰明了，避免使用行话和缩写。</p>
+<p>如果请求授予应用程序对用户帐户的完全访问权限，或访问其帐户的大部分内容，例如除了更改密码之外能够执行所有操作，则该服务应该非常清楚。例如，Dropbox授权用户界面上的第一句话是“示例OAuth应用程序希望访问Dropbox中的文件和文件夹”，其中包含“了解更多”链接，该链接指向帮助页面，该帮助页面准确描述了应用程序将具有哪些访问权限。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/dropbox.png" alt="dropbox"></p>
+<p>Flickr授权界面显示用户在登录时授予应用程序的三件事，并清楚地显示应用程序不具有的权限。显示这一点的好处是，用户可以放心，他们授权的应用程序将无法进行潜在的破坏性操作。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/flickr.png" alt="flickr"></p>
+<p>GitHub在提供有关用户授予范围的详细信息方面做得非常出色。请求的每个范围都会在页面上显示一个部分，其中包含名称，图标，突出显示是只读还是读写的简短说明，以及下拉列表以查看更详细的说明。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github.png" alt="github"></p>
+<p>Google为其所有服务提供单一授权终端，包括Gmail API，Google云端硬盘，Youtube等。其授权界面会在列表中显示每个范围，并包含一个“信息”图标，您可以点击该图标以获取有关特定内容的详细信息范围。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/google.png" alt="google"></p>
+<p>单击信息图标会显示一个叠加层，详细描述此范围允许的内容。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/google-scope-popup.png" alt="google_scope"></p>
+<p>您可以看到有多种方法可以为用户提供有关OAuth授权范围的信息，并且各种服务采用了截然不同的方法。在您定义范围时，请务必考虑应用程序的隐私和安全要求。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--定义范围]]></title>
       <url>/2018/07/11/oauth-guide-17/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/scope/defining-scopes/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
@@ -295,18 +328,16 @@ Location: https://example-app.com/redirect?error=access_denied
     </entry>
     
     <entry>
-      <title><![CDATA[OAuth教程--授权]]></title>
-      <url>/2018/07/08/oauth-guide-10/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>授权界面是用户在授予应用程序访问其帐户时看到的页面。以下部分介绍如何构建授权页面，界面中包含哪些组件以及如何最好地向用户显示界面。</p>
-<p>在实施OAuth服务器时，您正在使开发人员能够构建利用您的平台的应用程序，允许应用程序访问并可能修改私有用户内容，或代表用户行事。因此，您需要确保为用户提供尽可能多的信息以保护其帐户，并确保他们了解应用程序对其帐户执行的操作。</p>
-<ul>
-<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">授权请求</a></li>
-<li><a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">要求用户登录</a></li>
-<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">授权接口</a></li>
-<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a></li>
-<li><a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">安全考虑因素</a></li>
-</ul>
+      <title><![CDATA[OAuth教程--删除应用程序和撤消密钥]]></title>
+      <url>/2018/07/08/oauth-guide-9/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
+<h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
+<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
+<h3 id="撤销密钥"><a href="#撤销密钥" class="headerlink" title="撤销密钥"></a>撤销密钥</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在密钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧密钥。撤销密钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端密钥提示"><br>GitHub要求确认重置应用程序的密钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧密钥的任何已部署应用程序将无法使用旧密钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其密钥。</p>
 ]]></content>
       
         <categories>
@@ -325,16 +356,18 @@ Location: https://example-app.com/redirect?error=access_denied
     </entry>
     
     <entry>
-      <title><![CDATA[OAuth教程--删除应用程序和撤消密钥]]></title>
-      <url>/2018/07/08/oauth-guide-9/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/client-registration/deleting-applications-revoking-secrets/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销并为其应用程序生成新的客户端密钥也是一个好主意。</p>
-<h3 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h3><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_delete_application.png" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
-<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权码和刷新令牌。</p>
-<h3 id="撤销密钥"><a href="#撤销密钥" class="headerlink" title="撤销密钥"></a>撤销密钥</h3><p>该服务应该为开发人员提供重置客户端密钥的方法。在密钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧密钥。撤销密钥不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
-<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_reset_client_secret.png" alt="GitHub重置客户端密钥提示"><br>GitHub要求确认重置应用程序的密钥</p>
-<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧密钥的任何已部署应用程序将无法使用旧密钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其密钥。</p>
+      <title><![CDATA[OAuth教程--授权]]></title>
+      <url>/2018/07/08/oauth-guide-10/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com/oauth2-servers/authorization/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>授权界面是用户在授予应用程序访问其帐户时看到的页面。以下部分介绍如何构建授权页面，界面中包含哪些组件以及如何最好地向用户显示界面。</p>
+<p>在实施OAuth服务器时，您正在使开发人员能够构建利用您的平台的应用程序，允许应用程序访问并可能修改私有用户内容，或代表用户行事。因此，您需要确保为用户提供尽可能多的信息以保护其帐户，并确保他们了解应用程序对其帐户执行的操作。</p>
+<ul>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/" target="_blank" rel="noopener">授权请求</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/" target="_blank" rel="noopener">要求用户登录</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-interface/" target="_blank" rel="noopener">授权接口</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a></li>
+<li><a href="https://www.oauth.com/oauth2-servers/authorization/security-considerations/" target="_blank" rel="noopener">安全考虑因素</a></li>
+</ul>
 ]]></content>
       
         <categories>
