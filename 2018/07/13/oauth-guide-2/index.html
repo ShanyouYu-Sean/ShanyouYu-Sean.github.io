@@ -43,6 +43,8 @@
     
     <title>
         
+            OAuth教程--访问OAuth服务器中的数据 | 
+        
         小鱼肖恩
     </title>
 
@@ -52,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩">
+    <meta name="keywords" content="小鱼肖恩,OAuth">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -79,6 +81,9 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -214,7 +219,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/page/3/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/07/13/oauth-guide-2/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -233,13 +238,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/page/3/">
+    <meta property="og:url" content="http://seanthefish.com/2018/07/13/oauth-guide-2/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="小鱼肖恩">
+    <meta property="og:title" content="OAuth教程--访问OAuth服务器中的数据 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    
+    <meta property="og:article:tag" content="OAuth"> 
 
+    
+        <meta property="article:published_time" content="Fri Jul 13 2018 02:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Jul 18 2018 11:40:40 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -247,13 +255,43 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/page/3/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2018/07/13/oauth-guide-2/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-2/index.html",
+    "headline": "OAuth教程--访问OAuth服务器中的数据",
+    "datePublished": "Fri Jul 13 2018 02:00:00 GMT+0800",
+    "dateModified": "Wed Jul 18 2018 11:40:40 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",OAuth小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
 
 
     
@@ -398,27 +436,29 @@
 
                     
 
-                    <!-- Index Module -->
-<div class="material-index mdl-grid">
-    
-    <div class="locate-thumbnail-symbol"></div>
+                    <!-- Post TOC -->
 
-    <!-- Pin on top -->
-    
-        
     
 
-    <!-- Normal Post -->
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+
+
+    <!-- Isolation Post Header -->
+    <!-- Post thumbnail -->
     
         <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
+        <div class="post-header_info without-thumbnail">
             <!-- Author Avatar & Name -->
             <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
             <span class="name-span">Sean Yu</span>
@@ -429,233 +469,230 @@
     
         </div>
 
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/03/29/module-system/">Java模块系统综述</a>
-        </p>
 
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是Mark Reinhold的The State of the Module System最新版的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/03/29/module-system/" target="_self">阅读全文</a>
-            </span>
-        </p>
 
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-9/">Java 9</a></li><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-module/">Java module</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                3月 29, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
-                
-            </div>
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+
+    
+        <div class="post-content_wrapper">
+            <p class="post-title">
+                OAuth教程--访问OAuth服务器中的数据
+            </p>
+            <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>在本章中，我们将介绍如何在现有OAuth 2.0服务器上访问您的数据。对于此示例，我们将使用GitHub API，并构建一个简单的应用程序，该应用程序将展示出该GitHub登录用户创建的所有库。</p>
+<h3 id="创建一个应用程序"><a href="#创建一个应用程序" class="headerlink" title="创建一个应用程序"></a>创建一个应用程序</h3><p>在我们开始之前，我们需要在GitHub上创建一个应用程序，以获取客户端ID和客户端密钥。</p>
+<p>在GitHub.com上，从“设置”页面，单击侧栏中的“开发人员设置”链接。您最终将访问<code>https://github.com/settings/developers</code>。从那里，单击“新OAuth应用程序”，您将看到一个简短的表单，如下所示。</p>
+<p>填写所需信息，包括回调URL。如果您在本地开发应用程序，则必须使用本地地址作为回调URL。由于GitHub每个应用程序只允许一个注册的回调URL，因此创建两个应用程序非常有用，一个用于开发，另一个用于生产。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ft8d4v1w2oj318g0v40wo.jpg" alt="在GitHub上注册一个新的OAuth应用程序"></p>
+<p>完成此表单后，您将进入一个页面，您可以在其中看到发布到您的应用程序的客户端ID和秘钥，如下所示。</p>
+<p>客户端ID被视为公共信息，用于构建登录URL，或者可以包含在网页的Javascript源代码中。客户密钥必须保密。不要将它提交到您的git存储库！</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ft8dayhs69j316k1vdqcv.jpg" alt="GitHub应用程序已创建"></p>
+<h3 id="建立环境"><a href="#建立环境" class="headerlink" title="建立环境"></a>建立环境</h3><p>此示例代码是用PHP编写的，不需要外部包，也不需要框架。这可以很容易地翻译成其他语言。您可以将它全部放在一个PHP文件中。</p>
+<p>创建一个新文件夹并在该文件夹中创建一个空文件index.php。从该文件夹内部运行命令行，<code>php -S localhost:8000</code>，您将能够在浏览器中访问<code>http://localhost:8000</code>来运行您的代码。以下示例中的所有代码都应添加到此index.php文件中。</p>
+<p>为了让我们更轻松，让我们定义一个方法，apiRequest()它是一个简单的cURL包装器。此函数将包含GitHub API所需的Accept和User-Agent Header，并自动解码JSON响应。如果我们在会话中有访问令牌，它也会发送带有访问令牌的正确OAuth Header，以便进行经过身份验证的请求。</p>
+<pre><code class="php">function apiRequest($url, $post=FALSE, $headers=array()) {
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+  if($post)
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+
+  $headers = [
+    &#39;Accept: application/vnd.github.v3+json, application/json&#39;,
+    &#39;User-Agent: https://example-app.com/&#39;
+  ];
+
+  if(isset($_SESSION[&#39;access_token&#39;]))
+    $headers[] = &#39;Authorization: Bearer &#39;.$_SESSION[&#39;access_token&#39;];
+
+  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+  $response = curl_exec($ch);
+  return json_decode($response, true);
+}
+</code></pre>
+<p>现在让我们设置一些OAuth流程所需的变量。</p>
+<pre><code class="php">// Fill these out with the values from Github
+$githubClientID = &#39;&#39;;
+$githubClientSecret = &#39;&#39;;
+
+// This is the URL we&#39;ll send the user to first
+// to get their authorization
+$authorizeURL = &#39;https://github.com/login/oauth/authorize&#39;;
+
+// This is the endpoint we&#39;ll request an access token from
+$tokenURL = &#39;https://github.com/login/oauth/access_token&#39;;
+
+// This is the Github base URL for API requests
+$apiURLBase = &#39;https://api.github.com/&#39;;
+
+// The URL for this script, used as the redirect URL
+$baseURL = &#39;https://&#39; . $_SERVER[&#39;SERVER_NAME&#39;]
+    . $_SERVER[&#39;PHP_SELF&#39;];
+
+// Start a session so we have a place to
+// store things between redirects
+session_start();
+</code></pre>
+<p>首先，让我们设置“登录”和“注销”视图。这将显示一条简单的消息，指示用户是登录还是注销。</p>
+<pre><code class="php">// If there is an access token in the session
+// the user is already logged in
+if(!isset($_GET[&#39;action&#39;])) {
+  if(!empty($_SESSION[&#39;access_token&#39;])) {
+    echo &#39;&lt;h3&gt;Logged In&lt;/h3&gt;&#39;;
+    echo &#39;&lt;p&gt;&lt;a href=&quot;?action=repos&quot;&gt;View Repos&lt;/a&gt;&lt;/p&gt;&#39;;
+    echo &#39;&lt;p&gt;&lt;a href=&quot;?action=logout&quot;&gt;Log Out&lt;/a&gt;&lt;/p&gt;&#39;;
+  } else {
+    echo &#39;&lt;h3&gt;Not logged in&lt;/h3&gt;&#39;;
+    echo &#39;&lt;p&gt;&lt;a href=&quot;?action=login&quot;&gt;Log In&lt;/a&gt;&lt;/p&gt;&#39;;
+  }
+  die();
+}
+</code></pre>
+<p>已注销的视图包含指向我们的登录URL的链接，该URL启动OAuth流程。</p>
+<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>现在我们已经设置了必要的变量，让我们开始OAuth流程。</p>
+<p>我们要让人们做的第一件事是,在查询字符串<code>?action=login</code>中访问此页面以启动该过程。</p>
+<p>请注意，我们在此请求中要求的范围包括“user”和“public_repo”。这意味着该应用程序将能够读取用户配置文件信息以及访问公共存储库。</p>
+<pre><code class="php">// Start the login process by sending the user
+// to Github&#39;s authorization page
+if(isset($_GET[&#39;action&#39;]) &amp;&amp; $_GET[&#39;action&#39;] == &#39;login&#39;) {
+  unset($_SESSION[&#39;access_token&#39;]);
+
+  // Generate a random hash and store in the session
+  $_SESSION[&#39;state&#39;] = bin2hex(random_bytes(16));
+
+  $params = array(
+    &#39;response_type&#39; =&gt; &#39;code&#39;,
+    &#39;client_id&#39; =&gt; $githubClientID,
+    &#39;redirect_uri&#39; =&gt; $baseURL,
+    &#39;scope&#39; =&gt; &#39;user public_repo&#39;,
+    &#39;state&#39; =&gt; $_SESSION[&#39;state&#39;]
+  );
+
+  // Redirect the user to Github&#39;s authorization page
+  header(&#39;Location: &#39;.$authorizeURL.&#39;?&#39;.http_build_query($params));
+  die();
+}
+</code></pre>
+<p>生成用于保护客户端的“state”参数非常重要。这是客户端生成并存储在会话中的随机字符串。我们使用state参数作为额外的安全检查，以便当Github将用户发送回查询字符串中的状态时，我们可以验证我们确实发起了此请求，并且它不是发出该请求的攻击者。</p>
+<p>我们建立授权URL，然后将用户发送到那里。URL包含我们的公共客户端ID，我们之前在Github上注册的重定向URL，我们要求的范围以及“state”参数。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ft8difjyjmj30xg1dsjx4.jpg" alt="GitHub的授权请求"></p>
+<p>此时，用户将看到Github的OAuth授权提示，如上所示。</p>
+<p>当用户批准该请求时，他们将被重定向回我们的页面并在请求中包含code和state参数。下一步是用授权码交换访问令牌。</p>
+<h3 id="获取访问令牌"><a href="#获取访问令牌" class="headerlink" title="获取访问令牌"></a>获取访问令牌</h3><p>当用户被重定向回我们的应用程序时，查询字符串中将有一个code和state参数。该state参数将与我们在初始授权请求中设置的参数相同，在我们继续使用应用程序之前应该检查它是否匹配。这可以确保我们的应用程序不会被欺骗向GitHub发送攻击者的授权代码。</p>
+<pre><code class="php">// When Github redirects the user back here,
+// there will be a &quot;code&quot; and &quot;state&quot; parameter in the query string
+if(isset($_GET[&#39;code&#39;])) {
+  // Verify the state matches our stored state
+  if(!isset($_GET[&#39;state&#39;])
+    || $_SESSION[&#39;state&#39;] != $_GET[&#39;state&#39;]) {
+
+    header(&#39;Location: &#39; . $baseURL . &#39;?error=invalid_state&#39;);
+    die();
+  }
+
+  // Exchange the auth code for an access token
+  $token = apiRequest($tokenURL, array(
+    &#39;grant_type&#39; =&gt; &#39;authorization_code&#39;,
+    &#39;client_id&#39; =&gt; $githubClientID,
+    &#39;client_secret&#39; =&gt; $githubClientSecret,
+    &#39;redirect_uri&#39; =&gt; $baseURL,
+    &#39;code&#39; =&gt; $_GET[&#39;code&#39;]
+  ));
+  $_SESSION[&#39;access_token&#39;] = $token[&#39;access_token&#39;];
+
+  header(&#39;Location: &#39; . $baseURL);
+  die();
+}
+</code></pre>
+<p>在这里，我们向Github的令牌endpoint发送请求，用授权码来交换访问令牌。该请求包含我们的公共客户端ID以及私密客户端密钥。我们还发送与之前相同的重定向URL以及授权码。</p>
+<p>如果一切都检出，Github会生成一个访问令牌并在响应中返回它。我们将访问令牌存储在会话中并重定向到主页，并且用户已登录。</p>
+<p>GitHub的回复如下所示。</p>
+<pre><code class="json">{
+  &quot;access_token&quot;: &quot;e2f8c8e136c73b1e909bb1021b3b4c29&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;scope&quot;: &quot;public_repo,user&quot;
+}
+</code></pre>
+<p>我们的代码已经提取了访问令牌并将其保存在会话中。下次访问该页面时，它会识别出已存在访问令牌并显示我们之前创建的登录页面。</p>
+<p>注意：为简单起见，我们在此示例中未包含任何错误处理代码。实际上，您将检查从GitHub返回的错误并向用户显示相应的消息。</p>
+
+            
         </div>
-    </div>
+    
 </div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/03/29/java9-quick-guide/">Project Jigsaw:Java模块系统快速入门指南</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文为openjdk官方java模块入门指南的翻译。(
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/03/29/java9-quick-guide/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-9/">Java 9</a></li><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/Java-module/">Java module</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                3月 29, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
+                    <!-- Paradox Post Info -->
+                    
                 
-            </div>
-        </div>
-    </div>
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 Gitalk -->
+<div id="gitalk-comment">
+    <!-- Gitalk 评论框 -->
+<div id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+
+<script>
+    var gitalk = new Gitalk({
+            clientID: '37e3045f7495549e8e8f',
+            clientSecret: '7f01ca7a36dbfefe6abbb00c66c37d8d8559e8b2',
+            repo: 'seanthefish-repo',
+            owner: 'ShanyouYu-Sean',
+            admin: ['ShanyouYu-Sean'],
+            // facebook-like distraction free mode
+            distractionFreeMode: false,
+            id: md5(location.href)
+        })
+   gitalk.render('gitalk-container')
+</script>
 </div>
+<style>
+    #gitalk-comment {
+        background-color: #fff;
+        padding: 2pc;
+    }
+</style>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/01/11/classloader-classpath-hell/">也来谈谈classloader和classpath hell问题</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                classpath hell, 也叫 
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/01/11/classloader-classpath-hell/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/classLoader/">classLoader</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                1月 11, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
                 
             </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/07/13/oauth-guide-1/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
         </div>
     </div>
-</div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2017/12/22/hello-world/">Hello World</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                Welcome to Hexo
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2017/12/22/hello-world/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                12月 22, 2017
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-
-    
-    <!-- Index nav -->
-        <nav class="material-nav mdl-cell mdl-cell--12-col">
-            <a class="extend prev" rel="prev" href="/page/2/"><button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"><i class="material-icons" role="presentation">arrow_back</i></button></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
-        </nav>
-    
-
-    
-</div>
 
 
                     
@@ -732,6 +769,10 @@
 <!-- Import prettify js  -->
 
     
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
 
 
 
@@ -744,6 +785,11 @@
     });
 
     
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
         
     
     
