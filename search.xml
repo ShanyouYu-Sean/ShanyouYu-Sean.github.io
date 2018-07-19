@@ -3,6 +3,873 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--范围]]></title>
+      <url>/2018/07/13/oauth-guide-10/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>本章是对OAuth服务提供商的指导。</p>
+<p>范围(scope)是一种限制应用访问用户数据的方法。与授予对用户帐户的完全访问权限相比，为应用程序提供一种方式，来限制他们代表用户访问和操作的范围，通常是一种更有效的方式。</p>
+<p>某些应用仅使用OAuth来识别用户，因此他们只需要访问用户ID和基本配置文件信息。其他应用可能需要知道更敏感的信息，例如用户的生日，或者他们可能需要能够代表用户发布内容，或修改个人资料数据。如果用户确切知道应用程序可以和不能对他们的帐户做什么，他们将更愿意授权应用程序。范围是一种控制访问权限的方法，可帮助用户识别他们授予应用程序的权限。</p>
+<h3 id="定义范围"><a href="#定义范围" class="headerlink" title="定义范围"></a>定义范围</h3><p>定义范围的好地方是分别定义读取与写入。这适用于Twitter，因为并非所有应用程序实际上都希望能够将内容发布到您的Twitter帐户，有些只需要访问您的个人资料信息。</p>
+<p>定义服务范围时的挑战是不要因定义太多范围而被忽略。用户需要能够理解他们授予的授权范围，并且这将在列表中呈现给用户。当呈现给用户时，他们需要真正了解正在发生的事情。如果您为用户设计的过度复杂，他们可能会单击“确定”直到应用程序正常工作，并忽略任何警告。</p>
+<h4 id="读与写"><a href="#读与写" class="headerlink" title="读与写"></a>读与写</h4><p>通常，在定义服务范围时，读取和写入访问是一个很好的起点。通常，对想要更新配置文件信息的应用程序，使用单独的访问控制来处理对用户的私有配置文件信息的读访问。</p>
+<p>需要能够代表用户创建内容的应用程序（例如，将推文发布到用户的时间线的第三方Twitter应用程序），与仅需要读取用户的公共数据的应用程序相比，需要获得不同级别的访问权限。</p>
+<h4 id="限制对敏感信息的访问"><a href="#限制对敏感信息的访问" class="headerlink" title="限制对敏感信息的访问"></a>限制对敏感信息的访问</h4><p>通常，对于不同安全级别的用户，服务将具有不同的配置。例如，GitHub有一个单独的范围，允许应用程序访问私有存储库。默认情况下，应用程序无权访问私有存储库，除非他们要求该范围，因此用户可以放心地知道他们选择的应用只能访问属于其组织的私有存储库。</p>
+<p>GitHub提供了一个单独的范围，允许应用程序删除repos，因此用户可以放心，随机应用程序无法绕过这个范围删除其存储库。</p>
+<p>Dropbox为应用程序提供了一种限制自己只能编辑单个文件夹中文件的方法。这为尝试使用Dropbox作为存储或同步机制的应用程序提供了一种方法，用户无需担心应用程序可能会读取其所有文件。</p>
+<h4 id="通过功能选择性地启用访问"><a href="#通过功能选择性地启用访问" class="headerlink" title="通过功能选择性地启用访问"></a>通过功能选择性地启用访问</h4><p>范围的一个很好的用途是根据所需的功能选择性地启用对用户帐户的访问。例如，Google为其各种服务提供了一组范围，例如Google云端硬盘，Gmail，YouTube等。这意味着需要访问YouTube API的应用程序也不一定能够访问用户的Gmail帐户。</p>
+<p>谷歌的API是有效使用范围的一个很好的例子。有关Google OAuth API支持的范围的完整列表，请访问<code>https://developers.google.com/oauthplayground/</code>上的 OAuth 2.0 Playground。</p>
+<h4 id="限制对可结算资源的访问"><a href="#限制对可结算资源的访问" class="headerlink" title="限制对可结算资源的访问"></a>限制对可结算资源的访问</h4><p>如果您的服务提供的API可能会导致用户产生费用，那么设定范围是防止滥用此功能的应用程序的好方法。</p>
+<p>例如，在提供使用许可内容的高级功能的情况下，提供用于聚合给定区域的人口统计数据的API。用户在使用服务时收取费用，费用取决于要查询的区域的大小。当用户登录使用完全不同的API部分的应用时，用户希望确保此应用无法使用人口统计信息API，因为这会导致该用户产生费用。在这种情况下，服务应定义一个特殊范围，例如“人口统计”。人口统计信息API应仅响应来自包含此范围的令牌的API请求。</p>
+<p>在此示例中，人口统计信息API可以使用<a href="https://www.oauth.com/oauth2-servers/token-introspection-endpoint/" target="_blank" rel="noopener">令牌自解析端点</a>来查找对此令牌有效的范围列表。如果响应在范围列表中不包含“人口统计”，则端点将使用HTTP 403响应拒绝该请求。</p>
+<h3 id="用户界面"><a href="#用户界面" class="headerlink" title="用户界面"></a>用户界面</h3><p>用户在授权应用程序时看到的界面需要清楚地显示应用程序请求的范围列表。用户可能不知道服务提供的范围的所有可能性，因此最好使该文本尽可能清晰明了，避免使用行话和缩写。</p>
+<p>如果请求授予应用程序对用户帐户的完全访问权限，或访问其帐户的大部分内容，例如除了更改密码之外能够执行所有操作，则该服务应该非常清楚。例如，Dropbox授权用户界面上的第一句话是“示例OAuth应用程序希望访问Dropbox中的文件和文件夹”，其中包含“了解更多”链接，该链接指向帮助页面，该帮助页面准确描述了应用程序将具有哪些访问权限。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/dropbox.png" alt="dropbox"></p>
+<p>Flickr授权界面显示用户在登录时授予应用程序的三件事，并清楚地显示应用程序不具有的权限。显示这一点的好处是，用户可以放心，他们授权的应用程序将无法进行潜在的破坏性操作。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/flickr.png" alt="flickr"></p>
+<p>GitHub在提供有关用户授予范围的详细信息方面做得非常出色。请求的每个范围都会在页面上显示一个部分，其中包含名称，图标，突出显示是只读还是读写的简短说明，以及下拉列表以查看更详细的说明。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github.png" alt="github"></p>
+<p>Google为其所有服务提供单一授权终端，包括Gmail API，Google云端硬盘，Youtube等。其授权界面会在列表中显示每个范围，并包含一个“信息”图标，您可以点击该图标以获取有关特定内容的详细信息范围。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/google.png" alt="google"></p>
+<p>单击信息图标会显示一个叠加层，详细描述此范围允许的内容。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/google-scope-popup.png" alt="google_scope"></p>
+<p>您可以看到有多种方法可以为用户提供有关OAuth授权范围的信息，并且各种服务采用了截然不同的方法。在您定义范围时，请务必考虑应用程序的隐私和安全要求。</p>
+<h3 id="复选框"><a href="#复选框" class="headerlink" title="复选框"></a>复选框</h3><p>虽然这是一个看似未充分利用的功能，但OAuth 2.0规范明确允许授权服务器授予访问令牌的范围小于应用程序的请求。这为一些有趣的可能性留下了空间。</p>
+<p>在开始开发OAuth 2.0规范之前，OAuth 1已部署在Twitter上，Twitter应用程序生态系统正在迅速发展。在创建Twitter应用程序时，您可以选择您的应用程序是需要读取+写入权限还是只读取对用户帐户的访问权限。这是一种开发OAuth 2.0范围概念的机制。但是，这种实现是相当有限的，因为应用程序要么不请求写访问权限，要么用户可能只是拒绝该请求，如果他们不想授予应用程序写访问权限。</p>
+<p>很快就开发了一种常见的Twitter应用程序的反模式，它只使用写访问权来发布推文给应用程序做广告。其中一个更臭名昭着的事件发生在2010年，当时应用程序“Twifficiency”声称“根据你的推特活动计算你的推特效率”，但这却很快失控。您将使用您的Twitter帐户登录该应用程序，它会抓取您过去的推文并对其进行分析。但是，它也自动发推文“我的Twifficiency得分是__％。你的是多少？”从而链接到第三方网站。许多人甚至不知道应用程序正在执行此操作，或者他们已授予此应用程序权限以发布到其帐户。这导致应用程序变成病毒式传播，因为使用该应用程序的任何人的关注者都会在他们的时间轴中看到它。</p>
+<p>许多人对此感到不安，并在Twitter上大声抱怨。当时雅虎的开发人员Ben Ward更进一步，创建了一个可以解决这个问题的潜在用户界面的模型，并写了一篇简短的博客文章解释它。<code>https://benward.uk/blog/tumblr-968515729</code></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftfc4um00ij30lp0cftat.jpg" alt="twitter"></p>
+<p>在帖子中，Ward描述了一个允许应用程序请求特定权限的用户界面，用户可以选择授予或不授予每个权限。这将允许用户登录应用程序但不允许其首先发布到其帐户。稍后，如果用户确实想要允许该应用发布，则该应用可以提供在Twitter上重新授权用户的机制。几个月后，沃德在Twitter被聘用。</p>
+<p>这篇文章引发了一些参与OAuth规范开发的人们之间的讨论，这个讨论现在只存在于archive.org上的Google Buzz主题：<code>http://web.archive.org/web/20100823114908/</code>,<code>http://www.google.com/buzz/tantek/5YHAAmztLcD/t-Look-BenWard-schools-Twitter-on-OAuth</code>。</p>
+<p>直到今天，Twitter仍然没有提供这种细粒度的授权。但是，其他服务已经开始实现类似的功能，在授权流程中为用户提供更多控制，而不是使其看起来像“单击确定以继续”对话框。</p>
+<p>Facebook推出了最近的更新，为初始页面提供了一个简单的用户界面，允许用户点击编辑应用程序将被授予的范围，如下所示。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftfc74seznj30sc0f7jso.jpg" alt="facebook"></p>
+<p>如果单击“编辑您提供的信息”，则会转到一个界面，列出应用程序请求的每个范围，您可以根据需要取消选中它们。在下面的屏幕截图中，我选择不允许应用程序查看我的朋友列表。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftfc7yma0rj30si0f775b.jpg" alt="facebook checkbox"></p>
+<p>只有应用程序请求的范围才会出现在此列表中。这为用户提供了更好的体验，因为他们能够保持控制并更好地了解应用程序如何使用其帐户。</p>
+<p>FitBit跟踪用户健康的许多方面，例如步数，心率，消耗的食物和饮料，睡眠质量，体重等。FitBit API对第三方应用程序提供对所有这些数据的访问。由于许多第三方应用程序只会读取或写入某些类型的数据，FitBit会提供精细的范围，以便用户只能授予对其配置文件的某些部分的访问权限。</p>
+<p>FitBit的授权页面（如下所示）允许用户有选择地授予或拒绝访问应用程序请求的每个特定范围。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftfcao2nejj30pw0r4n14.jpg" alt="fitbit"></p>
+<p>GitHub 在2013 年的博客文章中描述了他们计划允许用户编辑范围，但截至2018年，依旧没有后续跟进。</p>
+<p>使用户能够选择授予哪些范围是让人们对使用第三方应用感到更舒服的好方法。每个范围旁边加复选框就足够了，或者您可以将控件移动到像Facebook这样的单独屏幕。您需要确保在发送访问令牌响应时，它包括用户所授予的范围列表，而不是应用程序请求的。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--授权]]></title>
+      <url>/2018/07/13/oauth-guide-9/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>本章是对OAuth服务提供商的指导。</p>
+<p>授权界面是用户在授予应用程序访问其帐户时看到的页面。以下部分介绍如何构建授权页面，界面中包含哪些组件以及如何最好地向用户显示界面。</p>
+<p>在实施OAuth服务时，您正在使开发人员能够构建利用您的平台的应用程序，允许应用程序访问并可能修改私有用户内容，或代表用户行事。因此，您需要确保为用户提供尽可能多的信息以保护其帐户，并确保他们了解应用程序对其帐户执行的操作。</p>
+<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>客户端会将用户的浏览器定向到授权服务器以开始OAuth流程。客户端可以使用授权码授予类型或隐式授权。除了response_type参数指定的授权类型外，请求还有许多其他参数来指示请求的细节。</p>
+<p><a href="http://seanthefish.com/2018/06/29/oauth-guide-2/">OAuth 2.0客户端</a>描述了客户端如何为您的服务构建授权URL。授权服务器第一次看到用户申请此授权请求时，将使用客户端设置的查询参数将用户定向到服务器。此时，授权服务器将需要验证请求并提供授权接口，允许用户批准或拒绝该请求。</p>
+<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>以下参数用于开始授权请求。例如，如果授权服务器URL是<code>https://authorization-server.com/auth</code>, 客户端将创建如下的URL并将用户的浏览器指向它：</p>
+<pre><code class="html">https://authorization-server.com/auth?response_type=code
+&amp;client_id=29352735982374239857
+&amp;redirect_uri=https://example-app.com/callback
+&amp;scope=create+delete
+&amp;state=xcoivjuywkdkhvusuye3kch
+</code></pre>
+<blockquote>
+<p><strong>response_type</strong><br>response_type将设置为code，表示应用程序希望在成功时收到授权码。</p>
+<p><strong>client_id</strong><br>client_id是应用程序的公共标识符。</p>
+<p><strong>redirect_uri （可选的）</strong><br>redirect_uri不规范所要求的，但你的服务应该需要它。此URL必须与开发人员在创建应用程序时注册的其中一个URL匹配，如果请求不匹配，授权服务器应拒绝该请求。</p>
+<p><strong>scope （可选的）</strong><br>请求可以具有一个或多个scope值，指示应用程序请求的附加访问。授权服务器需要向用户显示请求的scope。</p>
+<p><strong>state （推荐的）</strong><br>state应用程序使用该参数来存储特定于请求的数据和/或防止CSRF攻击。授权服务器必须将未修改的state值返回给应用程序。</p>
+</blockquote>
+<h4 id="授予类型"><a href="#授予类型" class="headerlink" title="授予类型"></a>授予类型</h4><p>当客户端应用程序期望授权码作为响应时，授权码授予类型将与密钥和公共客户端一起工作。要启动授权码授予，客户端将使用查询参数response_type=code以及其他所需参数将用户的浏览器定向到授权服务器。</p>
+<h4 id="验证授权请求"><a href="#验证授权请求" class="headerlink" title="验证授权请求"></a>验证授权请求</h4><p>授权服务器必须首先验证client_id请求中的对应的有效的应用程序。</p>
+<p>如果您的服务器允许应用程序注册多个重定向URL，则验证重定向URL有两个步骤。如果请求包含redirect_uri参数，则服务器必须确认它是此应用程序的有效重定向URL。如果redirect_uri请求中没有参数，并且只注册了一个URL，则服务器使用先前注册的重定向URL。否则，如果请求中没有重定向URL，并且没有注册重定向URL，就将会返回一个错误。</p>
+<p>如果client_id无效，服务器应立即拒绝请求并向用户显示错误。</p>
+<h4 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h4><p>如果授权服务器检测到重定向URL有问题，则需要通知用户该问题。由于多种原因，重定向网址可能无效，包括：</p>
+<ul>
+<li>缺少重定向URL参数</li>
+<li>重定向URL参数无效，例如，如果它是不解析为URL的字符串</li>
+<li>重定向URL与应用程序的已注册重定向URL之一不匹配</li>
+</ul>
+<p>在这些情况下，授权服务器应向用户显示错误，通知他们问题。服务器不得将用户重定向回应用程序。这避免了所谓的“<a href="https://oauth.net/advisories/2014-1-covert-redirect/" target="_blank" rel="noopener">开放重定向器攻击</a>”。如果已注册重定向URL，则服务器应仅将用户重定向到重定向URL。</p>
+<h4 id="其他错误"><a href="#其他错误" class="headerlink" title="其他错误"></a>其他错误</h4><p>通过将用户重定向到重定向URL，并使用查询字符串中的错误代码来处理所有其他错误。有关如何响应错误的详细信息，请参阅“<a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-response/" target="_blank" rel="noopener">授权响应</a>”部分。</p>
+<p>如果请求缺少response_type参数，或者该参数的值是除了code和token之外的任何内容，则服务器会返回invalid_request错误。</p>
+<p>由于授权服务器可能要求客户端指定它们是公共的还是机密的，因此它可以拒绝不允许的授权请求。例如，如果客户端指定它们是机密客户端，则服务器可以拒绝使用令牌授权类型的请求。拒绝时，请使用错误代码unauthorized_client。</p>
+<p>如果存在无法识别的scope值，授权服务器应拒绝该请求。在这种情况下，服务器可以使用invalid_scope错误代码重定向到回调URL 。</p>
+<p>授权服务器需要存储此请求的“state”值，以便将其包含在访问令牌响应中。服务器不得修改或对state值包含的内容做出任何假设，因为它纯粹是为了客户端的便利。</p>
+<h3 id="用户登录"><a href="#用户登录" class="headerlink" title="用户登录"></a>用户登录</h3><p>用户在单击应用程序的“登录”或“连接”按钮后将看到的第一件事是您的授权服务器UI。由授权服务器决定是否在每次访问授权屏幕时要求用户登录，或者让用户登录一段时间。如果授权服务器要在请求之间记住用户，那么它将需要请求用户在将来访问时授权该应用程序。</p>
+<p>通常像Twitter或Facebook这样的网站希望他们的用户在大多数时间都是签名的，因此他们为他们的授权屏幕提供了一种方式，通过不要求他们每次登录来为用户提供简化的体验。但是，根据服务以及第三方应用程序的安全要求，可能需要或允许开发人员选择要求用户在每次访问授权屏幕时登录。</p>
+<p>在Google的API中，应用程序可以添加prompt=login到授权请求，这会导致授权服务器在显示授权提示之前强制用户再次登录。</p>
+<p>在任何情况下，如果用户已退出，或者在您的服务上还没有帐户，则需要为他们提供在此屏幕上登录或创建帐户的方法。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/twitter_logged_out_auth_screen.png" alt="Twitter的授权屏幕的退出视图"></p>
+<p>因为OAuth 2.0规范中未指定，您可以按照您希望的方式对用户进行身份验证。大多数服务使用传统的用户名/密码登录来验证其用户，但这绝不是解决问题的唯一方法。在企业环境中，常见的技术是使用SAML（一种基于XML的身份验证标准）来利用组织中的现有身份验证机制，同时避免创建另一个用户名/密码数据库。</p>
+<p>一旦用户使用授权服务器进行身份验证，它就可以继续处理授权请求并将用户重定向回应用程序。通常，服务器将认为成功登录也意味着用户授权该应用程序。在这种情况下，具有登录提示的授权页面将需要包括描述以下事实的文本：通过登录，用户正在批准该授权请求。这将导致以下用户流程。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="登录和未登录的用户流程"></p>
+<p>如果授权服务器需要通过SAML或其他内部系统对用户进行身份验证，则用户流程将如下所示</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams_2.png" alt="用于单独验证服务器的用户流"></p>
+<p>在此流程中，用户在登录后被定向回授权服务器，在那里他们看到授权请求，就像他们已经登录一样。</p>
+<h3 id="授权接口"><a href="#授权接口" class="headerlink" title="授权接口"></a>授权接口</h3><p>授权界面是用户在收到来自第三方应用程序的授权请求时将看到的屏幕。由于第三方应用程序会要求用户授予某种级别的访问权限，因此您需要确保用户在授权应用程序权限时做出明智决策所需的所有信息。授权接口通常具有以下组件：</p>
+<h4 id="网站名称和logo"><a href="#网站名称和logo" class="headerlink" title="网站名称和logo"></a>网站名称和logo</h4><p>该服务应该易于用户识别，因为他们需要知道他们授予哪些服务访问权限。但是，您确定主页上的网站应与授权界面一致。通常，这通过在屏幕的一定的位置显示应用程序名称和logo，或在整个网站上使用一致的颜色方案来完成。</p>
+<h4 id="用户识别"><a href="#用户识别" class="headerlink" title="用户识别"></a>用户识别</h4><p>如果用户已登录，则应向用户指明。这可能就像在屏幕的右上角显示他们的名字和照片一样，就像在网站的其他部分一样。</p>
+<p>重要的是，用户知道他们当前登录的帐户，以防他们管理多个帐户，以便他们不会错误地授权不同的用户帐户。</p>
+<h5 id="申请细节"><a href="#申请细节" class="headerlink" title="申请细节"></a>申请细节</h5><p>授权接口应清楚地标识发出请求的应用程序。除了开发人员提供的应用程序名称之外，通常还应该显示网站和应用程序的logo，这是开发人员注册应用程序时收集的信息。我们在<a href="http://seanthefish.com/2018/07/08/oauth-guide-7/">客户端注册</a>中详细讨论了这一点。</p>
+<h4 id="要求的范围"><a href="#要求的范围" class="headerlink" title="要求的范围"></a>要求的范围</h4><p>应该向用户清楚地显示授权请求中提供的范围值。范围值通常是表示特定访问的短字符串，因此应向用户显示更易于阅读的版本。</p>
+<p>例如，如果服务将“私有”范围定义为对私有配置文件数据的读取访问权限，则授权服务器应该说“此应用程序将能够查看您的私有配置文件数据”。如果范围明确允许写入访问，也应该在描述中标识，例如“此应用程序将能够编辑您的配置文件数据”。</p>
+<p>如果没有范围，但您的服务仍然授予对用户帐户的一些基本访问级别，则应该包含描述应用程序将访问的内容的消息。如果省略范围意味着应用程序获得的唯一内容是用户标识，则可以包含一条消息，以表示“此应用程序希望您登录”。</p>
+<p>有关如何在服务中有效使用范围的更多信息，请参阅<a href="https://www.oauth.com/oauth2-servers/scope/" target="_blank" rel="noopener">范围</a>。</p>
+<h4 id="请求的或有效的生命周期"><a href="#请求的或有效的生命周期" class="headerlink" title="请求的或有效的生命周期"></a>请求的或有效的生命周期</h4><p>授权服务器必须决定授权的有效期，访问令牌的持续时间以及刷新令牌的持续时间。</p>
+<p>大多数服务不会自动使授权失效，而是希望用户定期查看和撤消对他们不再想要使用的应用的访问权限。但是，默认情况下，某些服务提供有限的令牌生存期，并允许应用程序请求更长的持续时间，或强制用户在授权过期后重新授权应用程序。</p>
+<p>无论您对授权的有效期做出何种决定，都应该向用户明确说明应用程序能够代表用户执行多长时间。这可能是一个句子，加单的表明：“这个应用程序将能够访问您的帐户，直到您撤销访问”或者“这个应用程序将能够访问您的帐户，时效为一个星期。”关于令牌生命周期的更多信息请参见<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-lifetime/" target="_blank" rel="noopener">访问令牌生命周期</a>。</p>
+<h4 id="允许否认"><a href="#允许否认" class="headerlink" title="允许否认"></a>允许否认</h4><p>最后，授权服务器应该向用户提供两个按钮，以允许或拒绝该请求。如果用户未登录，则应提供登录提示而不是“允许”按钮。</p>
+<p>如果用户批准该请求，则授权服务器将生成访问令牌并使用令牌信息重定向到应用程序。如果用户单击“拒绝”，则服务器会重定向到应用程序，并在URL中显示错误代码。</p>
+<h3 id="授权响应"><a href="#授权响应" class="headerlink" title="授权响应"></a>授权响应</h3><p>根据授权类型，授权服务器将使用授权码或访问令牌进行响应。</p>
+<h4 id="授权码响应"><a href="#授权码响应" class="headerlink" title="授权码响应"></a>授权码响应</h4><p>如果请求有效并且用户授予授权请求，则授权服务器生成授权码并将用户重定向回应用程序，将代码和先前的“state”值添加到重定向URL。</p>
+<h4 id="生成授权码"><a href="#生成授权码" class="headerlink" title="生成授权码"></a>生成授权码</h4><p>授权码必须在颁发后不久到期。OAuth 2.0规范建议最长生命周期为10分钟，但实际上，大多数服务设置的到期时间要短得多，大约30-60秒。授权代码本身可以是任意长度，但应记录代码的长度。</p>
+<p>因为授权代码是短暂的并且是单次使用的，所以它们是实现自编码的很好的候选者。使用此技术，您可以避免将授权代码存储在数据库中，而是将所有必要的信息编码到代码本身中。您可以使用服务器端环境的内置加密库，也可以使用JSON Web Signature（JWS）等标准。由于此字符串只需要您的授权服务器可以理解，因此不需要使用JWS等标准来实现此字符串。也就是说，如果您没有可以轻松访问的已经可用的加密库，JWS是一个很好的候选者，因为有许多语言的库可用。</p>
+<p>需要与授权代码关联的信息如下。</p>
+<blockquote>
+<p><strong>client_id</strong><br>请求此代码的客户端ID（或其他客户端标识符）</p>
+<p><strong>redirect_uri</strong><br>使用的重定向网址。需要存储，因为访问令牌请求必须包含相同的重定向URL，以便在发出访问令牌时进行验证。</p>
+<p><strong>用户信息(User info)</strong><br>用于标识此授权代码所针对的用户的某种方式，例如用户ID。</p>
+<p><strong>到期日期(Expiration Date)</strong><br>代码需要包含到期日期，以便使它能只持续很短的时间。</p>
+<p><strong>唯一ID(Unique ID)</strong><br>代码需要其自己的某种ID，以便能够检查代码之前是否已被使用过。数据库ID或随机字符串就足够了。</p>
+</blockquote>
+<p>通过创建JWS令牌或生成随机字符串并将关联信息存储在数据库中生成授权码后，您需要将用户重定向到指定的应用程序重定向URL。要添加到重定向URL的查询字符串的参数如下：</p>
+<blockquote>
+<p><strong>code</strong><br>此参数包含客户端稍后将为访问令牌交换的授权码。</p>
+<p><strong>state</strong><br>如果初始请求包含state参数，则响应还必须包含请求中的确切值。客户端将使用此将此响应与初始请求相关联。</p>
+</blockquote>
+<p>例如，授权服务器通过发送以下HTTP响应来重定向用户。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://oauth2client.com/redirect?code=g0ZGZmNjVmOWI&amp;state=dkZmYxMzE2
+</code></pre>
+<h4 id="隐式授权类型响应"><a href="#隐式授权类型响应" class="headerlink" title="隐式授权类型响应"></a>隐式授权类型响应</h4><p>使用隐式授权，授权服务器立即生成访问令牌，并使用令牌和其他参数重定向到回调URL。有关生成访问令牌的详细信息以及响应中所需参数的详细信息，请参阅访问<a href="https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/" target="_blank" rel="noopener">令牌响应</a>。</p>
+<p>例如，授权服务器通过发送以下HTTP响应来重定向用户（出于显示目的，需要额外的换行符）。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://example-app.com/redirect#access_token=MyMzFjNTk2NTk4ZTYyZGI3
+ &amp;state=dkZmYxMzE2
+ &amp;token_type=bearer
+ &amp;expires_in=86400
+</code></pre>
+<h5 id="错误响应"><a href="#错误响应" class="headerlink" title="错误响应"></a>错误响应</h5><p>在两种情况下，授权服务器应直接显示错误消息，而不是将用户重定向到应用程序：如果client_id无效，或者redirect_uri无效。在所有其他情况下，可以将用户重定向到应用程序的重定向URL以及描述错误的查询字符串参数。</p>
+<p>重定向到应用程序时，服务器会将以下参数添加到重定向URL：</p>
+<blockquote>
+<p><strong>error</strong><br>通常是以下列表中的一个ASCII错误代码：</p>
+<ul>
+<li><em>invalid_request</em> - 请求缺少参数，包含无效参数，多次包含参数，或者无效。</li>
+<li><em>access_denied</em> - 用户或授权服务器拒绝该请求</li>
+<li><em>unauthorized_client</em> - 不允许客户端使用此方法请求授权码，例如，如果机密客户端尝试使用隐式授权类型。</li>
+<li><em>unsupported_response_type8</em> - 服务器不支持使用此方法获取授权代码，例如，如果授权服务器从未实现隐式授权类型。</li>
+<li><em>invalid_scope</em> - 请求的范围无效或未知。</li>
+<li><em>server_error</em> - 服务器可以使用此错误代码重定向，而不是向用户显示500内部服务器错误页面。</li>
+<li><em>temporarily_unavailable</em> - 如果服务器正在进行维护或不可用，则可以返回此错误代码，而不是使用503 Service Unavailable状态代码进行响应。</li>
+</ul>
+<p><strong>error_description</strong><br>授权服务器可以可选地包括错误的描述。此参数旨在供开发人员理解错误，而不是要向最终用户显示。除双引号和反斜杠外，此参数的有效字符是ASCII字符集，特别是十六进制代码20-21,23-5B和5D-7E。</p>
+<p><strong>error_uri</strong><br>服务器还可以将URL返回到人类可读的网页，其中包含有关错误的信息。这是为了让开发人员获得有关错误的更多信息，而不是要向最终用户显示。</p>
+<p><strong>state</strong><br>如果请求包含状态参数，则错误响应还必须包含请求中的确切值。客户端可以使用它将此响应与初始请求相关联。</p>
+</blockquote>
+<p>例如，如果用户拒绝授权请求，服务器将构造以下URL并发送HTTP重定向响应（如下所示）（URL中的换行符用于说明目的）。</p>
+<pre><code class="http">HTTP/1.1 302 Found
+Location: https://example-app.com/redirect?error=access_denied
+ &amp;error_description=The+user+denied+the+request
+ &amp;error_uri=https%3A%2F%2Foauth2server.com%2Ferror%2Faccess_denied
+ &amp;state=wxyz1234
+</code></pre>
+<h3 id="安全考虑因素"><a href="#安全考虑因素" class="headerlink" title="安全考虑因素"></a>安全考虑因素</h3><p>以下是构建授权服务器时应考虑的一些已知问题。</p>
+<p>除了此处列出的注意事项外，<a href="https://tools.ietf.org/html/rfc6819" target="_blank" rel="noopener">OAuth 2.0线程模型和安全注意事项草案</a>中还提供了更多信息。</p>
+<h4 id="网络钓鱼攻击"><a href="#网络钓鱼攻击" class="headerlink" title="网络钓鱼攻击"></a>网络钓鱼攻击</h4><p>针对OAuth服务器的一种潜在攻击是网络钓鱼攻击。这是攻击者创建一个看起来与服务授权页面相同的网页的地方，该页面通常包含用户名和密码字段。然后，通过各种手段，攻击者可以诱骗用户访问该页面。除非用户可以检查浏览器的地址栏，否则该页面可能看起来与真正的授权页面相同，并且用户可以输入他们的用户名和密码。</p>
+<p>攻击者可以尝试诱骗用户访问伪造服务器的一种方法是将此网络钓鱼页面嵌入到本机应用程序中的嵌入式Web视图中。由于嵌入式Web视图不显示地址栏，因此用户无法直观地确认它们位于合法站点上。遗憾的是，这在移动应用程序中很常见，并且开发人员通常希望通过整个登录过程将用户保留在应用程序中来提供更好的用户体验。某些OAuth提供商鼓励第三方应用程序打开Web浏览器或启动提供程序的本机应用程序，而不是允许它们在Web视图中嵌入授权页面。</p>
+<h5 id="对策"><a href="#对策" class="headerlink" title="对策"></a>对策</h5><p>确保通过https提供授权服务器以避免DNS欺骗。</p>
+<p>授权服务器应该向开发人员介绍网络钓鱼攻击的风险，并且可以采取措施防止该页面嵌入到本机应用程序或iframe中。</p>
+<p>应该让用户了解网络钓鱼攻击的危险，并且应该教导用户最佳实践，例如只访问他们信任的应用程序，并定期查看应用程序列表，对不再使用的应用程序授权撤销的访问权限。</p>
+<p>该服务可能希望在允许其他用户使用该应用程序之前验证第三方应用程序。Instagram和Dropbox等服务目前都是这样做的，在初始创建应用程序时，该应用程序只能由开发人员或其他白名单用户帐户使用。应用程序提交审批并进行审核后，可以由该服务的整个用户群使用。这使服务有机会检查应用程序如何与服务交互。</p>
+<h4 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h4><p>在点击劫持攻击中，攻击者创建了一个恶意网站，在该网站中，攻击者网页上方的透明iframe中加载了授权服务器URL。攻击者的网页堆放在iframe下方，并且有一些看似无害的按钮或链接，非常小心地放在授权服务器的确认按钮下面。当用户单击误导性可见按钮时，他们实际上是单击授权页面上的隐藏按钮，从而授予对攻击者应用程序的访问权限。这允许攻击者欺骗用户在他们不知情的情况下授予访问权限。</p>
+<h5 id="对策-1"><a href="#对策-1" class="headerlink" title="对策"></a>对策</h5><p>通过确保授权URL始终直接在本机浏览器中加载，而不是嵌入在iframe中，可以防止这种攻击。较新的浏览器可以让授权服务器设置HTTP标头，X-Frame-Options旧版浏览器可以使用常见的Javascript“框架破坏”技术。</p>
+<h4 id="重定向URL操作"><a href="#重定向URL操作" class="headerlink" title="重定向URL操作"></a>重定向URL操作</h4><p>攻击者可以使用属于已知正常应用程序的客户端ID构建授权URL，将重定向URL设置为攻击者控制下的URL。如果授权服务器未验证重定向URL，并且攻击者使用“令牌”响应类型，则用户将使用URL中的访问令牌返回到攻击者的应用程序。如果客户端是公共客户端，并且攻击者拦截授权码，则攻击者还可以通过授权码交换访问令牌。</p>
+<p>另一个类似的攻击是攻击者可以欺骗用户的DNS，并且注册的重定向不是https URL。这将允许攻击者伪装成有效的重定向URL，并以这种方式窃取访问令牌。</p>
+<p>“打开重定向”攻击是指授权服务器不需要重定向URL的完全匹配，而是允许攻击者构建将重定向到攻击者网站的URL。无论这是否最终被用于窃取授权码或访问令牌，这也是一个危险，因为它可以用于发起其他无关的攻击。有关Open Redirect攻击的更多详细信息，请访问<code>https://oauth.net/advisories/2014-1-covert-redirect/</code>。</p>
+<h4 id="对策-2"><a href="#对策-2" class="headerlink" title="对策"></a>对策</h4><p>授权服务器必须要求应用程序注册一个或多个重定向URL，并且重定向到先前注册的URL必须完全匹配。</p>
+<p>授权服务器还应要求所有重定向URL均为https。由于这有时会给开发人员带来负担，特别是在应用程序运行之前，在应用程序处于“开发阶段”时允许非https重定向URL并且只能由开发人员访问，然后要求在发布应用程序之前，重定向URL应更改为https URL。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--客户端注册]]></title>
+      <url>/2018/07/13/oauth-guide-8/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>本章是对OAuth服务提供商的指导。</p>
+<h3 id="注册新的应用程序"><a href="#注册新的应用程序" class="headerlink" title="注册新的应用程序"></a>注册新的应用程序</h3><p>当开发人员访问您的网站时，他们需要一种方法来创建新的应用程序并获取凭据。通常，您可以让他们在创建应用程序之前创建开发人员帐户，或代表其组织创建帐户。</p>
+<p>虽然OAuth 2.0规范不要求您在授予凭据之前特别收集任何应用程序信息，但大多数服务会在发出client_id和client_secret之前收集有关应用程序的基本信息，例如应用程序名称和图标。但是，为了安全起见，您需要开发人员为应用程序注册一个或多个重定向URL，这一点非常重要。重定向URL中对此进行了更详细的说明。</p>
+<p>通常，服务收集有关应用程序的信息，例如：</p>
+<ul>
+<li>应用名称</li>
+<li>应用程序的图标</li>
+<li>应用程序主页的URL</li>
+<li>应用程序的简短描述</li>
+<li>应用程序隐私策略的链接</li>
+<li>重定向网址列表</li>
+</ul>
+<p>下面是GitHub用于注册应用程序的界面。在其中，它们收集应用程序名称，主页URL，回调URL和可选描述。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="在Github上创建一个新的应用程序"><br>在GitHub上创建一个新的应用程序</p>
+<p>最好向开发人员展示您从中收集的信息是显示给最终用户，还是仅供内部使用。</p>
+<p>Foursquare的应用程序注册页面要求提供类似的信息，但他们还要求提供简短的标语和隐私政策URL。这些在授权提示中显示给用户。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/foursquare_create_new_application.png" alt="在Foursquare上创建一个新的应用程序"><br>在Foursquare上创建一个新的应用程序</p>
+<p>由于使用隐式授权类型的安全性考虑因素，某些服务（例如Instagram）默认情况下会禁用新应用程序的此授权类型，并要求开发人员在应用程序的设置中明确启用它，如下所示。或者，该服务可以使开发人员选择他们正在创建的应用程序类型（公共或私有），并仅向私有应用程序发出密钥。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/instagram_create_new_application.png" alt="在Instagram上创建一个新的应用程序"><br>在Instagram上创建一个新的应用程序</p>
+<p>Instagram还提供了一个说明，指示开发人员不要用可能使应用程序看起来来自Instagram的单词命名他们的应用程序。这也是包含API使用条款链接的优势。</p>
+<h3 id="客户端ID和秘钥"><a href="#客户端ID和秘钥" class="headerlink" title="客户端ID和秘钥"></a>客户端ID和秘钥</h3><p>此时，您已构建了应用程序注册页面，您已准备好让开发人员注册该应用程序。当开发人员注册应用程序时，您需要生成客户端ID和可选的密钥。在生成这些字符串时，在安全性和美学方面需要考虑一些重要的事项。</p>
+<h4 id="客户端ID"><a href="#客户端ID" class="headerlink" title="客户端ID"></a>客户端ID</h4><p>client_id是应用程序的公共标识符。即使它是公开的，最好是第三方无法猜测，因此许多实现使用类似32字符的十六进制字符串。它在授权服务器处理的所有客户端中也必须是唯一的。如果客户端ID是可猜测的，则可以更轻松地针对任意应用程序进行网络钓鱼攻击。</p>
+<p>以下是来自支持OAuth 2.0的服务的客户端ID的一些示例：</p>
+<ul>
+<li>Foursquare： ZYDPLLBWSK3MVQJSIYHB1OR2JXCY0X2C5UJ2QAR2MAAIT5Q</li>
+<li>Github： 6779ef20e75817b79602</li>
+<li>Google： 292085223830.apps.googleusercontent.com</li>
+<li>Instagram： f2a1ed52710d4533bde25be6da03b6e3</li>
+<li>SoundCloud： 269d98e4922fb3895e9ae2108cbb5064</li>
+<li>Windows Live： 00000000400ECB04</li>
+</ul>
+<p>如果开发人员正在创建“公共”应用程序（移动或单页应用程序），那么您根本不应该向应用程序发出client_secret。这是确保开发人员不会意外地将其包含在应用程序中的唯一方法。如果它不存在，它就不会泄露！</p>
+<p>因此，您应该询问开发人员在启动时创建的应用程序类型。您可以向他们提供以下选项，并仅为“Web服务器”应用程序发出密钥。</p>
+<ul>
+<li>Web服务器应用程序</li>
+<li>基于浏览器的应用</li>
+<li>原生应用</li>
+<li>移动应用</li>
+</ul>
+<p>当然，没有什么可以阻止开发人员选择错误的选项，但是通过主动询问开发人员将使用哪种类型的应用程序，您可以帮助减少泄露秘密的可能性。了解正在创建哪种类型的应用程序的另一个原因是您需要注册公共客户端的重定向URL，但是对于私有客户端，重定向URL的注册在技术上是可选的。有关详细信息，请参阅<a href="https://www.oauth.com/oauth2-servers/redirect-uris/redirect-uri-registration/" target="_blank" rel="noopener">重定向URI注册</a>。</p>
+<h4 id="客户端密钥"><a href="#客户端密钥" class="headerlink" title="客户端密钥"></a>客户端密钥</h4><p>client_secret是只有应用程序和授权服务器知道的密钥。它必须足够随机以至于无法猜测，这意味着您应该避免使用常见的UUID库，这些库通常会考虑生成它的服务器的时间戳或MAC地址。生成安全密钥的一个好方法是使用加密安全库生成256位值并将其转换为十六进制表示。</p>
+<p>在PHP中，您可以使用OpenSSL函数生成随机字节并转换为十六进制字符串：</p>
+<pre><code class="php">bin2hex(openssl_random_pseudo_bytes(32));
+</code></pre>
+<p>或者在PHP 7及更高版本中，random_bytes可以使用内置函数。</p>
+<p>在Ruby中，您可以使用SecureRandom库生成十六进制字符串：</p>
+<pre><code class="ruby">require &#39;securerandom&#39;
+SecureRandom.hex(32)
+</code></pre>
+<p>开发人员永远不要将其client_secret公开（基于移动或基于浏览器的）应用程序包含在内是至关重 为了帮助开发人员避免意外地执行此操作，最好使客户端密钥在视觉上与ID不同。这种方式当开发人员复制并粘贴ID和密钥时，很容易识别哪个是哪个。通常使用较长的字符串来表示密钥是一种很好的方式来表明这一点，或者在密钥前加上“密钥”或“私密”。</p>
+<h4 id="存储和显示客户端ID和密钥"><a href="#存储和显示客户端ID和密钥" class="headerlink" title="存储和显示客户端ID和密钥"></a>存储和显示客户端ID和密钥</h4><p>对于每个注册的应用程序，您需要存储公共client_id和私有client_secret。因为这些本质上等同于用户名和密码，所以不应以纯文本格式存储密钥，而应仅存储加密或散列版本，以帮助降低秘密泄露的可能性。</p>
+<p>当您发出客户端ID和密钥时，您需要将它们显示给开发人员。大多数服务为开发人员提供了一种检索现有应用程序密钥的方法，尽管有些服务只显示一次密钥并要求开发人员立即自行存储。如果您只显示一次密钥，则可以存储它的散列版本以避免存储明文密码。</p>
+<p>如果您选择稍后可以向开发人员显示的方式存储密钥，则在披露密钥时应采取额外的预防措施。保护密钥的常用方法是在开发人员尝试检索密钥时插入“重新授权”提示。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_confirm_password.png" alt="GitHub重新授权提示"><br>GitHub在进行敏感更改时要求确认您的密码</p>
+<p>该服务要求开发人员在泄密之前确认其密码。当您尝试查看或更新敏感信息时，这在Amazon或GitHub的网站中很常见。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/dropbox_show_secret.png" alt="Dropbox&#39;显示秘密&#39;确认"><br>Dropbox会隐藏秘密，直到被点击为止</p>
+<p>此外，在开发人员点击“显示”之前模糊应用程序详细信息页面上的密钥是防止意外泄露秘密的好方法。</p>
+<h3 id="删除应用程序和撤消秘钥"><a href="#删除应用程序和撤消秘钥" class="headerlink" title="删除应用程序和撤消秘钥"></a>删除应用程序和撤消秘钥</h3><p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销秘钥，并为其应用程序生成新的客户端密钥也是一个好主意。</p>
+<h4 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h4><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1ftfbpd4ohnj30d106e0tk.jpg" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
+<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权代码和刷新令牌。</p>
+<h4 id="撤销秘钥"><a href="#撤销秘钥" class="headerlink" title="撤销秘钥"></a>撤销秘钥</h4><p>该服务应该为开发人员提供重置客户端密钥的方法。在秘钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧秘密。撤销秘密不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftfbqqm2vzj30d607kq40.jpg" alt="GitHub重置客户端密码提示"><br>GitHub要求确认重置应用程序的秘钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧秘钥的任何已部署应用程序将无法使用旧秘钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其秘密。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--进行身份验证请求]]></title>
+      <url>/2018/07/13/oauth-guide-7/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>无论您使用哪种授权类型，或者您是否使用了客户端密钥，您现在都可以使用API​​来使用OAuth 2.0 Bearer Token。</p>
+<p>API服务器可以通过两种方式接受Bearer Token。一个在HTTP Authorization标头中，另一个在post body参数中。它取决于它支持的服务，因此您需要检查文档以确定。</p>
+<p>在HTTP标头中传入访问令牌时，您应该发出如下请求：</p>
+<pre><code class="bash">POST /resource/1/update HTTP/1.1
+Authorization: Bearer RsT5OjbzRn430zqMLgV3Ia&quot;
+Host: api.authorization-server.com
+
+description=Hello+World
+</code></pre>
+<p>如果服务接受帖子正文中的访问令牌，那么您可以发出如下请求：</p>
+<pre><code class="bash">POST /resource/1/ HTTP/1.1
+Host: api.authorization-server.com
+
+access_token=RsT5OjbzRn430zqMLgV3Ia
+&amp;description=Hello+World
+</code></pre>
+<p>请注意，由于OAuth 2.0规范实际上并不需要上面的任何一个选项，因此您必须阅读与之交互的特定服务的API文档，以了解它们是否支持post body参数或HTTP标头。</p>
+<p>访问令牌不应由您的应用程序解析。你应用程序唯一应该做的就是使用它来发出API请求。一些服务将使用结构化令牌（如JWT）作为其访问令牌，但客户端在这种情况下无需担心解码令牌。</p>
+<p>实际上，尝试解码访问令牌是危险的，因为服务器不保证访问令牌将始终保持相同的格式。完全有可能在下次从服务获得访问令牌时，它将采用不同的格式。要记住的是，访问令牌对客户端是不透明的，并且应该仅用于发出API请求而不是自己解释。</p>
+<p>如果您试图找出您的访问令牌是否已过期，您可以存储您第一次获得访问令牌时返回的过期时间，或者只是尝试发出请求查看当前令牌是否过期，并获取新的访问令牌。</p>
+<p>如果您正在尝试查找有关登录用户的更多信息，您应该阅读特定服务的API文档以了解他们的建议。例如，Google的API使用OpenID Connect提供userinfo endpoint，该endpoint可以返回有关给定访问令牌的用户的信息。</p>
+<h3 id="刷新访问令牌"><a href="#刷新访问令牌" class="headerlink" title="刷新访问令牌"></a>刷新访问令牌</h3><p>当您最初收到访问令牌时，它可能包含刷新令牌以及到期时间，如下例所示。</p>
+<pre><code class="json">{
+  &quot;access_token&quot;: &quot;AYjcyMzY3ZDhiNmJkNTY&quot;,
+  &quot;refresh_token&quot;: &quot;RjY2NjM5NzA2OWJjuE7c&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires&quot;: 3600
+}
+</code></pre>
+<p>刷新令牌的存在意味着访问令牌将过期，您将能够在没有用户交互的情况下获得新令牌。</p>
+<p>“expires”值是访问令牌有效的秒数。这取决于令牌服务的提供商，并且可能取决于应用程序或组织自己的策略。您可以使用它来抢先刷新访问令牌，而不是等待带有过期令牌的请求失败。</p>
+<p>如果您发出API请求并且令牌已经过期，您将收到一个指示响应。您可以检查此特定错误消息，然后刷新令牌并再次尝试请求。</p>
+<p>如果您使用的是基于JSON的API，则可能会返回带有invalid_token错误的JSON错误响应。在一些情况下，WWW-Authenticate header也会出现invalid_token错误。</p>
+<pre><code class="bash">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer error=&quot;invalid_token&quot;
+  error_description=&quot;The access token expired&quot;
+Content-type: application/json
+
+{
+  &quot;error&quot;: &quot;invalid_token&quot;,
+  &quot;error_description&quot;: &quot;The access token expired&quot;
+}
+</code></pre>
+<p>当您的代码识别出此特定错误时，它可以使用之前收到的刷新令牌向令牌endpoint发出请求，并返回可用于重试原始请求的新访问令牌。</p>
+<p>要使用刷新令牌，请向服务的令牌endpoint发出POST请求grant_type=refresh_token，并包括刷新令牌和客户端凭据。</p>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+Host: authorization-server.com
+
+grant_type=refresh_token
+&amp;amp;refresh_token=xxxxxxxxxxx
+&amp;amp;client_id=xxxxxxxxxx
+&amp;amp;client_secret=xxxxxxxxxx
+</code></pre>
+<p>响应将是新的访问令牌，也可能包含新的刷新令牌，就像您在交换访问令牌的授权代码时收到的那样。</p>
+<pre><code class="json">{
+  &quot;access_token&quot;: &quot;BWjcyMzY3ZDhiNmJkNTY&quot;,
+  &quot;refresh_token&quot;: &quot;Srq2NjM5NzA2OWJjuE7c&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires&quot;: 3600
+}
+</code></pre>
+<p>如果您没有获得新的刷新令牌，那么这意味着当新的访问令牌到期时，您现有的刷新令牌将继续工作。</p>
+<p>请记住，用户可以在任何时候撤销应用程序 ，因此，当刷新访问令牌也失败时，您的应用程序需要能够处理这种情况。此时，您需要再次提示用户进行授权。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--移动和原生应用]]></title>
+      <url>/2018/07/13/oauth-guide-6/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>与单页应用程序一样，移动应用程序也无法保持客户机密的机密性。因此，移动应用还必须使用不需要客户端密钥的OAuth流程。当前的最佳做法是使用授权流程以及启动外部浏览器，以确保本机应用程序无法修改浏览器窗口或检查内容。</p>
+<p>许多网站都提供移动SDK，为您处理授权过程。对于这些网站，你最好直接使用他们的SDK，因为他们可能用非标准的方式添加增加了他们的API。Google提供了一个名为AppAuth的开源库，它可以处理下面描述的流程的实现细节。它旨在能够与任何实现规范的OAuth 2.0服务器一起使用。如果服务不提供自己的抽象，并且您必须直接使用其OAuth 2.0的endpoint，你就可以参照本节介绍来了解如何使用授权与API进行交互。</p>
+<h3 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h3><p>创建一个“登录”按钮，该按钮将打开SFSafariViewController或启动本机浏览器。您将使用与服务器端应用程序中所述相同的授权请求参数。</p>
+<p>对于本机应用程序的重定向URL，在iOS上，应用程序可以注册像<code>org.example.app://</code>这样的自定义URL scheme，只要访问具有该scheme的URL，就会启动应用程序。在Android上，应用程序可以注册URL匹配模式，如果访问了与模式匹配的URL，则会启动本机应用程序。</p>
+<h3 id="举个栗子🌰"><a href="#举个栗子🌰" class="headerlink" title="举个栗子🌰"></a>举个栗子🌰</h3><p>在这个例子中，我们将创建一个简单的iPhone应用程序，获取访问虚构API的授权。</p>
+<h4 id="应用程序启动授权请求"><a href="#应用程序启动授权请求" class="headerlink" title="应用程序启动授权请求"></a>应用程序启动授权请求</h4><p>要开始授权过程，应用程序应该有一个“登录”按钮。该链接应构建为服务授权endpoint的完整URL。</p>
+<p>授权URL通常采用以下格式：</p>
+<pre><code class="http">https://authorization-server.com/authorize
+?client_id=eKNjzFFjH9A1ysYd
+&amp;response_type=code
+&amp;redirect_uri=exampleapp://auth
+&amp;state=1234zyx
+</code></pre>
+<p>在这种情况下请注意重定向URL的自定义方案。iOS提供了应用程序注册自定义URL方案的功能。在Android上，应用可以改为匹配特定的网址模式，以便应用在访问特定网址时在应用列表中显示并进行处理。在iOS上，您应该在应用程序的.plist文件中注册您将使用的自定义方案。这将导致设备在访问以您的自定义方案开头的URL时启动您的应用，包括移动版Safari或其他iOS应用。</p>
+<p>当用户点击“登录”按钮时，应用程序应用SFSafariViewController打开共享系统cookie的嵌入式浏览器来打开登录URL。WebView在应用程序中使用嵌入式窗口被认为是非常危险的，因为这使用户无法保证他们正在查看服务自己的网站，并且是网络钓鱼攻击的简单来源。通过使用SFSafariViewController共享Safari cookie的API，您可以知道用户是否已经登录该服务。</p>
+<h4 id="用户批准该请求"><a href="#用户批准该请求" class="headerlink" title="用户批准该请求"></a>用户批准该请求</h4><p>在被定向到auth服务器时，用户看到如下所示的授权请求。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/sfsafariviewcontroller-example.png" alt="内置浏览器"></p>
+<p>嵌入式SFSafariViewController。右上角的“完成”按钮折叠视图并将用户返回到应用程序。</p>
+<h4 id="该服务将用户重定向回应用程序"><a href="#该服务将用户重定向回应用程序" class="headerlink" title="该服务将用户重定向回应用程序"></a>该服务将用户重定向回应用程序</h4><p>当用户完成登录后，该服务将重定向回您的应用程序的重定向URL，在这种情况下，该URL具有一个自定义方案，该方案将触发您的应用程序委托的application:openURL:options:方法。Location重定向的标题将类似于以下内容，它将作为url参数传递给您的方法。</p>
+<pre><code class="html">org.example.app://auth?state=1234zyx
+&amp;code=lS0KgilpRsT07qT_iMOg9bBSaWqODC1g061nSLsa8gV2GYtyynB6A
+</code></pre>
+<p>然后，您的应用应该从URL解析授权码，交换代码以获取访问令牌，并关闭SFSafariViewController。除了不使用客户端密钥之外，交换访问令牌的代码与授权代码流中的代码相同。</p>
+<h3 id="安全考虑因素"><a href="#安全考虑因素" class="headerlink" title="安全考虑因素"></a>安全考虑因素</h3><h4 id="始终打开本机浏览器或使用-SFSafariViewController"><a href="#始终打开本机浏览器或使用-SFSafariViewController" class="headerlink" title="始终打开本机浏览器或使用 SFSafariViewController"></a>始终打开本机浏览器或使用 SFSafariViewController</h4><p>您永远不应该使用OAuth提示打开嵌入式Web视图，因为它无法让用户验证他们正在查看的网页的来源。攻击者会创建一个看起来就像授权网页并将其嵌入到自己的恶意应用程序中的网页，让他们能够窃取用户名和密码。</p>
+<h4 id="PKCE"><a href="#PKCE" class="headerlink" title="PKCE"></a>PKCE</h4><p>如果您使用的服务支持PKCE扩展（<a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">RFC 7636</a>），那么您应该利用它提供的额外安全性。通常，例如在使用Google OAuth API的情况下，服务提供的本机SDK将透明地处理此问题，因此您无需担心详细信息，并且无需任何额外工作即可从额外的安全性中受益。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--单页应用]]></title>
+      <url>/2018/07/13/oauth-guide-5/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>从网页加载Javascript和HTML源代码后，单页应用程序（或基于浏览器的应用程序）将会完全在浏览器中运行。由于浏览器可以使用所有源代码，因此无法保持客户端密钥的机密性，因此这些应用程序不会使用该密钥。该流程与授权代码流完全相同，但在最后一步，授权码在不使用客户端密钥的情况下交换访问令牌。</p>
+<p>下图是用户与浏览器进行交互的示例，该浏览器直接向服务发出API请求。在首次从客户端下载Javascript和HTML源代码之后，浏览器会直接向服务发出API请求。在这种情况下，应用程序的服务器永远不会向服务发出API请求，因为所有事情都是直接在浏览器中处理的。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams.png" alt="用户的浏览器直接与API服务器通信"></p>
+<h3 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h3><p>授权码是客户端交换访问令牌的临时代码。代码本身从授权服务器获得，用户可以查看客户端请求的信息，并批准或拒绝该请求。</p>
+<p>Web流程的第一步是请求用户授权。这是通过为用户创建单击的授权请求链接来完成的。</p>
+<p>授权URL通常采用以下格式：</p>
+<pre><code class="html">https://authorization-server.com/oauth/authorize
+  ?client_id=a17c21ed
+  &amp;response_type=code
+  &amp;state=5ca75bd30
+  &amp;redirect_uri=https%3A%2F%2Fexample-app.com%2Fauth
+</code></pre>
+<p>用户访问授权页面后，服务会向用户显示请求的解释，包括应用程序名称，范围等。如果用户单击“批准”，服务器将重定向回网站，并附带授权码和URL查询字符串中的state值。</p>
+<h3 id="授权请求参数"><a href="#授权请求参数" class="headerlink" title="授权请求参数"></a>授权请求参数</h3><p>以下参数用于发出授权请求。</p>
+<blockquote>
+<p><strong>client_id</strong><br>这client_id是您的应用的标识符。首次向服务注册您的应用程序时，您将收到一个client_id。</p>
+<p><strong>response_type</strong><br>response_type设置为code表示您希望以授权码作为响应。</p>
+<p><strong>redirect_uri （可选的）</strong><br>该redirect_uri是在规范中可选的，但是有些服务需要它。这是您希望在授权完成后将用户重定向到的URL。这必须与您先前在服务中注册的重定向URL相匹配。</p>
+<p><strong>scope （可选的）</strong><br>包括一个或多个范围值以请求其他访问级别。这些值将取决于特定的服务。</p>
+<p><strong>state （推荐的）</strong><br>该state参数有两个功能。当用户被重定向回您的应用程序时，您在状态中包含的任何值都将包含在重定向中。这使您的应用程序有机会在被定向到授权服务器的用户和再次返回之间保留数据，例如使用state参数作为会话密钥。这可用于指示在授权完成后应用中要执行的操作，例如，指示在授权后要重定向到应用的哪个页面。这也可以作为CSRF保护机制。当用户重定向回您的应用程序时，请仔细检查状态值是否与您最初设置的值相匹配。这将确保攻击者无法拦截授权流程。</p>
+<p>请注意，缺少使用客户端密钥意味着使用state参数对单页应用程序更为重要。</p>
+</blockquote>
+<h3 id="举个栗子🌰"><a href="#举个栗子🌰" class="headerlink" title="举个栗子🌰"></a>举个栗子🌰</h3><p>以下分步示例说明了对单页应用程序使用授权授予类型。</p>
+<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><h5 id="应用程序启动授权请求"><a href="#应用程序启动授权请求" class="headerlink" title="应用程序启动授权请求"></a>应用程序启动授权请求</h5><p>应用程序通过制作包含ID的URL以及可选的scope和state来启动流程。该应用程序可以将其放入<code>&lt;a href=&quot;&quot;&gt;</code>标签中。</p>
+<pre><code class="html">&lt;a href=&quot;https://authorization-server.com/authorize?response_type=code
+     &amp;client_id=mRkZGFjM&amp;state=TY2OTZhZGFk&quot;&gt;Connect Your Account&lt;/a&gt;
+</code></pre>
+<h5 id="用户批准该请求"><a href="#用户批准该请求" class="headerlink" title="用户批准该请求"></a>用户批准该请求</h5><p>在被定向到auth服务器时，用户看到授权请求。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/okta_oauth-diagrams-approve.png" alt="示例授权请求"></p>
+<p>用户被带到服务并看到请求后，他们将允许或拒绝该请求。如果他们允许请求，他们将被重定向回重定向URL以及查询字符串中的授权码。然后，该应用程序需要交换授权码以获得访问令牌。</p>
+<pre><code class="http">https://example-app.com/cb?code=Yzk5ZDczMzRlNDEwY&amp;state=TY2OTZhZGFk
+</code></pre>
+<p>如果您在初始授权网址中包含“state”参数，则该服务会在用户授权您的应用后将其返回给您。你的应用程序应该将state参数与它在初始请求中创建的state餐素进行比较。这有助于确保您只交换您请求的授权码，防止攻击者使用任意或被盗的授权码重定向到您的回调URL。</p>
+<h5 id="交换访问令牌的授权码"><a href="#交换访问令牌的授权码" class="headerlink" title="交换访问令牌的授权码"></a>交换访问令牌的授权码</h5><p>要交换访问令牌的授权码，应用程序会向服务的令牌endpoint发出POST请求。请求将具有以下参数。</p>
+<blockquote>
+<p><strong>grant_type （需要）</strong><br>该grant_type参数必须设置为“authorization_code”。</p>
+<p><strong>code （需要）</strong><br>此参数用于从授权服务器接收的授权代码，该授权代码将位于此请求中的查询字符串参数“code”中。</p>
+<p><strong>redirect_uri （可能需要）</strong><br>如果重定向URL包含在初始授权请求中，则它也必须包含在令牌请求中，并且必须相同。某些服务支持注册多个重定向URL，有些服务需要在每个请求上指定重定向URL。请查看服务的文档以了解具体信息。</p>
+<p><strong>客户端识别ID（必填）</strong><br>尽管客户端密钥未在此流程中使用，但该请求需要发送客户端ID以识别发出请求的应用程序。这意味着客户端必须将客户端ID包含为POST主体参数，而不是像包含客户端密钥时那样使用HTTP基本认证。</p>
+</blockquote>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+  Host: authorization-endpoint.com
+  grant_type=code
+  &amp;code=Yzk5ZDczMzRlNDEwY
+  &amp;redirect_uri=https://example-app.com/cb
+  &amp;client_id=mRkZGFjM
+</code></pre>
+<h3 id="隐式流程"><a href="#隐式流程" class="headerlink" title="隐式流程"></a>隐式流程</h3><p>有些服务使用隐式流程用于单页面应用程序，而不是允许应用程序毫无限制地使用授权码流程。</p>
+<p>隐式流程绕过代码交换步骤，而是将查询字符串片段中的访问令牌立即返回给客户端。</p>
+<p>在实践中，只有非常有限的情况需要这样做。几个主要的实现（Keycloak，Deutsche Telekom，Smart Health IT）选择完全避免隐式流程并使用授权码流程。</p>
+<p>为了使单页应用程序使用授权码流程，它必须能够向授权服务器发出POST请求。这意味着如果授权服务器位于不同的域上，则服务器将需要支持相应的CORS头。如果不支持CORS头，则服务可以使用隐式流程。</p>
+<p>在任何情况下，对于隐式流程以及授权码流程来说，都没有客户端秘钥，服务器必须要求注册重定向URL以保持流程的安全性。</p>
+<h4 id="安全考虑"><a href="#安全考虑" class="headerlink" title="安全考虑"></a>安全考虑</h4><p>通过使用“state”参数并将重定向URL限制为可认证客户端，这是授权代码授予无客户端密钥的客户端的唯一安全方法。由于没有使用密钥，除了使用注册的重定向URL之外，没有办法验证客户的身份。这就是为什么您需要使用OAuth 2.0服务预先注册您的重定向网址。</p>
+<p>尽管OAuth 2.0规范并不特别要求重定向URL使用TLS加密，但强烈建议您使用它。不需要的唯一原因是因为部署SSL网站对许多开发人员来说仍然是一个障碍，这将阻碍规范的广泛采用。有些API确实需要https作为重定向端点，但许多API仍然没有。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--服务器端应用程序]]></title>
+      <url>/2018/07/13/oauth-guide-4/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>服务器端应用程序是处理OAuth 2服务器时遇到的最常见的应用程序类型。这些应用程序在Web服务器上运行，其中应用程序的源代码不可供公众使用，因此他们可以保持其客户端秘钥的机密性。</p>
+<p>下图说明了用户与正在与客户端通信的浏览器进行交互的典型示例。客户端和API服务器之间具有单独的安全通信通道。用户的浏览器从不直接向API服务器发出请求，所有内容都先通过客户端。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftf3o8318wj30p006edfx.jpg" alt="应用程序的服务器与API通信"></p>
+<p>服务器端应用程序使用authorization_code授权类型。在此流程中，在用户授权应用程序之后，应用程序接收“授权码”，然后它可以交换访问令牌。</p>
+<h3 id="授权码授予"><a href="#授权码授予" class="headerlink" title="授权码授予"></a>授权码授予</h3><p>授权码是客户端将为访问令牌交换的临时代码。代码本身从授权服务器获得，其中用户有机会查看客户端请求的信息，并批准或拒绝该请求。</p>
+<p>授权码流程与其他授权类型相比具有一些优势。当用户授权应用程序时，会带着URL中的临时代码返回应用程序。应用程序有这个代码来交换访问令牌。当应用程序发出访问令牌请求时，该请求将使用客户端密钥进行身份验证，从而降低攻击者拦截授权码并自行使用它的风险。这也意味着访问令牌永远不会被用户看到，因此这是将令牌传递回应用程序的最安全方式，从而降低令牌泄露给其他人的风险。</p>
+<p>Web流程的第一步是请求用户授权。这是通过创建用户单击的授权请求链接来完成的。</p>
+<p>授权URL通常采用以下格式：</p>
+<pre><code class="http">https://authorization-server.com/oauth/authorize
+?client_id=a17c21ed
+&amp;response_type=code
+&amp;state=5ca75bd30
+&amp;redirect_uri=https%3A%2F%2Fexample-app.com%2Fauth
+</code></pre>
+<p>确切的URL endpoint将由您要连接的服务指定，但参数名称将始终相同。</p>
+<p>请注意，在接受服务之前，您很可能首先需要在服务中注册重定向URL。这也意味着您无法根据请求更改重定向网址。相反，您可以使用该state参数来自定义请求。</p>
+<p>用户访问授权页面后，该服务会向用户显示请求的说明，包括应用程序名称，范围等。如果用户单击“批准”，则服务器将使用您在查询字符串参数中提供的“code”和相同的“state”参数重定向回应用程序。请务必注意，这不是访问令牌。您可以使用授权码执行的唯一操作是发出获取访问令牌的请求。</p>
+<h4 id="授权授予参数"><a href="#授权授予参数" class="headerlink" title="授权授予参数"></a>授权授予参数</h4><p>以下参数用于授予授权。您应该使用以下参数构建一个查询字符串，并将其附加到从其文档中获取的应用程序的授权endpoint后。</p>
+<blockquote>
+<p><strong>response_type=code</strong><br>response_type设置为code表示您希望将授权码作为响应。</p>
+<p><strong>client_id</strong><br>client_id是您的应用的标识符。首次向服务注册您的应用时，您将收到client_id。</p>
+<p><strong>redirect_uri （可选的）</strong><br>redirect_uri是可选的，但强烈建议你添加。这是您希望在授权完成后将用户重定向到的URL。这必须与您先前在服务中注册的重定向URL相匹配。</p>
+<p><strong>scope （可选的）</strong><br>包括一个或多个范围值（以空格分隔）以请求其他访问级别。它的值取决于特定服务。</p>
+<p><strong>state （推荐的）</strong><br>state参数有两个功能。当用户被重定向回您的应用程序时，您在state中包含的任何值都将包含在重定向中。这使您的应用程序有机会在用户被定向到授权服务器和再次返回之间保留数据，例如使用state参数作为会话密钥。也可用于指示在授权完成后应用中要执行的操作，例如，指示在授权后应该重定向到应用的哪个页面。也可以作为CSRF保护机制。当用户重定向回您的应用程序时，请仔细检查state值是否与您最初设置的值相匹配。这将确保攻击者无法拦截授权流程。</p>
+</blockquote>
+<p>将所有这些查询字符串参数组合到登录URL中，并将用户的浏览器定向到那里。通常，应用程序会将这些参数放入登录按钮，或者从应用程序自己的登录URL发送重定向到此URL。</p>
+<h4 id="用户批准该请求"><a href="#用户批准该请求" class="headerlink" title="用户批准该请求"></a>用户批准该请求</h4><p>在用户进入服务并看到请求后，他们将允许或拒绝该请求。如果他们允许请求，他们将带着查询字符串中的授权码，并被重定向回指定的重定向URL。然后，应用程序需要使用此授权码交换访问令牌。</p>
+<h4 id="交换访问令牌的授权码"><a href="#交换访问令牌的授权码" class="headerlink" title="交换访问令牌的授权码"></a>交换访问令牌的授权码</h4><p>要使用授权码交换访问令牌，应用程序会向服务的令牌endpoint发出POST请求。请求将具有以下参数。</p>
+<blockquote>
+<p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“authorization_code”。</p>
+<p><strong>code （需要）</strong><br>查询字符串参数“code”中存放从授权服务器接收的授权码。</p>
+<p><strong>redirect_uri （可能需要）</strong><br>如果重定向URL包含在初始授权请求中，则它也必须包含在令牌请求中，并且必须相同。某些服务支持注册多个重定向URL，有些服务需要在每个请求上指定重定向URL。请查看服务的文档以了解具体信息。</p>
+</blockquote>
+<h4 id="客户端验证（必填）"><a href="#客户端验证（必填）" class="headerlink" title="客户端验证（必填）"></a>客户端验证（必填）</h4><p>该服务将要求客户端在发出访问令牌请求时进行身份验证。通常，服务通过HTTP Basic Auth来进行客户端身份验证，并使用客户端的client_id和client_secret。但是，某些服务通过接受client_id和client_secret作为POST body参数来支持身份验证。检查服务的文档以找出服务所期望的内容，因为OAuth 2.0规范将此决定留给了服务。</p>
+<h3 id="示例流程"><a href="#示例流程" class="headerlink" title="示例流程"></a>示例流程</h3><p>以下逐步说明示例使用授权代码授予类型。</p>
+<p>步骤：</p>
+<ul>
+<li>使用应用程序的客户端ID，重定向URL和state参数创建登录链接</li>
+<li>用户看到授权提示并批准该请求</li>
+<li>用户带着授权码重定向回应用程序的服务器</li>
+<li>应用程序使用授权码交换访问令牌</li>
+</ul>
+<h4 id="应用程序启动授权请求"><a href="#应用程序启动授权请求" class="headerlink" title="应用程序启动授权请求"></a>应用程序启动授权请求</h4><p>应用程序通过制作包含ID，scope和state的URL来启动流程。该应用程序可以将其放入<code>&lt;a href=&quot;&quot;&gt;</code>标签中。</p>
+<pre><code class="html">&lt;a href=&quot;https://authorization-server.com/oauth/authorize
+?response_type=code&amp;client_id=mRkZGFjM&amp;state=5ca75bd30&quot;&gt;
+Connect Your Account&lt;/a&gt;
+</code></pre>
+<h4 id="用户批准该请求-1"><a href="#用户批准该请求-1" class="headerlink" title="用户批准该请求"></a>用户批准该请求</h4><p>在被定向到auth服务器后，用户会看到下图所示的授权请求。如果用户批准该请求，他们将带着授权码和state参数重定向回应用程序。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftf5fephk0j30kw0bw0t3.jpg" alt="示例授权请求"></p>
+<h4 id="服务将用户重定向回应用程序"><a href="#服务将用户重定向回应用程序" class="headerlink" title="服务将用户重定向回应用程序"></a>服务将用户重定向回应用程序</h4><p>服务将用户重定向回发出请求的应用程序。重定向将在URL中包含“code”和原始的“state”参数。</p>
+<pre><code class="http">https://example-app.com/cb?code=Yzk5ZDczMzRlNDEwY&amp;state=5ca75bd30
+</code></pre>
+<h4 id="应用程序使用授权吗交换访问令牌"><a href="#应用程序使用授权吗交换访问令牌" class="headerlink" title="应用程序使用授权吗交换访问令牌"></a>应用程序使用授权吗交换访问令牌</h4><p>该应用程序使用授权码，通过向授权服务器发出POST请求来获取访问令牌。</p>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+Host: authorization-server.com
+
+code=Yzk5ZDczMzRlNDEwY
+&amp;grant_type=code
+&amp;redirect_uri=https://example-app.com/cb
+&amp;client_id=mRkZGFjM
+&amp;client_secret=ZGVmMjMz
+</code></pre>
+<p>auth服务器验证请求，并返回访问令牌和访问令牌过期时使用的刷新令牌。</p>
+<p>响应：</p>
+<pre><code class="json">{
+  &quot;access_token&quot;: &quot;AYjcyMzY3ZDhiNmJkNTY&quot;,
+  &quot;refresh_token&quot;: &quot;RjY2NjM5NzA2OWJjuE7c&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires&quot;: 3600
+}
+</code></pre>
+<h3 id="可能的错误"><a href="#可能的错误" class="headerlink" title="可能的错误"></a>可能的错误</h3><p>有几种情况下，您可能会在授权期间收到错误响应。</p>
+<p>错误会通过在返回的重定向URL的查询字符串提示。重定向URL总会有一个错误参数，也可能包含error_description和error_uri。</p>
+<p>例如:<br><code>https://example-app.com/cb?error=invalid_scope</code></p>
+<p>尽管服务器返回error_description密钥，但错误描述并不打算显示给用户。相反，您应该向用户显示您自己的错误消息。这允许您告诉用户采取适当的措施来纠正问题，并且如果您正在构建多语言网站，还可以让您有机会本地化错误消息。</p>
+<h4 id="无效的重定向网址"><a href="#无效的重定向网址" class="headerlink" title="无效的重定向网址"></a>无效的重定向网址</h4><p>如果提供的重定向URL无效，则auth服务器不会重定向到它。相反，它可以向用户显示描述问题的信息。</p>
+<h4 id="无法识别-client-id"><a href="#无法识别-client-id" class="headerlink" title="无法识别 client_id"></a>无法识别 client_id</h4><p>如果无法识别客户端ID，则auth服务器不会重定向用户。相反，它可能会显示一条描述问题的信息。</p>
+<h4 id="用户拒绝该请求"><a href="#用户拒绝该请求" class="headerlink" title="用户拒绝该请求"></a>用户拒绝该请求</h4><p>如果用户拒绝授权请求，则服务器会将用户重定向包含error=access_denied查询字符串的重定向URL ，并且不会出现code字段。由应用程序决定此时向用户显示的内容。</p>
+<h4 id="无效的参数"><a href="#无效的参数" class="headerlink" title="无效的参数"></a>无效的参数</h4><p>如果一个或多个参数无效，例如缺少必需值，或者response_type参数错误，服务器将重定向到重定向URL并包含描述问题的查询字符串参数。</p>
+<p>error参数的其他可能值为：</p>
+<ul>
+<li>invalid_request：请求缺少必需参数，包含无效参数值，或者格式错误。</li>
+<li>unauthorized_client：客户端无权使用此方法请求授权码。</li>
+<li>unsupported_response_type：授权服务器不支持使用此方法获取授权码。</li>
+<li>invalid_scope：请求的范围无效，未知或格式错误。</li>
+<li>server_error：授权服务器遇到意外情况，导致无法完成请求。</li>
+<li>temporarily_unavailable：由于服务器临时过载或维护，授权服务器当前无法处理请求。</li>
+</ul>
+<p>此外，服务器可以包括参数error_description和error_uri关于错误的附加信息。</p>
+<h3 id="用户体验考虑事项"><a href="#用户体验考虑事项" class="headerlink" title="用户体验考虑事项"></a>用户体验考虑事项</h3><p>为了使授权代码授权生效，授权页面必须出现在用户熟悉的Web浏览器中，并且不得嵌入到iframe弹出窗口或移动到应用程序中的嵌入式浏览器中。因此，对于传统的“Web应用程序”来说，用户已经在Web浏览器中并且重定向到服务器的授权页面的这种操作，是最适用的。</p>
+<h3 id="安全考虑"><a href="#安全考虑" class="headerlink" title="安全考虑"></a>安全考虑</h3><p>授权码授权是为可以保护其客户端ID和密钥的客户端设计的。因此，最适合不提供其源代码的在服务器上运行的网络应用程序。</p>
+<p>如果应用程序想要使用授权代码授权但无法保护其密钥（即本机移动应用程序），则在请求交换访问令牌的授权代码时就不需要客户端密钥。但是，某些服务不接受没有客户端密钥的授权码交换，因此本机应用程序可能需要为这些服务使用备用方法。</p>
+<p>尽管OAuth 2.0规范并不特别要求重定向URL使用TLS加密，但我强烈建议您使用它。不需要的唯一原因是因为部署SSL网站对许多开发人员来说仍然是一个障碍，这将阻碍规范的广泛采用。有些API确实需要https作为重定向端点，但许多API仍然没有这样要求。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--使用Google登录]]></title>
+      <url>/2018/07/13/oauth-guide-3/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>尽管OAuth是<strong>授权协议</strong>而不是<strong>身份验证协议</strong>，但它通常用作身份验证工作流程的基础。许多常见OAuth API的典型用途是在登录第三方应用程序时识别当前用户。</p>
+<p>身份验证和授权经常相互混淆，但如果从应用程序的角度考虑它们，则可以更容易理解。正在验证用户的应用只是验证用户是谁。授权用户的应用程序正在尝试访问或修改属于该用户的内容。</p>
+<p>OAuth被设计为授权协议，因此每个OAuth流程的最终结果是应用程序获取访问令牌，以便能够访问或修改有关用户帐户的内容。访问令牌本身并未说明用户是谁。</p>
+<p>有几种方法可以让不同的服务为应用程序提供一种查找用户身份的方法。一种简单的方法是API提供“用户信息”的endpoint，当使用访问令牌访问API时，该endpoint将返回经过身份验证的用户的名称和其他配置文件信息。虽然这不是OAuth标准的一部分，但它是许多服务采用的常见方法。更高级和标准化的方法是使用OAID 2.0扩展的OpenID Connect。OpenID Connect在后面有更详细的介绍。</p>
+<p>本章将使用简化的OpenID Connect工作流程和Google API来识别用户并登录到您的应用程序。</p>
+<h3 id="创建一个应用程序"><a href="#创建一个应用程序" class="headerlink" title="创建一个应用程序"></a>创建一个应用程序</h3><p>在我们开始之前，我们需要在Google API控制台中创建一个应用程序，以获取客户端ID和客户端秘钥，并注册重定向URL。</p>
+<p>访问<code>https://console.developers.google.com/</code>并创建一个新项目。您还需要为项目创建OAuth 2.0凭据，因为Google不会自动执行此操作。在侧栏中，单击“Credentials”选项卡，然后单击“Create credentials”并从下拉列表中选择“OAuth client ID”。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftdy5lw1czj30sg0jwn09.jpg" alt="创建一个应用程序"></p>
+<p>Google控制台会提示您提供有关您的应用程序的一些信息，例如产品名称，主页和logo。在下一页上，选择”Web application”类型，然后输入重定向URL。这样，您就会收到客户端ID和秘钥。</p>
+<h3 id="建立环境"><a href="#建立环境" class="headerlink" title="建立环境"></a>建立环境</h3><p>本章节示例代码是用PHP编写的，不需要外部包，也不需要框架，这可以很容易地翻译成其他语言。要模仿此示例代码，您应该将它全部放在一个PHP文件中。</p>
+<p>创建一个新文件夹并在该文件夹中创建一个空文件<code>index.php</code>。从该文件夹内部运行的命令行输入<code>php -S localhost:8000</code>，您将能够在浏览器中访问<code>http://localhost:8000</code>来运行您的代码。以下示例中的所有代码都应添加到此index.php文件中。</p>
+<p>让我们为OAuth流程设置一些变量，添加我们在创建应用程序时从Google获得的客户端ID和秘钥。</p>
+<pre><code class="php">// Fill these out with the values you got from Google
+$googleClientID = &#39;&#39;;
+$googleClientSecret = &#39;&#39;;
+
+// This is the URL we&#39;ll send the user to first
+// to get their authorization
+$authorizeURL = &#39;https://accounts.google.com/o/oauth2/v2/auth&#39;;
+
+// This is Google&#39;s OpenID Connect token endpoint
+$tokenURL = &#39;https://www.googleapis.com/oauth2/v4/token&#39;;
+
+// The URL for this script, used as the redirect URL
+$baseURL = &#39;https://&#39; . $_SERVER[&#39;SERVER_NAME&#39;]
+    . $_SERVER[&#39;PHP_SELF&#39;];
+
+// Start a session so we have a place
+// to store things between redirects
+session_start();
+</code></pre>
+<p>定义了这些变量，并开始会话，让我们设置登录和注销的页面。我们将显示一个超级简单的页面，它只是指示用户是否已登录，并且具有登录或注销的链接。</p>
+<pre><code class="php">// If there is a user ID in the session
+// the user is already logged in
+if(!isset($_GET[&#39;action&#39;])) {
+  if(!empty($_SESSION[&#39;user_id&#39;])) {
+    echo &#39;&lt;h3&gt;Logged In&lt;/h3&gt;&#39;;
+    echo &#39;&lt;p&gt;User ID: &#39;.$_SESSION[&#39;user_id&#39;].&#39;&lt;/p&gt;&#39;;
+    echo &#39;&lt;p&gt;Email: &#39;.$_SESSION[&#39;email&#39;].&#39;&lt;/p&gt;&#39;;
+    echo &#39;&lt;p&gt;&lt;a href=&quot;?action=logout&quot;&gt;Log Out&lt;/a&gt;&lt;/p&gt;&#39;;
+
+    // Fetch user info from Google&#39;s userinfo endpoint
+    echo &#39;&lt;h3&gt;User Info&lt;/h3&gt;&#39;;
+    echo &#39;&lt;pre&gt;&#39;;
+    $ch = curl_init(&#39;https://www.googleapis.com/oauth2/v3/userinfo&#39;);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      &#39;Authorization: Bearer &#39;.$_SESSION[&#39;access_token&#39;]
+    ]);
+    curl_exec($ch);
+    echo &#39;&lt;/pre&gt;&#39;;
+
+  } else {
+    echo &#39;&lt;h3&gt;Not logged in&lt;/h3&gt;&#39;;
+    echo &#39;&lt;p&gt;&lt;a href=&quot;?action=login&quot;&gt;Log In&lt;/a&gt;&lt;/p&gt;&#39;;
+  }
+  die();
+}
+</code></pre>
+<p>已注销的页面包含指向我们的登录的URL链接，该URL用于启动OAuth流程。</p>
+<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>现在我们已经设置了必要的变量，让我们开始OAuth流程。</p>
+<p>我们要让人们做的第一件事是,在查询字符串为<code>?action=login</code>时，访问此页面以启动该流程。</p>
+<p>请注意，此请求中的scope现在是OpenID Connect的scope，“openid email”，表示我们不是要求访问用户的Google数据，只是想知道他们是谁。</p>
+<p>另请注意，我们使用<code>response_type=code</code>参数来指示我们希望Google返回用来交换id_token的授权码。</p>
+<pre><code class="php">// Start the login process by sending the user
+// to Google&#39;s authorization page
+if(isset($_GET[&#39;action&#39;]) &amp;&amp; $_GET[&#39;action&#39;] == &#39;login&#39;) {
+  unset($_SESSION[&#39;user_id&#39;]);
+
+  // Generate a random hash and store in the session
+  $_SESSION[&#39;state&#39;] = bin2hex(random_bytes(16));
+
+  $params = array(
+    &#39;response_type&#39; =&gt; &#39;code&#39;,
+    &#39;client_id&#39; =&gt; $googleClientID,
+    &#39;redirect_uri&#39; =&gt; $baseURL,
+    &#39;scope&#39; =&gt; &#39;openid email&#39;,
+    &#39;state&#39; =&gt; $_SESSION[&#39;state&#39;]
+  );
+
+  // Redirect the user to Google&#39;s authorization page
+  header(&#39;Location: &#39;.$authorizeURL.&#39;?&#39;.http_build_query($params));
+  die();
+}
+</code></pre>
+<p>生成用于保护客户端的“state”参数非常重要。这是客户端生成并存储在会话中的随机字符串。当Google将用户发送回应用时，该应用使用state参数来验证是否是它发出的请求。</p>
+<p>我们建立一个授权URL，然后将用户发送到那里。该网址包含我们的公共客户ID，我们之前在Google注册的重定向网址，我们要求的scope以及state参数。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftdz43ass6j30se0x2wgz.jpg" alt="Google的授权请求"></p>
+<p>如果用户已登录Google，他们会看到如上所示的帐户选择页面，要求他们选择现有帐户或使用其他帐户。请注意，此屏幕看起来不像典型的OAuth屏幕，因为用户没有授予应用程序任何权限，而只是尝试识别它们。</p>
+<p>当用户选择一个帐户时，他们将被重定向回我们的页面，并在请求中返回code和state参数。下一步是使用Google API验证授权码。</p>
+<h3 id="获取ID令牌"><a href="#获取ID令牌" class="headerlink" title="获取ID令牌"></a>获取ID令牌</h3><p>当用户被重定向回我们的应用程序时，查询字符串中将有一个code和state参数。该state参数将与我们在初始授权请求中设置的参数相同，并且在用于我们的应用程序之前，应该检查它是否匹配。这可确保我们的应用不会欺骗Google向攻击者发送授权码。</p>
+<pre><code class="php">// When Google redirects the user back here, there will
+// be a &quot;code&quot; and &quot;state&quot; parameter in the query string
+if(isset($_GET[&#39;code&#39;])) {
+  // Verify the state matches our stored state
+  if(!isset($_GET[&#39;state&#39;]) || $_SESSION[&#39;state&#39;] != $_GET[&#39;state&#39;]) {
+    header(&#39;Location: &#39; . $baseURL . &#39;?error=invalid_state&#39;);
+    die();
+  }
+
+  // Verify the authorization code
+  $ch = curl_init($tokenURL);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+    &#39;grant_type&#39; =&gt; &#39;authorization_code&#39;,
+    &#39;client_id&#39; =&gt; $googleClientID,
+    &#39;client_secret&#39; =&gt; $googleClientSecret,
+    &#39;redirect_uri&#39; =&gt; $baseURL,
+    &#39;code&#39; =&gt; $_GET[&#39;code&#39;]
+  ]));
+  $response = json_decode(curl_exec($ch), true);
+
+  // ... fill in from the code in the next section
+}
+</code></pre>
+<p>此代码首先检查从Google返回的“状态”是否与我们在会话中存储的状态匹配。</p>
+<p>我们向Google的令牌endpoint建立了一个POST请求，其中包含我们应用的客户端ID和密码，以及Google在查询字符串中发回给我们的授权码。</p>
+<p>Google将验证我们的请求，然后使用访问令牌和ID令牌进行回复。响应将如下所示。</p>
+<pre><code class="json">{
+  &quot;access_token&quot;: &quot;ya29.Glins-oLtuljNVfthQU2bpJVJPTu&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;id_token&quot;: &quot;eyJhbGciOiJSUzI1NiIsImtpZCI6ImFmZmM2MjkwN
+  2E0NDYxODJhZGMxZmE0ZTgxZmRiYTYzMTBkY2U2M2YifQ.eyJhenAi
+  OiIyNzIxOTYwNjkxNzMtZm81ZWI0MXQzbmR1cTZ1ZXRkc2pkdWdzZX
+  V0ZnBtc3QuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQi
+  OiIyNzIxOTYwNjkxNzMtZm81ZWI0MXQzbmR1cTZ1ZXRkc2pkdWdzZX
+  V0ZnBtc3QuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIi
+  OiIxMTc4NDc5MTI4NzU5MTM5MDU0OTMiLCJlbWFpbCI6ImFhcm9uLn
+  BhcmVja2lAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUs
+  ImF0X2hhc2giOiJpRVljNDBUR0luUkhoVEJidWRncEpRIiwiZXhwIj
+  oxNTI0NTk5MDU2LCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2ds
+  ZS5jb20iLCJpYXQiOjE1MjQ1OTU0NTZ9.ho2czp_1JWsglJ9jN8gCg
+  WfxDi2gY4X5-QcT56RUGkgh5BJaaWdlrRhhN_eNuJyN3HRPhvVA_KJ
+  Vy1tMltTVd2OQ6VkxgBNfBsThG_zLPZriw7a1lANblarwxLZID4fXD
+  YG-O8U-gw4xb-NIsOzx6xsxRBdfKKniavuEg56Sd3eKYyqrMA0DWnI
+  agqLiKE6kpZkaGImIpLcIxJPF0-yeJTMt_p1NoJF7uguHHLYr6752h
+  qppnBpMjFL2YMDVeg3jl1y5DeSKNPh6cZ8H2p4Xb2UIrJguGbQHVIJ
+  vtm_AspRjrmaTUQKrzXDRCfDROSUU-h7XKIWRrEd2-W9UkV5oCg&quot;
+}
+</code></pre>
+<p>应将访问令牌视为不透明字符串。除了能够使用它来发出API请求之外，它对您的应用程序没有重要意义。</p>
+<p>ID令牌具有您的应用可以解析的特定结构，以找出登录者的用户数据。ID令牌是JWT，在OpenID Connect中有更详细的解释。您可以将Google的JWT粘贴到jsonwebtoken.io等网站，以快速向您显示内容。</p>
+<h3 id="验证用户信息"><a href="#验证用户信息" class="headerlink" title="验证用户信息"></a>验证用户信息</h3><p>通常，在信任ID令牌中的任何信息之前验证ID令牌至关重要。这是因为通常您的应用会通过不受信任的渠道（例如浏览器重定向）获取ID令牌。</p>
+<p>在这种情况下，您使用客户端密钥通过HTTPS连接向Google获取ID令牌，以便向Google进行身份验证，因此您可以确信您获得的ID令牌实际上来自服务商而非攻击者。考虑到这一点，我们可以不加验证的解码ID令牌。谷歌就是这样做的：<code>https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo</code>。</p>
+<p>看看上面的JWT。它由三个部分组成，每个部分用一个句点分隔。我们可以在点上分割字符串，然后取出中间部分。中间部分是base64编码的JSON字符串，包含ID令牌数据。以下是JWT中的数据示例。</p>
+<pre><code class="json">{
+  &quot;azp&quot;: &quot;272196069173.apps.googleusercontent.com&quot;,
+  &quot;aud&quot;: &quot;272196069173.apps.googleusercontent.com&quot;,
+  &quot;sub&quot;: &quot;110248495921238986420&quot;,
+  &quot;hd&quot;: &quot;okta.com&quot;,
+  &quot;email&quot;: &quot;aaron.parecki@okta.com&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;at_hash&quot;: &quot;0bzSP5g7IfV3HXoLwYS3Lg&quot;,
+  &quot;exp&quot;: 1524601669,
+  &quot;iss&quot;: &quot;https://accounts.google.com&quot;,
+  &quot;iat&quot;: 1524598069
+}
+</code></pre>
+<p>我们真正关心的这个演示是两个属性sub和email。sub(subject)属性包含了登录用户的唯一用户标识符。我们会提取它，并将其存储在会话中，这将向我们的应用程序表明用户已经登录。</p>
+<p>我们还会在会话中存储ID令牌和访问令牌，以便我们以后可以使用它们，这也是我们获取并显示用户信息的另一种方法。</p>
+<pre><code class="php">  // ... continuing from the previous code sample, insert this
+
+  // Split the JWT string into three parts
+  $jwt = explode(&#39;.&#39;, $data[&#39;id_token&#39;]);
+
+  // Extract the middle part, base64 decode, then json_decode it
+  $userinfo = json_decode(base64_decode($jwt[1]), true);
+
+  $_SESSION[&#39;user_id&#39;] = $userinfo[&#39;sub&#39;];
+  $_SESSION[&#39;email&#39;] = $userinfo[&#39;email&#39;];
+
+  // While we&#39;re at it, let&#39;s store the access token and id token
+  // so we can use them later
+  $_SESSION[&#39;access_token&#39;] = $data[&#39;access_token&#39;];
+  $_SESSION[&#39;id_token&#39;] = $data[&#39;id_token&#39;];
+
+  header(&#39;Location: &#39; . $baseURL);
+  die();
+}
+</code></pre>
+<p>现在，您将被重定向回应用程序的主页，我们将使用我们在先前创建的代码向您显示用户ID和电子邮件。</p>
+<pre><code class="javascript">echo &#39;&lt;p&gt;User ID: &#39;.$_SESSION[&#39;user_id&#39;].&#39;&lt;/p&gt;&#39;;
+echo &#39;&lt;p&gt;Email: &#39;.$_SESSION[&#39;email&#39;].&#39;&lt;/p&gt;&#39;;
+</code></pre>
+<h4 id="使用ID令牌检索用户信息"><a href="#使用ID令牌检索用户信息" class="headerlink" title="使用ID令牌检索用户信息"></a>使用ID令牌检索用户信息</h4><p>Google提供了一个额外的API endpoint，称为tokeninfo endpoint，您可以使用它来查找ID令牌详细信息，而不是自己解析它。这不建议用于生产应用程序，因为它需要额外的HTTP往返，但可用于测试和故障排除。</p>
+<p>Google的tokeninfo endpoint<code>https://www.googleapis.com/oauth2/v3/tokeninfo</code>位于其OpenID Connect发现文档中:<code>https://accounts.google.com/.well-known/openid-configuration</code>。要查找我们收到的ID令牌的信息，请使用查询字符串中的ID令牌向tokeninfo endpoint发出GET请求。</p>
+<p><code>https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=eyJ</code></p>
+<p>响应将是一个JSON对象，其中包含JWT本身包含的类似属性列表。</p>
+<pre><code class="json">{
+ &quot;azp&quot;: &quot;272196069173.apps.googleusercontent.com&quot;,
+ &quot;aud&quot;: &quot;272196069173.apps.googleusercontent.com&quot;,
+ &quot;sub&quot;: &quot;110248495921238986420&quot;,
+ &quot;hd&quot;: &quot;okta.com&quot;,
+ &quot;email&quot;: &quot;aaron.parecki@okta.com&quot;,
+ &quot;email_verified&quot;: &quot;true&quot;,
+ &quot;at_hash&quot;: &quot;NUuq_yggZYi_2-13hJSOXw&quot;,
+ &quot;exp&quot;: &quot;1524681857&quot;,
+ &quot;iss&quot;: &quot;https://accounts.google.com&quot;,
+ &quot;iat&quot;: &quot;1524678257&quot;,
+ &quot;alg&quot;: &quot;RS256&quot;,
+ &quot;kid&quot;: &quot;affc62907a446182adc1fa4e81fdba6310dce63f&quot;
+}
+</code></pre>
+<h4 id="使用访问令牌来检索用户信息"><a href="#使用访问令牌来检索用户信息" class="headerlink" title="使用访问令牌来检索用户信息"></a>使用访问令牌来检索用户信息</h4><p>如前所述，许多OAuth 2.0服务还提供endpoint来检索登录用户的用户信息。这是OpenID Connect标准的一部分，endpoint将成为服务的OpenID Connect Discovery文档的一部分。</p>
+<p>谷歌的userinfo endpoint是<code>https://www.googleapis.com/oauth2/v3/userinfo</code>。在这种情况下，您使用访问令牌而不是ID令牌来查找用户信息。向该 endpoint发出GET请求，并像执行OAuth 2.0 API请求时那样,在HTTP Header中添加Authorization传递访问令牌。</p>
+<pre><code class="http">GET /oauth2/v3/userinfo
+Host: www.googleapis.com
+Authorization: Bearer ya29.Gl-oBRPLiI9IrSRA70...
+</code></pre>
+<p>响应将是一个JSON对象，其中包含有关用户的若干属性。响应将始终包含sub密钥，该密钥是用户的唯一标识符。Google还会返回用户的个人资料信息，例如姓名，个人资料照片网址，性别，区域设置，个人资料网址和电子邮件。服务器还可以添加自己的声明，例如Google hd在使用G Suite帐户时显示帐户的“托管域”。</p>
+<pre><code class="json">{
+ &quot;sub&quot;: &quot;110248495921238986420&quot;,
+ &quot;name&quot;: &quot;Aaron Parecki&quot;,
+ &quot;given_name&quot;: &quot;Aaron&quot;,
+ &quot;family_name&quot;: &quot;Parecki&quot;,
+ &quot;picture&quot;: &quot;https://lh4.googleusercontent.com/-kw-iMgD
+   _j34/AAAAAAAAAAI/AAAAAAAAAAc/P1YY91tzesU/photo.jpg&quot;,
+ &quot;email&quot;: &quot;aaron.parecki@okta.com&quot;,
+ &quot;email_verified&quot;: true,
+ &quot;locale&quot;: &quot;en&quot;,
+ &quot;hd&quot;: &quot;okta.com&quot;
+}
+</code></pre>
+<h4 id="下载示例代码"><a href="#下载示例代码" class="headerlink" title="下载示例代码"></a>下载示例代码</h4><p>您可以从GitHub下载此示例中使用的完整示例代码，网址为<code>https://github.com/aaronpk/sample-oauth2-client</code>。</p>
+<p>在用户登录后，您已经看到了三种不同的方式来获取用户的个人资料信息。那么您应该使用哪个以及何时使用？</p>
+<p>对于性能敏感的应用程序，您可能在每个请求上读取ID令牌或使用它们来维护会话，您绝对应该在本地验证ID令牌而不是发出网络请求。Google的API文档提供了有关离线验证ID令牌的详细信息的指南。</p>
+<p>如果您所做的只是在登录后尝试查找用户的姓名和电子邮件，那么向userinfo endpoint发出API请求是最简单，最直接的选择。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--访问OAuth服务器中的数据]]></title>
       <url>/2018/07/13/oauth-guide-2/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>

@@ -43,7 +43,7 @@
     
     <title>
         
-            标签: OAuth | 
+            OAuth教程--客户端注册 | 
         
         小鱼肖恩
     </title>
@@ -54,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩">
+    <meta name="keywords" content="小鱼肖恩,OAuth">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -81,6 +81,9 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -216,7 +219,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/tags/OAuth/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/07/13/oauth-guide-8/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -235,13 +238,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/tags/OAuth/">
+    <meta property="og:url" content="http://seanthefish.com/2018/07/13/oauth-guide-8/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="标签: OAuth | 小鱼肖恩">
+    <meta property="og:title" content="OAuth教程--客户端注册 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    
+    <meta property="og:article:tag" content="OAuth"> 
 
+    
+        <meta property="article:published_time" content="Fri Jul 13 2018 08:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Thu Jul 19 2018 18:00:49 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -249,13 +255,43 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/tags/OAuth/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2018/07/13/oauth-guide-8/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-8/index.html",
+    "headline": "OAuth教程--客户端注册",
+    "datePublished": "Fri Jul 13 2018 08:00:00 GMT+0800",
+    "dateModified": "Thu Jul 19 2018 18:00:49 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",OAuth小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
 
 
     
@@ -400,27 +436,29 @@
 
                     
 
-                    <!-- Index Module -->
-<div class="material-index mdl-grid">
-    
-    <div class="locate-thumbnail-symbol"></div>
+                    <!-- Post TOC -->
 
-    <!-- Pin on top -->
-    
-        
     
 
-    <!-- Normal Post -->
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+
+
+    <!-- Isolation Post Header -->
+    <!-- Post thumbnail -->
     
         <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
+        <div class="post-header_info without-thumbnail">
             <!-- Author Avatar & Name -->
             <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
             <span class="name-span">Sean Yu</span>
@@ -431,587 +469,165 @@
     
         </div>
 
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-10/">OAuth教程--范围</a>
-        </p>
 
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-10/" target="_self">阅读全文</a>
-            </span>
-        </p>
 
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
-                
-            </div>
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+
+    
+        <div class="post-content_wrapper">
+            <p class="post-title">
+                OAuth教程--客户端注册
+            </p>
+            <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>本章是对OAuth服务提供商的指导。</p>
+<h3 id="注册新的应用程序"><a href="#注册新的应用程序" class="headerlink" title="注册新的应用程序"></a>注册新的应用程序</h3><p>当开发人员访问您的网站时，他们需要一种方法来创建新的应用程序并获取凭据。通常，您可以让他们在创建应用程序之前创建开发人员帐户，或代表其组织创建帐户。</p>
+<p>虽然OAuth 2.0规范不要求您在授予凭据之前特别收集任何应用程序信息，但大多数服务会在发出client_id和client_secret之前收集有关应用程序的基本信息，例如应用程序名称和图标。但是，为了安全起见，您需要开发人员为应用程序注册一个或多个重定向URL，这一点非常重要。重定向URL中对此进行了更详细的说明。</p>
+<p>通常，服务收集有关应用程序的信息，例如：</p>
+<ul>
+<li>应用名称</li>
+<li>应用程序的图标</li>
+<li>应用程序主页的URL</li>
+<li>应用程序的简短描述</li>
+<li>应用程序隐私策略的链接</li>
+<li>重定向网址列表</li>
+</ul>
+<p>下面是GitHub用于注册应用程序的界面。在其中，它们收集应用程序名称，主页URL，回调URL和可选描述。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_create_new_application_1.png" alt="在Github上创建一个新的应用程序"><br>在GitHub上创建一个新的应用程序</p>
+<p>最好向开发人员展示您从中收集的信息是显示给最终用户，还是仅供内部使用。</p>
+<p>Foursquare的应用程序注册页面要求提供类似的信息，但他们还要求提供简短的标语和隐私政策URL。这些在授权提示中显示给用户。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/foursquare_create_new_application.png" alt="在Foursquare上创建一个新的应用程序"><br>在Foursquare上创建一个新的应用程序</p>
+<p>由于使用隐式授权类型的安全性考虑因素，某些服务（例如Instagram）默认情况下会禁用新应用程序的此授权类型，并要求开发人员在应用程序的设置中明确启用它，如下所示。或者，该服务可以使开发人员选择他们正在创建的应用程序类型（公共或私有），并仅向私有应用程序发出密钥。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/instagram_create_new_application.png" alt="在Instagram上创建一个新的应用程序"><br>在Instagram上创建一个新的应用程序</p>
+<p>Instagram还提供了一个说明，指示开发人员不要用可能使应用程序看起来来自Instagram的单词命名他们的应用程序。这也是包含API使用条款链接的优势。</p>
+<h3 id="客户端ID和秘钥"><a href="#客户端ID和秘钥" class="headerlink" title="客户端ID和秘钥"></a>客户端ID和秘钥</h3><p>此时，您已构建了应用程序注册页面，您已准备好让开发人员注册该应用程序。当开发人员注册应用程序时，您需要生成客户端ID和可选的密钥。在生成这些字符串时，在安全性和美学方面需要考虑一些重要的事项。</p>
+<h4 id="客户端ID"><a href="#客户端ID" class="headerlink" title="客户端ID"></a>客户端ID</h4><p>client_id是应用程序的公共标识符。即使它是公开的，最好是第三方无法猜测，因此许多实现使用类似32字符的十六进制字符串。它在授权服务器处理的所有客户端中也必须是唯一的。如果客户端ID是可猜测的，则可以更轻松地针对任意应用程序进行网络钓鱼攻击。</p>
+<p>以下是来自支持OAuth 2.0的服务的客户端ID的一些示例：</p>
+<ul>
+<li>Foursquare： ZYDPLLBWSK3MVQJSIYHB1OR2JXCY0X2C5UJ2QAR2MAAIT5Q</li>
+<li>Github： 6779ef20e75817b79602</li>
+<li>Google： 292085223830.apps.googleusercontent.com</li>
+<li>Instagram： f2a1ed52710d4533bde25be6da03b6e3</li>
+<li>SoundCloud： 269d98e4922fb3895e9ae2108cbb5064</li>
+<li>Windows Live： 00000000400ECB04</li>
+</ul>
+<p>如果开发人员正在创建“公共”应用程序（移动或单页应用程序），那么您根本不应该向应用程序发出client_secret。这是确保开发人员不会意外地将其包含在应用程序中的唯一方法。如果它不存在，它就不会泄露！</p>
+<p>因此，您应该询问开发人员在启动时创建的应用程序类型。您可以向他们提供以下选项，并仅为“Web服务器”应用程序发出密钥。</p>
+<ul>
+<li>Web服务器应用程序</li>
+<li>基于浏览器的应用</li>
+<li>原生应用</li>
+<li>移动应用</li>
+</ul>
+<p>当然，没有什么可以阻止开发人员选择错误的选项，但是通过主动询问开发人员将使用哪种类型的应用程序，您可以帮助减少泄露秘密的可能性。了解正在创建哪种类型的应用程序的另一个原因是您需要注册公共客户端的重定向URL，但是对于私有客户端，重定向URL的注册在技术上是可选的。有关详细信息，请参阅<a href="https://www.oauth.com/oauth2-servers/redirect-uris/redirect-uri-registration/" target="_blank" rel="noopener">重定向URI注册</a>。</p>
+<h4 id="客户端密钥"><a href="#客户端密钥" class="headerlink" title="客户端密钥"></a>客户端密钥</h4><p>client_secret是只有应用程序和授权服务器知道的密钥。它必须足够随机以至于无法猜测，这意味着您应该避免使用常见的UUID库，这些库通常会考虑生成它的服务器的时间戳或MAC地址。生成安全密钥的一个好方法是使用加密安全库生成256位值并将其转换为十六进制表示。</p>
+<p>在PHP中，您可以使用OpenSSL函数生成随机字节并转换为十六进制字符串：</p>
+<pre><code class="php">bin2hex(openssl_random_pseudo_bytes(32));
+</code></pre>
+<p>或者在PHP 7及更高版本中，random_bytes可以使用内置函数。</p>
+<p>在Ruby中，您可以使用SecureRandom库生成十六进制字符串：</p>
+<pre><code class="ruby">require &#39;securerandom&#39;
+SecureRandom.hex(32)
+</code></pre>
+<p>开发人员永远不要将其client_secret公开（基于移动或基于浏览器的）应用程序包含在内是至关重 为了帮助开发人员避免意外地执行此操作，最好使客户端密钥在视觉上与ID不同。这种方式当开发人员复制并粘贴ID和密钥时，很容易识别哪个是哪个。通常使用较长的字符串来表示密钥是一种很好的方式来表明这一点，或者在密钥前加上“密钥”或“私密”。</p>
+<h4 id="存储和显示客户端ID和密钥"><a href="#存储和显示客户端ID和密钥" class="headerlink" title="存储和显示客户端ID和密钥"></a>存储和显示客户端ID和密钥</h4><p>对于每个注册的应用程序，您需要存储公共client_id和私有client_secret。因为这些本质上等同于用户名和密码，所以不应以纯文本格式存储密钥，而应仅存储加密或散列版本，以帮助降低秘密泄露的可能性。</p>
+<p>当您发出客户端ID和密钥时，您需要将它们显示给开发人员。大多数服务为开发人员提供了一种检索现有应用程序密钥的方法，尽管有些服务只显示一次密钥并要求开发人员立即自行存储。如果您只显示一次密钥，则可以存储它的散列版本以避免存储明文密码。</p>
+<p>如果您选择稍后可以向开发人员显示的方式存储密钥，则在披露密钥时应采取额外的预防措施。保护密钥的常用方法是在开发人员尝试检索密钥时插入“重新授权”提示。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/github_confirm_password.png" alt="GitHub重新授权提示"><br>GitHub在进行敏感更改时要求确认您的密码</p>
+<p>该服务要求开发人员在泄密之前确认其密码。当您尝试查看或更新敏感信息时，这在Amazon或GitHub的网站中很常见。</p>
+<p><img src="https://raw.githubusercontent.com/ShanyouYu-Sean/blog-images/master/oauth-guide/dropbox_show_secret.png" alt="Dropbox&#39;显示秘密&#39;确认"><br>Dropbox会隐藏秘密，直到被点击为止</p>
+<p>此外，在开发人员点击“显示”之前模糊应用程序详细信息页面上的密钥是防止意外泄露秘密的好方法。</p>
+<h3 id="删除应用程序和撤消秘钥"><a href="#删除应用程序和撤消秘钥" class="headerlink" title="删除应用程序和撤消秘钥"></a>删除应用程序和撤消秘钥</h3><p>开发人员需要一种方法来删除（或至少停用）他们的应用程序。为开发人员提供一种方法来撤销秘钥，并为其应用程序生成新的客户端密钥也是一个好主意。</p>
+<h4 id="删除应用程序"><a href="#删除应用程序" class="headerlink" title="删除应用程序"></a>删除应用程序</h4><p>当开发人员删除应用程序时，该服务应通知开发人员删除应用程序的后果。例如，GitHub告诉开发人员将撤销所有访问令牌，以及将受影响的用户数量。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1ftfbpd4ohnj30d106e0tk.jpg" alt="GitHub删除应用程序提示"><br>GitHub要求确认删除申请</p>
+<p>删除应用程序应立即撤消颁发给应用程序的所有访问令牌和其他凭据，例如待处理的授权代码和刷新令牌。</p>
+<h4 id="撤销秘钥"><a href="#撤销秘钥" class="headerlink" title="撤销秘钥"></a>撤销秘钥</h4><p>该服务应该为开发人员提供重置客户端密钥的方法。在秘钥被意外暴露的情况下，开发人员需要一种方法来确保可以撤销旧秘密。撤销秘密不一定会使用户的访问令牌无效，因为如果开发人员想要使所有用户令牌无效，他们也可以随时删除该应用程序。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftfbqqm2vzj30d607kq40.jpg" alt="GitHub重置客户端密码提示"><br>GitHub要求确认重置应用程序的秘钥</p>
+<p>重置密钥应该保持所有现有的访问令牌都处于活动状态。但是，这确实意味着使用旧秘钥的任何已部署应用程序将无法使用旧秘钥刷新访问令牌。部署的应用程序需要在能够使用刷新令牌之前更新其秘密。</p>
+
+            
         </div>
-    </div>
+    
 </div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-9/">OAuth教程--授权</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-9/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
                 
+                    <!-- Paradox Post Info -->
+                    
                 
-            </div>
-        </div>
-    </div>
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 Gitalk -->
+<div id="gitalk-comment">
+    <!-- Gitalk 评论框 -->
+<div id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+
+<script>
+    var gitalk = new Gitalk({
+            clientID: '37e3045f7495549e8e8f',
+            clientSecret: '7f01ca7a36dbfefe6abbb00c66c37d8d8559e8b2',
+            repo: 'seanthefish-repo',
+            owner: 'ShanyouYu-Sean',
+            admin: ['ShanyouYu-Sean'],
+            // facebook-like distraction free mode
+            distractionFreeMode: false,
+            id: md5(location.href)
+        })
+   gitalk.render('gitalk-container')
+</script>
 </div>
+<style>
+    #gitalk-comment {
+        background-color: #fff;
+        padding: 2pc;
+    }
+</style>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-8/">OAuth教程--客户端注册</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-8/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
                 
             </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2018/07/13/oauth-guide-9/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/07/13/oauth-guide-7/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
         </div>
     </div>
-</div>
 
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-7/">OAuth教程--进行身份验证请求</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-7/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-6/">OAuth教程--移动和原生应用</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-6/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-5/">OAuth教程--单页应用</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-5/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-4/">OAuth教程--服务器端应用程序</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-4/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-3/">OAuth教程--使用Google登录</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-3/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-2/">OAuth教程--访问OAuth服务器中的数据</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-2/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-        
-            
-            
-                <!-- Isolation Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post_entry Header -->
-    
-        <!-- Post Header Info -->
-        <div class="post_entry-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
-        </div>
-
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
-    
-        </div>
-
-    <!-- Post_entry Content -->
-    <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
-        <!-- Post Title -->
-        <p class="post_entry-title">
-            <a href="/2018/07/13/oauth-guide-1/">OAuth教程--准备工作</a>
-        </p>
-
-        <!-- Post Excerpt -->
-        <p class="post_entry-excerpt">
-            
-                本文是oauth.com上的教程的翻译。（
-            
-            &nbsp;&nbsp;&nbsp;
-            <span>
-                <a href="/2018/07/13/oauth-guide-1/" target="_self">阅读全文</a>
-            </span>
-        </p>
-
-        <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/OAuth/">OAuth</a></li></ul>
-    </div>
-
-    <!-- Post_entry Footer -->
-    <div class="post_entry-footer">
-        <div class="post_entry-footer-border"></div>
-        <div class="post_entry-footer-info">
-            <div class="post_entry-footer-date">
-                7月 13, 2018
-            </div>
-            <div class="post_entry-footer-comment">
-                
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-            
-        
-    
-
-    
-    <!-- Index nav -->
-        <nav class="material-nav mdl-cell mdl-cell--12-col">
-            <span class="page-number current">1</span><a class="page-number" href="/tags/OAuth/page/2/">2</a><a class="extend next" rel="next" href="/tags/OAuth/page/2/"><button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"><i class="material-icons" role="presentation">arrow_forward</i></button></a>
-        </nav>
-    
-
-    
-</div>
 
 
                     
@@ -1088,6 +704,10 @@
 <!-- Import prettify js  -->
 
     
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
 
 
 
@@ -1100,6 +720,11 @@
     });
 
     
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
         
     
     
