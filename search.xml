@@ -3,6 +3,357 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--访问令牌]]></title>
+      <url>/2018/07/13/oauth-guide-12/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>访问令牌是应用程序用于代表用户发出API请求的内容。访问令牌表示特定应用程序访问用户数据的特定部分的授权。</p>
+<p>访问令牌必须在运输和存储过程中保密。应该看到访问令牌的唯一方是应用程序本身，授权服务器和资源服务器。应用程序应确保同一设备上的其他应用程序无法访问访问令牌的存储。访问令牌只能在https连接上使用，因为通过非加密通道传递它会使第三方拦截变得非常容易。</p>
+<p>令牌endpoint是应用程序发出请求以获取用户访问令牌的位置。本节介绍如何验证令牌请求以及如何返回相应的响应和错误。</p>
+<h3 id="授权码请求"><a href="#授权码请求" class="headerlink" title="授权码请求"></a>授权码请求</h3><p>当应用试图交换访问令牌时，将使用授权码交换授予。用户通过重定向URL返回应用程序后，应用程序将从URL获取授权码并使用它来请求访问令牌。此请求将发送到令牌endpoint。</p>
+<p>####请求参数</p>
+<p>访问令牌请求将包含以下参数。</p>
+<blockquote>
+<p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“authorization_code”。</p>
+<p><strong>code （需要）</strong><br>code参数是客户端先前从授权服务器接收的授权码。</p>
+<p><strong>redirect_uri （可能需要）</strong><br>如果重定向URI包含在初始授权请求中，则服务也必须在令牌请求中要求它。令牌请求中的重定向URI必须与生成授权代码时使用的重定向URI完全匹配。 否则服务必须拒绝该请求。</p>
+<p><strong>client_id （如果不存在其他客户端身份验证，则需要）</strong><br>如果客户端通过HTTP Basic Auth或其他方法进行身份验证，则不需要此参数。否则，此参数是必需的。</p>
+</blockquote>
+<p>如果客户端发出了客户端密钥，则服务器必须对客户端进行身份验证。验证客户端的一种方法是接受此请求中的另一个参数client_secret。或者，授权服务器可以使用HTTP Basic Auth。从技术上讲，规范允许授权服务器支持任何形式的客户端身份验证，甚至提到公钥/私钥对作为选项。但实际上，大多数服务器都支持使用此处提到的方法之一或两者共同来验证客户端的简单方法。</p>
+<h4 id="验证授权码"><a href="#验证授权码" class="headerlink" title="验证授权码"></a>验证授权码</h4><p>在检查所有必需参数并在客户端被发出秘钥时验证客户端之后，授权服务器可以继续验证请求的其他部分。</p>
+<p>然后，服务器检查授权码是否有效，并且尚未过期。然后，该服务必须验证请求中提供的授权码是否已发送给所标识的客户端。最后，服务必须确保存的重定向URI参数与用于请求授权代码的重定向URI匹配。</p>
+<p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。</p>
+<p>例<br>以下示例显示了私密客户端的授权授予请求。</p>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+Host: authorization-server.com
+
+grant_type=authorization_code
+&amp;code=xxxxxxxxxxx
+&amp;redirect_uri=https://example-app.com/redirect
+&amp;client_id=xxxxxxxxxx
+&amp;client_secret=xxxxxxxxxx
+</code></pre>
+<h4 id="安全考虑因素"><a href="#安全考虑因素" class="headerlink" title="安全考虑因素"></a>安全考虑因素</h4><h5 id="防止重复攻击"><a href="#防止重复攻击" class="headerlink" title="防止重复攻击"></a>防止重复攻击</h5><p>如果多次使用授权码，授权服务器必须拒绝后续请求。授权码存储在数据库中是很容易实现，因为它们可以简单地标记为已使用。</p>
+<p>如果要实现自编码授权码（如我们的示例代码中所示），则需要跟踪已在令牌生命周期中使用的令牌。一种方法是通过生命周期之内，将授权码缓存在缓存中来实现此目的（具有过期时间的缓存）。这样在验证时，我们可以通过检查授权码的缓存来检查它们是否已被使用。一旦授权码到达其到期日期，它将不再在缓存中，但我们可以根据到期日期拒绝它。</p>
+<p>如果授权码被多次使用，则应将其视为攻击。如果可能，服务应撤销此授权码发出的先前访问令牌。</p>
+<h3 id="密码授予"><a href="#密码授予" class="headerlink" title="密码授予"></a>密码授予</h3><p>当应用程序交换用户的访问令牌的用户名和密码时，将使用密码授予。这正是首先要创建的OAuth，因此您绝不允许第三方应用使用此授权。</p>
+<p>此授权类型的常见用途是用您的服务为应用启用密码登录。用户使用他们的用户名和密码登录来登录网站或原生应用程序，但绝不允许第三方应用程序直接询问用户的密码。</p>
+<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<blockquote>
+<p><strong>grant_type（必填）</strong> - grant_type参数必须设置为“password”。<br><strong>username （必填）</strong> - 用户的用户名。<br><strong>password （必填）</strong> - 用户的密码。<br><strong>scope （可选）</strong> - 应用程序请求的范围。<br><strong>客户端身份验证</strong>（如果客户端被授予秘钥，则需要）</p>
+</blockquote>
+<p>如果客户端被授予秘钥，则必须验证此请求。通常，服务将允许其他请求参数如client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
+<p>例<br>以下是服务将接收的示例密码授予。</p>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+Host: authorization-server.com
+
+grant_type=password
+&amp;username=user@example.com
+&amp;password=1234luggage
+&amp;client_id=xxxxxxxxxx
+&amp;client_secret=xxxxxxxxxx
+</code></pre>
+<h3 id="客户端凭据"><a href="#客户端凭据" class="headerlink" title="客户端凭据"></a>客户端凭据</h3><p>当应用程序请求访问令牌来访问其自己的资源，而不是代表用户访问他们的资源时，将使用客户端凭据授予。</p>
+<h4 id="请求参数-1"><a href="#请求参数-1" class="headerlink" title="请求参数"></a>请求参数</h4><blockquote>
+<p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为client_credentials。</p>
+<p><strong>scope （可选的）</strong><br>您的服务可以支持客户端凭据授予的不同范围。实际上，实际上并没有多少服务支持这一点。</p>
+<p><strong>客户端验证（必填）</strong><br>客户端需要为此请求进行身份验证。通常，服务将接受请求参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
+</blockquote>
+<p>例<br>以下是客户端凭据的请求例子。</p>
+<pre><code class="bash">POST /token HTTP/1.1
+Host: authorization-server.com
+
+grant_type=client_credentials
+&amp;client_id=xxxxxxxxxx
+&amp;client_secret=xxxxxxxxxx
+</code></pre>
+<h3 id="访问令牌响应"><a href="#访问令牌响应" class="headerlink" title="访问令牌响应"></a>访问令牌响应</h3><h4 id="响应成功"><a href="#响应成功" class="headerlink" title="响应成功"></a>响应成功</h4><p>如果访问令牌的请求有效，则授权服务器需要生成访问令牌（和可选的刷新令牌）并将这些令牌返回给客户端，通常还有一些有关授权的其他属性。</p>
+<p>具有访问令牌的响应应包含以下属性：</p>
+<blockquote>
+<p><strong>access_token （必需）</strong> 授权服务器发出的访问令牌字符串。<br><strong>token_type （必需）</strong> 这是令牌的类型，通常只是字符串“bearer”。<br><strong>expires_in （推荐）</strong> 如果访问令牌会过期，服务器应回复授予访问令牌的持续时间。<br><strong>refresh_token（可选）</strong> 如果访问令牌会过期，则应该返回刷新令牌，应用程序可以使用该令牌来获取新的访问令牌。但是，使用隐式授权发出的令牌无法发出刷新令牌。<br><strong>scope（可选）</strong> 如果用户授予的范围与应用程序请求的范围相同，则此参数是可选的。如果授予的范围与请求的范围不同，例如，如果用户修改了范围，则此参数是必需的。</p>
+</blockquote>
+<p>使用访问令牌进行响应时，服务器还必须包含附加<code>Cache-Control: no-store</code>和<code>Pragma: no-cache</code>的HTTP header，以确保客户端不会缓存此请求。</p>
+<p>例如，成功的令牌响应可能如下所示：</p>
+<pre><code class="json">HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  &quot;access_token&quot;:&quot;MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3&quot;,
+  &quot;token_type&quot;:&quot;bearer&quot;,
+  &quot;expires_in&quot;:3600,
+  &quot;refresh_token&quot;:&quot;IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk&quot;,
+  &quot;scope&quot;:&quot;create&quot;
+}
+</code></pre>
+<p>####访问令牌</p>
+<p>OAuth 2.0 Bearer Token的格式实际上是在单独的规范<a href="https://tools.ietf.org/html/rfc6750" target="_blank" rel="noopener">RFC 6750</a>中描述的。规范要求的令牌没有已定义的结构，因此您可以生成任意字符串并实现所需的令牌。令牌中的有效字符是字母数字，和标点字符：-._~+/</p>
+<p>通常，服务将生成随机字符串并将其与相关的用户和范围信息一起存储在数据库中，或者将使用自编码令牌，其中令牌字符串本身包含所有必要的信息。</p>
+<h4 id="响应失败"><a href="#响应失败" class="headerlink" title="响应失败"></a>响应失败</h4><p>如果访问令牌请求无效，例如重定向URL与授权期间使用的URL不匹配，则服务器需要返回错误响应。</p>
+<p>使用HTTP 400状态代码（除非另有说明）返回错误响应，带有<code>error</code>和<code>error_description</code>参数。该<code>error</code>参数将始终是下面列出的值之一。</p>
+<blockquote>
+<p><strong>invalid_request</strong> - 请求缺少参数，因此服务器无法继续执行请求。如果请求包含不受支持的参数或重复参数，也可能会返回此信息。<br><strong>invalid_client</strong> - 客户端身份验证失败，例如请求包含无效的客户端ID或秘钥。在这种情况下发送HTTP 401响应。<br><strong>invalid_grant</strong> - 授权码（或密码授予类型的用户密码）无效或已过期。或者授权中给出的重定向URL与此访问令牌请求中提供的URL不匹配，也将返回这个的错误。<br><strong>invalid_scope</strong> - 对于包含范围（密码或client_credentials授权）的访问令牌请求，此错误表示请求中的范围值无效。<br><strong>unauthorized_client</strong> - 此客户端无权使用请求的授权类型。例如，如果限制哪些应用程序可以使用隐式授权，则会为其他应用程序返回此错误。<br><strong>unsupported_grant_type</strong> - 如果请求授权服务器无法识别的授权类型，请使用此代码。请注意，未知的授权类型也使用此特定错误代码而不是使用invalid_request。</p>
+</blockquote>
+<p>返回错误响应时有两个可选参数，<code>error_description</code>和<code>error_uri</code>。这些旨在为开发人员提供有关错误的更多信息，而不是向最终用户显示。但是，请记住，无论您多么警告，许多开发人员都会将此错误文本直接传递给最终用户，因此最好确保它对最终用户至少有所帮助。</p>
+<p>该<code>error_description</code>参数只能包含ASCII字符，最多应该是一两句话来描述错误的情况。这<code>error_uri</code>是链接到API文档的好地方，可以获取有关如何更正遇到的特定错误的信息。</p>
+<p>整个错误响应作为JSON字符串返回，类似于成功响应。以下是错误响应的示例。</p>
+<pre><code class="json">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  &quot;error&quot;: &quot;invalid_request&quot;,
+  &quot;error_description&quot;: &quot;Request was missing the &#39;redirect_uri&#39; parameter.&quot;,
+  &quot;error_uri&quot;: &quot;See the full API docs at https://authorization-server.com/docs/access_token&quot;
+}
+</code></pre>
+<h3 id="自编码访问令牌"><a href="#自编码访问令牌" class="headerlink" title="自编码访问令牌"></a>自编码访问令牌</h3><p>自编码令牌提供了一种通过编码令牌字符串中的所有必要信息来避免在数据库中存储令牌的方法。这样做的主要好处是API服务器能够在不对每个API请求进行数据库查找的情况下验证访问令牌，从而使API更容易扩展。</p>
+<p>OAuth 2.0 Bearer Tokens的好处是应用程序无需了解服务中如何实现访问令牌。这意味着可以在不影响客户端的情况下更改令牌的实现规则。</p>
+<p>如果您已经拥有可水平扩展的分布式数据库系统，那么使用自编码令牌可能无法获得任何好处。实际上，如果已经解决了分布式数据库问题，使用自编码令牌只会引入新问题，因为使自编码令牌失效会成为额外的障碍。</p>
+<p>有许多方法可以自编码令牌。您选择的实际方法仅对您的实现很重要，因为令牌信息不会暴露给外部开发人员。</p>
+<p>创建自编码标记的一种方法是创建序列化的json串来包含在token中的所有数据，并使用仅为您的服务器知道的密钥对结果字符串进行签名。</p>
+<p>一种常见的技术是使用<a href="https://tools.ietf.org/html/rfc7515" target="_blank" rel="noopener">JSON Web Signature（JWS）</a>标准来处理令牌的编码，解码和验证。 <a href="https://tools.ietf.org/html/rfc7519" target="_blank" rel="noopener">JSON Web Token (JWT)</a>规范定义了一些字段，你可以在JWS中使用，或定义一些时间戳字段来确定令牌是否有效。我们将在此示例中使用JWT库，因为它提供了时间到期的内置处理。</p>
+<h4 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h4><p>下面的代码是用PHP编写的，使用Firebase PHP-JWT库来编码和验证令牌。您需要包含该库才能运行示例代码</p>
+<pre><code class="php">&lt;?php
+use \Firebase\JWT\JWT;
+
+# Define the secret key used to create and verify the signature
+$jwt_key = &#39;secret&#39;;
+
+# Set the user ID of the user this token is for
+$user_id = 1000;
+
+# Set the client ID of the app that is generating this token
+$client_id = &#39;https://example-app.com&#39;;
+
+# Provide the list of scopes this token is valid for
+$scope = &#39;read write&#39;;
+
+$token_data = array(
+
+  # Subject (The user ID)
+  &#39;sub&#39; =&gt; $user_id,
+
+  # Issuer (the token endpoint)
+  &#39;iss&#39; =&gt; &#39;https://&#39; . $_SERVER[&#39;PHP_SELF&#39;],
+
+  # Client ID (this is a non-standard claim)
+  &#39;cid&#39; =&gt; $client_id,
+
+  # Issued At
+  &#39;iat&#39; =&gt; time(),
+
+  # Expires At
+  &#39;exp&#39; =&gt; time()+7200, // Valid for 2 hours
+
+  # The list of OAuth scopes this token includes
+  &#39;scope&#39; =&gt; $scope
+);
+$token_string = JWT::encode($token_data, $jwt_key);
+</code></pre>
+<p>这将产生一个字符串，如：</p>
+<pre><code class="jwt">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEwMDAsI
+mlzcyI6Imh0dHBzOi8vYXV0aG9yaXphdGlvbi1zZXJ2ZXIuY29tIiw
+iY2lkIjoiaHR0cHM6Ly9leGFtcGxlLWFwcC5jb20iLCJpYXQiOjE0N
+zAwMDI3MDMsImV4cCI6MTUyOTE3NDg1MSwic2NvcGUiOiJyZWFkIHd
+yaXRlIn0.QiIrnmaC4VrbAYAsu0YPeuJ992p20fSxrXWPLw-gkFA
+</code></pre>
+<p>此令牌由三部分组成，以句点分隔。第一部分描述了使用的签名方法。第二部分包含令牌数据。第三部分是签名。</p>
+<p>例如，此令牌的第一个部分是JSON对象：</p>
+<pre><code class="json">{
+   &quot;typ&quot;:&quot;JWT&quot;,
+   &quot;alg&quot;:&quot;HS256”
+}
+</code></pre>
+<p>第二个部分包含API端点处理请求所需的实际数据，例如用户标识和范围访问。</p>
+<pre><code class="json">{
+  &quot;sub&quot;: 1000,
+  &quot;iss&quot;: &quot;https://authorization-server.com&quot;,
+  &quot;cid&quot;: &quot;https://example-app.com&quot;,
+  &quot;iat&quot;: 1470002703,
+  &quot;exp&quot;: 1470009903,
+  &quot;scope&quot;: &quot;read write&quot;
+}
+</code></pre>
+<p>Base64编码前两个部分产生以下两个字符串：</p>
+<pre><code class="jwt">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+</code></pre>
+<pre><code class="jwt">eyJzdWIiOjEwMDAsImlzcyI6Imh0dHBzOi8vYXV0aG9yaXphdGlvbi1z
+ZXJ2ZXIuY29tIiwiY2lkIjoiaHR0cHM6Ly9leGFtcGxlLWFwcC5jb20i
+LCJpYXQiOjE0NzAwMDI3MDMsImV4cCI6MTUyOTE3NDg1MSwic2NvcGUi
+OiJyZWFkIHdyaXRlIn0
+</code></pre>
+<p>然后我们计算两个字符串和秘钥的散列，从而产生另一个字符串：</p>
+<pre><code class="jwt">QiIrnmaC4VrbAYAsu0YPeuJ992p20fSxrXWPLw-gkFA
+</code></pre>
+<p>最后，将所有三个字符串连接在一起，用句点分隔。</p>
+<pre><code class="jwt">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEwMDAsI
+mlzcyI6Imh0dHBzOi8vYXV0aG9yaXphdGlvbi1zZXJ2ZXIuY29tIiw
+iY2lkIjoiaHR0cHM6Ly9leGFtcGxlLWFwcC5jb20iLCJpYXQiOjE0N
+zAwMDI3MDMsImV4cCI6MTUyOTE3NDg1MSwic2NvcGUiOiJyZWFkIHd
+yaXRlIn0.QiIrnmaC4VrbAYAsu0YPeuJ992p20fSxrXWPLw-gkFA
+</code></pre>
+<h4 id="解码"><a href="#解码" class="headerlink" title="解码"></a>解码</h4><p>可以使用相同的JWT库来验证访问令牌。库将同时解码和验证签名，如果签名无效，或者令牌的过期日期已经过去，则会抛出异常。</p>
+<p>注意：任何人都可以通过base64解码令牌信息来解码令牌字符串的中间部分。因此，您不要存储您不希望用户或开发人员在令牌中看到的私人信息或信息，这一点很重要。如果要隐藏令牌信息，可以使用JSON Web加密规范加密令牌中的数据。</p>
+<pre><code class="php">try {
+  # Note: You must provide the list of supported algorithms in order to prevent 
+  # an attacker from bypassing the signature verification. See:
+  # https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/
+  $token = JWT::decode($token_string, $jwt_key, [&#39;HS256&#39;]);
+  $error = false;
+} catch(\Firebase\JWT\ExpiredException $e) {
+  $token = false;
+  $error = &#39;expired&#39;;
+  $error_description = &#39;The token has expired&#39;;
+} catch(\Firebase\JWT\SignatureInvalidException $e) {
+  $token = false;
+  $error = &#39;invalid&#39;;
+  $error_description = &#39;The token provided was malformed&#39;;
+} catch(Exception $e) {
+  $token = false;
+  $error = &#39;unauthorized&#39;;
+  $error_description = $e-&gt;getMessage();
+}
+
+if($error) {
+  header(&#39;HTTP/1.1 401 Unauthorized&#39;);
+  echo json_encode(array(
+    &#39;error&#39;=&gt;$error, 
+    &#39;error_description&#39;=&gt;$error_description
+  ));
+  die();
+} else {
+  // Now $token has all the data that we encoded in it originally
+  print_r($token);
+}
+</code></pre>
+<p>此时，该服务具有所需的所有信息，例如可用的用户ID，范围等，并且不必进行数据库查找。接下来，它可以检查以确保访问令牌未过期，可以验证范围是否足以执行所请求的操作，然后可以处理该请求。</p>
+<p>因为可以在不进行数据库查找的情况下验证令牌，所以在令牌过期之前无法使令牌无效。您需要采取其他步骤来使自编码的令牌无效。</p>
+<h3 id="访问令牌生命周期"><a href="#访问令牌生命周期" class="headerlink" title="访问令牌生命周期"></a>访问令牌生命周期</h3><p>当您的服务发出访问令牌时，您需要做出一些关于您希望令牌持续多久的决定。不幸的是，每项服务都没有全面的解决方案。不同的选项会有各种权衡，因此您应该选择最适合您应用需求的选项（或选项组合）。</p>
+<h4 id="短期访问令牌和长期刷新令牌"><a href="#短期访问令牌和长期刷新令牌" class="headerlink" title="短期访问令牌和长期刷新令牌"></a>短期访问令牌和长期刷新令牌</h4><p>授予令牌的常用方法是使用访问令牌和刷新令牌的组合，以获得最大的安全性和灵活性。OAuth 2.0规范建议使用此选项，并且一些实现已采用此方法。</p>
+<p>通常，使用此方法的服务将发出持续时间从几小时到几周的访问令牌。当服务发出访问令牌时，它还会生成一个永不过期的刷新令牌，并在响应中返回该令牌。（请注意，无法使用隐式授权发布刷新令牌。）</p>
+<p>当访问令牌到期时，应用程序可以使用刷新令牌来获取新的访问令牌。它可以在幕后进行，无需用户参与，因此对用户来说是一个无缝的过程。</p>
+<p>这种方法的主要好处是该服务可以使用自编码访问令牌，无需数据库查找即可对其进行验证。但是，这意味着没有办法直接使这些令牌过期，因此，令牌的发布时间很短，因此应用程序被迫不断刷新它们，从而使服务有机会在需要时撤销应用程序的访问权限。</p>
+<p>从第三方开发人员的角度来看，处理刷新令牌往往令人沮丧。开发人员非常喜欢不会过期的访问令牌，因为处理的代码要少得多。为了帮助缓解这些问题，服务通常会在其SDK中构建令牌刷新逻辑，以便该流程对开发人员而言是透明的。</p>
+<p>总之，在以下情况下使用短期访问令牌和长期刷新令牌：</p>
+<ul>
+<li>您想使用自编码访问令牌</li>
+<li>您希望限制泄露访问令牌的风险</li>
+<li>您将提供给开发人员处理刷新逻辑的SDK</li>
+</ul>
+<h4 id="短期访问令牌，没有刷新令牌"><a href="#短期访问令牌，没有刷新令牌" class="headerlink" title="短期访问令牌，没有刷新令牌"></a>短期访问令牌，没有刷新令牌</h4><p>如果要确保用户了解正在访问其帐户的应用程序，则该服务可以在不刷新令牌的情况下发出相对短期的访问令牌。访问令牌可以持续从当前应用程序会话到几周。当访问令牌到期时，应用程序将被强制使用户再次登录，以便您作为服务知道用户不断参与重新授权应用程序。</p>
+<p>通常，此选项由服务使用，如果第三方应用程序意外或恶意泄漏访问令牌，则存在高风险。通过要求用户不断重新授权应用程序，如果攻击者从服务中窃取访问权限，则该服务可以确保潜在的损害受到限制。</p>
+<p>通过不发布刷新令牌，这使得应用程序无法在用户不在屏幕前的情况下持续使用访问令牌。这使得连续同步数据的应用程序将无法在此方法下执行此操作。</p>
+<p>从用户的角度来看，这是最有可能让人感到沮丧的选项，因为用户必须不断重新授权应用程序。</p>
+<p>总之，在以下情况下使用没有刷新令牌的短期访问令牌：</p>
+<ul>
+<li>您希望最大程度地防范泄露访问令牌的风险</li>
+<li>您希望强制用户了解他们授予的第三方访问权限</li>
+<li>您不希望第三方应用程序对用户数据进行脱机访问</li>
+</ul>
+<h4 id="非过期访问令牌"><a href="#非过期访问令牌" class="headerlink" title="非过期访问令牌"></a>非过期访问令牌</h4><p>非过期访问令牌是开发人员最简单的方法。如果您选择此选项，请务必考虑您所做的权衡。</p>
+<p>如果你想能够任意撤销它们，那么使用自编码令牌是不切实际的。因此，您需要将这些令牌存储在某种数据库中，因此可以根据需要删除它们或将其标记为无效。</p>
+<p>请注意，即使服务打算发布非过期访问令牌以供正常使用，您仍需要提供一种机制，以便在特殊情况下使其过期，例如，如果用户明确要撤消应用程序的访问权限，或者用户帐户已删除。</p>
+<p>对于测试自己的应用程序的开发人员来说，非过期访问令牌就更容易。您甚至可以为开发人员预生成一个或多个非过期访问令牌，并在应用程序详细信息页面上显示给他们。通过这种方式，他们可以立即开始使用令牌发出API请求，而不必担心设置OAuth流程以开始测试API。</p>
+<p>总之，在以下情况下使用非过期访问令牌：</p>
+<ul>
+<li>你有一个机制来随时撤销访问令牌</li>
+<li>如果令牌泄露，你没有巨大的风险</li>
+<li>您希望为开发人员提供简单的身份验证机制</li>
+<li>您希望第三方应用程序可以脱机访问用户的数据</li>
+</ul>
+<h3 id="刷新访问令牌"><a href="#刷新访问令牌" class="headerlink" title="刷新访问令牌"></a>刷新访问令牌</h3><p>本节介绍如何允许开发人员使用刷新令牌获取新的访问令牌。如果您的服务与访问令牌一起发布刷新令牌，那么您需要实现此处描述的刷新授权类型。</p>
+<h4 id="请求参数-2"><a href="#请求参数-2" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<blockquote>
+<p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“refresh_token”。</p>
+<p><strong>refresh_token （需要）</strong><br>先前发布给客户端的刷新令牌。</p>
+<p><strong>scope （可选的）</strong><br>请求的范围不得包含原始访问令牌中未发布的其他范围。通常，这不会包含在请求中，如果省略，服务应发出一个访问令牌，其范围与先前发布的相同。</p>
+<p>客户端身份验证（如果客户端被授予秘钥，则需要）<br>通常，刷新令牌仅用于私密客户端。但是，由于可以在没有客户端秘钥的情况下使用授权码流程，因此刷新授权也可以给没有秘钥的客户端使用。如果客户端被授予秘钥，则客户端必须验证此请求。通常，该服务将允许额外的查询参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。如果客户端没有秘钥，则此请求中不会出现客户端身份验证。</p>
+</blockquote>
+<h4 id="验证刷新令牌授权"><a href="#验证刷新令牌授权" class="headerlink" title="验证刷新令牌授权"></a>验证刷新令牌授权</h4><p>在检查所有必需参数并在客户端被授予秘钥时验证客户端之后，授权服务器可以继续验证请求的其他部分。</p>
+<p>然后，服务器检查刷新令牌是否有效，并且尚未过期。如果向私密客户端发出刷新令牌，则服务必须确保将请求中的刷新令牌发送给经过身份验证的客户端。</p>
+<p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。服务器可以在响应中发出新的刷新令牌，但是如果响应不包括新的刷新令牌，则客户端假定现有的刷新令牌仍然有效。</p>
+<p>例<br>以下是服务将接收的示例刷新授权。</p>
+<pre><code class="bash">POST /oauth/token HTTP/1.1
+Host: authorization-server.com
+
+grant_type=refresh_token
+&amp;refresh_token=xxxxxxxxxxx
+&amp;client_id=xxxxxxxxxx
+&amp;client_secret=xxxxxxxxxx
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--重定向URI]]></title>
+      <url>/2018/07/13/oauth-guide-11/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>重定向网址是OAuth流程的重要组成部分。用户成功授权应用程序后，授权服务器将带着URL中的授权码或访问令牌将用户重定向回应用程序。由于重定向URL将包含敏感信息，因此服务不会将用户重定向到任意位置就显得至关重要。</p>
+<p>确保用户仅被定向到适当位置的最佳方法是要求开发人员在创建应用程序时注册一个或多个重定向URL。在这些部分中，我们将介绍如何处理移动应用程序的重定向URL，如何验证重定向URL以及如何处理错误。</p>
+<h3 id="重定向URI注册"><a href="#重定向URI注册" class="headerlink" title="重定向URI注册"></a>重定向URI注册</h3><p>为了确保服务的安全性，您必须要求开发人员为应用程序注册一个或多个重定向URL。授权服务器绝不能重定向到任何其他位置。注册新应用程序包括创建注册表单，以允许开发人员为其应用程序注册重定向URL。</p>
+<p>如果攻击者可以在用户到达授权服务器之前操纵重定向URL，则可能导致服务器将用户重定向到恶意服务器，恶意服务器会将授权码发送给攻击者。对于没有client_secret的公共客户端，只需要client_id和授权码就可以获取访问令牌。如果攻击者可以获得授权码，则可以将其交换为公共客户端的访问令牌。这是授权服务器在应用程序注册期间就应该知道应用程序是公共还是私有的另一个重要原因。</p>
+<h4 id="有效的重定向网址"><a href="#有效的重定向网址" class="headerlink" title="有效的重定向网址"></a>有效的重定向网址</h4><p>在构建表单以允许开发人员注册重定向URL时，您应该对他们输入的URL进行一些基本验证。</p>
+<p>已注册的重定向URL可能包含查询字符串参数，但不得在fragment中包含任何内容。如果开发人员尝试注册包含fragment的重定向URL，则注册服务器应拒绝该请求。</p>
+<p>请注意，对于原生和移动应用程序，该平台可能允许开发人员注册URL方案<code>myapp://</code>，然后可以在重定向URL中使用该方案。这意味着授权服务器应允许注册任意URL方案，以支持为原生应用程序注册重定向URL。</p>
+<h4 id="按请求自定义"><a href="#按请求自定义" class="headerlink" title="按请求自定义"></a>按请求自定义</h4><p>通常，开发人员会认为他们需要能够在每个授权请求上使用不同的重定向URL，并且会尝试更改每个请求的查询字符串参数。这不是重定向URL的预期用途，授权服务器不应该允许这样的URL。服务器应拒绝任何具有与注册URL不完全匹配的重定向URL的授权请求。</p>
+<p>如果客户端希望在重定向URL中包含特定于请求的数据，则可以使用“state”参数来存储在重定向用户之后将包括的数据。可以在state参数本身中对数据进行编码，也可以使用state参数作为会话ID来在服务器上存储状态。</p>
+<h3 id="原生应用程序的重定向URI"><a href="#原生应用程序的重定向URI" class="headerlink" title="原生应用程序的重定向URI"></a>原生应用程序的重定向URI</h3><p>原生应用程序是安装在设备上的客户端，例如桌面应用程序或移动应用程序。在支持与安全性和用户体验相关的原生应用程序时，需要记住一些事项。</p>
+<p>授权endpoint通常会将用户重定向回客户端注册的重定向URL。根据平台，应用程序可以声明URL模式，也可以注册启动应用程序的自定义URL方案。例如，iOS应用程序可以注册自定义协议，例如<code>myapp://</code>，然后使用redirect_uri <code>myapp://callback</code>。</p>
+<h4 id="应用程序声明的https-URL重定向"><a href="#应用程序声明的https-URL重定向" class="headerlink" title="应用程序声明的https URL重定向"></a>应用程序声明的https URL重定向</h4><p>某些平台（从iOS 9开始的Android和iOS）允许应用程序覆盖特定的URL模式以启应用程序而不是Web浏览器。例如，应用程序可以注册<code>https://app.example.com/auth</code>，只要Web浏览器尝试重定向到该URL，操作系统就会启动应用程序。</p>
+<p>如果操作系统支持声明URL，则应使用此方法。这允许操作系统保证应用程序的标识。如果操作系统不支持此操作，则应用程序必须使用自定义URL方案。</p>
+<h4 id="自定义URL方案"><a href="#自定义URL方案" class="headerlink" title="自定义URL方案"></a>自定义URL方案</h4><p>大多数移动和桌面操作系统允许应用注册自定义URL方案，当从系统浏览器访问具有该方案的URL时，该方案将启动应用程序。</p>
+<p>使用此方法，本机应用程序正常启动OAuth流，方法是使用标准授权码参数启动系统浏览器。唯一的区别是重定向URL将是具有应用程序自定义方案的URL。</p>
+<p>当授权服务器发送打算将用户重定向到<code>myapp://callback#token=....</code>的Location header时，手机将启动应用程序，应用程序将能够恢复授权过程，从URL解析访问令牌并在内部存储它。</p>
+<h4 id="自定义URL方案命名空间"><a href="#自定义URL方案命名空间" class="headerlink" title="自定义URL方案命名空间"></a>自定义URL方案命名空间</h4><p>由于没有集中注册URL方案的方法，因此应用程序必须尽力选择不会相互冲突的URL方案。</p>
+<p>您的服务可以通过要求URL方案遵循特定模式来提供帮助，并且只允许开发人员注册与该模式匹配的自定义方案。</p>
+<p>例如，Facebook根据应用的客户端ID为每个应用生成一个URL方案。例如，<code>fb00000000://</code>数字对应于应用程序的客户端ID。这提供了一种生成全局唯一URL方案的合理可靠方法，因为其他应用程序不太可能使用具有此模式的URL方案。</p>
+<p>应用程序的另一个选项是将反向域名模式与应用程序发布者控制的域一起使用。这也可以由服务强制执行。</p>
+<h3 id="重定向URI验证"><a href="#重定向URI验证" class="headerlink" title="重定向URI验证"></a>重定向URI验证</h3><p>有三种情况需要验证重定向网址。</p>
+<ul>
+<li>当开发人员将重定向URL注册为创建应用程序的一部分时</li>
+<li>在授权请求中（授权码类型和隐式授权类型）</li>
+<li>当应用程序交换访问令牌的授权码时</li>
+</ul>
+<h4 id="重定向URL注册"><a href="#重定向URL注册" class="headerlink" title="重定向URL注册"></a>重定向URL注册</h4><p>如创建应用程序中所述，该服务应允许开发人员在创建应用程序时注册一个或多个重定向URL。重定向URL的唯一限制是它不能包含fragment组件。该服务必须允许开发人员使用自定义URL方案注册重定向URL，以便在某些平台上支持应用程序。</p>
+<h4 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h4><p>当应用程序启动OAuth流程时，它会将用户定向到您服务的授权endpoint。该请求将在URL中包含多个参数，包括重定向URL。</p>
+<p>此时，授权服务器必须验证重定向URL，以确保请求中的URL与应用程序的一个已注册URL匹配。请求还将有一个client_id参数，因此服务应该根据该id查找重定向URL。攻击者完全有可能使用一个应用程序的客户端ID和攻击者的重定向URL来创建授权请求，这就是需要注册的原因。</p>
+<p>服务应查找URL的完全匹配，并避免仅匹配特定URL的一部分。（如果需要自定义每个请求，客户端可以使用state参数。）简单的字符串匹配就足够了，因为无法根据请求自定义重定向URL。服务器需要做的就是检查请求中的重定向URL是否与开发人员在注册其应​​用程序时输入的重定向URL相匹配。</p>
+<p>如果重定向URL不是已注册的重定向URL之一，则服务器必须立即显示指示此类的错误，而不是重定向用户。这样可以避免将授权服务器用作打开的重定向程序。</p>
+<h4 id="授予访问令牌"><a href="#授予访问令牌" class="headerlink" title="授予访问令牌"></a>授予访问令牌</h4><p>令牌endpoint时用授权码交换访问令牌的的请求。此请求将包含重定向URL以及授权码。作为安全性的附加度量，服务器应验证此请求中的重定向URL是否与授权码的初始授权请求中包含的重定向URL完全匹配。如果重定向URL不匹配，则服务器会拒绝该请求并显示错误。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--范围]]></title>
       <url>/2018/07/13/oauth-guide-10/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
