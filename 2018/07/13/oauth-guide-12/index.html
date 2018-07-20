@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Fri Jul 13 2018 12:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Fri Jul 20 2018 17:18:13 GMT+0800">
+        <meta property="article:modified_time" content="Fri Jul 20 2018 17:47:28 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-12/index.html",
     "headline": "OAuth教程--访问令牌",
     "datePublished": "Fri Jul 13 2018 12:00:00 GMT+0800",
-    "dateModified": "Fri Jul 20 2018 17:18:13 GMT+0800",
+    "dateModified": "Fri Jul 20 2018 17:47:28 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -487,8 +487,7 @@
 <p>访问令牌必须在运输和存储过程中保密。应该看到访问令牌的唯一方是应用程序本身，授权服务器和资源服务器。应用程序应确保同一设备上的其他应用程序无法访问访问令牌的存储。访问令牌只能在https连接上使用，因为通过非加密通道传递它会使第三方拦截变得非常容易。</p>
 <p>令牌endpoint是应用程序发出请求以获取用户访问令牌的位置。本节介绍如何验证令牌请求以及如何返回相应的响应和错误。</p>
 <h3 id="授权码请求"><a href="#授权码请求" class="headerlink" title="授权码请求"></a>授权码请求</h3><p>当应用试图交换访问令牌时，将使用授权码交换授予。用户通过重定向URL返回应用程序后，应用程序将从URL获取授权码并使用它来请求访问令牌。此请求将发送到令牌endpoint。</p>
-<p>####请求参数</p>
-<p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“authorization_code”。</p>
 <p><strong>code （需要）</strong><br>code参数是客户端先前从授权服务器接收的授权码。</p>
@@ -514,7 +513,7 @@ grant_type=authorization_code
 <p>如果授权码被多次使用，则应将其视为攻击。如果可能，服务应撤销此授权码发出的先前访问令牌。</p>
 <h3 id="密码授予"><a href="#密码授予" class="headerlink" title="密码授予"></a>密码授予</h3><p>当应用程序交换用户的访问令牌的用户名和密码时，将使用密码授予。这正是首先要创建的OAuth，因此您绝不允许第三方应用使用此授权。</p>
 <p>此授权类型的常见用途是用您的服务为应用启用密码登录。用户使用他们的用户名和密码登录来登录网站或原生应用程序，但绝不允许第三方应用程序直接询问用户的密码。</p>
-<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数-1"><a href="#请求参数-1" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type（必填）</strong> - grant_type参数必须设置为“password”。<br><strong>username （必填）</strong> - 用户的用户名。<br><strong>password （必填）</strong> - 用户的密码。<br><strong>scope （可选）</strong> - 应用程序请求的范围。<br><strong>客户端身份验证</strong>（如果客户端被授予秘钥，则需要）</p>
 </blockquote>
@@ -530,7 +529,7 @@ grant_type=password
 &amp;client_secret=xxxxxxxxxx
 </code></pre>
 <h3 id="客户端凭据"><a href="#客户端凭据" class="headerlink" title="客户端凭据"></a>客户端凭据</h3><p>当应用程序请求访问令牌来访问其自己的资源，而不是代表用户访问他们的资源时，将使用客户端凭据授予。</p>
-<h4 id="请求参数-1"><a href="#请求参数-1" class="headerlink" title="请求参数"></a>请求参数</h4><blockquote>
+<h4 id="请求参数-2"><a href="#请求参数-2" class="headerlink" title="请求参数"></a>请求参数</h4><blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为client_credentials。</p>
 <p><strong>scope （可选的）</strong><br>您的服务可以支持客户端凭据授予的不同范围。实际上，实际上并没有多少服务支持这一点。</p>
 <p><strong>客户端验证（必填）</strong><br>客户端需要为此请求进行身份验证。通常，服务将接受请求参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
@@ -741,12 +740,12 @@ if($error) {
 <li>您希望第三方应用程序可以脱机访问用户的数据</li>
 </ul>
 <h3 id="刷新访问令牌"><a href="#刷新访问令牌" class="headerlink" title="刷新访问令牌"></a>刷新访问令牌</h3><p>本节介绍如何允许开发人员使用刷新令牌获取新的访问令牌。如果您的服务与访问令牌一起发布刷新令牌，那么您需要实现此处描述的刷新授权类型。</p>
-<h4 id="请求参数-2"><a href="#请求参数-2" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数-3"><a href="#请求参数-3" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“refresh_token”。</p>
 <p><strong>refresh_token （需要）</strong><br>先前发布给客户端的刷新令牌。</p>
 <p><strong>scope （可选的）</strong><br>请求的范围不得包含原始访问令牌中未发布的其他范围。通常，这不会包含在请求中，如果省略，服务应发出一个访问令牌，其范围与先前发布的相同。</p>
-<p>客户端身份验证（如果客户端被授予秘钥，则需要）<br>通常，刷新令牌仅用于私密客户端。但是，由于可以在没有客户端秘钥的情况下使用授权码流程，因此刷新授权也可以给没有秘钥的客户端使用。如果客户端被授予秘钥，则客户端必须验证此请求。通常，该服务将允许额外的查询参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。如果客户端没有秘钥，则此请求中不会出现客户端身份验证。</p>
+<p><strong>客户端身份验证（如果客户端被授予秘钥，则需要）</strong><br>通常，刷新令牌仅用于私密客户端。但是，由于可以在没有客户端秘钥的情况下使用授权码流程，因此刷新授权也可以给没有秘钥的客户端使用。如果客户端被授予秘钥，则客户端必须验证此请求。通常，该服务将允许额外的查询参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。如果客户端没有秘钥，则此请求中不会出现客户端身份验证。</p>
 </blockquote>
 <h4 id="验证刷新令牌授权"><a href="#验证刷新令牌授权" class="headerlink" title="验证刷新令牌授权"></a>验证刷新令牌授权</h4><p>在检查所有必需参数并在客户端被授予秘钥时验证客户端之后，授权服务器可以继续验证请求的其他部分。</p>
 <p>然后，服务器检查刷新令牌是否有效，并且尚未过期。如果向私密客户端发出刷新令牌，则服务必须确保将请求中的刷新令牌发送给经过身份验证的客户端。</p>
@@ -820,7 +819,7 @@ grant_type=refresh_token
 
     <!-- Next Nav -->
     
-        <a href="/2018/07/13/oauth-guide-11/" id="post_nav-older" class="next-content">
+        <a href="/2018/07/13/oauth-guide-13/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">

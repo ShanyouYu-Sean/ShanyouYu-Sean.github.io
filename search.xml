@@ -10,8 +10,7 @@
 <p>访问令牌必须在运输和存储过程中保密。应该看到访问令牌的唯一方是应用程序本身，授权服务器和资源服务器。应用程序应确保同一设备上的其他应用程序无法访问访问令牌的存储。访问令牌只能在https连接上使用，因为通过非加密通道传递它会使第三方拦截变得非常容易。</p>
 <p>令牌endpoint是应用程序发出请求以获取用户访问令牌的位置。本节介绍如何验证令牌请求以及如何返回相应的响应和错误。</p>
 <h3 id="授权码请求"><a href="#授权码请求" class="headerlink" title="授权码请求"></a>授权码请求</h3><p>当应用试图交换访问令牌时，将使用授权码交换授予。用户通过重定向URL返回应用程序后，应用程序将从URL获取授权码并使用它来请求访问令牌。此请求将发送到令牌endpoint。</p>
-<p>####请求参数</p>
-<p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“authorization_code”。</p>
 <p><strong>code （需要）</strong><br>code参数是客户端先前从授权服务器接收的授权码。</p>
@@ -37,7 +36,7 @@ grant_type=authorization_code
 <p>如果授权码被多次使用，则应将其视为攻击。如果可能，服务应撤销此授权码发出的先前访问令牌。</p>
 <h3 id="密码授予"><a href="#密码授予" class="headerlink" title="密码授予"></a>密码授予</h3><p>当应用程序交换用户的访问令牌的用户名和密码时，将使用密码授予。这正是首先要创建的OAuth，因此您绝不允许第三方应用使用此授权。</p>
 <p>此授权类型的常见用途是用您的服务为应用启用密码登录。用户使用他们的用户名和密码登录来登录网站或原生应用程序，但绝不允许第三方应用程序直接询问用户的密码。</p>
-<h4 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数-1"><a href="#请求参数-1" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type（必填）</strong> - grant_type参数必须设置为“password”。<br><strong>username （必填）</strong> - 用户的用户名。<br><strong>password （必填）</strong> - 用户的密码。<br><strong>scope （可选）</strong> - 应用程序请求的范围。<br><strong>客户端身份验证</strong>（如果客户端被授予秘钥，则需要）</p>
 </blockquote>
@@ -53,7 +52,7 @@ grant_type=password
 &amp;client_secret=xxxxxxxxxx
 </code></pre>
 <h3 id="客户端凭据"><a href="#客户端凭据" class="headerlink" title="客户端凭据"></a>客户端凭据</h3><p>当应用程序请求访问令牌来访问其自己的资源，而不是代表用户访问他们的资源时，将使用客户端凭据授予。</p>
-<h4 id="请求参数-1"><a href="#请求参数-1" class="headerlink" title="请求参数"></a>请求参数</h4><blockquote>
+<h4 id="请求参数-2"><a href="#请求参数-2" class="headerlink" title="请求参数"></a>请求参数</h4><blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为client_credentials。</p>
 <p><strong>scope （可选的）</strong><br>您的服务可以支持客户端凭据授予的不同范围。实际上，实际上并没有多少服务支持这一点。</p>
 <p><strong>客户端验证（必填）</strong><br>客户端需要为此请求进行身份验证。通常，服务将接受请求参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
@@ -264,12 +263,12 @@ if($error) {
 <li>您希望第三方应用程序可以脱机访问用户的数据</li>
 </ul>
 <h3 id="刷新访问令牌"><a href="#刷新访问令牌" class="headerlink" title="刷新访问令牌"></a>刷新访问令牌</h3><p>本节介绍如何允许开发人员使用刷新令牌获取新的访问令牌。如果您的服务与访问令牌一起发布刷新令牌，那么您需要实现此处描述的刷新授权类型。</p>
-<h4 id="请求参数-2"><a href="#请求参数-2" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
+<h4 id="请求参数-3"><a href="#请求参数-3" class="headerlink" title="请求参数"></a>请求参数</h4><p>访问令牌请求将包含以下参数。</p>
 <blockquote>
 <p><strong>grant_type （需要）</strong><br>grant_type参数必须设置为“refresh_token”。</p>
 <p><strong>refresh_token （需要）</strong><br>先前发布给客户端的刷新令牌。</p>
 <p><strong>scope （可选的）</strong><br>请求的范围不得包含原始访问令牌中未发布的其他范围。通常，这不会包含在请求中，如果省略，服务应发出一个访问令牌，其范围与先前发布的相同。</p>
-<p>客户端身份验证（如果客户端被授予秘钥，则需要）<br>通常，刷新令牌仅用于私密客户端。但是，由于可以在没有客户端秘钥的情况下使用授权码流程，因此刷新授权也可以给没有秘钥的客户端使用。如果客户端被授予秘钥，则客户端必须验证此请求。通常，该服务将允许额外的查询参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。如果客户端没有秘钥，则此请求中不会出现客户端身份验证。</p>
+<p><strong>客户端身份验证（如果客户端被授予秘钥，则需要）</strong><br>通常，刷新令牌仅用于私密客户端。但是，由于可以在没有客户端秘钥的情况下使用授权码流程，因此刷新授权也可以给没有秘钥的客户端使用。如果客户端被授予秘钥，则客户端必须验证此请求。通常，该服务将允许额外的查询参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。如果客户端没有秘钥，则此请求中不会出现客户端身份验证。</p>
 </blockquote>
 <h4 id="验证刷新令牌授权"><a href="#验证刷新令牌授权" class="headerlink" title="验证刷新令牌授权"></a>验证刷新令牌授权</h4><p>在检查所有必需参数并在客户端被授予秘钥时验证客户端之后，授权服务器可以继续验证请求的其他部分。</p>
 <p>然后，服务器检查刷新令牌是否有效，并且尚未过期。如果向私密客户端发出刷新令牌，则服务必须确保将请求中的刷新令牌发送给经过身份验证的客户端。</p>
@@ -283,6 +282,57 @@ grant_type=refresh_token
 &amp;client_id=xxxxxxxxxx
 &amp;client_secret=xxxxxxxxxx
 </code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--授权列表与撤销]]></title>
+      <url>/2018/07/13/oauth-guide-13/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<h3 id="授权列表"><a href="#授权列表" class="headerlink" title="授权列表"></a>授权列表</h3><p>一旦用户开始授权多个应用程序，让许多应用程序访问其帐户，就有必要提供一种方法来允许用户管理具有访问权限的应用程序。这通常在帐户设置页面或帐户隐私页面中呈现给用户。</p>
+<p>OAuth 2.0规范中没有任何内容要求用户能够撤销访问权限，或者对如何执行此操作的建议，因此我们将查看几个主要的API提供商，以获取有关如何实现此目的的灵感。</p>
+<p>大多数提供商都有一个页面，其中列出了用户授权其帐户的所有应用程序。通常会显示有关应用程序的一些信息，以及用于向用户提供有关此应用程序何时以及为何具有访问权限的上下文的信息。</p>
+<h4 id="谷歌"><a href="#谷歌" class="headerlink" title="谷歌"></a>谷歌</h4><p>Google会在<code>https://security.google.com/settings/security/permissions</code>上提供您在帐户中授权的应用程序列表。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftgh6j6yqmj30mm0iiq4r.jpg" alt="google"></p>
+<p>该列表显示应用程序图标，名称以及授予应用程序范围的摘要。单击其中一个将展开以显示更多详细信息。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ftgha78weuj30j40ijq4c.jpg" alt="一个授权访问您的Google帐户的应用程序的详细信息"></p>
+<p>此视图提供了已授予范围的更详细列表，以及您授权应用程序的日期。</p>
+<h4 id="Twitter"><a href="#Twitter" class="headerlink" title="Twitter"></a>Twitter</h4><p>Twitter在<code>https://twitter.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1ftghc5l2bmj30sg0jz79r.jpg" alt="您授权访问Twitter帐户的应用程序列表"></p>
+<p>Twitter显示授予的范围（只读，读/写，读/写/直接消息），以及应用程序是否可以看到您的电子邮件地址。该列表包括您授权申请的日期。这使用户可以轻松地从他们暂时未使用的应用程序中撤消凭据。</p>
+<h4 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h4><p>GitHub在<code>https://github.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghef8w6qj30sg0cu40n.jpg" alt="您授权访问GitHub帐户的应用程序列表"></p>
+<p>GitHub提供的列表包括上次使用应用程序的描述，以便您了解是否可以安全地撤销应用程序的授权（如果它在一段时间内没有使用过）。</p>
+<p>单击应用程序可提供有关该应用程序访问权限的更多详细信息。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghezcvrqj30kw0cmab1.jpg" alt="一个授权访问您的GitHub帐户的应用程序的详细信息"></p>
+<p>在这里，您可以看到应用程序对您帐户的权限（范围）。</p>
+<p>您可以在此处找到指向其他服务授权页面的<a href="https://indieweb.org/appaccess" target="_blank" rel="noopener">链接</a>。</p>
+<h3 id="撤销访问权限"><a href="#撤销访问权限" class="headerlink" title="撤销访问权限"></a>撤销访问权限</h3><p>您可能需要撤销应用程序对用户帐户的访问权限的原因有几个。</p>
+<ul>
+<li>用户明确希望撤销应用程序的访问权限，例如，如果他们在授权页面上找到了他们不再想要使用的应用程序</li>
+<li>开发人员想要撤消其应用程序的所有用户令牌</li>
+<li>开发者删除了他们的申请</li>
+<li>您作为服务提供商已确定应用程序已被盗用或恶意，并希望禁用它</li>
+</ul>
+<p>根据您实现生成访问令牌的方式，将用不同的方式撤销他们。</p>
+<h4 id="令牌数据库"><a href="#令牌数据库" class="headerlink" title="令牌数据库"></a>令牌数据库</h4><p>如果将访问令牌存储在数据库中，则撤销属于特定用户的所有令牌相对容易。您可以轻松编写查找和删除属于该用户的令牌的查询，例如查找令牌表中的令牌user_id。假设您的资源服务器通过在数据库中查找它们来验证访问令牌，那么下次被撤销的客户端发出请求时，其令牌将无法验证。</p>
+<h4 id="自编码令牌"><a href="#自编码令牌" class="headerlink" title="自编码令牌"></a>自编码令牌</h4><p>如果授权服务器发出自编码令牌，则撤销对特定应用程序的访问会稍微困难一些。</p>
+<p>如果您有一个真正的无状态机制来验证令牌，并且您有资源服务器正在验证令牌而不与另一个系统共享服务，那么唯一的选择是等待所有未完成的令牌过期，并阻止应用程序生成新令牌。这是当您使用自编码令牌时，使用极短期令牌的主要原因。</p>
+<p>由于没有使单个访问令牌无效的机制，因此您需要使特定用户的应用程序刷新令牌无效。这样，下次应用程序尝试刷新访问令牌时，将拒绝对新访问令牌的请求。</p>
 ]]></content>
       
         <categories>
