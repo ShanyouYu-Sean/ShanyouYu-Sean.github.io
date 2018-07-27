@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Fri Jul 13 2018 12:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Fri Jul 20 2018 17:47:28 GMT+0800">
+        <meta property="article:modified_time" content="Fri Jul 27 2018 13:43:22 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-12/index.html",
     "headline": "OAuth教程--访问令牌",
     "datePublished": "Fri Jul 13 2018 12:00:00 GMT+0800",
-    "dateModified": "Fri Jul 20 2018 17:47:28 GMT+0800",
+    "dateModified": "Fri Jul 27 2018 13:43:22 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -499,7 +499,7 @@
 <p>然后，服务器检查授权码是否有效，并且尚未过期。然后，该服务必须验证请求中提供的授权码是否已发送给所标识的客户端。最后，服务必须确保存的重定向URI参数与用于请求授权代码的重定向URI匹配。</p>
 <p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。</p>
 <p>例<br>以下示例显示了私密客户端的授权授予请求。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=authorization_code
@@ -519,7 +519,7 @@ grant_type=authorization_code
 </blockquote>
 <p>如果客户端被授予秘钥，则必须验证此请求。通常，服务将允许其他请求参数如client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
 <p>例<br>以下是服务将接收的示例密码授予。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=password
@@ -535,7 +535,7 @@ grant_type=password
 <p><strong>客户端验证（必填）</strong><br>客户端需要为此请求进行身份验证。通常，服务将接受请求参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
 </blockquote>
 <p>例<br>以下是客户端凭据的请求例子。</p>
-<pre><code class="bash">POST /token HTTP/1.1
+<pre><code class="http">POST /token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=client_credentials
@@ -751,7 +751,7 @@ if($error) {
 <p>然后，服务器检查刷新令牌是否有效，并且尚未过期。如果向私密客户端发出刷新令牌，则服务必须确保将请求中的刷新令牌发送给经过身份验证的客户端。</p>
 <p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。服务器可以在响应中发出新的刷新令牌，但是如果响应不包括新的刷新令牌，则客户端假定现有的刷新令牌仍然有效。</p>
 <p>例<br>以下是服务将接收的示例刷新授权。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=refresh_token
@@ -813,13 +813,21 @@ grant_type=refresh_token
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
+        <a href="/2018/07/13/oauth-guide-13/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
 
     <!-- Section Spacer -->
     <div class="section-spacer"></div>
 
     <!-- Next Nav -->
     
-        <a href="/2018/07/13/oauth-guide-13/" id="post_nav-older" class="next-content">
+        <a href="/2018/07/13/oauth-guide-11/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            OAuth教程--OAuth 2.0规范 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,OAuth">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+        
+            <link rel="stylesheet" href="/css/fontawesome.min.css">
+        
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/07/14/oauth-guide-24/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2018/07/14/oauth-guide-24/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="OAuth教程--OAuth 2.0规范 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="OAuth"> 
+
+    
+        <meta property="article:published_time" content="Sat Jul 14 2018 01:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Fri Jul 27 2018 17:08:44 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2018/07/14/oauth-guide-24/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2018/07/14/oauth-guide-24/index.html",
+    "headline": "OAuth教程--OAuth 2.0规范",
+    "datePublished": "Sat Jul 14 2018 01:00:00 GMT+0800",
+    "dateModified": "Fri Jul 27 2018 17:08:44 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",OAuth小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Isolation" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+                    <!-- Isolation Header -->
+                    <header class="header">
+    <div class="header-wrapper">
+        <!-- Header Copyright -->
+        <div class="header-copyright">
+            <div class="header-site">
+                ©&nbsp;
+                <script type="text/javascript">
+                    var fd = new Date();
+                    document.write(fd.getFullYear());
+                </script>
+                &nbsp;小鱼肖恩
+            </div>
+            <!--
+            I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+            It will not impact the appearance and can give developers a lot of support :)
+
+            很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+            它不会影响美观并可以给开发者很大的支持。 :)
+            -->
+            <div>
+                Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a>
+                <br>
+                Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a>
+            </div>
+        </div>
+
+        <!-- Header Title -->
+        <span class="header-title header-item">
+            <a href="/" title="小鱼肖恩">
+                小鱼肖恩
+            </a>
+        </span>
+
+        <p class="header-slogan header-item">
+        
+            
+                我知道，是流星赞美了黑夜，鲸鱼安慰了大海
+            
+        
+        </p>
+
+        <!-- Header Nav -->
+        <nav class="header-nav header-item">
+            <span class="header-nav-item">
+                <a href="/" title="Home">
+                    <span>主页</span>
+                </a>
+            </span>
+
+            <!-- Pages  -->
+            
+                <span class="header-nav-item">
+                    <a href="/about" title="关于我">
+                        <span>关于我</span>
+                    </a>
+                </span>
+            
+            
+        </nav>
+
+        <!-- Header SNS -->
+        <div class="header-item header-sns_list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+        </a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+    </div>
+</header>
+
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+
+                    <!-- Post TOC -->
+
+    
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+
+
+    <!-- Isolation Post Header -->
+    <!-- Post thumbnail -->
+    
+        <!-- Post Header Info -->
+        <div class="post-header_info without-thumbnail">
+            <!-- Author Avatar & Name -->
+            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
+            <span class="name-span">Sean Yu</span>
+        </div>
+
+        <!-- Null Thumbnail -->
+        <div class="post_thumbnail-null">
+    
+        </div>
+
+
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+
+    
+        <div class="post-content_wrapper">
+            <p class="post-title">
+                OAuth教程--OAuth 2.0规范
+            </p>
+            <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>OAuth 2.0核心框架（RFC 6749）定义了角色和基本功能级别，但未指定大量实现细节。自RFC发布以来，OAuth工作组已经发布了许多基于此框架构建的其他规范，以填补缺失的部分。查看该小组正在进行的完整规范列表可能有点困难。本章列出了各种规范如何相互关联。</p>
+<h3 id="核心规格"><a href="#核心规格" class="headerlink" title="核心规格"></a>核心规格</h3><h4 id="OAuth-2-0核心（RFC-6749）"><a href="#OAuth-2-0核心（RFC-6749）" class="headerlink" title="OAuth 2.0核心（RFC 6749）"></a>OAuth 2.0核心（RFC 6749）</h4><p><code>https://tools.ietf.org/html/rfc6749</code></p>
+<p>RFC 6749是核心OAuth 2.0框架。这描述了角色（资源所有者，客户端，授权服务器等，在术语参考中有更详细的描述，几个授权流程和几个错误定义。重要的是要记住这是一个“框架”，因为有很多方面未指明您在构建完整实施时需要填写。其中大部分细节已记录为扩展规范。</p>
+<h4 id="承载令牌使用（RFC-6750）"><a href="#承载令牌使用（RFC-6750）" class="headerlink" title="承载令牌使用（RFC 6750）"></a>承载令牌使用（RFC 6750）</h4><p><code>https://tools.ietf.org/html/rfc6750</code></p>
+<p>核心规范没有定义访问令牌的格式或如何使用它们。在开发核心规范的早期，访问令牌是争论的主要问题，结果是访问令牌完全取自核心规范，而不是让人们在不受欢迎的令牌上妥协。但是，从那时起，大多数实现已经标准化使用承载令牌。RFC 6750描述了使用承载令牌访问API的语法和方法。</p>
+<h4 id="威胁模型和安全注意事项（RFC-6819）"><a href="#威胁模型和安全注意事项（RFC-6819）" class="headerlink" title="威胁模型和安全注意事项（RFC 6819）"></a>威胁模型和安全注意事项（RFC 6819）</h4><p><code>https://tools.ietf.org/html/rfc6819</code></p>
+<p>编写威胁模型和安全注意事项文档是为了提供超出核心文档所述内容的其他指导。在主要提供商具有真正的实施经验之后，添加了大部分文档。该文件描述了许多已知的攻击，无论是理论攻击还是已经被证明的攻击。它描述了每种方法的对策。</p>
+<p>实施OAuth 2.0服务器的每个人都应该阅读本文档，以避免陷入已经探索和解决过的陷阱。</p>
+<h3 id="令牌"><a href="#令牌" class="headerlink" title="令牌"></a>令牌</h3><h4 id="令牌自解析（RFC-7662）"><a href="#令牌自解析（RFC-7662）" class="headerlink" title="令牌自解析（RFC 7662）"></a>令牌自解析（RFC 7662）</h4><p><code>https://tools.ietf.org/html/rfc7662</code></p>
+<p>令牌自解析规范定义了资源服务器获取有关访问令牌的信息的机制。如果没有此规范，资源服务器必须有一种定制方式来检查访问令牌是否有效，并找出有关它们的用户数据等。这通常发生在自定义API endpoint上，或者因为资源服务器和授权服务器共享一个数据库或其他一些常见的存储。</p>
+<p>使用此规范，资源服务器可以检查访问令牌的有效性，并通过HTTP API调用查找其他信息，从而更好地分离授权服务器与任何资源服务器之间的关注点。</p>
+<h4 id="令牌绑定"><a href="#令牌绑定" class="headerlink" title="令牌绑定"></a>令牌绑定</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-token-binding</code></p>
+<p>令牌绑定扩展描述了一种将令牌加密绑定到客户端的技术，以保护令牌免受中间人和重放攻击。标准承载令牌和授权码与使用它们的客户端没有加密连接，这是OAuth 1中OAuth 2的重大变化。</p>
+<h3 id="移动和其他设备"><a href="#移动和其他设备" class="headerlink" title="移动和其他设备"></a>移动和其他设备</h3><p>编写这些规范是为了在更广泛的设备上支持OAuth。</p>
+<h4 id="适用于原生应用的OAuth-2-0"><a href="#适用于原生应用的OAuth-2-0" class="headerlink" title="适用于原生应用的OAuth 2.0"></a>适用于原生应用的OAuth 2.0</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-native-apps</code></p>
+<p>本文档更多的是一组准则而不是协议更改。在本文档中，您将找到针对这些环境特有的原生应用程序和安全建议的建议。它描述了诸如不允许第三方应用程序打开更容易受到网络钓鱼攻击的嵌入式Web视图以及有关如何执行此操作的特定于平台的建议。它还建议使用PKCE扩展，如下所述。</p>
+<h4 id="PKCE：代码交换的证明密钥（RFC-7636）"><a href="#PKCE：代码交换的证明密钥（RFC-7636）" class="headerlink" title="PKCE：代码交换的证明密钥（RFC 7636）"></a>PKCE：代码交换的证明密钥（RFC 7636）</h4><p><code>https://tools.ietf.org/html/rfc7636</code></p>
+<p>移动和桌面应用等公共客户端缺少使授权流程安全的Web应用程序的许多功能。Web应用程序具有使用HTTPS URL访问的好处，因此授权服务器可以合理地确信它在生成授权代码后,将用户的浏览器重定向到正确的应用程序。在用授权码交换访问令牌时，Web应用程序还能够利用客户端秘钥。由于移动和桌面应用程序都没有这些功能，因此授权服务器无法确定它是否将用户返回到正确的应用程序。</p>
+<p>PKCE扩展描述了应用程序首先生成在请求访问令牌时使用秘钥的方式，以便拦截授权代码的攻击者无法使用被盗代码。</p>
+<p>PKCE中详细介绍了PKCE扩展。</p>
+<h4 id="设备流程"><a href="#设备流程" class="headerlink" title="设备流程"></a>设备流程</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-device-flow</code></p>
+<p>设备流是一种扩展，它使没有浏览器或有限输入功能的设备能够获得用户授权。您通常会在没有网络浏览器的Apple TV等设备上看到这种情况，或者除了几个按钮之外没有输入机制的流式视频编码器。</p>
+<p>该流程的工作原理是让用户访问辅助设备（如智能手机）上的URL并输入设备上显示的代码。</p>
+<h4 id="身份验证和会话管理"><a href="#身份验证和会话管理" class="headerlink" title="身份验证和会话管理"></a>身份验证和会话管理</h4><p>这些规范用于促进身份验证和会话管理，这两者都不是核心OAuth规范的一部分。</p>
+<h4 id="OpenID-Connect"><a href="#OpenID-Connect" class="headerlink" title="OpenID Connect"></a>OpenID Connect</h4><p><code>https://openid.net/connect/</code></p>
+<p>由于OAuth框架仅描述授权方法，并且未提供有关用户的任何详细信息，因此OpenID Connect通过描述身份验证和会话管理机制来填补这一空白。</p>
+<h4 id="IndieAuth"><a href="#IndieAuth" class="headerlink" title="IndieAuth"></a>IndieAuth</h4><p><code>https://www.w3.org/TR/indieauth/</code></p>
+<p>IndieAuth是一个基于OAuth 2.0构建的分散式身份协议，使用URL来识别用户和应用程序。这样就无需事先注册客户端，因为所有客户端都有内置的客户端ID：应用程序的URL。</p>
+<h4 id="令牌撤销（RFC-7009）"><a href="#令牌撤销（RFC-7009）" class="headerlink" title="令牌撤销（RFC 7009）"></a>令牌撤销（RFC 7009）</h4><p><code>https://tools.ietf.org/html/rfc7009</code></p>
+<p>本文档描述了授权服务器的新endpoint，客户端可以使用该endpoint通知服务器不再需要访问令牌或刷新令牌。这用于在客户端中启用“注销”功能，允许授权服务器清除与该会话关联的任何凭据。</p>
+<h3 id="交互操作"><a href="#交互操作" class="headerlink" title="交互操作"></a>交互操作</h3><p>为了支持创建可以与任何OAuth 2.0服务器一起使用的完全通用的客户端，需要对发现和客户端注册等内容进行标准化，因为它们超出了核心规范的范围。</p>
+<h4 id="授权服务器元数据"><a href="#授权服务器元数据" class="headerlink" title="授权服务器元数据"></a>授权服务器元数据</h4><p><code>https://tools.ietf.org/html/rfc8414</code></p>
+<p>授权服务器元数据规范（也称为发现）定义了客户端用于查找与特定OAuth服务器交互所需的信息的格式。这包括查找授权endpoint和列出支持的范围等内容。</p>
+<h4 id="动态客户端注册（RFC-7591）"><a href="#动态客户端注册（RFC-7591）" class="headerlink" title="动态客户端注册（RFC 7591）"></a>动态客户端注册（RFC 7591）</h4><p><code>https://tools.ietf.org/html/rfc7591</code></p>
+<p>通常，开发人员将手动在服务中注册应用程序以获取客户端ID，并提供有关将在授权接口上使用的应用程序的信息。此规范提供了动态或以编程方式注册客户端的机制。此规范源自OpenID Connect动态客户端注册规范，并且仍与OpenID Connect服务器兼容。</p>
+<h4 id="动态客户端管理（RFC-7592）"><a href="#动态客户端管理（RFC-7592）" class="headerlink" title="动态客户端管理（RFC 7592）"></a>动态客户端管理（RFC 7592）</h4><p><code>https://tools.ietf.org/html/rfc7592</code></p>
+<p>在需要更新客户端信息的情况下，此规范提供了以编程方式执行此操作的机制。此规范扩展了动态注册RFC 7591。</p>
+<h3 id="企业"><a href="#企业" class="headerlink" title="企业"></a>企业</h3><p>这些规范支持更高级的企业用例。</p>
+<h4 id="断言框架（RFC-7521）"><a href="#断言框架（RFC-7521）" class="headerlink" title="断言框架（RFC 7521）"></a>断言框架（RFC 7521）</h4><p><code>https://tools.ietf.org/html/rfc7521</code></p>
+<p>此规范提供了使用OAuth 2.0断言的框架。它定义了新的客户端身份验证机制和新的授权授予类型。由于此规范也是一个框架，因此它仅适用于下面描述的特定断言类型之一。</p>
+<h4 id="JWT断言（RFC-7523）"><a href="#JWT断言（RFC-7523）" class="headerlink" title="JWT断言（RFC 7523）"></a>JWT断言（RFC 7523）</h4><p><code>https://tools.ietf.org/html/rfc7523</code></p>
+<p>此规范描述了当JWT的内容与客户端存在信任关系时，如何使用JWT来请求访问令牌。它还描述了如何将JWT用作核心OAuth授权的客户端身份验证。</p>
+<h4 id="SAML断言（RFC-7522）"><a href="#SAML断言（RFC-7522）" class="headerlink" title="SAML断言（RFC 7522）"></a>SAML断言（RFC 7522）</h4><p><code>https://tools.ietf.org/html/rfc7522</code></p>
+<p>此规范描述了当与客户端存在信任关系时，如何使用SAML断言来请求访问令牌。例如，这可用于将旧版SAML工作流与新的OAuth 2.0系统集成。</p>
+
+            
+        </div>
+    
+</div>
+
+
+                
+                    <!-- Paradox Post Info -->
+                    
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 Gitalk -->
+<div id="gitalk-comment">
+    <!-- Gitalk 评论框 -->
+<div id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+
+<script>
+    var gitalk = new Gitalk({
+            clientID: '37e3045f7495549e8e8f',
+            clientSecret: '7f01ca7a36dbfefe6abbb00c66c37d8d8559e8b2',
+            repo: 'seanthefish-repo',
+            owner: 'ShanyouYu-Sean',
+            admin: ['ShanyouYu-Sean'],
+            // facebook-like distraction free mode
+            distractionFreeMode: false,
+            id: md5(location.href)
+        })
+   gitalk.render('gitalk-container')
+</script>
+</div>
+<style>
+    #gitalk-comment {
+        background-color: #fff;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2018/07/14/oauth-guide-25/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/07/13/oauth-guide-23/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- GitTalk -->
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-07-20T09:47:28.991Z</updated>
+  <updated>2018-07-27T08:15:42.240Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,119 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>OAuth教程--访问令牌</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-12/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-12/</id>
-    <published>2018-07-13T04:00:00.000Z</published>
-    <updated>2018-07-20T09:47:28.991Z</updated>
+    <title>OAuth教程--OpenID Connect</title>
+    <link href="http://seanthefish.com/2018/07/27/oauth-guide-22/"/>
+    <id>http://seanthefish.com/2018/07/27/oauth-guide-22/</id>
+    <published>2018-07-27T07:33:55.649Z</published>
+    <updated>2018-07-27T08:15:42.240Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OAuth
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--附录</title>
+    <link href="http://seanthefish.com/2018/07/14/oauth-guide-26/"/>
+    <id>http://seanthefish.com/2018/07/14/oauth-guide-26/</id>
+    <published>2018-07-13T19:00:00.000Z</published>
+    <updated>2018-07-27T09:18:40.998Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;规范&quot;&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--工具和帮助文档</title>
+    <link href="http://seanthefish.com/2018/07/14/oauth-guide-25/"/>
+    <id>http://seanthefish.com/2018/07/14/oauth-guide-25/</id>
+    <published>2018-07-13T18:00:00.000Z</published>
+    <updated>2018-07-27T09:13:10.286Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;h3
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--OAuth 2.0规范</title>
+    <link href="http://seanthefish.com/2018/07/14/oauth-guide-24/"/>
+    <id>http://seanthefish.com/2018/07/14/oauth-guide-24/</id>
+    <published>2018-07-13T17:00:00.000Z</published>
+    <updated>2018-07-27T09:08:44.466Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OAuth 2.0核心框架（RFC
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--IndieAuth</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-23/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-23/</id>
+    <published>2018-07-13T15:00:00.000Z</published>
+    <updated>2018-07-27T08:51:12.803Z</updated>
     
     <summary type="html">
     
@@ -43,11 +151,224 @@
   </entry>
   
   <entry>
+    <title>OAuth教程--OAuth 1和2之间的差异</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-21/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-21/</id>
+    <published>2018-07-13T13:00:00.000Z</published>
+    <updated>2018-07-27T07:33:42.986Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OAuth
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--术语参考</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-20/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-20/</id>
+    <published>2018-07-13T12:00:00.000Z</published>
+    <updated>2018-07-27T07:10:18.043Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;角色&quot;&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--创建文档</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-19/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-19/</id>
+    <published>2018-07-13T11:00:00.000Z</published>
+    <updated>2018-07-27T07:05:55.171Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--令牌自解析endpoint（Token Introspection Endpoint）</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-18/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-18/</id>
+    <published>2018-07-13T10:00:00.000Z</published>
+    <updated>2018-07-27T06:41:11.185Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;当OAuth
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--使用PKCE保护移动应用程序</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-17/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-17/</id>
+    <published>2018-07-13T09:00:00.000Z</published>
+    <updated>2018-07-27T06:22:58.312Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--无浏览器和输入约束设备的OAuth</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-16/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-16/</id>
+    <published>2018-07-13T08:00:00.000Z</published>
+    <updated>2018-07-27T06:06:31.591Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OAuth
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--原生应用的OAuth</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-15/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-15/</id>
+    <published>2018-07-13T07:00:00.000Z</published>
+    <updated>2018-07-27T03:18:45.467Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--资源服务器</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-14/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-14/</id>
+    <published>2018-07-13T06:00:00.000Z</published>
+    <updated>2018-07-27T05:43:22.151Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;资源服务器是API服务器的OAuth
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
     <title>OAuth教程--授权列表与撤销</title>
     <link href="http://seanthefish.com/2018/07/13/oauth-guide-13/"/>
     <id>http://seanthefish.com/2018/07/13/oauth-guide-13/</id>
-    <published>2018-07-13T04:00:00.000Z</published>
-    <updated>2018-07-20T10:10:40.131Z</updated>
+    <published>2018-07-13T05:00:00.000Z</published>
+    <updated>2018-07-26T02:13:34.260Z</updated>
     
     <summary type="html">
     
@@ -57,6 +378,32 @@
         
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
 &lt;h3 id=&quot;授权列表&quot;&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--访问令牌</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-12/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-12/</id>
+    <published>2018-07-13T04:00:00.000Z</published>
+    <updated>2018-07-27T05:43:22.151Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
         
       
     
@@ -126,7 +473,7 @@
     <link href="http://seanthefish.com/2018/07/13/oauth-guide-9/"/>
     <id>http://seanthefish.com/2018/07/13/oauth-guide-9/</id>
     <published>2018-07-13T01:00:00.000Z</published>
-    <updated>2018-07-19T10:06:43.697Z</updated>
+    <updated>2018-07-19T10:06:43.698Z</updated>
     
     <summary type="html">
     
@@ -152,7 +499,7 @@
     <link href="http://seanthefish.com/2018/07/13/oauth-guide-8/"/>
     <id>http://seanthefish.com/2018/07/13/oauth-guide-8/</id>
     <published>2018-07-13T00:00:00.000Z</published>
-    <updated>2018-07-19T10:00:49.324Z</updated>
+    <updated>2018-07-19T10:00:49.325Z</updated>
     
     <summary type="html">
     
@@ -178,7 +525,7 @@
     <link href="http://seanthefish.com/2018/07/13/oauth-guide-7/"/>
     <id>http://seanthefish.com/2018/07/13/oauth-guide-7/</id>
     <published>2018-07-12T23:00:00.000Z</published>
-    <updated>2018-07-19T09:53:52.470Z</updated>
+    <updated>2018-07-27T05:43:22.151Z</updated>
     
     <summary type="html">
     
@@ -196,335 +543,6 @@
     
     
       <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--移动和原生应用</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-6/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-6/</id>
-    <published>2018-07-12T22:00:00.000Z</published>
-    <updated>2018-07-19T08:42:05.136Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--单页应用</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-5/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-5/</id>
-    <published>2018-07-12T21:00:00.000Z</published>
-    <updated>2018-07-19T08:39:54.721Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--服务器端应用程序</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-4/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-4/</id>
-    <published>2018-07-12T20:00:00.000Z</published>
-    <updated>2018-07-19T08:33:30.998Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;服务器端应用程序是处理OAuth
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--使用Google登录</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-3/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-3/</id>
-    <published>2018-07-12T19:00:00.000Z</published>
-    <updated>2018-07-18T08:44:56.190Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--访问OAuth服务器中的数据</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-2/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-2/</id>
-    <published>2018-07-12T18:00:00.000Z</published>
-    <updated>2018-07-18T03:40:40.969Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--准备工作</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-1/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-1/</id>
-    <published>2018-07-12T17:00:00.000Z</published>
-    <updated>2018-07-13T09:01:27.493Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>什么是OAuth？</title>
-    <link href="http://seanthefish.com/2018/06/19/what-is-oauth/"/>
-    <id>http://seanthefish.com/2018/06/19/what-is-oauth/</id>
-    <published>2018-06-19T06:00:00.000Z</published>
-    <updated>2018-06-19T10:24:32.083Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是Matt Raible的What the Heck is OAuth?的翻译。（&lt;a href=&quot;https://developer.okta.com/blog/2017/06/21/what-the-heck-is-oauth&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-      <category term="OIDC" scheme="http://seanthefish.com/categories/OAuth/OIDC/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-      <category term="OIDC" scheme="http://seanthefish.com/tags/OIDC/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>用gradle构建Java 9模块化系统快速指南</title>
-    <link href="http://seanthefish.com/2018/04/11/gradle-guide-java9/"/>
-    <id>http://seanthefish.com/2018/04/11/gradle-guide-java9/</id>
-    <published>2018-04-11T08:28:00.000Z</published>
-    <updated>2018-04-17T14:40:32.887Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是gradle官方的构建Java 9模块化系统的入门指南的翻译。（&lt;a
-        
-      
-    
-    </summary>
-    
-      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
-    
-      <category term="gradle" scheme="http://seanthefish.com/categories/Java-9/Java-module/gradle/"/>
-    
-    
-      <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
-    
-      <category term="gradle" scheme="http://seanthefish.com/tags/gradle/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Java模块系统综述</title>
-    <link href="http://seanthefish.com/2018/03/29/module-system/"/>
-    <id>http://seanthefish.com/2018/03/29/module-system/</id>
-    <published>2018-03-29T08:28:00.000Z</published>
-    <updated>2018-04-03T06:22:02.705Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是Mark Reinhold的The State of the Module System最新版的翻译。（&lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/spec/sotms/&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
-    
-    
-      <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Project Jigsaw:Java模块系统快速入门指南</title>
-    <link href="http://seanthefish.com/2018/03/29/java9-quick-guide/"/>
-    <id>http://seanthefish.com/2018/03/29/java9-quick-guide/</id>
-    <published>2018-03-29T02:12:00.000Z</published>
-    <updated>2018-03-30T16:15:16.990Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文为openjdk官方java模块入门指南的翻译。(&lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/quick-start&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Java 9" scheme="http://seanthefish.com/categories/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/categories/Java-9/Java-module/"/>
-    
-    
-      <category term="Java 9" scheme="http://seanthefish.com/tags/Java-9/"/>
-    
-      <category term="Java module" scheme="http://seanthefish.com/tags/Java-module/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>也来谈谈classloader和classpath hell问题</title>
-    <link href="http://seanthefish.com/2018/01/11/classloader-classpath-hell/"/>
-    <id>http://seanthefish.com/2018/01/11/classloader-classpath-hell/</id>
-    <published>2018-01-11T04:14:47.000Z</published>
-    <updated>2018-03-29T06:45:33.617Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;classpath hell, 也叫 &lt;a href=&quot;https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;jar
-        
-      
-    
-    </summary>
-    
-      <category term="classLoader" scheme="http://seanthefish.com/categories/classLoader/"/>
-    
-    
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://seanthefish.com/2017/12/22/hello-world/"/>
-    <id>http://seanthefish.com/2017/12/22/hello-world/</id>
-    <published>2017-12-22T05:22:04.312Z</published>
-    <updated>2017-12-22T05:22:04.312Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a
-        
-      
-    
-    </summary>
-    
     
   </entry>
   

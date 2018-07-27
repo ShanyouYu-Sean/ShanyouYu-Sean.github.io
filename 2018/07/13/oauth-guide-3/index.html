@@ -247,7 +247,7 @@
 
     
         <meta property="article:published_time" content="Fri Jul 13 2018 03:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Wed Jul 18 2018 16:44:56 GMT+0800">
+        <meta property="article:modified_time" content="Fri Jul 27 2018 17:20:07 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -270,7 +270,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-3/index.html",
     "headline": "OAuth教程--使用Google登录",
     "datePublished": "Fri Jul 13 2018 03:00:00 GMT+0800",
-    "dateModified": "Wed Jul 18 2018 16:44:56 GMT+0800",
+    "dateModified": "Fri Jul 27 2018 17:20:07 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -545,7 +545,7 @@ if(!isset($_GET[&#39;action&#39;])) {
 <h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>现在我们已经设置了必要的变量，让我们开始OAuth流程。</p>
 <p>我们要让人们做的第一件事是,在查询字符串为<code>?action=login</code>时，访问此页面以启动该流程。</p>
 <p>请注意，此请求中的scope现在是OpenID Connect的scope，“openid email”，表示我们不是要求访问用户的Google数据，只是想知道他们是谁。</p>
-<p>另请注意，我们使用<code>response_type=code</code>参数来指示我们希望Google返回用来交换id_token的授权码。</p>
+<p>另请注意，我们使用<code>response_type=code</code>参数来指示我们希望Google返回用来交换<code>id_token</code>的授权码。</p>
 <pre><code class="php">// Start the login process by sending the user
 // to Google&#39;s authorization page
 if(isset($_GET[&#39;action&#39;]) &amp;&amp; $_GET[&#39;action&#39;] == &#39;login&#39;) {

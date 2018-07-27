@@ -3,6 +3,928 @@
   
     
     <entry>
+      <title><![CDATA[OAuth教程--OpenID Connect]]></title>
+      <url>/2018/07/27/oauth-guide-22/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>OAuth 2.0框架明确不提供有关已授权应用程序的用户的任何信息。OAuth 2.0是一个委派框架，允许第三方应用程序代表用户行事，而无需应用程序知道用户的身份。</p>
+<p>OpenID Connect采用OAuth 2.0框架并在顶部添加标识层。它提供有关用户的信息，并使客户端能够建立登录会话。虽然本章并不是OpenID Connect的完整指南，但它旨在阐明OAuth 2.0和OpenID Connect如何相互关联。</p>
+<h3 id="授权与身份验证"><a href="#授权与身份验证" class="headerlink" title="授权与身份验证"></a>授权与身份验证</h3><p>OAuth 2.0被称为授权“框架”而不是“协议”，因为核心规范实际上为各种实现留下了相当大的空间，根据其用例不同地执行操作。具体来说，OAuth 2.0不提供说明用户是谁或如何进行身份验证的机制，它只是说用户委托应用程序代表他们行事。OAuth 2.0框架以访问令牌的形式提供此委派，应用程序可以使用该令牌代表用户执行操作。访问令牌被呈现给API（“资源服务器”），其知道如何验证访问令牌是否是活动的。从应用程序的角度来看，它是一个不透明的字符串。</p>
+<p>当您入住酒店时，您将获得一张钥匙卡，您可以使用该卡进入指定的房间。您可以将钥匙卡视为访问令牌。钥匙卡上没有说明您的身份，也没有说明您在前台的身份验证，但您可以在入住期间使用该卡进入酒店房间。同样，OAuth 2.0访问令牌不会指示用户是谁，它只是您可以用来访问数据的东西，它可能会在将来某个时候到期。</p>
+<p>OAuth 2.0有意设计为在不提供用户身份和身份验证的情况下提供授权，因为这些问题具有非常不同的安全注意事项，这些注意事项不一定与授权协议的安全注意事项重叠。分别处理身份验证和身份允许是OAuth 2.0框架用作构建身份验证协议的一部分。</p>
+<h3 id="构建身份验证框架"><a href="#构建身份验证框架" class="headerlink" title="构建身份验证框架"></a>构建身份验证框架</h3><p>OAuth 2.0框架是作为构建身份验证和身份协议的基础。</p>
+<p>要使用OAuth 2.0作为身份验证协议的基础，您至少需要做一些事情。</p>
+<ul>
+<li>定义endpoint以返回有关用户的属性</li>
+<li>定义第三方应用程序可用于进行请求用户身份信息的一个或多个范围</li>
+<li>在处理身份验证时，需要定义其错误代码和必要的扩展参数，例如当会话超时重新提示用户输入凭据，或者如何允许用户选择新帐户登录应用程序。</li>
+</ul>
+<p>通常，当单个提供商尝试向OAuth 2.0添加内容以创建身份验证和身份协议时，这会导致另一个API具有不同程度的安全性。OpenID Connect从许多不同的实现中获取共享，并将其标准化为适合企业级实现的协议。</p>
+<h3 id="ID令牌"><a href="#ID令牌" class="headerlink" title="ID令牌"></a>ID令牌</h3><p>OpenID Connect的核心基于一个名为“ID令牌”的概念。这是授权服务器将返回的新令牌类型，它对用户的身份验证信息进行编码。与仅旨在由资源服务器理解的访问令牌相反，ID令牌旨在被第三方应用程序理解。当客户端发出OpenID Connect请求时，它可以请求ID令牌以及访问令牌。</p>
+<p>OpenID Connect的ID令牌采用JWT（JSON Web令牌）的形式，JWT是一个JSON有效负载，使用发行者的私钥进行签名，并且可以由应用程序进行解析和验证。</p>
+<p>JWT内部是一些定义的属性名称，它们为应用程序提供信息。它们用简写名称表示，以保持JWT的整体大小。这包括用户的唯一标识符（sub即“subject”的缩写），发出令牌的服务器的标识符（iss即“issuer”的缩写），请求此令牌的客户端的标识符（aud即“audience”的缩写），以及少数属性，例如令牌的生命周期，以及用户在多长时间之前获得主要身份验证提示。</p>
+<pre><code class="json">{
+  &quot;iss&quot;: &quot;https://server.example.com&quot;,
+  &quot;sub&quot;: &quot;24400320&quot;,
+  &quot;aud&quot;: &quot;s6BhdRkqt3&quot;,
+  &quot;nonce&quot;: &quot;n-0S6_WzA2Mj&quot;,
+  &quot;exp&quot;: 1311281970,
+  &quot;iat&quot;: 1311280970,
+  &quot;auth_time&quot;: 1311280969,
+  &quot;acr&quot;: &quot;urn:mace:incommon:iap:silver&quot;
+}
+</code></pre>
+<p>标准化endpoint，名称和元数据有助于减少实现错误，并允许传递共享关于安全性考虑的知识。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>OpenID Connect在OAuth 2.0框架之上提供用户身份和身份验证。您可以使用OpenID Connect建立登录会话，并使用OAuth访问受保护资源。</p>
+<p>您可以是有与OAuth 2.0相同的流程，以便同时请求ID令牌和访问令牌两种认证，以及获得授权访问受保护的资源。</p>
+<p>OpenID Connect由OpenID Foundation维护。可以在<code>https://openid.net/connect/</code>上完整阅读核心OpenID Connect规范以及许多扩展。</p>
+<p><a href="https://oidcdebugger.com/" target="_blank" rel="noopener">OpenID Connect Debugger</a>是一个奇妙的资源，帮助您构建OpenID Connect请求。此外，<a href="https://www.oauth.com/playground/" target="_blank" rel="noopener">OAuth 2.0 Playground</a>还提供了针对实时服务器的OpenID Connect流程演练。</p>
+<p>在使用Google登录时，我们将使用OpenID Connect构建一个示例应用。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--附录]]></title>
+      <url>/2018/07/14/oauth-guide-26/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<h3 id="规范"><a href="#规范" class="headerlink" title="规范"></a>规范</h3><ul>
+<li><a href="http://tools.ietf.org/html/rfc6749" target="_blank" rel="noopener">OAuth 2.0 RFC 6749</a></li>
+<li><a href="http://tools.ietf.org/html/rfc6750" target="_blank" rel="noopener">承载令牌使用RFC 6750</a></li>
+<li><a href="http://tools.ietf.org/html/rfc6819" target="_blank" rel="noopener">OAuth 2.0威胁模型和安全注意事项RFC 6819</a></li>
+<li><a href="https://tools.ietf.org/html/draft-ietf-oauth-device-flow" target="_blank" rel="noopener">OAuth 2.0设备流程</a></li>
+<li><a href="https://tools.ietf.org/html/draft-ietf-oauth-native-apps" target="_blank" rel="noopener">适用于原生应用的OAuth 2.0</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">代码交换RFC 7636的证明密钥</a></li>
+<li><a href="http://tools.ietf.org/html/rfc7519" target="_blank" rel="noopener">JSON Web Token RFC 7519</a></li>
+<li><a href="https://openid.net/connect/" target="_blank" rel="noopener">OpenID Connect</a></li>
+<li><a href="https://www.w3.org/TR/indieauth/" target="_blank" rel="noopener">IndieAuth</a></li>
+<li><a href="https://tools.ietf.org/wg/oauth/" target="_blank" rel="noopener">所有OAuth工作组规范</a></li>
+</ul>
+<h3 id="供应商文档"><a href="#供应商文档" class="headerlink" title="供应商文档"></a>供应商文档</h3><ul>
+<li><a href="https://developers.google.com/identity/protocols/OAuth2" target="_blank" rel="noopener">Google OAuth 2.0</a></li>
+<li><a href="https://developers.facebook.com/" target="_blank" rel="noopener">Facebook开发者</a></li>
+<li><a href="https://developer.github.com/apps/" target="_blank" rel="noopener">GitHub文档</a></li>
+<li><a href="https://developer.foursquare.com/overview/auth" target="_blank" rel="noopener">Foursquare文档</a></li>
+</ul>
+<h3 id="社区资源"><a href="#社区资源" class="headerlink" title="社区资源"></a>社区资源</h3><ul>
+<li><a href="https://aaronparecki.com/oauth/" target="_blank" rel="noopener">由Aaron Parecki提供的OAuth资源</a></li>
+<li><a href="https://alexbilbie.com/tag/oauth/" target="_blank" rel="noopener">Alex Bilbie撰写的OAuth文章</a></li>
+<li><a href="https://hueniverse.com/tagged/oauth" target="_blank" rel="noopener">Eran Hammer撰写的OAuth文章</a></li>
+<li><a href="https://oauth.net/articles/authentication/" target="_blank" rel="noopener">使用OAuth 2.0进行用户身份验证</a></li>
+<li><a href="https://www.ietf.org/mailman/listinfo/oauth" target="_blank" rel="noopener">OAuth IETF邮件列表</a></li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--工具和帮助文档]]></title>
+      <url>/2018/07/14/oauth-guide-25/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<h3 id="OAuth-2-0游乐场"><a href="#OAuth-2-0游乐场" class="headerlink" title="OAuth 2.0游乐场"></a>OAuth 2.0游乐场</h3><p><code>https://www.oauth.com/playground/</code></p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftoj9ztdrzj30sg0kw41k.jpg" alt="play"></p>
+<p>OAuth 2.0 Playground通过与真正的OAuth 2.0授权服务器交互，引导您完成各种OAuth流程。</p>
+<p>它包含授权码流，PKCE，设备流以及OpenID Connect的简单示例。</p>
+<h3 id="Google-OAuth-2-0-Playground"><a href="#Google-OAuth-2-0-Playground" class="headerlink" title="Google OAuth 2.0 Playground"></a>Google OAuth 2.0 Playground</h3><p><code>https://developers.google.com/oauthplayground/</code></p>
+<p>Google的OAuth 2.0 Playground允许您手动逐步完成从此测试应用程序访问您自己的Google帐户的授权过程。</p>
+<p>您可以从可用范围列表中进行选择，点击“授权”以转到标准Google授权页面，重定向会将您返回到OAuth 2.0 Playground。在那里，您可以查看交换访问令牌的授权代码的请求，然后使用访问令牌进行测试以发出API请求。</p>
+<p>该工具还允许您通过自定义授权和令牌endpoint来对其他OAuth 2.0服务器进行授权。</p>
+<h3 id="OpenID-Connect-Debugger"><a href="#OpenID-Connect-Debugger" class="headerlink" title="OpenID Connect Debugger"></a>OpenID Connect Debugger</h3><p><code>https://oidcdebugger.com</code></p>
+<p>OpenID Connect Debugger允许您测试OpenID Connect请求并调试来自服务器的响应。您可以将该工具配置为与任何OpenID服务器（如Google）配合使用。</p>
+<h3 id="服务器和客户端库目录"><a href="#服务器和客户端库目录" class="headerlink" title="服务器和客户端库目录"></a>服务器和客户端库目录</h3><p><code>https://oauth.net/code/</code></p>
+<p>oauth.net网站包含支持OAuth 2.0的服务器，客户端和服务的目录。您可以找到从完整的OAuth 2.0服务器实现到促进流程的每个步骤的库的任何内容，以及客户端库和代理服务。</p>
+<p>如果您要提供任何库或服务，也可以将它们添加到目录中。</p>
+<h3 id="jsonwebtoken-io"><a href="#jsonwebtoken-io" class="headerlink" title="jsonwebtoken.io"></a>jsonwebtoken.io</h3><p><code>https://jsonwebtoken.io</code></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftojc727cbj30sg0ovahn.jpg" alt="jwt"></p>
+<p>jsonwebtoken.io是一个用于调试JSON Web令牌的工具。它允许您粘贴JWT，它将对其进行解码并显示各个组件。如果您向其提供用于签署JWT的秘钥，它还可以验证签名。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--OAuth 2.0规范]]></title>
+      <url>/2018/07/14/oauth-guide-24/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>OAuth 2.0核心框架（RFC 6749）定义了角色和基本功能级别，但未指定大量实现细节。自RFC发布以来，OAuth工作组已经发布了许多基于此框架构建的其他规范，以填补缺失的部分。查看该小组正在进行的完整规范列表可能有点困难。本章列出了各种规范如何相互关联。</p>
+<h3 id="核心规格"><a href="#核心规格" class="headerlink" title="核心规格"></a>核心规格</h3><h4 id="OAuth-2-0核心（RFC-6749）"><a href="#OAuth-2-0核心（RFC-6749）" class="headerlink" title="OAuth 2.0核心（RFC 6749）"></a>OAuth 2.0核心（RFC 6749）</h4><p><code>https://tools.ietf.org/html/rfc6749</code></p>
+<p>RFC 6749是核心OAuth 2.0框架。这描述了角色（资源所有者，客户端，授权服务器等，在术语参考中有更详细的描述，几个授权流程和几个错误定义。重要的是要记住这是一个“框架”，因为有很多方面未指明您在构建完整实施时需要填写。其中大部分细节已记录为扩展规范。</p>
+<h4 id="承载令牌使用（RFC-6750）"><a href="#承载令牌使用（RFC-6750）" class="headerlink" title="承载令牌使用（RFC 6750）"></a>承载令牌使用（RFC 6750）</h4><p><code>https://tools.ietf.org/html/rfc6750</code></p>
+<p>核心规范没有定义访问令牌的格式或如何使用它们。在开发核心规范的早期，访问令牌是争论的主要问题，结果是访问令牌完全取自核心规范，而不是让人们在不受欢迎的令牌上妥协。但是，从那时起，大多数实现已经标准化使用承载令牌。RFC 6750描述了使用承载令牌访问API的语法和方法。</p>
+<h4 id="威胁模型和安全注意事项（RFC-6819）"><a href="#威胁模型和安全注意事项（RFC-6819）" class="headerlink" title="威胁模型和安全注意事项（RFC 6819）"></a>威胁模型和安全注意事项（RFC 6819）</h4><p><code>https://tools.ietf.org/html/rfc6819</code></p>
+<p>编写威胁模型和安全注意事项文档是为了提供超出核心文档所述内容的其他指导。在主要提供商具有真正的实施经验之后，添加了大部分文档。该文件描述了许多已知的攻击，无论是理论攻击还是已经被证明的攻击。它描述了每种方法的对策。</p>
+<p>实施OAuth 2.0服务器的每个人都应该阅读本文档，以避免陷入已经探索和解决过的陷阱。</p>
+<h3 id="令牌"><a href="#令牌" class="headerlink" title="令牌"></a>令牌</h3><h4 id="令牌自解析（RFC-7662）"><a href="#令牌自解析（RFC-7662）" class="headerlink" title="令牌自解析（RFC 7662）"></a>令牌自解析（RFC 7662）</h4><p><code>https://tools.ietf.org/html/rfc7662</code></p>
+<p>令牌自解析规范定义了资源服务器获取有关访问令牌的信息的机制。如果没有此规范，资源服务器必须有一种定制方式来检查访问令牌是否有效，并找出有关它们的用户数据等。这通常发生在自定义API endpoint上，或者因为资源服务器和授权服务器共享一个数据库或其他一些常见的存储。</p>
+<p>使用此规范，资源服务器可以检查访问令牌的有效性，并通过HTTP API调用查找其他信息，从而更好地分离授权服务器与任何资源服务器之间的关注点。</p>
+<h4 id="令牌绑定"><a href="#令牌绑定" class="headerlink" title="令牌绑定"></a>令牌绑定</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-token-binding</code></p>
+<p>令牌绑定扩展描述了一种将令牌加密绑定到客户端的技术，以保护令牌免受中间人和重放攻击。标准承载令牌和授权码与使用它们的客户端没有加密连接，这是OAuth 1中OAuth 2的重大变化。</p>
+<h3 id="移动和其他设备"><a href="#移动和其他设备" class="headerlink" title="移动和其他设备"></a>移动和其他设备</h3><p>编写这些规范是为了在更广泛的设备上支持OAuth。</p>
+<h4 id="适用于原生应用的OAuth-2-0"><a href="#适用于原生应用的OAuth-2-0" class="headerlink" title="适用于原生应用的OAuth 2.0"></a>适用于原生应用的OAuth 2.0</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-native-apps</code></p>
+<p>本文档更多的是一组准则而不是协议更改。在本文档中，您将找到针对这些环境特有的原生应用程序和安全建议的建议。它描述了诸如不允许第三方应用程序打开更容易受到网络钓鱼攻击的嵌入式Web视图以及有关如何执行此操作的特定于平台的建议。它还建议使用PKCE扩展，如下所述。</p>
+<h4 id="PKCE：代码交换的证明密钥（RFC-7636）"><a href="#PKCE：代码交换的证明密钥（RFC-7636）" class="headerlink" title="PKCE：代码交换的证明密钥（RFC 7636）"></a>PKCE：代码交换的证明密钥（RFC 7636）</h4><p><code>https://tools.ietf.org/html/rfc7636</code></p>
+<p>移动和桌面应用等公共客户端缺少使授权流程安全的Web应用程序的许多功能。Web应用程序具有使用HTTPS URL访问的好处，因此授权服务器可以合理地确信它在生成授权代码后,将用户的浏览器重定向到正确的应用程序。在用授权码交换访问令牌时，Web应用程序还能够利用客户端秘钥。由于移动和桌面应用程序都没有这些功能，因此授权服务器无法确定它是否将用户返回到正确的应用程序。</p>
+<p>PKCE扩展描述了应用程序首先生成在请求访问令牌时使用秘钥的方式，以便拦截授权代码的攻击者无法使用被盗代码。</p>
+<p>PKCE中详细介绍了PKCE扩展。</p>
+<h4 id="设备流程"><a href="#设备流程" class="headerlink" title="设备流程"></a>设备流程</h4><p><code>https://tools.ietf.org/html/draft-ietf-oauth-device-flow</code></p>
+<p>设备流是一种扩展，它使没有浏览器或有限输入功能的设备能够获得用户授权。您通常会在没有网络浏览器的Apple TV等设备上看到这种情况，或者除了几个按钮之外没有输入机制的流式视频编码器。</p>
+<p>该流程的工作原理是让用户访问辅助设备（如智能手机）上的URL并输入设备上显示的代码。</p>
+<h4 id="身份验证和会话管理"><a href="#身份验证和会话管理" class="headerlink" title="身份验证和会话管理"></a>身份验证和会话管理</h4><p>这些规范用于促进身份验证和会话管理，这两者都不是核心OAuth规范的一部分。</p>
+<h4 id="OpenID-Connect"><a href="#OpenID-Connect" class="headerlink" title="OpenID Connect"></a>OpenID Connect</h4><p><code>https://openid.net/connect/</code></p>
+<p>由于OAuth框架仅描述授权方法，并且未提供有关用户的任何详细信息，因此OpenID Connect通过描述身份验证和会话管理机制来填补这一空白。</p>
+<h4 id="IndieAuth"><a href="#IndieAuth" class="headerlink" title="IndieAuth"></a>IndieAuth</h4><p><code>https://www.w3.org/TR/indieauth/</code></p>
+<p>IndieAuth是一个基于OAuth 2.0构建的分散式身份协议，使用URL来识别用户和应用程序。这样就无需事先注册客户端，因为所有客户端都有内置的客户端ID：应用程序的URL。</p>
+<h4 id="令牌撤销（RFC-7009）"><a href="#令牌撤销（RFC-7009）" class="headerlink" title="令牌撤销（RFC 7009）"></a>令牌撤销（RFC 7009）</h4><p><code>https://tools.ietf.org/html/rfc7009</code></p>
+<p>本文档描述了授权服务器的新endpoint，客户端可以使用该endpoint通知服务器不再需要访问令牌或刷新令牌。这用于在客户端中启用“注销”功能，允许授权服务器清除与该会话关联的任何凭据。</p>
+<h3 id="交互操作"><a href="#交互操作" class="headerlink" title="交互操作"></a>交互操作</h3><p>为了支持创建可以与任何OAuth 2.0服务器一起使用的完全通用的客户端，需要对发现和客户端注册等内容进行标准化，因为它们超出了核心规范的范围。</p>
+<h4 id="授权服务器元数据"><a href="#授权服务器元数据" class="headerlink" title="授权服务器元数据"></a>授权服务器元数据</h4><p><code>https://tools.ietf.org/html/rfc8414</code></p>
+<p>授权服务器元数据规范（也称为发现）定义了客户端用于查找与特定OAuth服务器交互所需的信息的格式。这包括查找授权endpoint和列出支持的范围等内容。</p>
+<h4 id="动态客户端注册（RFC-7591）"><a href="#动态客户端注册（RFC-7591）" class="headerlink" title="动态客户端注册（RFC 7591）"></a>动态客户端注册（RFC 7591）</h4><p><code>https://tools.ietf.org/html/rfc7591</code></p>
+<p>通常，开发人员将手动在服务中注册应用程序以获取客户端ID，并提供有关将在授权接口上使用的应用程序的信息。此规范提供了动态或以编程方式注册客户端的机制。此规范源自OpenID Connect动态客户端注册规范，并且仍与OpenID Connect服务器兼容。</p>
+<h4 id="动态客户端管理（RFC-7592）"><a href="#动态客户端管理（RFC-7592）" class="headerlink" title="动态客户端管理（RFC 7592）"></a>动态客户端管理（RFC 7592）</h4><p><code>https://tools.ietf.org/html/rfc7592</code></p>
+<p>在需要更新客户端信息的情况下，此规范提供了以编程方式执行此操作的机制。此规范扩展了动态注册RFC 7591。</p>
+<h3 id="企业"><a href="#企业" class="headerlink" title="企业"></a>企业</h3><p>这些规范支持更高级的企业用例。</p>
+<h4 id="断言框架（RFC-7521）"><a href="#断言框架（RFC-7521）" class="headerlink" title="断言框架（RFC 7521）"></a>断言框架（RFC 7521）</h4><p><code>https://tools.ietf.org/html/rfc7521</code></p>
+<p>此规范提供了使用OAuth 2.0断言的框架。它定义了新的客户端身份验证机制和新的授权授予类型。由于此规范也是一个框架，因此它仅适用于下面描述的特定断言类型之一。</p>
+<h4 id="JWT断言（RFC-7523）"><a href="#JWT断言（RFC-7523）" class="headerlink" title="JWT断言（RFC 7523）"></a>JWT断言（RFC 7523）</h4><p><code>https://tools.ietf.org/html/rfc7523</code></p>
+<p>此规范描述了当JWT的内容与客户端存在信任关系时，如何使用JWT来请求访问令牌。它还描述了如何将JWT用作核心OAuth授权的客户端身份验证。</p>
+<h4 id="SAML断言（RFC-7522）"><a href="#SAML断言（RFC-7522）" class="headerlink" title="SAML断言（RFC 7522）"></a>SAML断言（RFC 7522）</h4><p><code>https://tools.ietf.org/html/rfc7522</code></p>
+<p>此规范描述了当与客户端存在信任关系时，如何使用SAML断言来请求访问令牌。例如，这可用于将旧版SAML工作流与新的OAuth 2.0系统集成。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--IndieAuth]]></title>
+      <url>/2018/07/13/oauth-guide-23/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>IndieAuth是一个基于OAuth 2.0的分散式身份协议，它使用URL来识别用户和应用程序。它允许人们在使用该身份登录和授权应用程序时使用其控制下的域作为其身份。该规范可以在<code>https://www.w3.org/TR/indieauth/</code>找到。</p>
+<p>所有用户ID都是URL，并且应用程序也通过其URL而不是预先注册的客户端ID进行标识。这使得它非常适用于您不希望开发人员在每个授权服务器上注册帐户的情况，例如在WordPress安装中对用户进行身份验证的应用程序。</p>
+<p>IndieAuth分离授权服务器和发布访问令牌的角色，以便可以为流程的每个部分使用完全独立的实现和服务。</p>
+<p>当应用程序只需要识别用户进行登录时，IndieAuth可以用作身份验证机制，或者应用程序可以使用IndieAuth来获取用户使用的访问令牌。</p>
+<p>例如，Micropub客户端使用IndieAuth获取访问令牌，然后用于在用户的网站上创建内容。</p>
+<p>IndieAuth建立在OAuth 2.0框架之上，如下所示：</p>
+<ul>
+<li>指定用于标识用户的机制和格式（可解析的URL）</li>
+<li>指定在给定profile URL的情况下发现授权和令牌endpoint的方法</li>
+<li>指定客户端ID的格式（也作为可解析的URL）</li>
+<li>所有客户都是公共客户，因为不使用客户秘钥</li>
+<li>客户端注册不是必需的，因为所有客户端都必须使用可解析的URL作为其客户端ID</li>
+<li>重定向URI注册是由应用程序在其网站上公布其有效的重定向URL来完成的</li>
+<li>指定令牌endpoint和授权endpoint进行通信的机制，类似于令牌自解析这是针对授权码的</li>
+</ul>
+<p>更多信息和规范可以在<a href="IndieAuth">indieauth.net</a>找到。下面是两个工作流程的简要概述。</p>
+<h3 id="发现"><a href="#发现" class="headerlink" title="发现"></a>发现</h3><p>在应用程序可以重定向到授权服务器之前，应用程序需要知道将用户引导到哪个授权服务器！这是因为每个用户都由URL标识，并且用户的URL指示其授权服务器所在的位置。</p>
+<p>应用程序首先需要提示用户输入其URL，或以其他方式获取其URL。通常，应用程序将包含一个URL字段，供用户输入其URL。</p>
+<p>该应用程序将向用户的URL发出HTTP GET请求，查找HTTP Link header或HTML <code>&lt;link&gt;</code>的标记的<code>authorization_endpoint</code>的<code>rel</code>值。在客户端也试图为用户获取访问令牌的情况下，它还将查找<code>token_endpoint</code>的<code>rel</code>值。</p>
+<p>例如，GET请求<code>https://aaronparecki.com/</code>可能会返回以下内容，显示为缩写的HTTP请求。</p>
+<pre><code class="http">HTTP/2 200
+content-type: text/html; charset=UTF-8
+link: &lt;https://aaronparecki.com/auth&gt;; rel=&quot;authorization_endpoint&quot;
+link: &lt;https://aaronparecki.com/token&gt;; rel=&quot;token_endpoint&quot;
+link: &lt;https://aaronparecki.com/micropub&gt;; rel=&quot;micropub&quot;
+
+&lt;!doctype html&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;Aaron Parecki&lt;/title&gt;
+&lt;link rel=&quot;authorization_endpoint&quot; href=&quot;/auth&quot;&gt;
+&lt;link rel=&quot;token_endpoint&quot; href=&quot;/token&quot;&gt;
+&lt;link rel=&quot;micropub&quot; href=&quot;/micropub&quot;&gt;
+</code></pre>
+<p>请注意，endpoint URL可以是相对URL或绝对URL，并且可以位于与用户endpoint相同的域或不同的域上。这允许用户为任何组件使用托管服务。</p>
+<p>有关发现的更多详细信息，请访问<br><code>https://www.w3.org/TR/indieauth/#discovery-by-clients</code>。</p>
+<h3 id="登录工作流程"><a href="#登录工作流程" class="headerlink" title="登录工作流程"></a>登录工作流程</h3><p>用户登录应用程序的基本流程如下。</p>
+<ul>
+<li>用户以应用程序的登录形式输入其个人URL。</li>
+<li>发现：应用程序获取URL并查找用户的授权endpoint。</li>
+<li>授权请求：应用程序将用户的浏览器定向到发现的授权endpoint，作为标准OAuth 2.0授权以及在第一步中输入的用户URL。</li>
+<li>身份验证/批准：用户在其授endpoint进行身份验证并批准登录请求。授权服务器生成授权代码并重定向回应用程序的重定向URL。</li>
+<li>验证：应用程序检查授权endpoint处的代码，类似于交换访问令牌的代码，但不返回访问令牌，因为这只是对身份验证的检查。授权endpoint使用经过身份验证的用户的完整URL进行响应。</li>
+</ul>
+<h4 id="认证请求"><a href="#认证请求" class="headerlink" title="认证请求"></a>认证请求</h4><p>当应用程序构建URL以对用户进行身份验证时，该请求看起来与OAuth授权请求非常相似，除了不需要预先注册客户端，并且该请求还将包括用户的profile URL。URL将如下所示。</p>
+<pre><code class="http">https://user.example.net/auth?
+    me=https://user.example.net/
+    &amp;amp;redirect_uri=https://example-app.com/redirect
+    &amp;amp;client_id=https://example-app.com/
+    &amp;amp;state=1234567890
+</code></pre>
+<p>然后授权服务器会要求用户登录，就像OAuth流程一样，然后询问用户是否要继续登录应用程序，如下所示。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftoifez6zej311g0fywm8.jpg" alt="auth"></p>
+<p>如果用户批准，将使用查询字符串中的授权码（和应用程序的状态值）将它们重定向回应用程序。</p>
+<p>然后，应用程序将获取授权码并使用授权endpoint对其进行验证，以确认登录用户的身份。应用程序向授权endpoint发出POST请求code，<code>client_id</code>并且<code>redirect_uri</code>就像正常的授权码一样交换。</p>
+<pre><code class="http">POST /auth
+Host: user.example.net
+Content-type: application/x-www-form-urlencoded
+
+code=xxxxxxxx
+&amp;amp;client_id=https://example-app.com/
+&amp;amp;redirect_uri=https://example-app.com/redirect
+</code></pre>
+<p>响应将是一个简单的JSON对象，其中包含用户的完整profile URL。</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  &quot;me&quot;: &quot;https://user.example.net/&quot;
+}
+</code></pre>
+<p>有关处理请求和响应的更多详细信息，请参阅<br><code>https://www.w3.org/TR/indieauth/#authorization-code-verification</code>。</p>
+<h3 id="授权工作流程"><a href="#授权工作流程" class="headerlink" title="授权工作流程"></a>授权工作流程</h3><p>当应用程序尝试获取用户的访问令牌以修改或访问用户的数据时，将使用授权工作流程。这类似于访问数据中描述的OAuth 2.0授权码工作流程，但不使用预先注册客户端，因为使用了URL。</p>
+<p>下面是授权应用程序的用户的基本流程。</p>
+<ul>
+<li>用户以应用程序的登录形式输入其个人URL。</li>
+<li>发现：应用程序获取URL并查找用户的授权和令牌endpoint。</li>
+<li>授权请求：应用程序将用户的浏览器定向到发现的授权endpoint，作为标准OAuth 2.0授权授予和请求的范围，以及在第一步中输入的用户URL。</li>
+<li>身份验证/批准：用户在其授权endpoint进行身份验证，查看请求的范围并批准请求。授权服务器生成授权代码并重定向回应用程序的重定向URL。</li>
+<li>令牌交换：应用程序向令牌端点发出请求用授权码交换访问令牌。令牌端点使用访问令牌和经过身份验证的用户的完整URL进行响应。</li>
+</ul>
+<h4 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h4><p>当应用程序构建URL以对用户进行身份验证时，该请求看起来与OAuth授权请求非常相似，除了不需要预先注册客户端，并且该请求还将包括用户的profile URL。URL将如下所示。</p>
+<pre><code class="http">https://user.example.net/auth?
+    me=https://user.example.net/
+    &amp;amp;response_type=code
+    &amp;amp;redirect_uri=https://example-app.com/redirect
+    &amp;amp;client_id=https://example-app.com/
+    &amp;amp;state=1234567890
+    &amp;amp;scope=create+update
+</code></pre>
+<p>请注意，与上述身份验证请求不同，此请求包括<code>response_type=code</code>和应用程序请求的请求范围列表。</p>
+<p>授权服务器将要求用户登录，然后向他们提供授权提示。</p>
+<p>不同的IndieAuth服务器可能会以不同的方式显示此提示，如我网站的授权服务器和下面显示的WordPress IndieAuth插件的屏幕截图所示。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftoininhyaj31020y47fr.jpg" alt="me"></p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftoio589r3j30bd0hrt9i.jpg" alt="wordpress"></p>
+<p>当用户批准该请求时，服务器将用户重定向回具有查询字符串中的授权码的应用程序。</p>
+<p>为了获得访问令牌，应用程序使用授权码和其他所需数据向用户的令牌endpoint（在第一个发现步骤中发现的endpoint）发出POST请求。</p>
+<pre><code class="http">POST /token
+Host: user.example.net
+Content-type: application/x-www-form-urlencoded&lt;/pre&gt;
+
+&lt;pre class=&quot;break-before&quot;&gt;grant_type=authorization_code
+&amp;amp;code=xxxxxxxx
+&amp;amp;client_id=https://example-app.com/
+&amp;amp;redirect_uri=https://example-app.com/redirect
+&amp;amp;me=https://user.example.net/
+</code></pre>
+<p>令牌endpoint将为用户生成访问令牌，并使用正常的OAuth 2.0令牌响应进行响应，并添加授权应用程序的用户的profile URL。</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  &quot;me&quot;: &quot;https://user.example.net/&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;access_token&quot;: &quot;XXXXXX&quot;,
+  &quot;scope&quot;: &quot;create update&quot;
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--OAuth 1和2之间的差异]]></title>
+      <url>/2018/07/13/oauth-guide-21/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>OAuth 2.0从头开始就完全重写了OAuth 1.0，仅共享总体目标和一般用户体验。OAuth 2.0不向后兼容OAuth 1.0或1.1，应该被视为一个全新的协议。</p>
+<p>OAuth 1.0主要基于两个现有的专有协议：Flickr的授权API和Google的AuthSub。OAuth 1.0的工作是基于当时实际实施经验的最佳解决方案。在许多公司构建OAuth 1 API的过程中，以及许多编写代码来使用API​​的开发人员和社区了解到协议在哪些方面对人们产生了挑战。几个特定领域被确定为需要改进，因为它们要么限制API的能力，要么实施起来太具挑战性。</p>
+<p>OAuth 2.0代表了多家公司和个人之间多年的讨论，包括Yahoo！，Facebook，Salesforce，Microsoft，Twitter，Deutsche Telekom，Intuit，Mozilla和Google。</p>
+<p>本节介绍OAuth 1.0和2.0之间的主要差异，以及它们背后的动机。如果您熟悉OAuth 1.0，这是快速了解OAuth 2.0中主要更改的良好起点。</p>
+<h3 id="术语和角色"><a href="#术语和角色" class="headerlink" title="术语和角色"></a>术语和角色</h3><p>OAuth 2.0定义了四个角色（客户端，授权服务器，资源服务器和资源所有者），OAuth 1对这些角色使用不同的术语集。OAuth 2.0的“客户端”被称为“消费者”，“资源所有者”被简称为“用户”，“资源服务器”被称为“服务提供者”。OAuth 1也未明确区分资源服务器和授权服务器的角色。</p>
+<p>“two-legged”和“three-legged”这两个术语已被授权类型的概念所取代，例如客户凭证授权类型和授权码授权类型。</p>
+<h3 id="身份验证和签名"><a href="#身份验证和签名" class="headerlink" title="身份验证和签名"></a>身份验证和签名</h3><p>由于协议的加密要求，大多数OAuth 1.0实施尝试都失败了。对于任何来自简单用户名/密码身份验证的人来说，OAuth 1.0签名的复杂性是一个主要的痛点。</p>
+<p>过去，开发人员只需使用用户名和密码即可快速编写Twitter脚本以执行有用的操作。随着迁移到OAuth 1.0，这些开发人员被迫查找，安装和配置库，以便向Twitter API发出请求，因为它需要对每个请求进行加密签名。</p>
+<p>随着OAuth 2.0承载令牌的引入，再次可以通过cURL命令快速进行API调用。使用访问令牌而不是使用用户名和密码。</p>
+<p>例如，在OAuth之前，您可能已经看过API文档中的示例，例如：</p>
+<pre><code class="bash">curl --user bob:pa55 https://api.example.com/profile
+</code></pre>
+<p>使用OAuth 1 API，不再可能对此类示例进行硬编码，因为请求必须使用应用程序的密钥进行签名。Twitter等一些服务开始在其开发者网站中提供“签名生成器”工具，这样您就可以在不使用库的情况下从网站生成curl命令。例如，Twitter上的工具生成一个curl命令，例如：</p>
+<pre><code class="bash">curl --get &#39;https://api.twitter.com/1.1/statuses/show.json&#39; \
+--data &#39;id=210462857140252672&#39; \
+--header &#39;Authorization: OAuth oauth_consumer_key=&quot;xRhHSKcKLl9VF7fbyP2eEw&quot;, oauth_nonce=&quot;33ec5af28add281c63db55d1839d90f1&quot;, oauth_signature=&quot;oBO19fJO8imCAMvRxmQJsA6idXk%3D&quot;, oauth_signature_method=&quot;HMAC-SHA1&quot;, oauth_timestamp=&quot;1471026075&quot;, oauth_token=&quot;12341234-ZgJYZOh5Z3ldYXH2sm5voEs0pPXOPv8vC0mFjMFtG&quot;, oauth_version=&quot;1.0&quot;&#39;
+</code></pre>
+<p>使用OAuth 2.0承载令牌，请求中只需要令牌本身，因此示例再次变得非常简单：</p>
+<pre><code class="bash">curl https://api.example.com/profile -H &quot;Authorization: Bearer XXXXXXXXXXX&quot;
+</code></pre>
+<p>这在API的易用性和良好的安全实践之间提供了良好的平衡。</p>
+<h3 id="用户体验和备用令牌颁发选项"><a href="#用户体验和备用令牌颁发选项" class="headerlink" title="用户体验和备用令牌颁发选项"></a>用户体验和备用令牌颁发选项</h3><p>OAuth 2.0有两个主要部分：用户获取授权（最终结果是应用程序具有该用户的访问令牌），并使用访问令牌代表用户发出请求。获取访问令牌的方法称为流程。</p>
+<p>OAuth 1.0最初有3个流程，适用于基于Web的应用程序，桌面客户端以及移动或“有限”设备。但是，随着规范的发展，这三个流程合并为一个理论上支持所有三种客户端类型的流程。在实践中，流程适用于基于Web的应用程序，但在其他地方提供了较差的体验。</p>
+<p>随着越来越多的网站开始使用OAuth，尤其是Twitter，开发人员意识到OAuth提供的单一流程非常有限，并且通常会产生糟糕的用户体验。另一方面，Facebook Connect提供了更丰富的流程，适用于Web应用程序，移动设备和游戏控制台。</p>
+<p>OAuth 2.0通过再次定义多个流程来解决这个问题，称为“授权类型”，可以灵活地支持各种应用程序类型。还有一种机制来开发扩展来处理以前没想过的用例。</p>
+<p>服务器端应用程序使用“授权码”授权类型和客户端秘钥，提示用户授权应用程序，并生成一个授权码，该代码将传回应用程序。然后，应用程序的服务器用授权码交换访问令牌。服务器端应用程序使用其秘钥来和授权码交换访问令牌，可以获得此流程的安全性。</p>
+<p>单页或移动应用程序使用相同的授权类型，但不使用客户机秘钥。相反，安全性在于验证重定向URL以及可选的PKCE扩展。</p>
+<p>OAuth 2.0正式定义了“密码”授权类型，允许应用程序收集用户的用户名和密码，并将其交换为访问令牌。虽然这是规范的一部分，但它仅供受信任的客户端使用，例如服务自己的第一方应用程序。它不应该被第三方应用程序使用，因为这将允许第三方应用程序访问用户的用户名和密码。</p>
+<p>当应用程序访问其自己的资源时，将使用“客户端凭据”授予。此授权类型只是交换<code>client_id</code>和<code>client_secret</code>来获取访问令牌。</p>
+<p>OAuth 2.0还支持扩展授予类型，允许组织定义自己的自定义授权类型以支持其他客户端类型或在OAuth与现有系统之间提供桥接。</p>
+<p>其中一个扩展是用于在没有Web浏览器的设备上授权应用程序的设备流程。</p>
+<h3 id="规模表现"><a href="#规模表现" class="headerlink" title="规模表现"></a>规模表现</h3><p>随着较大的提供商开始使用OAuth 1.0，社区意识到该协议有一些限制，使得难以扩展到大型系统。OAuth 1.0需要跨不同步骤进行状态管理，并且通常跨不同服务器进行。它需要生成临时凭证，这些凭证通常被丢弃未使用，并且通常需要发布安全性较低且难以管理的持久凭证。</p>
+<p>此外，OAuth 1.0要求受保护资源endpoint可以访问客户端凭据以验证请求。这打破了大多数大型提供商的典型架构，其中集中授权服务器用于颁发凭证，并且单独的服务器用于处理API调用。由于OAuth 1.0需要使用客户端凭据来验证签名，因此这种分离非常困难。</p>
+<p>OAuth 2.0仅在应用程序从用户获取授权时使用客户端凭据来解决此问题。在授权步骤中使用凭据后，在进行API调用时仅使用生成的访问令牌。这意味着API服务器不需要知道客户端凭据，因为它们可以自己验证访问令牌。</p>
+<h3 id="承载令牌（Bearer-Tokens）"><a href="#承载令牌（Bearer-Tokens）" class="headerlink" title="承载令牌（Bearer Tokens）"></a>承载令牌（Bearer Tokens）</h3><p>在OAuth 1中，访问令牌有两个组件，即公共字符串和私有字符串。签名请求时使用私有字符串，并且从不通过网络发送。</p>
+<p>访问OAuth 2.0 API的最常用方法是使用“承载令牌”。这是一个单个字符串，用作API请求的身份验证，在HTTP“授权”header中发送。该字符串对于使用它的客户来说毫无意义，并且可能具有不同的长度。</p>
+<p>承载令牌是一种更简单的API请求方式，因为它们不需要对每个请求进行加密签名。权衡是所有API请求必须通过HTTPS连接进行，因为请求包含一个明文标记，如果被截获，任何人都可以使用该标记。优点是它不需要复杂的库来发出请求，并且客户端和服务器实现起来要简单得多。</p>
+<p>承载令牌的缺点是没有任何东西阻止其他应用程序使用Bearer令牌，如果这个应用程序可以访问它。这是对OAuth 2.0的常见批评，尽管大多数提供商仍然只使用Bearer令牌。在正常情况下，当应用程序正确保护其控制下的访问令牌时，这不是问题，尽管从技术上讲它不太安全。如果您的服务需要更安全的方法，则可以使用可满足安全要求的其他访问令牌类型。</p>
+<h3 id="具有长期授权的短期令牌"><a href="#具有长期授权的短期令牌" class="headerlink" title="具有长期授权的短期令牌"></a>具有长期授权的短期令牌</h3><p>OAuth 1.0 API通常会发布极其持久的访问令牌。这些令牌可以无限期地持续，或者大约一年。虽然对开发人员来说很方便，但在某些情况下，这证明限制了一些服务。</p>
+<p>负责任的API提供商应允许用户查看他们已授权使用其帐户的第三方应用，并且应该能够根据需要撤消应用。如果用户撤消了应用，则API应该停止尽快结束发布到该应用的访问令牌。根据API的实现方式，这可能具有挑战性，或者需要系统内部部件之间的其他联系。</p>
+<p>使用OAuth 2.0，授权服务器可以发出短期访问令牌和长期刷新令牌。这允许应用程序在不涉及用户的情况下获得新的访问令牌，但也增加了服务器更容易撤销令牌的能力。此功能是从Yahoo！的BBAuth协议和后来的OAuth 1.0会话扩展中采用的。</p>
+<h3 id="角色分离"><a href="#角色分离" class="headerlink" title="角色分离"></a>角色分离</h3><p>OAuth 2.0的设计决策之一是明确地将授权服务器的角色与API服务器分开。这意味着您可以将授权服务器构建为独立组件，该组件仅负责从用户获取授权并向客户端发送令牌。这两个角色可以位于物理上独立的服务器上，甚至可以位于不同的域名上，从而允许系统的每个部分独立扩展。某些提供程序有许多资源服务器，每个服务器位于不同的子域中。</p>
+<p>授权服务器需要了解应用程序的<code>client_id</code>和<code>client_secret</code>，但API服务器将只需要接受访问令牌。通过将授权服务器构建为独立组件，您可以避免与API服务器共享数据库，从而可以更轻松地独立于授权服务器扩展API服务器，因为它们不需要共享公共数据存储。</p>
+<p>例如，Google的OAuth 2.0实施使用“accounts.google.com”上的服务器进行授权请求，但在向Google+ API发出请求时使用“www.gooogleapis.com”。</p>
+<p>服务提供商的好处是这些系统的开发可以完全独立地由不同的团队和不同的时间线发生。由于它们是完全独立的，因此可以独立扩展，升级或更换，而无需考虑系统的其他部分。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--术语参考]]></title>
+      <url>/2018/07/13/oauth-guide-20/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><p>OAuth定义了四个角色：</p>
+<ul>
+<li>资源所有者（用户）</li>
+<li>资源服务器（API）</li>
+<li>授权服务器（可以是与API相同的服务器）</li>
+<li>客户端（第三方应用）</li>
+</ul>
+<h3 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h3><p>OAuth 2.0规范将用户称为“资源所有者”。资源所有者是能够允许访问其部分帐户的人员。在这种情况下，资源可以是数据（照片，文档，联系人），服务（发布博客条目，转移资金）或任何其他需要访问限制的资源。任何想要代表用户行事的系统必须首先获得他们的许可。</p>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><p>规范指的是您通常认为的主要API作为“资源服务器”。资源服务器是包含用户信息的服务器，用于第三方应用程序的访问。资源服务器必须能够接受并验证访问令牌，并在用户允许的情况下授予请求。资源服务器不一定需要了解第三方的应用程序。</p>
+<h3 id="授权服务器"><a href="#授权服务器" class="headerlink" title="授权服务器"></a>授权服务器</h3><p>授权服务器是用户在请求访问其帐户时与之交互的内容。这是显示OAuth提示的服务器，以及用户批准或拒绝访问请求的位置。授权服务器还负责在用户授权应用程序后授予访问令牌。因此，授权服务器通常具有两个主URL，一个用于授权请求，一个用于用于授予访问令牌的应用程序。这些通常是这样的：</p>
+<ul>
+<li><code>https://authorization-server.com/authorize</code></li>
+<li><code>https://authorization-server.com/token</code></li>
+</ul>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p>客户端是试图代表用户行动或访问用户资源的应用程序。在客户端可以访问用户的帐户之前，它需要获得许可。客户端通过将用户引导至授权服务器或通过直接与授权服务器断言权限，来实现无需用户交互来获得许可。</p>
+<h3 id="私密客户端（Confidential-Clients）"><a href="#私密客户端（Confidential-Clients）" class="headerlink" title="私密客户端（Confidential Clients）"></a>私密客户端（Confidential Clients）</h3><p>私密客户端是能够保持client_secret（客户端密钥）机密性的客户端。通常，这些客户端只是在开发人员控制下的服务器上运行的应用程序，用户无法访问源代码。这些类型的应用程序通常称为“Web应用程序”，因为它们通常由Web浏览器访问。</p>
+<h3 id="公共客户端（Public-Clients）"><a href="#公共客户端（Public-Clients）" class="headerlink" title="公共客户端（Public Clients）"></a>公共客户端（Public Clients）</h3><p>公共客户端无法保持client_secret（客户端密钥）的机密性，因此密钥不会用于这些应用程序。移动应用和Javascript应用都被视为公共客户端。由于运行Javascript应用程序的任何人都可以轻松查看应用程序的源代码，因此可以轻松地看到密钥。对于移动应用程序，可以反编译二进制文件以提取字符串。</p>
+<h3 id="访问令牌（Access-Token）"><a href="#访问令牌（Access-Token）" class="headerlink" title="访问令牌（Access Token）"></a>访问令牌（Access Token）</h3><p>访问令牌是向API发出经过身份验证的请求时使用的字符串。令牌表示用户已授权第三方应用程序访问该用户的帐户。令牌具有相应的访问持续时间，范围和可能的其他信息。令牌可以是自解析的（服务器可以从令牌字符串中检索所有必要的信息），也可以是数据库中的密钥。</p>
+<h3 id="刷新令牌（Refresh-Token）"><a href="#刷新令牌（Refresh-Token）" class="headerlink" title="刷新令牌（Refresh Token）"></a>刷新令牌（Refresh Token）</h3><p>刷新令牌是一个字符串，用于在访问令牌过期时获取新的访问令牌。并非所有API都使用刷新令牌。</p>
+<h3 id="授权码（Authorization-Code）"><a href="#授权码（Authorization-Code）" class="headerlink" title="授权码（Authorization Code）"></a>授权码（Authorization Code）</h3><p>授权码是在服务器端应用程序流程中使用的中间令牌，更详细地描述服务器端应用程序。授权步骤后，授权码返回给客户端，然后客户端将其交换为访问令牌。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--创建文档]]></title>
+      <url>/2018/07/13/oauth-guide-19/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>正如您在阅读完这篇文章后可能已经注意到的那样，OAuth 2.0规范中有很多地方需要做出决策。其中许多事情都没有明确规定，以便允许根据自己的安全要求做出不同的实现。最终结果是大多数OAuth 2.0实现都不可互操作，尽管在实践中，许多实现仍然做出了相同的决策，并且非常相似。</p>
+<p>由于实现可以有许多不同的方式，因此为您的服务构建良好的文档至关重要。</p>
+<p>本节介绍了您需要记录的内容，以便开发人员能够使用您的API。其中一些项目可以在适当的界面中内联记录（例如开发人员用于客户端注册的界面），有些更适合在API文档的“概述”部分中进行记录。</p>
+<h3 id="客户注册"><a href="#客户注册" class="headerlink" title="客户注册"></a>客户注册</h3><p>开发人员如何注册新的客户端应用程序以获取客户端ID和可选的秘钥？</p>
+<ul>
+<li>提供注册页面的链接。</li>
+<li>您的服务可能会实施<a href="https://tools.ietf.org/html/rfc7591" target="_blank" rel="noopener">动态客户端注册规范</a>，或者拥有用于注册应用程序的专有API</li>
+<li>您是否为开发人员注册应用程序提供了其他机制？如果是这样，您将需要描述注册应用程序的其他方法。</li>
+</ul>
+<p>您的服务应至少询问开发人员他们的应用程序是私密客户端还是公共客户端，并提供注册重定向URI的方法。除此之外，您还应记录您收集的有关应用程序的其他信息，并指出在授权请求期间向最终用户显示哪些信息。</p>
+<ul>
+<li>应用名称</li>
+<li>有关应用程序的网页</li>
+<li>描述</li>
+<li>logo或其他图像</li>
+<li>有关应用程序使用条款的网页</li>
+<li>其他信息</li>
+</ul>
+<h3 id="endpoint"><a href="#endpoint" class="headerlink" title="endpoint"></a>endpoint</h3><p>开发人员将在OAuth流程中使用两个主要endpoint。您的授权endpoint是指导用户开始授权流程的位置。在应用程序获得授权码后，它将在令牌endpoint处交换该代码以获取访问令牌。令牌endpoint还负责为其他授权类型发出访问令牌。</p>
+<p>您需要让开发人员知道他们将使用的这两个endpoint的URL。</p>
+<h3 id="客户端认证"><a href="#客户端认证" class="headerlink" title="客户端认证"></a>客户端认证</h3><p>如果请求中需要客户端身份验证（例如授权码授权），则服务可以通过两种方式接受请求中的客户端ID和秘钥。您的服务可以使用客户端ID作为用户名和秘钥作为密码接受HTTP Basic Auth header中的身份验证，或者接受post body中的字符串作为<code>client_id</code>和<code>client_secret</code>。无论您是要接受这些方法中的一种还是两种，都取决于您的服务，因此您需要告诉开发人员您希望他们如何在请求中包含此身份验证。</p>
+<p>此外，您的服务可能支持其他形式的客户端身份验证，例如公钥/私钥对。这在当前部署的OAuth 2.0实现中相对不常见，但是规范保留了开放的可能性。</p>
+<p>对发布给应用程序的客户端ID和秘钥的最大或最小长度没有要求，因此通常最好让开发人员知道这些字符串有多大，以便他们可以适当地存储它们。</p>
+<h3 id="字符串的大小"><a href="#字符串的大小" class="headerlink" title="字符串的大小"></a>字符串的大小</h3><p>由于开发人员在开始编写代码之前不会看到授权码或访问令牌，因此您应该记录他们将遇到的字符串的最大大小。</p>
+<ul>
+<li>客户端ID</li>
+<li>客户端秘钥</li>
+<li>授权码</li>
+<li>访问令牌</li>
+</ul>
+<h3 id="响应类型"><a href="#响应类型" class="headerlink" title="响应类型"></a>响应类型</h3><p>您的服务支持哪些响应类型？通常，服务仅支持基于Web和本机应用程序的“code”响应类型。但是，如果您的服务还支持“token”响应类型（在没有中间授权码的情况下发出令牌），那么在文档中指出是很重要的。您应该记录您的服务是否支持其中一个或两个，以及您是否还有其他支持的响应类型。</p>
+<h3 id="重定向URL限制"><a href="#重定向URL限制" class="headerlink" title="重定向URL限制"></a>重定向URL限制</h3><p>您的服务可能会对开发人员可以使用的已注册重定向URL进行限制。例如，服务通常会禁止开发人员使用非TLS httpendpoint，或限制非生产应用程序使用的endpoint。虽然支持自定义方案对于支持原生应用程序很重要，但某些服务也不允许这些。您应该记录您在注册重定向URL时的任何要求。</p>
+<h3 id="默认范围"><a href="#默认范围" class="headerlink" title="默认范围"></a>默认范围</h3><p>如果开发人员在授权请求期间未指定范围，则服务可以假定该请求的默认范围。如果是这种情况，您应该记录默认范围。</p>
+<p>授权服务器可以忽略开发人员请求的范围，或者添加超出请求范围的其他范围。服务器还可以允许用户根据请求改变范围。这些中的任何一种都是可能的，因此服务应该明确为开发人员指明，以便他们可以考虑访问令牌可能具有不同于他们请求的范围。</p>
+<p>该服务还应记录授权码的生命周期，因此开发人员可以了解代码在发布和使用之间的持续时间。授权服务器还可以防止代码被多次使用，并且如果是这样则应该记录该代码。</p>
+<h3 id="访问令牌响应"><a href="#访问令牌响应" class="headerlink" title="访问令牌响应"></a>访问令牌响应</h3><p>当您发出访问令牌时，访问令牌响应会列出许多可选的参数。您应该记录您的服务支持哪些，以便开发人员知道会发生什么。</p>
+<p>响应何时包含<code>expires_in</code>参数？如果令牌会过期，您的服务可能始终包含它，如果没有此参数，您的服务应该可以记录开发人员应该期望的默认过期时间。</p>
+<p>响应是否始终包含授予的访问令牌的范围？在响应中返回它通常是一个好主意，但是如果授权范围与请求的范围匹配，许多服务会将其遗漏。无论哪种方式，您都应该记录服务器对此参数的行为方式。</p>
+<h3 id="刷新令牌"><a href="#刷新令牌" class="headerlink" title="刷新令牌"></a>刷新令牌</h3><p>OAuth 2.0 API开发人员面临的一个更令人困惑或令人沮丧的方面是刷新令牌。重要的是要非常清楚地了解您的服务如何处理刷新令牌（如果有的话）。</p>
+<p>如果您的访问令牌过期，您可能希望支持刷新令牌，以便开发人员可以构建继续访问用户帐户的应用程序，而无需用户不断重新授权该应用程序。</p>
+<p>您应该清楚地记录哪些受支持的授权类型在响应中应该包含刷新令牌。</p>
+<p>当您的服务发出新的访问令牌以响应刷新令牌授权时，您的服务可以同时发出新的刷新令牌，并使之前的刷新令牌到期。这意味着刷新令牌经常刷新，这可能是您的应用程序所需要的。如果是这种情况，请确保开发人员知道这将发生，因此他们不会错误地假设他们获得的第一个刷新令牌将继续无限期地工作。</p>
+<h3 id="扩展授权"><a href="#扩展授权" class="headerlink" title="扩展授权"></a>扩展授权</h3><p>除了四种基本授权类型（授权码，密码，客户端凭据和隐式）之外，您的服务还可以支持其他授权类型。</p>
+<p>某些授权类型标准化为OAuth 2.0的扩展，例如设备流和SAML。某些服务还实现了自己的自定义授权类型，例如将旧版API迁移到OAuth 2.0时。记录您的服务支持的其他授权类型非常重要，并提供有关如何使用它们的文档。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--令牌自解析endpoint（Token Introspection Endpoint）]]></title>
+      <url>/2018/07/13/oauth-guide-18/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>当OAuth 2.0客户端向资源服务器发出请求时，资源服务器需要某种方式来验证访问令牌。OAuth 2.0核心规范没有定义资源服务器应如何验证访问令牌，只是提到它需要在资源和授权服务器之间协调。在某些情况下，特别是对于小型服务，两个endpoint都是同一系统的一部分，并且可以在内部共享令牌信息，例如在数据库中。在两个endpoint位于不同服务器上的较大系统中，这导致了两个服务器之间通信的专有和非标准协议。</p>
+<p>OAuth 2.0 令牌自解析扩展定义了一个协议，该协议返回有关访问令牌的信息，供资源服务器或其他内部服务器使用。</p>
+<h3 id="令牌自解析规范"><a href="#令牌自解析规范" class="headerlink" title="令牌自解析规范"></a>令牌自解析规范</h3><p>令牌自解析规范可以在<code>https://tools.ietf.org/html/rfc7662</code>找到</p>
+<h3 id="自解析endpoint"><a href="#自解析endpoint" class="headerlink" title="自解析endpoint"></a>自解析endpoint</h3><p>令牌自解析endpoint需要能够返回有关令牌的信息，因此您很可能将其构建在令牌endpoint所在的相同位置。两个endpoint需要共享数据库，或者如果您已实现自编码令牌，则需要共享密钥。</p>
+<h3 id="令牌信息请求"><a href="#令牌信息请求" class="headerlink" title="令牌信息请求"></a>令牌信息请求</h3><p>该请求将是一个POST请求，仅包含名为“token”的参数。预计此endpoint不会公开给开发人员。不应允许最终用户客户端使用此endpoint，因为响应可能包含开发人员无权访问的特权信息。保护endpoint的一种方法是将其放在无法从外部访问的内部服务器上，或者可以使用HTTP basic auth证进行保护。</p>
+<pre><code class="http">POST /token_info HTTP/1.1
+Host: authorization-server.com
+Authorization: Basic Y4NmE4MzFhZGFkNzU2YWRhN
+
+token=c1MGYwNDJiYmYxNDFkZjVkOGI0MSAgLQ
+</code></pre>
+<h3 id="令牌信息响应"><a href="#令牌信息响应" class="headerlink" title="令牌信息响应"></a>令牌信息响应</h3><p>令牌自解析Endpoint应该使用具有下面列出的属性的JSON对象进行响应。必须的只有“active”属性，其余属性是可选的。自解析规范中的一些属性专门用于JWT令牌，因此我们将仅在此处介绍基本的属性。如果您有关于可能有用的令牌的其他信息，您还可以在响应中添加其他属性。</p>
+<blockquote>
+<p><strong>active</strong><br>必须。这是所呈现的令牌当前是否处于活动状态的布尔值。如果此授权服务器已发出令牌，用户尚未撤消该令牌且未过期，则该值应为“true”。</p>
+<p><strong>scope</strong><br>一个JSON字符串，以空格分隔,包含与此标记关联的范围列表。</p>
+<p><strong>client_id</strong><br>颁发令牌的OAuth 2.0客户端的客户端标识符。</p>
+<p><strong>username</strong><br>授权此令牌的用户的可读标识符。</p>
+<p><strong>exp</strong><br>unix时间戳（整数时间戳，UTC自1970年1月1日以来的秒数），指示此令牌何时到期。</p>
+</blockquote>
+<h3 id="示例响应"><a href="#示例响应" class="headerlink" title="示例响应"></a>示例响应</h3><p>下面是自解析endpoint返回的响应示例。</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  &quot;active&quot;: true,
+  &quot;scope&quot;: &quot;read write email&quot;,
+  &quot;client_id&quot;: &quot;J8NFmU4tJVgDxKaJFmXTWvaHO&quot;,
+  &quot;username&quot;: &quot;aaronpk&quot;,
+  &quot;exp&quot;: 1437275311
+}
+</code></pre>
+<h3 id="错误响应"><a href="#错误响应" class="headerlink" title="错误响应"></a>错误响应</h3><p>如果自解析endpoint可公开访问，则endpoint必须首先验证身份验证。如果身份验证无效，则endpoint应使用<code>HTTP 401</code>状态代码和<code>invalid_client</code>响应进行响应。</p>
+<pre><code class="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json; charset=utf-8
+
+{
+  &quot;error&quot;: &quot;invalid_client&quot;,
+  &quot;error_description&quot;: &quot;The client authentication was invalid&quot;
+}
+</code></pre>
+<p>任何其他错误都被视为“inactive”令牌。</p>
+<ul>
+<li>请求的令牌不存在或无效</li>
+<li>令牌已过期</li>
+<li>令牌发送给不同的客户端而不是发出此请求</li>
+</ul>
+<p>在任何这些情况下，它都不被视为错误响应，并且endpoint仅返回非活动标志。</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  &quot;active&quot;: false
+}
+</code></pre>
+<h3 id="安全考虑因素"><a href="#安全考虑因素" class="headerlink" title="安全考虑因素"></a>安全考虑因素</h3><p>使用令牌自解析endpoint意味着,任何资源服务器都将依赖endpoint来确定访问令牌当前是否处于活动状态。这意味着自解析endpoint独自负责决定API请求是否成功。因此，endpoint必须针对令牌的状态执行所有适用的检查，例如检查令牌是否已过期，验证签名等。</p>
+<h4 id="令牌钓鱼攻击"><a href="#令牌钓鱼攻击" class="headerlink" title="令牌钓鱼攻击"></a>令牌钓鱼攻击</h4><p>如果自解析endpoint保持打开且不受限制，则它为攻击者提供了一种方法，用于轮询endpoint捕获有效令牌。为防止这种情况发生，服务器必须要求使用endpoint对客户端进行身份验证，或者仅通过其他方式（如防火墙）使endpoint只用于内部服务器。</p>
+<p>请注意，资源服务器也是钓鱼攻击的潜在目标，并且应该采取诸如速率限制之类的对策来防止这种情况。</p>
+<h4 id="高速缓存"><a href="#高速缓存" class="headerlink" title="高速缓存"></a>高速缓存</h4><p>自解析endpoint的使用者可能希望出于性能原因缓存endpoint的响应。因此，在决定缓存时考虑性能和安全性权衡非常重要。例如，较短的缓存到期时间将导致更高的安全性，因为资源服务器将不得不更频繁地查询自解析endpoint，但是这将导致endpoint上的负载增加。较长的到期时间会使一个窗口打开，其中令牌可能实际上已过期或被撤销，但由于缓存时间有剩余，仍然能够在资源服务器上被查到。</p>
+<p>缓解问题的一种方法是，使用者永远不会缓存至超出令牌的到期时间，这将在自解析响应的“exp”参数中返回。</p>
+<h4 id="限制信息"><a href="#限制信息" class="headerlink" title="限制信息"></a>限制信息</h4><p>自解析endpoint不一定需要为同一令牌的所有查询返回相同的信息。例如，两个不同的资源服务器（如果它们在进行自解析请求时进行身份验证）可能会获得令牌状态的不同视图。这可用于限制有关返回到特定资源服务器的令牌的信息。这使得多个资源服务器在互不知情上可以使用相同的令牌。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--使用PKCE保护移动应用程序]]></title>
+      <url>/2018/07/13/oauth-guide-17/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>用于代码交换的证明密钥（PKCE，发音为pixie）扩展描述了一种,公共客户端用于减轻拦截授权代码的威胁的技术。该技术涉及客户端首先创建秘钥，然后在交换访问令牌的授权码时再次使用该秘钥。这样，如果代码被截获，它将不能被使用，因为令牌请求依赖于初始秘钥。</p>
+<p>完整规范以<a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">RFC7636</a>的形式提供。我们将在下面介绍协议的摘要。</p>
+<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>当原生应用程序开始授权请求时，客户端首先创建所谓的“代码验证程序” ，而不是立即启动浏览器。这是使用随机字符串A-Z，a-z，0-9和标点字符-._~（连字符，期间，下划线和波浪线）来进行加密，长字符43和128之间。</p>
+<p>一旦应用程序生成了代码验证程序，它就会使用它来创建代码验证。对于可以执行SHA256哈希的设备，代码验证是代码验证程序的SHA256哈希的BASE64-URL编码字符串。允许无法执行SHA256哈希的客户端使用普通代码验证程序字符串作为验证。</p>
+<p>现在客户端有一个代码验证字符串，它包含了一个参数，该参数指示用于生成验证的方法（plain或S256）以及授权请求的标准参数。这意味着完整的授权请求将包括以下参数。</p>
+<blockquote>
+<p><strong>response_type = code</strong> - 表示您的服务器希望收到授权代码<br><strong>client_id =</strong> - 首次创建应用程序时收到的客户端ID<br><strong>redirect_uri =</strong> - 表示授权完成后返回用户的URL，例如org.example.app://redirect<br><strong>state = 1234zyx</strong> - 应用程序生成的随机字符串，稍后您将验证该字符串<br><strong>code_challenge = XXXXXXXXX</strong> - 如前所述生成的代码验证<br><strong>code_challenge_method = S256</strong> - plain或者S256，取决于验证是普通验证者字符串还是字符串的SHA256哈希。如果省略此参数，则服务器将采用plain。</p>
+</blockquote>
+<p>授权服务器应识别code_challenge请求中的参数，并将其与其生成的授权码相关联。将其与授权码一起存储在数据库中，或者如果您使用自编码授权码，则可以将其包含在代码本身中。服务器正常返回授权码，并且不包括返回数据中的验证。</p>
+<h4 id="错误响应"><a href="#错误响应" class="headerlink" title="错误响应"></a>错误响应</h4><p>授权服务器可以要求公共客户端必须使用PKCE扩展。这实际上是允许公共客户端在不使用客户端密钥的情况下拥有安全授权流的唯一方法。由于对应于公共客户端，授权服务器应该知道特定客户端ID，因此它可以拒绝对不包含代码验证的公共客户端的授权请求。</p>
+<p>如果授权服务器要求公共客户端使用PKCE，并且授权请求缺少代码验证，则服务器应返回错误响应，<code>error=invalid_request</code>并且应该使用<code>error_description</code>或者<code>error_uri</code>解释错误的性质。</p>
+<h3 id="授权码交换"><a href="#授权码交换" class="headerlink" title="授权码交换"></a>授权码交换</h3><p>本机应用程序将用授权码交换访问令牌。除了授权码请求中定义的参数之外，客户端还将发送<code>code_verifier</code>参数。完整的访问令牌请求将包括以下参数：</p>
+<blockquote>
+<p><strong>grant_type = authorization_code</strong> - 表示此令牌请求的授权类型<br><strong>code</strong> - 客户端将发送它在重定向中获得的授权代码<br><strong>redirect_uri</strong> - 初始授权请求中使用的重定向URL<br><strong>client_id</strong> - 应用程序注册的客户端ID<br><strong>code_verifier</strong> - 应用程序最初在授权请求之前生成的PKCE请求的代码验证程序。</p>
+</blockquote>
+<p>除了验证标准参数之外，授权服务器还将验证<code>code_verifier</code>请求中的内容。由于<code>code_challenge</code>和<code>code_challenge_method</code>用授权码相关联，因此服务器应该已经知道使用哪种方法（普通或SHA256）验证<code>code_verifier</code>。</p>
+<p>如果方法是plain，那么授权服务器只需要检查提供的<code>code_verifier</code>是否与预期的<code>code_challenge</code>字符串匹配。</p>
+<p>如果方法是S256，那么授权服务器应该使用提供的<code>code_verifier</code>, 并使用客户端最初使用的相同方法对其进行转换。这意味着计算其SHA256哈希值并对其进行base64-url编码，然后将其与存储的<code>code_challenge</code>字符串进行比较。</p>
+<p>如果验证程序与期望值匹配，则服务器可以正常继续，发出访问令牌并进行适当响应。如果出现问题，则服务器会响应<code>invalid_grant</code>错误。</p>
+<p>PKCE扩展不会添加任何新响应，因此即使授权服务器不支持，客户端也可以始终使用PKCE扩展。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--无浏览器和输入约束设备的OAuth]]></title>
+      <url>/2018/07/13/oauth-guide-16/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>OAuth 2.0“设备流”扩展程序可在具有Internet连接但没有浏览器或简单方法输入文本的设备上启用OAuth。如果您曾在Apple TV等设备上登录过自己的YouTube帐户，那么您已经遇到过此工作流程。谷歌参与了这个扩展的开发，并且也是它在生产中的早期实现者。</p>
+<p>此流程也可在智能电视，媒体控制台，相框，打印机或硬件视频编码器等设备上看到。在该流程中，设备指示用户在诸如智能电话或计算机的辅助设备上打开URL以完成授权。用户的两个设备之间不需要通信通道。</p>
+<h3 id="用户流程"><a href="#用户流程" class="headerlink" title="用户流程"></a>用户流程</h3><p>当您开始登录设备（例如此硬件视频编码器）时，设备会与Google通话以获取设备代码，如下所示。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fto9emscc3j30sg07nwf7.jpg" alt="设备发出API请求以获取设备代码"></p>
+<p>接下来，我们看到设备会显示代码以及URL。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fto9f6gvy7j30sg07nt9h.jpg" alt="设备显示设备代码和URL"></p>
+<p>登录Google帐户后访问该网址会显示一个界面，提示您输入设备上显示的代码。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fto9frx7oxj30me0jdgm9.jpg" alt="Google会提示用户输入代码"></p>
+<p>输入代码并单击“下一步”后，您将看到标准OAuth授权提示，该提示描述了应用程序请求的范围，如下所示。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fto9g4x5oxj30ok0dhaay.jpg" alt="Google会显示应用程序请求的范围"></p>
+<p>一旦您允许该请求，Google就会显示一条消息，说明要返回您的设备，如下所示。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fto9gir6bij30lp0izmxt.jpg" alt="Google会指示用户返回设备"></p>
+<p>几秒钟后，设备完成并且您已登录。</p>
+<p>总的来说，这是一次非常轻松的体验。由于您可以使用任何想要打开URL的设备，因此可以使用您可能已登录的授权服务器的主计算机或电话。这也使您在设备上无需输入数据！</p>
+<p>让我们逐步了解设备所需的功能。</p>
+<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>首先，客户端向授权服务器发出请求以请求设备代码的请求。</p>
+<pre><code class="http">POST /token HTTP/1.1
+Host: authorization-server.com
+Content-type: application/x-www-form-urlencoded
+
+client_id=a17c21ed
+</code></pre>
+<p>请注意，某些授权服务器将允许设备在此请求中指定范围，稍后将在授权界面上向用户显示该范围。</p>
+<p>授权服务器使用JSON进行响应，该json包含设备代码，用户将输入的代码，用户应访问的URL以及轮询间隔。</p>
+<pre><code class="json">HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+{
+    &quot;device_code&quot;: &quot;NGU5OWFiNjQ5YmQwNGY3YTdmZTEyNzQ3YzQ1YSA&quot;,
+    &quot;user_code&quot;: &quot;BDWP-HQPK&quot;,
+    &quot;verification_uri&quot;: &quot;https://authorization-server.com/device&quot;,
+    &quot;interval&quot;: 5,
+    &quot;expires_in&quot;: 1800
+}
+</code></pre>
+<p>设备在其显示屏上向用户显示<code>verification_uri</code>和<code>user_code</code>，指示用户输入该URL处的代码。</p>
+<h3 id="令牌请求"><a href="#令牌请求" class="headerlink" title="令牌请求"></a>令牌请求</h3><p>当设备等待用户在他们自己的计算机或电话上完成授权流程时，设备同时开始轮询令牌端点以请求访问令牌。</p>
+<p>设备以<code>device_code</code>指定的速率发出POST请求轮询。设备应继续请求访问令牌，直到<code>authorization_pending</code>返回，显示用户授予或拒绝请求或设备代码到期。</p>
+<pre><code class="http">POST /token HTTP/1.1
+Host: authorization-server.com
+Content-type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:device_code&amp;amp;
+client_id=a17c21ed&amp;amp;
+device_code=NGU5OWFiNjQ5YmQwNGY3YTdmZTEyNzQ3YzQ1YSA
+</code></pre>
+<p>授权服务器将回复错误或访问令牌。设备流程规范定义了两个额外的错误代码，这超越了OAuth 2.0用户核心定义，即<code>authorization_pending</code>和<code>slow_down</code>。</p>
+<p>如果设备过于频繁地轮询，授权服务器将返回<code>slow_down</code>错误。</p>
+<pre><code class="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  &quot;error&quot;: &quot;slow_down&quot;
+}
+</code></pre>
+<p>如果用户尚未允许或拒绝该请求，则授权服务器将返回<code>authorization_pending</code>错误。</p>
+<pre><code class="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  &quot;error&quot;: &quot;authorization_pending&quot;
+}
+</code></pre>
+<p>如果用户拒绝请求，授权服务器将返回<code>access_denied</code>错误。</p>
+<pre><code class="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  &quot;error&quot;: &quot;access_denied&quot;
+}
+</code></pre>
+<p>如果设备代码已过期，授权服务器将返回<code>expired_token</code>错误。设备可以立即请求新的设备代码。</p>
+<pre><code class="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  &quot;error&quot;: &quot;expired_token&quot;
+}
+</code></pre>
+<p>最后，如果用户允许请求，则授权服务器像正常一样发出访问令牌并返回标准访问令牌响应。</p>
+<pre><code class="json">HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  &quot;access_token&quot;: &quot;AYjcyMzY3ZDhiNmJkNTY&quot;,
+  &quot;refresh_token&quot;: &quot;RjY2NjM5NzA2OWJjuE7c&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires&quot;: 3600
+}
+</code></pre>
+<h3 id="授权服务器要求"><a href="#授权服务器要求" class="headerlink" title="授权服务器要求"></a>授权服务器要求</h3><p>支持设备流并不是授权服务器的大量额外工作。在向现有授权服务器添加对设备流的支持时，请记住以下几点。</p>
+<h4 id="设备代码请求"><a href="#设备代码请求" class="headerlink" title="设备代码请求"></a>设备代码请求</h4><p>设备将向授权服务器发出请求以获取该流程所需的验证码集合。以下参数是请求的一部分。</p>
+<blockquote>
+<p><strong>client_id</strong> - 必需，客户端注册中描述的客户端标识符。<br><strong>scope</strong> - 可选，范围中描述的请求范围。</p>
+</blockquote>
+<p>验证客户端ID和范围后，授权服务器返回带有验证码的URL，设备代码和用户代码的响应。除了上面给出的示例之外，授权服务器还可以返回一些可选参数。</p>
+<blockquote>
+<p><strong>device_code</strong> - 必需，授权服务器生成的验证码。<br><strong>user_code</strong> - 必需的，用户将在设备屏幕上输入的代码应该相对较短。通常使用6-8个数字和字母。<br><strong>verification_uri</strong> - 必需，用户应访问的授权服务器上的URL以开始授权。用户需要在他们的计算机或移动电话上手动输入此URL。<br><strong>expires_in</strong> - 可选，设备代码和用户代码的生命周期（以秒为单位）。<br><strong>interval</strong> - 可选，客户端轮询令牌端点的请求之间应等待的最短时间（以秒为单位）。</p>
+</blockquote>
+<h4 id="用户代码（user-code）"><a href="#用户代码（user-code）" class="headerlink" title="用户代码（user code）"></a>用户代码（user code）</h4><p>在许多情况下，用户的设备将是他们的移动电话。通常，这些界面比完整的计算机键盘更受限制，例如iPhone需要额外的选项来切换到数字输入。为了帮助减少数据输入错误并加快代码输入，用户代码的字符集应考虑到这些限制，例如仅使用大写字母。</p>
+<p>用于设备代码的合理字符集是不区分大小写的AZ字符的，而且没有元音，以避免意外拼写单词。最好使用base-20字符集BCDFGHJKLMNPQRSTVWXZ。比较输入的代码时，最好忽略字符集中没有的任何字符，如标点符号。例如用户码为BDWP-HQPK，授权服务器应该不区分大小写忽略标点符号来比较输入的字符串，所以应该允许以下匹配：bdwphqpk。</p>
+<h4 id="验证网址"><a href="#验证网址" class="headerlink" title="验证网址"></a>验证网址</h4><p>设备将显示的验证URL应尽可能短，并且易于记忆。它将显示在可能非常小的屏幕上，用户必须在他们的计算机或手机上手动输入。</p>
+<p>请注意，服务器应返回包含URL方案的完整URL，但某些设备可能会在显示URL时选择对其进行修剪。因此，服务器应配置为将http重定向到https，并在普通域和www前缀上提供服务，以防用户输入错误或设备省略该部分URL。</p>
+<p>Google的授权服务器是一个很容易输入的短网址的很好的例子。代码请求的响应是<code>https://www.google.com/device</code>, 但所有显示<code>google.com/device</code>的设备，Google都会相应地重定向。</p>
+<h4 id="非文本接口的优化"><a href="#非文本接口的优化" class="headerlink" title="非文本接口的优化"></a>非文本接口的优化</h4><p>没有显示或具有非文本显示的客户端显然无法向用户显示URL。因此，可以使用一些其他方法将验证URL和用户代码传达给用户。</p>
+<p>该设备可能能够通过NFC或蓝牙或甚至通过显示QR码来广播验证URL。在这些情况下，设备可以使用参数将用户代码包括为验证URL的一部分。例如：<br><code>https://authorization-server.com/device?user_code=BDWP-HQPK</code><br>这样，当用户启动URL时，可以在验证界面中预填充用户代码。建议授权服务器仍然要求用户确认代码而不是自动进行。</p>
+<p>如果设备能够显示代码，即使它无法显示URL，也可以通过提示用户确认验证界面上的代码与其设备上显示的代码相匹配来获得额外的安全性。如果这不是一个必需项，那么授权服务器至少可以要求用户确认他们刚刚请求授权的设备。</p>
+<h3 id="安全考虑因素"><a href="#安全考虑因素" class="headerlink" title="安全考虑因素"></a>安全考虑因素</h3><h4 id="用户代码暴力攻击"><a href="#用户代码暴力攻击" class="headerlink" title="用户代码暴力攻击"></a>用户代码暴力攻击</h4><p>由于用户有可能手动将用户代码输入到尚未了解的等待授权设备的界面中，因此应采取预防措施以避免对用户代码进行暴力攻击的可能性。</p>
+<p>通常使用具有比授权码所使用的熵少得多的短代码，以便容易地手动输入。因此，建议授权服务器对用于验证用户代码的端点进行速率限制。</p>
+<p>速率限制应基于用户代码的熵，以使暴力攻击变得不可行。例如，在上述20个字符集中有8个字符，它提供大约34位的熵。在选择可接受的速率限制时，您可以使用此公式计算熵的位数。log2(208) = 34.57</p>
+<h4 id="远程网络钓鱼"><a href="#远程网络钓鱼" class="headerlink" title="远程网络钓鱼"></a>远程网络钓鱼</h4><p>设备流程可能在攻击者拥有的设备上启动，以欺骗用户授权攻击者的设备。例如，攻击者可能发送短信指示用户访问URL并输入用户代码。</p>
+<p>为了降低此风险，除了用户界面中描述的授权界面中包含的标准信息之外，建议授权界面要让用户非常清楚他们正在授权物理设备访问其帐户。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--原生应用的OAuth]]></title>
+      <url>/2018/07/13/oauth-guide-15/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>本章介绍了在为原生应用程序支持OAuth时要记住的一些特殊注意事项。与基于浏览器的应用程序一样，原生应用程序无法在开发人员注册后保留客户端密钥，因为这需要开发人员在其应用程序的二进制版本中保存秘钥。目前已经证明，通过反编译提取秘钥是相对容易。因此，原生应用必须使用不需要秘钥的OAuth流程。</p>
+<p>当前的行业最佳实践是在省略客户端密钥的同时使用授权流程，并使用外部用户代理来完成流程。外部用户代理通常是设备的原生浏览器（具有与原生应用程序不同的安全域），因此应用程序无法访问cookie存储或检查或修改浏览器内的页面内容。由于应用程序无法访问此情况下使用内部浏览器，因此这为设备提供了在授权不同应用程序时让用户保持登录的机会，这样他们无需在每次授权新应用程序时输入密码。</p>
+<p>近年来，像iOS这样的平台一直在努力通过提供可以从应用程序内部启动的原生用户代理来进一步改善原生应用程序的OAuth用户体验，同时仍然与启动它的应用程序隔离。结果是用户不再需要离开应用程序以启动共享系统cookie的原生浏览器。这在iOS上称为SFSafariViewController。</p>
+<p>针对原生应用程序的这些建议被发布为<a href="https://tools.ietf.org/html/rfc8252" target="_blank" rel="noopener">RFC 8252</a>，这其中更详细地描述了这些概念。</p>
+<h3 id="使用系统浏览器"><a href="#使用系统浏览器" class="headerlink" title="使用系统浏览器"></a>使用系统浏览器</h3><p>截至撰写本文时，许多原生应用程序仍然在应用程序内部的Web视图中嵌入OAuth界面。此方法存在多个问题，包括客户端应用程序可能会在登录时窃听用户输入其凭据，甚至提供虚假授权页面。以操作系统级别安全性的实现方式是嵌入式Web视图不与系统的原生浏览器共享cookie，因此用户的体验更糟糕，因为他们每次都需要输入密码。</p>
+<p>完成授权流程的更安全和可信的方法是启动系统浏览器。然而，直到最近，这还有一个缺点，即应用程序弹出并启动浏览器，然后重定向回应用程序，这也不是一个理想的用户体验。</p>
+<p>值得庆幸的是，移动平台一直在解决这个问题。在iOS 9和10中，开发人员现在可以使用SFSafariViewControllerAPI启动从应用程序内共享系统cookie的系统浏览器。这是通过API实现的，不允许客户端应用程序窥视浏览器，从而获得使用外部浏览器的安全优势以及用户在整个过程中保留在应用程序中的优秀用户体验。</p>
+<p>强烈建议为iOS编写应用程序的原生应用程序开发人员使用SFSafariViewControllerAPI，如果API不可用，则启动外部Safari窗口（例如，如果应用程序需要支持iOS 8及更低版本）。</p>
+<p>授权服务器应通过尝试检测授权URL是否在嵌入式Web视图中启动来强制执行此行为，如果是，则拒绝该请求。用于检测页面是否在嵌入式Web视图中与系统浏览器进行访问的特定技术将取决于平台，但通常涉及检查用户代理haeder。</p>
+<h3 id="重定向原生应用程序的URL"><a href="#重定向原生应用程序的URL" class="headerlink" title="重定向原生应用程序的URL"></a>重定向原生应用程序的URL</h3><p>为了支持各种类型的原生应用程序，您的服务器需要支持注册三种类型的重定向URL，每种URL都支持稍微不同的用例。</p>
+<h4 id="自定义URL方案"><a href="#自定义URL方案" class="headerlink" title="自定义URL方案"></a>自定义URL方案</h4><p>某些平台（如iOS）允许应用程序注册自定义URL方案，只要在浏览器或其他应用程序中打开具有该方案的URL，该方案就会启动应用程序。支持具有自定义URL方案的重定向URL允许客户端启动外部浏览器以完成授权流程，然后在授权完成后重定向回应用程序。</p>
+<p>应用程序开发人员应该选择全局唯一的URL方案，以及他们可以断言控制权的URL方案。由于操作系统通常没有关于特定应用程序是否已声明这种URL方案的注册的汇总，因此理论上两种应用程序可以独立地选择相同的方案，例如<code>myapp://</code>。如果您希望帮助防止应用程序开发人员使用自定义方案时发生冲突，您应该建议（甚至强制执行）他们使用的方案是他们的反向域名模式。至少，您可以要求重定向URL至少包含一个<code>.</code>以免与其他系统方案（如mailto或ftp）冲突。</p>
+<p>例如，如果某个应用程序有一个相应的网站<code>photoprintr.example.org</code>，则可以使用反向域名作为其URL方案<code>org.example.photoprintr</code>。然后开发人员将注册<code>org.example.photoprintr://</code>开头的重定向URL。通过强制执行此操作，您可以帮助鼓励开发人员选择不会与其他已安装的应用程序冲突的显式URL方案。</p>
+<p>使用自定义URL方案的应用程序将正常启动授权请求，如授权请求中所述，但将提供具有其自定义URL方案的重定向URL。授权服务器仍应验证此URL是否已注册为允许的重定向URL，并且可将其视为Web应用程序注册的重定向URL一样的URL。</p>
+<p>当授权服务器使用自定义方案将原生应用程序重定向到URL时，操作系统将启动应用程序并使原始应用程序可以访问整个重定向URL。该应用可以像常规OAuth 2.0客户端一样提取授权代码。</p>
+<h4 id="HTTPS-URL匹配"><a href="#HTTPS-URL匹配" class="headerlink" title="HTTPS URL匹配"></a>HTTPS URL匹配</h4><p>某些平台允许应用程序注册URL模式，当系统浏览器访问的URL与注册模式的URL匹配时，应启动应用程序。这通常被应用程序用于“深层链接”到原生应用程序，例如在浏览器中查看Yelp URL时打开到Yelp应用程序的餐厅页面。</p>
+<p>应用程序也可以使用此技术向URL注册一个模式，该模式将在授权服务器重定向回应用程序时启动应用程序。如果平台提供此功能，则这是原生应用程序的推荐选择，因为这提供了应用程序属于其匹配的URL的最大完整性。在平台不支持应用程序声明URL的情况下，这也提供了合理的后备选择。</p>
+<h4 id="loopback-URL"><a href="#loopback-URL" class="headerlink" title="loopback URL"></a>loopback URL</h4><p>原生应用程序可用于支持无缝重定向的另一种技术是在loopback接口的随机端口上打开新的HTTP服务器。这通常仅在桌面操作系统上完成，因为移动操作系统通常不向应用开发者提供此功能。</p>
+<p>这种方法适用于命令行应用程序以及桌面GUI应用程序。该应用程序将启动HTTP服务器，然后开始授权请求，将重定向URL设置为loopback地址，例如<code>http://127.0.0.1:49152/redirect</code>启动浏览器。当授权服务器将浏览器重定向回loopback地址时，应用程序可以从请求中获取授权代码。</p>
+<p>为了支承实这种使用情况，授权服务器必须支持注册重定向URL以<code>http://127.0.0.1:[port]/</code>或<code>http://::1:[port]/</code>或<code>http://localhost:[port]/</code>开始。授权服务器应允许任意路径组件以及任意端口号。请注意，在这种情况下，可以使用HTTP方案而不是HTTPS，因为请求永远不会离开设备。</p>
+<h4 id="注册"><a href="#注册" class="headerlink" title="注册"></a>注册</h4><p>与服务器端应用程序一样，原生应用程序还必须使用授权服务器注册其重定向URL。这意味着除了服务器端应用程序的传统HTTPS URL之外，授权服务器还需要允许注册与上述所有模式匹配的重定向URL。</p>
+<p>在授权服务器上启动授权请求时，服务器将验证所有请求参数，包括给定的重定向URL。授权应拒绝请求中无法识别的URL，以帮助避免授权代码拦截攻击。</p>
+<h3 id="PKCE扩展"><a href="#PKCE扩展" class="headerlink" title="PKCE扩展"></a>PKCE扩展</h3><p>由于原生平台上的重定向URL的强制执行能力是有限的，因此还有另一种获得额外安全性的技术，称为代码交换的证明秘钥，或简称PKCE。</p>
+<p>此技术涉及原生应用程序创建初始随机密钥，并在交换访问令牌的授权代码时再次使用该秘密。这样，如果另一个应用程序截获授权代码，则在没有原始秘钥的情况下它将无法使用。</p>
+<h3 id="本地应用程序的服务器支持清单"><a href="#本地应用程序的服务器支持清单" class="headerlink" title="本地应用程序的服务器支持清单"></a>本地应用程序的服务器支持清单</h3><p>要总结本章，您的授权服务器应支持以下内容，以便完全支持原生应用程序的安全授权。</p>
+<ul>
+<li>允许客户为其重定向URL注册自定义URL方案。</li>
+<li>支持loopback IP重定向具有任意端口号的URL，以支持桌面应用程序。</li>
+<li>不要假设本机应用程序可以保守秘钥。要求所有应用程序声明它们是公开的还是保密的，并且只向机密应用程序发出客户秘钥。</li>
+<li>支持PKCE扩展，并要求公共客户端使用它。</li>
+<li>尝试检测并拒绝授权界面嵌入原生应用程序的Web视图的请求，要求其在系统浏览器中启动请求。</li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--资源服务器]]></title>
+      <url>/2018/07/13/oauth-guide-14/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<p>资源服务器是API服务器的OAuth 2.0术语。资源服务器在应用程序获取访问令牌后处理经过身份验证的请求。</p>
+<p>大规模部署可能有多个资源服务器。例如，Google的服务拥有数十种资源服务器，例如Google云平台，Google地图，Google云端硬盘，Youtube，Google +等等。这些资源服务器中的每一个都明显是分开的，但它们都共享相同的授权服务器。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftiyxmx2rrj30ox0dbgoc.jpg" alt="谷歌的一些API"></p>
+<p>较小的部署通常只有一个资源服务器，并且通常构建为与授权服务器相同的代码库或相同部署的一部分。</p>
+<h3 id="验证访问令牌"><a href="#验证访问令牌" class="headerlink" title="验证访问令牌"></a>验证访问令牌</h3><p>资源服务器将从应用发出的请求中的具有的HTTP Authorization header获取访问令牌。资源服务器需要能够验证访问令牌以确定是否处理请求，并找到关联的用户帐户等。</p>
+<p>如果您使用的是自编码访问令牌，则可以在资源服务器中完全验证令牌，而无需与数据库或外部服务器交互。</p>
+<p>如果您的令牌存储在数据库中，则验证令牌需要在数据库中查找。</p>
+<p>另一种选择是使用令牌自解析规范来构建API以验证访问令牌。这是处理在大量资源服务器上验证访问令牌的好方法，因为这意味着您可以将访问令牌的所有逻辑封装在单个服务器中，通过API将信息暴露给系统的其他部分。令牌自解析endpoint仅供内部使用，因此您需要使用某些内部授权来保护它，或者仅在系统防火墙内的服务器上启用它。</p>
+<h3 id="验证范围"><a href="#验证范围" class="headerlink" title="验证范围"></a>验证范围</h3><p>资源服务器需要知道与访问令牌关联的范围列表。如果访问令牌中的作用域不包含执行指定操作所需的作用域，则服务器负责拒绝请求。</p>
+<p>OAuth 2.0规范本身没有定义任何范围，也没有范围的注册表。范围列表由服务决定。</p>
+<h3 id="错误代码和未经授权的访问"><a href="#错误代码和未经授权的访问" class="headerlink" title="错误代码和未经授权的访问"></a>错误代码和未经授权的访问</h3><p>如果访问令牌不允许访问所请求的资源，或者请求中没有访问令牌，则服务器必须回复HTTP 401响应并在相应header中包含WWW-Authenticate。</p>
+<p>最简单的WWW-Authenticate标头包括字符串Bearer，表示需要承载令牌。标题还可以指示附加信息，例如“realm”和“scope”。“realm”值用于传统的<a href="https://tools.ietf.org/html/rfc2617" target="_blank" rel="noopener">HTTP身份验证</a>。“scope”值允许资源服务器指示访问资源所需的作用域列表，因此应用程序可以在启动授权流时请求适当的作用域。响应还应包括适当的“error”值，具体取决于发生的错误类型。</p>
+<blockquote>
+<p><strong>invalid_request （HTTP 400）</strong> - 请求缺少参数，否则会出现格式错误。<br><strong>invalid_token（HTTP 401）</strong> - 由于其他原因，访问令牌已过期，已撤销，格式错误或无效。客户端可以获取新的访问令牌，然后重试。<br><strong>insufficient_scope （HTTP 403）</strong> - 访问令牌请求范围错误</p>
+</blockquote>
+<p>例如：</p>
+<pre><code class="http">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer realm=&quot;example&quot;,
+                  scope=&quot;delete&quot;,
+                  error=&quot;insufficient_scope&quot;
+</code></pre>
+<p>如果请求没有身份验证，则不需要错误代码或其他错误信息。</p>
+<pre><code class="http">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer realm=&quot;example&quot;
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[OAuth教程--授权列表与撤销]]></title>
+      <url>/2018/07/13/oauth-guide-13/</url>
+      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+<h3 id="授权列表"><a href="#授权列表" class="headerlink" title="授权列表"></a>授权列表</h3><p>一旦用户开始授权多个应用程序，让许多应用程序访问其帐户，就有必要提供一种方法来允许用户管理具有访问权限的应用程序。这通常在帐户设置页面或帐户隐私页面中呈现给用户。</p>
+<p>OAuth 2.0规范中没有任何内容要求用户能够撤销访问权限，或者对如何执行此操作的建议，因此我们将查看几个主要的API提供商，以获取有关如何实现此目的的灵感。</p>
+<p>大多数提供商都有一个页面，其中列出了用户授权其帐户的所有应用程序。通常会显示有关应用程序的一些信息，以及用于向用户提供有关此应用程序何时以及为何具有访问权限的上下文的信息。</p>
+<h4 id="谷歌"><a href="#谷歌" class="headerlink" title="谷歌"></a>谷歌</h4><p>Google会在<code>https://security.google.com/settings/security/permissions</code>上提供您在帐户中授权的应用程序列表。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftgh6j6yqmj30mm0iiq4r.jpg" alt="google"></p>
+<p>该列表显示应用程序图标，名称以及授予应用程序范围的摘要。单击其中一个将展开以显示更多详细信息。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ftgha78weuj30j40ijq4c.jpg" alt="一个授权访问您的Google帐户的应用程序的详细信息"></p>
+<p>此视图提供了已授予范围的更详细列表，以及您授权应用程序的日期。</p>
+<h4 id="Twitter"><a href="#Twitter" class="headerlink" title="Twitter"></a>Twitter</h4><p>Twitter在<code>https://twitter.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1ftghc5l2bmj30sg0jz79r.jpg" alt="您授权访问Twitter帐户的应用程序列表"></p>
+<p>Twitter显示授予的范围（只读，读/写，读/写/直接消息），以及应用程序是否可以看到您的电子邮件地址。该列表包括您授权申请的日期。这使用户可以轻松地从他们暂时未使用的应用程序中撤消凭据。</p>
+<h4 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h4><p>GitHub在<code>https://github.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghef8w6qj30sg0cu40n.jpg" alt="您授权访问GitHub帐户的应用程序列表"></p>
+<p>GitHub提供的列表包括上次使用应用程序的描述，以便您了解是否可以安全地撤销应用程序的授权（如果它在一段时间内没有使用过）。</p>
+<p>单击应用程序可提供有关该应用程序访问权限的更多详细信息。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghezcvrqj30kw0cmab1.jpg" alt="一个授权访问您的GitHub帐户的应用程序的详细信息"></p>
+<p>在这里，您可以看到应用程序对您帐户的权限（范围）。</p>
+<p>您可以在此处找到指向其他服务授权页面的<a href="https://indieweb.org/appaccess" target="_blank" rel="noopener">链接</a>。</p>
+<h3 id="撤销访问权限"><a href="#撤销访问权限" class="headerlink" title="撤销访问权限"></a>撤销访问权限</h3><p>您可能需要撤销应用程序对用户帐户的访问权限的原因有几个。</p>
+<ul>
+<li>用户明确希望撤销应用程序的访问权限，例如，如果他们在授权页面上找到了他们不再想要使用的应用程序</li>
+<li>开发人员想要撤消其应用程序的所有用户令牌</li>
+<li>开发者删除了他们的申请</li>
+<li>您作为服务提供商已确定应用程序已被盗用或恶意，并希望禁用它</li>
+</ul>
+<p>根据您实现生成访问令牌的方式，将用不同的方式撤销他们。</p>
+<h4 id="令牌数据库"><a href="#令牌数据库" class="headerlink" title="令牌数据库"></a>令牌数据库</h4><p>如果将访问令牌存储在数据库中，则撤销属于特定用户的所有令牌相对容易。您可以轻松编写查找和删除属于该用户的令牌的查询，例如查找令牌表中的令牌user_id。假设您的资源服务器通过在数据库中查找它们来验证访问令牌，那么下次被撤销的客户端发出请求时，其令牌将无法验证。</p>
+<h4 id="自编码令牌"><a href="#自编码令牌" class="headerlink" title="自编码令牌"></a>自编码令牌</h4><p>如果授权服务器发出自编码令牌，则撤销对特定应用程序的访问会稍微困难一些。</p>
+<p>如果您有一个真正的无状态机制来验证令牌，并且您有资源服务器正在验证令牌而不与另一个系统共享服务，那么唯一的选择是等待所有未完成的令牌过期，并阻止应用程序生成新令牌。这是当您使用自编码令牌时，使用极短期令牌的主要原因。</p>
+<p>由于没有使单个访问令牌无效的机制，因此您需要使特定用户的应用程序刷新令牌无效。这样，下次应用程序尝试刷新访问令牌时，将拒绝对新访问令牌的请求。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[OAuth教程--访问令牌]]></title>
       <url>/2018/07/13/oauth-guide-12/</url>
       <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
@@ -22,7 +944,7 @@
 <p>然后，服务器检查授权码是否有效，并且尚未过期。然后，该服务必须验证请求中提供的授权码是否已发送给所标识的客户端。最后，服务必须确保存的重定向URI参数与用于请求授权代码的重定向URI匹配。</p>
 <p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。</p>
 <p>例<br>以下示例显示了私密客户端的授权授予请求。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=authorization_code
@@ -42,7 +964,7 @@ grant_type=authorization_code
 </blockquote>
 <p>如果客户端被授予秘钥，则必须验证此请求。通常，服务将允许其他请求参数如client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
 <p>例<br>以下是服务将接收的示例密码授予。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=password
@@ -58,7 +980,7 @@ grant_type=password
 <p><strong>客户端验证（必填）</strong><br>客户端需要为此请求进行身份验证。通常，服务将接受请求参数client_id和client_secret，或接受在HTTP Basic auth header中的客户端ID和秘钥。</p>
 </blockquote>
 <p>例<br>以下是客户端凭据的请求例子。</p>
-<pre><code class="bash">POST /token HTTP/1.1
+<pre><code class="http">POST /token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=client_credentials
@@ -274,7 +1196,7 @@ if($error) {
 <p>然后，服务器检查刷新令牌是否有效，并且尚未过期。如果向私密客户端发出刷新令牌，则服务必须确保将请求中的刷新令牌发送给经过身份验证的客户端。</p>
 <p>如果所有内容都检出，该服务可以生成访问令牌并进行响应。服务器可以在响应中发出新的刷新令牌，但是如果响应不包括新的刷新令牌，则客户端假定现有的刷新令牌仍然有效。</p>
 <p>例<br>以下是服务将接收的示例刷新授权。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=refresh_token
@@ -282,57 +1204,6 @@ grant_type=refresh_token
 &amp;client_id=xxxxxxxxxx
 &amp;client_secret=xxxxxxxxxx
 </code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> OAuth </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> OAuth </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[OAuth教程--授权列表与撤销]]></title>
-      <url>/2018/07/13/oauth-guide-13/</url>
-      <content type="html"><![CDATA[<p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<h3 id="授权列表"><a href="#授权列表" class="headerlink" title="授权列表"></a>授权列表</h3><p>一旦用户开始授权多个应用程序，让许多应用程序访问其帐户，就有必要提供一种方法来允许用户管理具有访问权限的应用程序。这通常在帐户设置页面或帐户隐私页面中呈现给用户。</p>
-<p>OAuth 2.0规范中没有任何内容要求用户能够撤销访问权限，或者对如何执行此操作的建议，因此我们将查看几个主要的API提供商，以获取有关如何实现此目的的灵感。</p>
-<p>大多数提供商都有一个页面，其中列出了用户授权其帐户的所有应用程序。通常会显示有关应用程序的一些信息，以及用于向用户提供有关此应用程序何时以及为何具有访问权限的上下文的信息。</p>
-<h4 id="谷歌"><a href="#谷歌" class="headerlink" title="谷歌"></a>谷歌</h4><p>Google会在<code>https://security.google.com/settings/security/permissions</code>上提供您在帐户中授权的应用程序列表。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftgh6j6yqmj30mm0iiq4r.jpg" alt="google"></p>
-<p>该列表显示应用程序图标，名称以及授予应用程序范围的摘要。单击其中一个将展开以显示更多详细信息。</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ftgha78weuj30j40ijq4c.jpg" alt="一个授权访问您的Google帐户的应用程序的详细信息"></p>
-<p>此视图提供了已授予范围的更详细列表，以及您授权应用程序的日期。</p>
-<h4 id="Twitter"><a href="#Twitter" class="headerlink" title="Twitter"></a>Twitter</h4><p>Twitter在<code>https://twitter.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1ftghc5l2bmj30sg0jz79r.jpg" alt="您授权访问Twitter帐户的应用程序列表"></p>
-<p>Twitter显示授予的范围（只读，读/写，读/写/直接消息），以及应用程序是否可以看到您的电子邮件地址。该列表包括您授权申请的日期。这使用户可以轻松地从他们暂时未使用的应用程序中撤消凭据。</p>
-<h4 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h4><p>GitHub在<code>https://github.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghef8w6qj30sg0cu40n.jpg" alt="您授权访问GitHub帐户的应用程序列表"></p>
-<p>GitHub提供的列表包括上次使用应用程序的描述，以便您了解是否可以安全地撤销应用程序的授权（如果它在一段时间内没有使用过）。</p>
-<p>单击应用程序可提供有关该应用程序访问权限的更多详细信息。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghezcvrqj30kw0cmab1.jpg" alt="一个授权访问您的GitHub帐户的应用程序的详细信息"></p>
-<p>在这里，您可以看到应用程序对您帐户的权限（范围）。</p>
-<p>您可以在此处找到指向其他服务授权页面的<a href="https://indieweb.org/appaccess" target="_blank" rel="noopener">链接</a>。</p>
-<h3 id="撤销访问权限"><a href="#撤销访问权限" class="headerlink" title="撤销访问权限"></a>撤销访问权限</h3><p>您可能需要撤销应用程序对用户帐户的访问权限的原因有几个。</p>
-<ul>
-<li>用户明确希望撤销应用程序的访问权限，例如，如果他们在授权页面上找到了他们不再想要使用的应用程序</li>
-<li>开发人员想要撤消其应用程序的所有用户令牌</li>
-<li>开发者删除了他们的申请</li>
-<li>您作为服务提供商已确定应用程序已被盗用或恶意，并希望禁用它</li>
-</ul>
-<p>根据您实现生成访问令牌的方式，将用不同的方式撤销他们。</p>
-<h4 id="令牌数据库"><a href="#令牌数据库" class="headerlink" title="令牌数据库"></a>令牌数据库</h4><p>如果将访问令牌存储在数据库中，则撤销属于特定用户的所有令牌相对容易。您可以轻松编写查找和删除属于该用户的令牌的查询，例如查找令牌表中的令牌user_id。假设您的资源服务器通过在数据库中查找它们来验证访问令牌，那么下次被撤销的客户端发出请求时，其令牌将无法验证。</p>
-<h4 id="自编码令牌"><a href="#自编码令牌" class="headerlink" title="自编码令牌"></a>自编码令牌</h4><p>如果授权服务器发出自编码令牌，则撤销对特定应用程序的访问会稍微困难一些。</p>
-<p>如果您有一个真正的无状态机制来验证令牌，并且您有资源服务器正在验证令牌而不与另一个系统共享服务，那么唯一的选择是等待所有未完成的令牌过期，并阻止应用程序生成新令牌。这是当您使用自编码令牌时，使用极短期令牌的主要原因。</p>
-<p>由于没有使单个访问令牌无效的机制，因此您需要使特定用户的应用程序刷新令牌无效。这样，下次应用程序尝试刷新访问令牌时，将拒绝对新访问令牌的请求。</p>
 ]]></content>
       
         <categories>
@@ -710,14 +1581,14 @@ SecureRandom.hex(32)
 <p>无论您使用哪种授权类型，或者您是否使用了客户端密钥，您现在都可以使用API​​来使用OAuth 2.0 Bearer Token。</p>
 <p>API服务器可以通过两种方式接受Bearer Token。一个在HTTP Authorization标头中，另一个在post body参数中。它取决于它支持的服务，因此您需要检查文档以确定。</p>
 <p>在HTTP标头中传入访问令牌时，您应该发出如下请求：</p>
-<pre><code class="bash">POST /resource/1/update HTTP/1.1
+<pre><code class="http">POST /resource/1/update HTTP/1.1
 Authorization: Bearer RsT5OjbzRn430zqMLgV3Ia&quot;
 Host: api.authorization-server.com
 
 description=Hello+World
 </code></pre>
 <p>如果服务接受帖子正文中的访问令牌，那么您可以发出如下请求：</p>
-<pre><code class="bash">POST /resource/1/ HTTP/1.1
+<pre><code class="http">POST /resource/1/ HTTP/1.1
 Host: api.authorization-server.com
 
 access_token=RsT5OjbzRn430zqMLgV3Ia
@@ -740,7 +1611,7 @@ access_token=RsT5OjbzRn430zqMLgV3Ia
 <p>“expires”值是访问令牌有效的秒数。这取决于令牌服务的提供商，并且可能取决于应用程序或组织自己的策略。您可以使用它来抢先刷新访问令牌，而不是等待带有过期令牌的请求失败。</p>
 <p>如果您发出API请求并且令牌已经过期，您将收到一个指示响应。您可以检查此特定错误消息，然后刷新令牌并再次尝试请求。</p>
 <p>如果您使用的是基于JSON的API，则可能会返回带有invalid_token错误的JSON错误响应。在一些情况下，WWW-Authenticate header也会出现invalid_token错误。</p>
-<pre><code class="bash">HTTP/1.1 401 Unauthorized
+<pre><code class="http">HTTP/1.1 401 Unauthorized
 WWW-Authenticate: Bearer error=&quot;invalid_token&quot;
   error_description=&quot;The access token expired&quot;
 Content-type: application/json
@@ -752,7 +1623,7 @@ Content-type: application/json
 </code></pre>
 <p>当您的代码识别出此特定错误时，它可以使用之前收到的刷新令牌向令牌endpoint发出请求，并返回可用于重试原始请求的新访问令牌。</p>
 <p>要使用刷新令牌，请向服务的令牌endpoint发出POST请求grant_type=refresh_token，并包括刷新令牌和客户端凭据。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 grant_type=refresh_token
@@ -877,7 +1748,7 @@ grant_type=refresh_token
 <p><strong>redirect_uri （可能需要）</strong><br>如果重定向URL包含在初始授权请求中，则它也必须包含在令牌请求中，并且必须相同。某些服务支持注册多个重定向URL，有些服务需要在每个请求上指定重定向URL。请查看服务的文档以了解具体信息。</p>
 <p><strong>客户端识别ID（必填）</strong><br>尽管客户端密钥未在此流程中使用，但该请求需要发送客户端ID以识别发出请求的应用程序。这意味着客户端必须将客户端ID包含为POST主体参数，而不是像包含客户端密钥时那样使用HTTP基本认证。</p>
 </blockquote>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
   Host: authorization-endpoint.com
   grant_type=code
   &amp;code=Yzk5ZDczMzRlNDEwY
@@ -915,7 +1786,7 @@ grant_type=refresh_token
 <p>服务器端应用程序是处理OAuth 2服务器时遇到的最常见的应用程序类型。这些应用程序在Web服务器上运行，其中应用程序的源代码不可供公众使用，因此他们可以保持其客户端秘钥的机密性。</p>
 <p>下图说明了用户与正在与客户端通信的浏览器进行交互的典型示例。客户端和API服务器之间具有单独的安全通信通道。用户的浏览器从不直接向API服务器发出请求，所有内容都先通过客户端。</p>
 <p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1ftf3o8318wj30p006edfx.jpg" alt="应用程序的服务器与API通信"></p>
-<p>服务器端应用程序使用authorization_code授权类型。在此流程中，在用户授权应用程序之后，应用程序接收“授权码”，然后它可以交换访问令牌。</p>
+<p>服务器端应用程序使用<code>authorization_code</code>授权类型。在此流程中，在用户授权应用程序之后，应用程序接收“授权码”，然后它可以交换访问令牌。</p>
 <h3 id="授权码授予"><a href="#授权码授予" class="headerlink" title="授权码授予"></a>授权码授予</h3><p>授权码是客户端将为访问令牌交换的临时代码。代码本身从授权服务器获得，其中用户有机会查看客户端请求的信息，并批准或拒绝该请求。</p>
 <p>授权码流程与其他授权类型相比具有一些优势。当用户授权应用程序时，会带着URL中的临时代码返回应用程序。应用程序有这个代码来交换访问令牌。当应用程序发出访问令牌请求时，该请求将使用客户端密钥进行身份验证，从而降低攻击者拦截授权码并自行使用它的风险。这也意味着访问令牌永远不会被用户看到，因此这是将令牌传递回应用程序的最安全方式，从而降低令牌泄露给其他人的风险。</p>
 <p>Web流程的第一步是请求用户授权。这是通过创建用户单击的授权请求链接来完成的。</p>
@@ -965,7 +1836,7 @@ Connect Your Account&lt;/a&gt;
 <pre><code class="http">https://example-app.com/cb?code=Yzk5ZDczMzRlNDEwY&amp;state=5ca75bd30
 </code></pre>
 <h4 id="应用程序使用授权吗交换访问令牌"><a href="#应用程序使用授权吗交换访问令牌" class="headerlink" title="应用程序使用授权吗交换访问令牌"></a>应用程序使用授权吗交换访问令牌</h4><p>该应用程序使用授权码，通过向授权服务器发出POST请求来获取访问令牌。</p>
-<pre><code class="bash">POST /oauth/token HTTP/1.1
+<pre><code class="http">POST /oauth/token HTTP/1.1
 Host: authorization-server.com
 
 code=Yzk5ZDczMzRlNDEwY
@@ -1088,7 +1959,7 @@ if(!isset($_GET[&#39;action&#39;])) {
 <h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>现在我们已经设置了必要的变量，让我们开始OAuth流程。</p>
 <p>我们要让人们做的第一件事是,在查询字符串为<code>?action=login</code>时，访问此页面以启动该流程。</p>
 <p>请注意，此请求中的scope现在是OpenID Connect的scope，“openid email”，表示我们不是要求访问用户的Google数据，只是想知道他们是谁。</p>
-<p>另请注意，我们使用<code>response_type=code</code>参数来指示我们希望Google返回用来交换id_token的授权码。</p>
+<p>另请注意，我们使用<code>response_type=code</code>参数来指示我们希望Google返回用来交换<code>id_token</code>的授权码。</p>
 <pre><code class="php">// Start the login process by sending the user
 // to Google&#39;s authorization page
 if(isset($_GET[&#39;action&#39;]) &amp;&amp; $_GET[&#39;action&#39;] == &#39;login&#39;) {
@@ -1283,8 +2154,8 @@ Authorization: Bearer ya29.Gl-oBRPLiI9IrSRA70...
 <p>客户端ID被视为公共信息，用于构建登录URL，或者可以包含在网页的Javascript源代码中。客户密钥必须保密。不要将它提交到您的git存储库！</p>
 <p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ft8dayhs69j316k1vdqcv.jpg" alt="GitHub应用程序已创建"></p>
 <h3 id="建立环境"><a href="#建立环境" class="headerlink" title="建立环境"></a>建立环境</h3><p>此示例代码是用PHP编写的，不需要外部包，也不需要框架。这可以很容易地翻译成其他语言。您可以将它全部放在一个PHP文件中。</p>
-<p>创建一个新文件夹并在该文件夹中创建一个空文件index.php。从该文件夹内部运行命令行，<code>php -S localhost:8000</code>，您将能够在浏览器中访问<code>http://localhost:8000</code>来运行您的代码。以下示例中的所有代码都应添加到此index.php文件中。</p>
-<p>为了让我们更轻松，让我们定义一个方法，apiRequest()它是一个简单的cURL包装器。此函数将包含GitHub API所需的Accept和User-Agent Header，并自动解码JSON响应。如果我们在会话中有访问令牌，它也会发送带有访问令牌的正确OAuth Header，以便进行经过身份验证的请求。</p>
+<p>创建一个新文件夹并在该文件夹中创建一个空文件<code>index.php</code>。从该文件夹内部运行命令行，<code>php -S localhost:8000</code>，您将能够在浏览器中访问<code>http://localhost:8000</code>来运行您的代码。以下示例中的所有代码都应添加到此index.php文件中。</p>
+<p>为了让我们更轻松，让我们定义一个方法，<code>apiRequest()</code>它是一个简单的cURL包装器。此函数将包含GitHub API所需的<code>Accept</code>和<code>User-Agent Header</code>，并自动解码JSON响应。如果我们在会话中有访问令牌，它也会发送带有访问令牌的正确OAuth Header，以便进行经过身份验证的请求。</p>
 <pre><code class="php">function apiRequest($url, $post=FALSE, $headers=array()) {
   $ch = curl_init($url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1347,7 +2218,7 @@ if(!isset($_GET[&#39;action&#39;])) {
 <p>已注销的视图包含指向我们的登录URL的链接，该URL启动OAuth流程。</p>
 <h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>现在我们已经设置了必要的变量，让我们开始OAuth流程。</p>
 <p>我们要让人们做的第一件事是,在查询字符串<code>?action=login</code>中访问此页面以启动该过程。</p>
-<p>请注意，我们在此请求中要求的范围包括“user”和“public_repo”。这意味着该应用程序将能够读取用户配置文件信息以及访问公共存储库。</p>
+<p>请注意，我们在此请求中要求的范围包括<code>user</code>和<code>public_repo</code>。这意味着该应用程序将能够读取用户配置文件信息以及访问公共存储库。</p>
 <pre><code class="php">// Start the login process by sending the user
 // to Github&#39;s authorization page
 if(isset($_GET[&#39;action&#39;]) &amp;&amp; $_GET[&#39;action&#39;] == &#39;login&#39;) {
