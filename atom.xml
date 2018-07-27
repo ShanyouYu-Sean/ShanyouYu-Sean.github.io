@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2018-07-27T08:15:42.240Z</updated>
+  <updated>2018-07-27T09:38:00.503Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>OAuth教程--OpenID Connect</title>
-    <link href="http://seanthefish.com/2018/07/27/oauth-guide-22/"/>
-    <id>http://seanthefish.com/2018/07/27/oauth-guide-22/</id>
-    <published>2018-07-27T07:33:55.649Z</published>
-    <updated>2018-07-27T08:15:42.240Z</updated>
+    <title>OAuth教程</title>
+    <link href="http://seanthefish.com/2018/07/14/oauth-guide/"/>
+    <id>http://seanthefish.com/2018/07/14/oauth-guide/</id>
+    <published>2018-07-13T21:00:00.000Z</published>
+    <updated>2018-07-27T09:38:00.503Z</updated>
     
     <summary type="html">
     
@@ -29,8 +29,8 @@
       
         
         
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;OAuth
+          &lt;p&gt;翻译了oauth.com上的教程，地址：&lt;code&gt;http://seanthefish.com/oauth-guide/#/&lt;/code&gt;&lt;/p&gt;
+
         
       
     
@@ -138,6 +138,33 @@
         
         
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
+    
+    
+      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OAuth教程--OpenID Connect</title>
+    <link href="http://seanthefish.com/2018/07/13/oauth-guide-22/"/>
+    <id>http://seanthefish.com/2018/07/13/oauth-guide-22/</id>
+    <published>2018-07-13T14:00:00.000Z</published>
+    <updated>2018-07-27T09:35:37.510Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OAuth
         
       
     
@@ -500,32 +527,6 @@
     <id>http://seanthefish.com/2018/07/13/oauth-guide-8/</id>
     <published>2018-07-13T00:00:00.000Z</published>
     <updated>2018-07-19T10:00:49.325Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--进行身份验证请求</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-7/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-7/</id>
-    <published>2018-07-12T23:00:00.000Z</published>
-    <updated>2018-07-27T05:43:22.151Z</updated>
     
     <summary type="html">
     
