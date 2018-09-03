@@ -97,10 +97,6 @@
     
 
     
-        
-            <link rel="stylesheet" href="/css/fontawesome.min.css">
-        
-    
 
     <!-- Config CSS -->
 
@@ -332,107 +328,8 @@
 
 
     
-        <body id="scheme-Isolation" class="lazy">
+        <body id="scheme-Paradox" class="lazy">
             <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
-                
-                    <!-- Isolation Header -->
-                    <header class="header">
-    <div class="header-wrapper">
-        <!-- Header Copyright -->
-        <div class="header-copyright">
-            <div class="header-site">
-                ©&nbsp;
-                <script type="text/javascript">
-                    var fd = new Date();
-                    document.write(fd.getFullYear());
-                </script>
-                &nbsp;小鱼肖恩
-            </div>
-            <!--
-            I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
-            It will not impact the appearance and can give developers a lot of support :)
-
-            很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
-            它不会影响美观并可以给开发者很大的支持。 :)
-            -->
-            <div>
-                Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a>
-                <br>
-                Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a>
-            </div>
-        </div>
-
-        <!-- Header Title -->
-        <span class="header-title header-item">
-            <a href="/" title="小鱼肖恩">
-                小鱼肖恩
-            </a>
-        </span>
-
-        <p class="header-slogan header-item">
-        
-            
-                我知道，是流星赞美了黑夜，鲸鱼安慰了大海
-            
-        
-        </p>
-
-        <!-- Header Nav -->
-        <nav class="header-nav header-item">
-            <span class="header-nav-item">
-                <a href="/" title="Home">
-                    <span>主页</span>
-                </a>
-            </span>
-
-            <!-- Pages  -->
-            
-                <span class="header-nav-item">
-                    <a href="/about" title="关于我">
-                        <span>关于我</span>
-                    </a>
-                </span>
-            
-            
-        </nav>
-
-        <!-- Header SNS -->
-        <div class="header-item header-sns_list">
-    <!-- Twitter -->
-    
-
-    <!-- Facebook -->
-    
-
-    <!-- Google + -->
-    
-
-    <!-- Weibo -->
-    
-
-    <!-- Instagram -->
-    
-
-    <!-- Tumblr -->
-    
-
-    <!-- Github -->
-    
-        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
-            <i class="fa fa-github fa-lg" aria-hidden="true"></i>
-        </a>
-    
-
-    <!-- LinkedIn -->
-    
-
-    <!-- Telegram -->
-    
-</div>
-
-    </div>
-</header>
-
                 
 
                 <!-- Main Container -->
@@ -442,10 +339,45 @@
                     <div id="top"></div>
 
                     
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
 
                     <!-- Post TOC -->
 
     
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth-2-0游乐场"><span class="post-toc-number">1.</span> <span class="post-toc-text">OAuth 2.0游乐场</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Google-OAuth-2-0-Playground"><span class="post-toc-number">2.</span> <span class="post-toc-text">Google OAuth 2.0 Playground</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OpenID-Connect-Debugger"><span class="post-toc-number">3.</span> <span class="post-toc-text">OpenID Connect Debugger</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#服务器和客户端库目录"><span class="post-toc-number">4.</span> <span class="post-toc-text">服务器和客户端库目录</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#jsonwebtoken-io"><span class="post-toc-number">5.</span> <span class="post-toc-text">jsonwebtoken.io</span></a></li></ol>
+    </ul>
+    
+
 
 
 
@@ -459,37 +391,140 @@
 
                 <!-- Post Header(Thumbnail & Title) -->
                 
-
-
-    <!-- Isolation Post Header -->
-    <!-- Post thumbnail -->
+    <!-- Paradox Post Header -->
     
-        <!-- Post Header Info -->
-        <div class="post-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                OAuth教程--工具和帮助文档
+            </p>
         </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>7月 14, 2018</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
     
-        </div>
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACaklEQVR42u3aQW7DMAwEwPz/0+0Diri7lKw6xfgUoIik6cFkVnx9/evnhYeHh4eHh4eH9zDeK35+fuvtBm/+er3yu13qs+Hh4eEd4f3yqg2Om3/r3dF/fmt2Njw8PLyTvHbL67KxXh7as+Hh4eF9Cu+6Ic5f98m+eHh4eJ/LSzDXq+VhBB4eHt6TeckP/vbQycoPylrw8PDwYl5+yXT+89H7PTw8PLyAV480LbCTdTYPXeHh4eHdwMtfxEkrnAxOJS17ex48PDy8v+LNrrhmZSAPbdsd8fDw8O7mta3z3iBj15gCHh4e3klefok1fE1fvu7zMOKWXwx4eHh4m36t5xf8SbgwY7TBMR4eHt55XjtWlR9raQhgFljg4eHhHeGtx6mzeLf964a6h4eHh7fMm0USs0a8XX+2Ox4eHt7dvKR1buPaNoTNr8qiVh4PDw/vCK8NF64jhlnhaYdih2EEHh4e3jIvQbYb58FBXkKWZsrw8PDwbuDNLrT2FpK8SPxShPDw8PBu5u297kqGAPJ1hvExHh4e3hFeHijkV2VtDLFSbPDw8PDO85LPyZhpHrm211pFgcHDw8M7zmtb3paUx8TD9h0PDw/vIK897h0rJOVn2FLj4eHhbeK1TztkkDfrbTNdDF3h4eHhbeW94icfC8iPPhsmKIau8PDw8G7j5cUgD2fXx7C2FQY8PDy823izoHYW9V7/K/PLNjw8PLzP5RUxa1lU6vKDh4eH90jeSgM9i2uTsBgPDw/vPC+/9GqHAGbtchtY4OHh4Z3kzTaeRQl5mDs7CR4eHt7dvP/34OHh4eHh4eHhPeD5BqIIPtrbHf+nAAAAAElFTkSuQmCC">
+    
+</ul>
 
+    
 
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/OAuth/">OAuth</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=OAuth教程--工具和帮助文档&url=http://seanthefish.com/2018/07/14/oauth-guide-25/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/07/14/oauth-guide-25/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=OAuth教程--工具和帮助文档&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/07/14/oauth-guide-25/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
 
                 
 
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-
-    
-        <div class="post-content_wrapper">
-            <p class="post-title">
-                OAuth教程--工具和帮助文档
-            </p>
-            <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+        <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
 <h3 id="OAuth-2-0游乐场"><a href="#OAuth-2-0游乐场" class="headerlink" title="OAuth 2.0游乐场"></a>OAuth 2.0游乐场</h3><p><code>https://www.oauth.com/playground/</code></p>
 <p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1ftoj9ztdrzj30sg0kw41k.jpg" alt="play"></p>
 <p>OAuth 2.0 Playground通过与真正的OAuth 2.0授权服务器交互，引导您完成各种OAuth流程。</p>
@@ -507,15 +542,13 @@
 <p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1ftojc727cbj30sg0ovahn.jpg" alt="jwt"></p>
 <p>jsonwebtoken.io是一个用于调试JSON Web令牌的工具。它允许您粘贴JWT，它将对其进行解码并显示各个组件。如果您向其提供用于签署JWT的秘钥，它还可以验证签名。</p>
 
-            
-        </div>
+        
+    
+
     
 </div>
 
 
-                
-                    <!-- Paradox Post Info -->
-                    
                 
 
                 <!-- Post Comments -->
@@ -587,11 +620,258 @@
 
 
                     
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">28</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
 
                     
 
                     <!--Footer-->
 <footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
     
 </footer>
 

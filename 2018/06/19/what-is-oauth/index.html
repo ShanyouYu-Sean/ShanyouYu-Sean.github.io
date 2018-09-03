@@ -97,10 +97,6 @@
     
 
     
-        
-            <link rel="stylesheet" href="/css/fontawesome.min.css">
-        
-    
 
     <!-- Config CSS -->
 
@@ -332,107 +328,8 @@
 
 
     
-        <body id="scheme-Isolation" class="lazy">
+        <body id="scheme-Paradox" class="lazy">
             <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
-                
-                    <!-- Isolation Header -->
-                    <header class="header">
-    <div class="header-wrapper">
-        <!-- Header Copyright -->
-        <div class="header-copyright">
-            <div class="header-site">
-                ©&nbsp;
-                <script type="text/javascript">
-                    var fd = new Date();
-                    document.write(fd.getFullYear());
-                </script>
-                &nbsp;小鱼肖恩
-            </div>
-            <!--
-            I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
-            It will not impact the appearance and can give developers a lot of support :)
-
-            很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
-            它不会影响美观并可以给开发者很大的支持。 :)
-            -->
-            <div>
-                Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a>
-                <br>
-                Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a>
-            </div>
-        </div>
-
-        <!-- Header Title -->
-        <span class="header-title header-item">
-            <a href="/" title="小鱼肖恩">
-                小鱼肖恩
-            </a>
-        </span>
-
-        <p class="header-slogan header-item">
-        
-            
-                我知道，是流星赞美了黑夜，鲸鱼安慰了大海
-            
-        
-        </p>
-
-        <!-- Header Nav -->
-        <nav class="header-nav header-item">
-            <span class="header-nav-item">
-                <a href="/" title="Home">
-                    <span>主页</span>
-                </a>
-            </span>
-
-            <!-- Pages  -->
-            
-                <span class="header-nav-item">
-                    <a href="/about" title="关于我">
-                        <span>关于我</span>
-                    </a>
-                </span>
-            
-            
-        </nav>
-
-        <!-- Header SNS -->
-        <div class="header-item header-sns_list">
-    <!-- Twitter -->
-    
-
-    <!-- Facebook -->
-    
-
-    <!-- Google + -->
-    
-
-    <!-- Weibo -->
-    
-
-    <!-- Instagram -->
-    
-
-    <!-- Tumblr -->
-    
-
-    <!-- Github -->
-    
-        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
-            <i class="fa fa-github fa-lg" aria-hidden="true"></i>
-        </a>
-    
-
-    <!-- LinkedIn -->
-    
-
-    <!-- Telegram -->
-    
-</div>
-
-    </div>
-</header>
-
                 
 
                 <!-- Main Container -->
@@ -442,10 +339,45 @@
                     <div id="top"></div>
 
                     
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
 
                     <!-- Post TOC -->
 
     
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#什么是OAuth？"><span class="post-toc-number">1.</span> <span class="post-toc-text">什么是OAuth？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#为什么使用OAuth？"><span class="post-toc-number">2.</span> <span class="post-toc-text">为什么使用OAuth？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#浏览器隐式流程"><span class="post-toc-number">3.</span> <span class="post-toc-text">浏览器隐式流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SAML"><span class="post-toc-number">4.</span> <span class="post-toc-text">SAML</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth和API"><span class="post-toc-number">5.</span> <span class="post-toc-text">OAuth和API</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth中央组件"><span class="post-toc-number">6.</span> <span class="post-toc-text">OAuth中央组件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth作用域"><span class="post-toc-number">7.</span> <span class="post-toc-text">OAuth作用域</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth扮演者"><span class="post-toc-number">8.</span> <span class="post-toc-text">OAuth扮演者</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth令牌"><span class="post-toc-number">9.</span> <span class="post-toc-text">OAuth令牌</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth流程"><span class="post-toc-number">10.</span> <span class="post-toc-text">OAuth流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全和企业"><span class="post-toc-number">11.</span> <span class="post-toc-text">安全和企业</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#企业OAuth-2-0使用案例"><span class="post-toc-number">12.</span> <span class="post-toc-text">企业OAuth 2.0使用案例</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OAuth不是身份验证协议"><span class="post-toc-number">13.</span> <span class="post-toc-text">OAuth不是身份验证协议</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#使用OAuth-2-0进行伪身份验证"><span class="post-toc-number">14.</span> <span class="post-toc-text">使用OAuth 2.0进行伪身份验证</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#输入OpenID-Connect"><span class="post-toc-number">15.</span> <span class="post-toc-text">输入OpenID Connect</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#总结"><span class="post-toc-number">16.</span> <span class="post-toc-text">总结</span></a></li></ol>
+    </ul>
+    
+
 
 
 
@@ -459,37 +391,140 @@
 
                 <!-- Post Header(Thumbnail & Title) -->
                 
-
-
-    <!-- Isolation Post Header -->
-    <!-- Post thumbnail -->
+    <!-- Paradox Post Header -->
     
-        <!-- Post Header Info -->
-        <div class="post-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                什么是OAuth？
+            </p>
         </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>6月 19, 2018</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
     
-        </div>
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACZ0lEQVR42u3aQY7cMAwEwPn/p5MHBON0U7KgXZRPA2Rtq3wQmRY/f3719cHDw8PDw8PDw7uM94mvf+/69oTkyd/WsGFteHh4eEd4/9lqS96M9PyWYm14eHh4B3nPW3x713p5GK4NDw8P73pey/j23uQ3Hh4e3s/lPTe4edyQ3IWHh4d3My/5D3+79X+7N2+jj2YteHh4eDEvD2HP/z56voeHh4cX8IaDTXFgkQwWtI376zNleHh4eI+8PAJIQoHnJe6KG/Dw8PDu4eVbeRvUrkS39RPw8PDwDvLyR7TbejvClcfBeHh4ePfwcljeNK8UhuTv8fDw8M7w2iP82YBU3oInd9UpNR4eHt5WXh6bzg69np+TfNYNLTUeHh7eVl6+TSeMfJh1FtpGzToeHh7eEV7bWK9s4nnT3ILx8PDwbuCtbNktcjb+hYeHh3cDL39Be2CWjynkxQkPDw/vPG84EjoasWp/5x8dDw8P7yRv1kznR1Zt1JuUkM0pNR4eHt5Czpkvd6WNTgpJ20bj4eHhneftek0+5NqWnOLz4eHh4b3MW9/680AhH8bKPwoeHh7eeV5++NQejLWHXm05GWYteHh4eMu8ldGo/GhqJd7NCwkeHh7eGV575Zt420y3/1pkLXh4eHhbeW0xSFrt2QhCW1qKuoeHh4f3Am9WDGahxsrB2DClxsPDw3uN14YOs9g3ecJKJIGHh4d3G68dMkgKya6PiIeHh3cnL2mRE8yspY4+Ch4eHt5BXr6s/MiqXXRbWjbHuHh4eHgvHICtjAi0zXpekPDw8PBO8n7fhYeHh4eHh4eHd8H1F7BJ41/NnwxkAAAAAElFTkSuQmCC">
+    
+</ul>
 
+    
 
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/OAuth/">OAuth</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/OIDC/">OIDC</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=什么是OAuth？&url=http://seanthefish.com/2018/06/19/what-is-oauth/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/06/19/what-is-oauth/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=什么是OAuth？&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/06/19/what-is-oauth/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
 
                 
 
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-
-    
-        <div class="post-content_wrapper">
-            <p class="post-title">
-                什么是OAuth？
-            </p>
-            <p><strong>本文是Matt Raible的What the Heck is OAuth?的翻译。（<a href="https://developer.okta.com/blog/2017/06/21/what-the-heck-is-oauth" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+        <p><strong>本文是Matt Raible的What the Heck is OAuth?的翻译。（<a href="https://developer.okta.com/blog/2017/06/21/what-the-heck-is-oauth" target="_blank" rel="noopener">原文地址</a>）</strong></p>
 <blockquote>
 <p>围绕OAuth的实际情况存在很多混淆。</p>
 <p>有些人认为OAuth是一种登录流程（就像当您使用Google登录登录应用程序时一样），有些人不假思索的认为OAuth是一种“安全事物”。</p>
@@ -665,15 +700,13 @@
 <p>OAuth具有非常大的安全覆盖面。确保使用安全工具包并验证所有输入！</p>
 <p>OAuth不是身份验证协议。OpenID Connect针对身份验证方案扩展了OAuth 2.0，通常称为“带花括号的SAML”。如果您希望进一步深入了解OAuth 2.0，我建议您查看<a href="https://www.oauth.com/" target="_blank" rel="noopener">OAuth.com</a>，使用Okta的Auth SDK进行测试，然后尝试自己的OAuth流程。</p>
 
-            
-        </div>
+        
+    
+
     
 </div>
 
 
-                
-                    <!-- Paradox Post Info -->
-                    
                 
 
                 <!-- Post Comments -->
@@ -745,11 +778,258 @@
 
 
                     
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">28</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
 
                     
 
                     <!--Footer-->
 <footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
     
 </footer>
 

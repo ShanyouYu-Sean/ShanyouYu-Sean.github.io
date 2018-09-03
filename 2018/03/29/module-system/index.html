@@ -97,10 +97,6 @@
     
 
     
-        
-            <link rel="stylesheet" href="/css/fontawesome.min.css">
-        
-    
 
     <!-- Config CSS -->
 
@@ -332,107 +328,8 @@
 
 
     
-        <body id="scheme-Isolation" class="lazy">
+        <body id="scheme-Paradox" class="lazy">
             <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
-                
-                    <!-- Isolation Header -->
-                    <header class="header">
-    <div class="header-wrapper">
-        <!-- Header Copyright -->
-        <div class="header-copyright">
-            <div class="header-site">
-                ©&nbsp;
-                <script type="text/javascript">
-                    var fd = new Date();
-                    document.write(fd.getFullYear());
-                </script>
-                &nbsp;小鱼肖恩
-            </div>
-            <!--
-            I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
-            It will not impact the appearance and can give developers a lot of support :)
-
-            很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
-            它不会影响美观并可以给开发者很大的支持。 :)
-            -->
-            <div>
-                Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a>
-                <br>
-                Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a>
-            </div>
-        </div>
-
-        <!-- Header Title -->
-        <span class="header-title header-item">
-            <a href="/" title="小鱼肖恩">
-                小鱼肖恩
-            </a>
-        </span>
-
-        <p class="header-slogan header-item">
-        
-            
-                我知道，是流星赞美了黑夜，鲸鱼安慰了大海
-            
-        
-        </p>
-
-        <!-- Header Nav -->
-        <nav class="header-nav header-item">
-            <span class="header-nav-item">
-                <a href="/" title="Home">
-                    <span>主页</span>
-                </a>
-            </span>
-
-            <!-- Pages  -->
-            
-                <span class="header-nav-item">
-                    <a href="/about" title="关于我">
-                        <span>关于我</span>
-                    </a>
-                </span>
-            
-            
-        </nav>
-
-        <!-- Header SNS -->
-        <div class="header-item header-sns_list">
-    <!-- Twitter -->
-    
-
-    <!-- Facebook -->
-    
-
-    <!-- Google + -->
-    
-
-    <!-- Weibo -->
-    
-
-    <!-- Instagram -->
-    
-
-    <!-- Tumblr -->
-    
-
-    <!-- Github -->
-    
-        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
-            <i class="fa fa-github fa-lg" aria-hidden="true"></i>
-        </a>
-    
-
-    <!-- LinkedIn -->
-    
-
-    <!-- Telegram -->
-    
-</div>
-
-    </div>
-</header>
-
                 
 
                 <!-- Main Container -->
@@ -442,10 +339,45 @@
                     <div id="top"></div>
 
                     
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
 
                     <!-- Post TOC -->
 
     
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#目录"><span class="post-toc-number">1.</span> <span class="post-toc-text">目录</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#定义模块"><span class="post-toc-number">2.</span> <span class="post-toc-text">定义模块</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#模块声明"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">模块声明</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#模块打包"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">模块打包</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#模块描述符"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">模块描述符</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#平台模块"><span class="post-toc-number">3.</span> <span class="post-toc-text">平台模块</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#使用模块"><span class="post-toc-number">4.</span> <span class="post-toc-text">使用模块</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#模块路径"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">模块路径</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#解决依赖"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">解决依赖</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#可读性"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">可读性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#可访问性"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">可访问性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#隐含的可读性"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">隐含的可读性</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#兼容性和迁移"><span class="post-toc-number">5.</span> <span class="post-toc-text">兼容性和迁移</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#未命名模块"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">未命名模块</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#自下而上的迁移"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">自下而上的迁移</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#自动模块"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">自动模块</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#与类路径建立联系"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">与类路径建立联系</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#服务"><span class="post-toc-number">6.</span> <span class="post-toc-text">服务</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#高级特性"><span class="post-toc-number">7.</span> <span class="post-toc-text">高级特性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#反射"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">反射</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#反射的可读性"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">反射的可读性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#类加载器"><span class="post-toc-number">7.3.</span> <span class="post-toc-text">类加载器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#未命名模块与类加载器"><span class="post-toc-number">7.4.</span> <span class="post-toc-text">未命名模块与类加载器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#层"><span class="post-toc-number">7.5.</span> <span class="post-toc-text">层</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#限制性导出"><span class="post-toc-number">7.6.</span> <span class="post-toc-text">限制性导出</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#总结"><span class="post-toc-number">8.</span> <span class="post-toc-text">总结</span></a></li></ol>
+    </ul>
+    
+
 
 
 
@@ -459,37 +391,140 @@
 
                 <!-- Post Header(Thumbnail & Title) -->
                 
-
-
-    <!-- Isolation Post Header -->
-    <!-- Post thumbnail -->
+    <!-- Paradox Post Header -->
     
-        <!-- Post Header Info -->
-        <div class="post-header_info without-thumbnail">
-            <!-- Author Avatar & Name -->
-            <img src="/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="Sean Yu's avatar">
-            <span class="name-span">Sean Yu</span>
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                Java模块系统综述
+            </p>
         </div>
 
-        <!-- Null Thumbnail -->
-        <div class="post_thumbnail-null">
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>3月 29, 2018</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
     
-        </div>
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACY0lEQVR42u3aQW7DMAwEwPz/0+0DiqS7lC0LwfhUNKnt0UFil3z9fPX1wsPDw8PDw8PDO4z3iq9/bvrx+8md2796+yw8PDy8Lbzk1S948B/MZ+Tw3fDw8PA28maPbL/ZLkH+bnh4eHjn82YF9Lv7rx8keHh4eCfz2mJ3JYzAw8PDO5k3e9Hkm23s+1jWgoeHhxfz2vJ3589b+3t4eHh4Aa8eaYo39M/b+sqYwo0zZXh4eHgBr40MkuZW3u5aORjw8PDwzuHljf+V42QWFl+QUuPh4eHdxku2+3aAIPl0NviFh4eHt5/XjkYl4GS7bwcRogIdDw8P72beSgFdBATlp7NhBTw8PLw9vNlwQNvab8OIlo2Hh4f3FG/W1ppt3/mneXSCh4eHt59X3KIMEfI7tMuNh4eH9xSvPQzqQag41MhL53p0AA8PD+9SXjtElbxWHSIsLDQeHh7es7xZa79ta7XDBBcMXeHh4eFdxJsVvm2zKi/N21GGaDICDw8P7wZeTmqb/W00PFt6PDw8vJ28vHhtMbPW1wW/wcPDw9vIWzkehqOl5UGStNzw8PDwdvLaknc2yr8yiFCHEXh4eHhbeElsmrfEomZ/vATRouPh4eHdzJsNBMxiiDb+yJcADw8PbydvVuCuF8f5IZQvAR4eHt5OXvL4JA6YDWa1pXN9MODh4eHdxms36M/g2QjCLBTGw8PDO5/XbuLtCEL7ezw8PLzzebPAdyWuLf4BwMPDw9vIy1tWswg4CSPawhoPDw/vKd4sAmiDibad9k/p/G7R8fDw8G7mfd+Fh4eHh4eHh4d3wPULb46vW8bueL4AAAAASUVORK5CYII=">
+    
+</ul>
 
+    
 
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Java-9/">Java 9</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Java-module/">Java module</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=Java模块系统综述&url=http://seanthefish.com/2018/03/29/module-system/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/03/29/module-system/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=Java模块系统综述&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/03/29/module-system/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
 
                 
 
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-
-    
-        <div class="post-content_wrapper">
-            <p class="post-title">
-                Java模块系统综述
-            </p>
-            <p><strong>本文是Mark Reinhold的The State of the Module System最新版的翻译。（<a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
+        <p><strong>本文是Mark Reinhold的The State of the Module System最新版的翻译。（<a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/" target="_blank" rel="noopener">原文地址</a>）</strong></p>
 <blockquote>
 <p>这份文档略有过时。其基本概念没有任何改变，但requires public关键字已被重新命名为requires transitive，并增加了几项附加功能。更新正在准备中，准备就绪后会在这里发布。</p>
 </blockquote>
@@ -812,15 +847,13 @@ if (providerName != null) {
 <p>限制性的导出可能会意外地将内部的类型到处到预期之外的模块，因此我们必须小心使用它们。例如命名一个名为java.corba的模块以访问sun.reflect包中的类型。为了防止这种情况，我们可以在构建时分析相关模块，并在每个模块的描述符中记录允许依赖它的模块内容的哈希值，并使用限制性导出。在分析期间，我们需要验证，那些使用限制性导出到其他命名模块的模块，其模块内容的哈希值，与引用该模块的模块中记录的该模块的哈希值匹配。只要声明和使用限制性的导出的模块以这种方式绑定在一起，限制性的导出就可以安全地在不受信任的环境中使用。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这里描述了模块系统的很多方面，但大多数开发人员只需要使用其中的一部分。我们期望在未来几年内，大多数Java开发人员都会熟悉模块声明，模块化JAR文件，模块路径，可读性，可访问性，未命名模块，自动模块和模块化服务等基本概念。相比之下，反射可读性，层和限制性的导出等更高级功能可能被使用的可能性比较小。</p>
 
-            
-        </div>
+        
+    
+
     
 </div>
 
 
-                
-                    <!-- Paradox Post Info -->
-                    
                 
 
                 <!-- Post Comments -->
@@ -892,11 +925,258 @@ if (providerName != null) {
 
 
                     
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">28</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
 
                     
 
                     <!--Footer-->
 <footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
     
 </footer>
 
