@@ -50,7 +50,7 @@
     
     <title>
         
-            OAuth教程--授权列表与撤销 | 
+            倒鸭子 | 
         
         小鱼肖恩
     </title>
@@ -61,7 +61,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,OAuth">
+    <meta name="keywords" content="小鱼肖恩,台词">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -226,7 +226,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/07/13/oauth-guide-13/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/09/30/daoyazi/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -245,16 +245,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2018/07/13/oauth-guide-13/">
+    <meta property="og:url" content="http://seanthefish.com/2018/09/30/daoyazi/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="OAuth教程--授权列表与撤销 | 小鱼肖恩">
+    <meta property="og:title" content="倒鸭子 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="OAuth"> 
+    <meta property="og:article:tag" content="台词"> 
 
     
-        <meta property="article:published_time" content="Fri Jul 13 2018 13:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Thu Jul 26 2018 10:13:34 GMT+0800">
+        <meta property="article:published_time" content="Sun Sep 30 2018 12:14:47 GMT+0800">
+        <meta property="article:modified_time" content="Thu Sep 13 2018 18:35:38 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -262,7 +262,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2018/07/13/oauth-guide-13/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2018/09/30/daoyazi/index.html" />
     
 
     <!-- Structured-data for SEO -->
@@ -274,10 +274,10 @@
 {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-13/index.html",
-    "headline": "OAuth教程--授权列表与撤销",
-    "datePublished": "Fri Jul 13 2018 13:00:00 GMT+0800",
-    "dateModified": "Thu Jul 26 2018 10:13:34 GMT+0800",
+    "mainEntityOfPage": "http://seanthefish.com/2018/09/30/daoyazi/index.html",
+    "headline": "倒鸭子",
+    "datePublished": "Sun Sep 30 2018 12:14:47 GMT+0800",
+    "dateModified": "Thu Sep 13 2018 18:35:38 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -295,7 +295,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": ",OAuth小鱼肖恩",
+    "keywords": ",台词小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -487,39 +487,79 @@
     
         <div class="post-content_wrapper">
             <p class="post-title">
-                OAuth教程--授权列表与撤销
+                倒鸭子
             </p>
-            <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<h3 id="授权列表"><a href="#授权列表" class="headerlink" title="授权列表"></a>授权列表</h3><p>一旦用户开始授权多个应用程序，让许多应用程序访问其帐户，就有必要提供一种方法来允许用户管理具有访问权限的应用程序。这通常在帐户设置页面或帐户隐私页面中呈现给用户。</p>
-<p>OAuth 2.0规范中没有任何内容要求用户能够撤销访问权限，或者对如何执行此操作的建议，因此我们将查看几个主要的API提供商，以获取有关如何实现此目的的灵感。</p>
-<p>大多数提供商都有一个页面，其中列出了用户授权其帐户的所有应用程序。通常会显示有关应用程序的一些信息，以及用于向用户提供有关此应用程序何时以及为何具有访问权限的上下文的信息。</p>
-<h4 id="谷歌"><a href="#谷歌" class="headerlink" title="谷歌"></a>谷歌</h4><p>Google会在<code>https://security.google.com/settings/security/permissions</code>上提供您在帐户中授权的应用程序列表。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftgh6j6yqmj30mm0iiq4r.jpg" alt="google"></p>
-<p>该列表显示应用程序图标，名称以及授予应用程序范围的摘要。单击其中一个将展开以显示更多详细信息。</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1ftgha78weuj30j40ijq4c.jpg" alt="一个授权访问您的Google帐户的应用程序的详细信息"></p>
-<p>此视图提供了已授予范围的更详细列表，以及您授权应用程序的日期。</p>
-<h4 id="Twitter"><a href="#Twitter" class="headerlink" title="Twitter"></a>Twitter</h4><p>Twitter在<code>https://twitter.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1ftghc5l2bmj30sg0jz79r.jpg" alt="您授权访问Twitter帐户的应用程序列表"></p>
-<p>Twitter显示授予的范围（只读，读/写，读/写/直接消息），以及应用程序是否可以看到您的电子邮件地址。该列表包括您授权申请的日期。这使用户可以轻松地从他们暂时未使用的应用程序中撤消凭据。</p>
-<h4 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h4><p>GitHub在<code>https://github.com/settings/applications</code>上提供了您授权的应用程序列表。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghef8w6qj30sg0cu40n.jpg" alt="您授权访问GitHub帐户的应用程序列表"></p>
-<p>GitHub提供的列表包括上次使用应用程序的描述，以便您了解是否可以安全地撤销应用程序的授权（如果它在一段时间内没有使用过）。</p>
-<p>单击应用程序可提供有关该应用程序访问权限的更多详细信息。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1ftghezcvrqj30kw0cmab1.jpg" alt="一个授权访问您的GitHub帐户的应用程序的详细信息"></p>
-<p>在这里，您可以看到应用程序对您帐户的权限（范围）。</p>
-<p>您可以在此处找到指向其他服务授权页面的<a href="https://indieweb.org/appaccess" target="_blank" rel="noopener">链接</a>。</p>
-<h3 id="撤销访问权限"><a href="#撤销访问权限" class="headerlink" title="撤销访问权限"></a>撤销访问权限</h3><p>您可能需要撤销应用程序对用户帐户的访问权限的原因有几个。</p>
-<ul>
-<li>用户明确希望撤销应用程序的访问权限，例如，如果他们在授权页面上找到了他们不再想要使用的应用程序</li>
-<li>开发人员想要撤消其应用程序的所有用户令牌</li>
-<li>开发者删除了他们的申请</li>
-<li>您作为服务提供商已确定应用程序已被盗用或恶意，并希望禁用它</li>
+            <h3 id="倒鸭子台词"><a href="#倒鸭子台词" class="headerlink" title="倒鸭子台词"></a>倒鸭子台词</h3><ul>
+<li>你好，请问有什么可以帮到您？</li>
+<li>喂，您好</li>
+<li>您好</li>
+<li>你这边有杂音，我听不清楚</li>
+<li>那个，我的车，刚才，我这才买的车，刚才，那个，在那个，马路边，低大梁擦道牙子擦了个坑</li>
+<li>先生您好，您的车辆出保险了，现在要报案是么？</li>
+<li>对对对</li>
+<li>唉，先生你好，是什么时候出的事情？</li>
+<li>刚刚时间，刚刚出的</li>
+<li>大概有几分钟了</li>
+<li>嗯，就刚刚的事</li>
+<li>半个小时是么？</li>
+<li>五，十分钟</li>
+<li>十分钟？</li>
+<li>对</li>
+<li>是在哪里出的事情？是在大连吗？</li>
+<li>在革镇堡</li>
+<li>是在辽宁，辽宁省的大连市，是吗？</li>
+<li>对，甘井子，革镇堡</li>
+<li>是在大连市的那条路？</li>
+<li>甘井子，革镇堡！</li>
+<li>干警市</li>
+<li>甘井子区，革镇堡镇</li>
+<li>先生您好，是在大连市的干警，干警两个字是怎么写的？</li>
+<li>甘井子区，甘井子开发区，呃，甘井子区</li>
+<li>干警市区是么？</li>
+<li>对</li>
+<li>干警市区，那个干是两横一竖那个干吗？警是警察的警吗？</li>
+<li>对对对</li>
+<li>干警市区哪里？</li>
+<li>甘井子区，就是大连市甘井子区革镇堡镇</li>
+<li>革陈铺，是吗？</li>
+<li>革镇堡</li>
+<li>啊，好啦，先生我知道了，您在那边发生什么事情了</li>
+<li>刚刚，开车，不小心，刮在底下道，刮在道牙子上了，倒车刮道牙子上了，那个，低保险，低杠，低大梁，大，大梁，大架子，底下大架子，刮那个保险杠刮了个坑</li>
+<li>先生您好，是您的车在直行的时候，还是倒车的时候？</li>
+<li>倒车</li>
+<li>倒车的时候是吧？</li>
+<li>对</li>
+<li>倒车的时候刮到哪个部位了？</li>
+<li>就是车，左侧地盘，低杆那个大梁，大架子</li>
+<li>左侧，就是您的车的左侧地盘受损了，是吗？</li>
+<li>对对对，底下，大架子，侧面大架子</li>
+<li>还有没有其他地方受损么？</li>
+<li>嗯，别的地方没有。</li>
+<li>其他地方没有啦，是您的车擦到哪里了？擦到墙了还是擦到哪里了？</li>
+<li>擦到就是道边的那个道牙子</li>
+<li>倒鸭子？</li>
+<li>对呀</li>
+<li>是一个什么物体呢？</li>
+<li>道牙子，什么物体，哎呀妈呀，就是道边的，公路道边不是有道牙子吗？</li>
+<li>是，是那个是墙还是铁杆还是怎么的？</li>
+<li>石头</li>
+<li>是土是吗？</li>
+<li>石块，就是道边铺道牙子的那个石块，那个，每个公路道边不都有那个道边那个道牙子么？</li>
+<li>倒鸭子？</li>
+<li>就是道边道牙子的那个石块，你叫那个，过来，出险的过来看一下就知道了</li>
+<li>那我想请问一下，对方的那个道牙子有没有什么事情呀？</li>
+<li>那些都不要紧，那都是大道，那个道边，那都不要紧，就是我车出事了</li>
+<li>就是您的车受损了，对方不要求您赔的，是吗？</li>
+<li>没有对方，就是车受损了</li>
+<li>呃，就是您的车受损了，然后对方的那个不需要您赔是吗？</li>
+<li>啊，那些都没有没有，就是我车有点，有毛病，你让过来看一下，要不，我这才买的新车</li>
+<li>唉，先生您好，我再跟您核对一下当时的信息，是您的车在倒车的时候刮到了倒鸭子，造成您本车的左侧底盘受损，对方没事是吧？</li>
+<li>对对对对，呵呵</li>
+<li>啊好叻，那那个麻烦您先在现场暂时不要移动好吗？</li>
+<li>啊，行</li>
+<li>啊好，感谢您的配合，再见</li>
+<li>哎呀妈呀，这女的</li>
 </ul>
-<p>根据您实现生成访问令牌的方式，将用不同的方式撤销他们。</p>
-<h4 id="令牌数据库"><a href="#令牌数据库" class="headerlink" title="令牌数据库"></a>令牌数据库</h4><p>如果将访问令牌存储在数据库中，则撤销属于特定用户的所有令牌相对容易。您可以轻松编写查找和删除属于该用户的令牌的查询，例如查找令牌表中的令牌user_id。假设您的资源服务器通过在数据库中查找它们来验证访问令牌，那么下次被撤销的客户端发出请求时，其令牌将无法验证。</p>
-<h4 id="自编码令牌"><a href="#自编码令牌" class="headerlink" title="自编码令牌"></a>自编码令牌</h4><p>如果授权服务器发出自编码令牌，则撤销对特定应用程序的访问会稍微困难一些。</p>
-<p>如果您有一个真正的无状态机制来验证令牌，并且您有资源服务器正在验证令牌而不与另一个系统共享服务，那么唯一的选择是等待所有未完成的令牌过期，并阻止应用程序生成新令牌。这是当您使用自编码令牌时，使用极短期令牌的主要原因。</p>
-<p>由于没有使单个访问令牌无效的机制，因此您需要使特定用户的应用程序刷新令牌无效。这样，下次应用程序尝试刷新访问令牌时，将拒绝对新访问令牌的请求。</p>
 
             
         </div>
@@ -571,21 +611,13 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2018/07/13/oauth-guide-14/" id="post_nav-newer" class="prev-content">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                <i class="material-icons">arrow_back</i>
-            </button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            新篇
-        </a>
-    
 
     <!-- Section Spacer -->
     <div class="section-spacer"></div>
 
     <!-- Next Nav -->
     
-        <a href="/2018/07/13/oauth-guide-12/" id="post_nav-older" class="next-content">
+        <a href="/2018/07/14/oauth-guide/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
