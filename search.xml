@@ -3,6 +3,219 @@
   
     
     <entry>
+      <title><![CDATA[使用oidc id token验证spring security resource server]]></title>
+      <url>/2018/11/06/spring-security-jwt/</url>
+      <content type="html"><![CDATA[<p>在前后端分离的项目中，前端因为不能保证密钥的安全，通常会使用oidc implicit grant type来获取access token和id token，后端会验证token的合法性并获得用户信息。</p>
+<p>后端使用spring，如果后端是验证access token，那好说，使用spring-security-oauth2-autoconfigure，详见<a href="https://docs.spring.io/spring-security-oauth2-boot/docs/current-SNAPSHOT/reference/htmlsingle/" target="_blank" rel="noopener">文档</a>。</p>
+<p>如果后端是验证id token，并且提供jwks url，那也好说，详见<a href="https://spring.io/blog/2018/08/21/spring-security-5-1-0-rc1-released#oauth2-resource-server" target="_blank" rel="noopener">文档</a>。</p>
+<p>可惜的是IBM ID OAuth server暂时还没有提供jwks url，只给了一个rsa public key的证书，因此记录一下解决方案。</p>
+<p><strong>版本：spring boot 2.1.0.RELEASE</strong></p>
+<pre><code class="gradle">dependencies{
+    compile(&#39;org.springframework.boot:spring-boot-starter-security&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-jose:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-client:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-resource-server:5.1.1.RELEASE&#39;)
+    compile(&#39;org.bouncycastle:bcprov-jdk15on:1.60&#39;)
+}
+</code></pre>
+<pre><code class="java">import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
+
+
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value(&quot;${JWK-certificate}&quot;)
+    String jwkCertificate;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2ResourceServer()
+                .jwt();
+    }
+
+    @Bean
+    JwtDecoder getJwtDecoder() throws Exception {
+        NimbusReactiveJwtDecoder nimbusReactiveJwtDecoder = new NimbusReactiveJwtDecoder(WebSecurityConfig.get(jwkCertificate));
+        return token -&gt; nimbusReactiveJwtDecoder.decode(token).block();
+    }
+
+    public static RSAPublicKey get(String filePath) throws Exception {
+        PemReader pemReader = new PemReader(new FileReader(new File(WebSecurityConfig.class.getResource(filePath).getPath())));
+        PemObject pemObject = pemReader.readPemObject();
+        pemReader.close();
+        CertificateFactory fact = CertificateFactory.getInstance(&quot;X.509&quot;);
+        InputStream input = new ByteArrayInputStream(pemObject.getContent());
+        X509Certificate cert = (X509Certificate) fact.generateCertificate(input);
+        return (RSAPublicKey)cert.getPublicKey();
+    }
+
+}
+</code></pre>
+<p><strong>版本：spring boot 2.0.6.RELEASE</strong></p>
+<pre><code class="gradle">dependencies{
+    compile(&#39;org.springframework.security:spring-security-oauth2-core:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-jose:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-client:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-oauth2-resource-server:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-core:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-config:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-web:5.1.1.RELEASE&#39;)
+    compile(&#39;org.springframework.security:spring-security-crypto&#39;:5.1.1.RELEASE)
+    compile(&#39;org.bouncycastle:bcprov-jdk15on:1.60&#39;)
+}
+</code></pre>
+<pre><code class="java">import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
+
+
+
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value(&quot;${JWK-certificate}&quot;)
+    String jwkCertificate;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        OAuth2ResourceServerConfigurer&lt;HttpSecurity&gt; oauth2ResourceServerConfigurer = new OAuth2ResourceServerConfigurer&lt;&gt;(http.getSharedObject(ApplicationContext.class));
+        oauth2ResourceServerConfigurer.jwt();
+        http
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .apply(oauth2ResourceServerConfigurer);
+    }
+
+    @Bean
+    JwtDecoder getJwtDecoder() throws Exception {
+        NimbusReactiveJwtDecoder nimbusReactiveJwtDecoder = new NimbusReactiveJwtDecoder(WebSecurityConfig.get(jwkCertificate));
+        return token -&gt; nimbusReactiveJwtDecoder.decode(token).block();
+    }
+
+    public static RSAPublicKey get(String filePath) throws Exception {
+        PemReader pemReader = new PemReader(new FileReader(new File(WebSecurityConfig.class.getResource(filePath).getPath())));
+        PemObject pemObject = pemReader.readPemObject();
+        pemReader.close();
+        CertificateFactory fact = CertificateFactory.getInstance(&quot;X.509&quot;);
+        InputStream input = new ByteArrayInputStream(pemObject.getContent());
+        X509Certificate cert = (X509Certificate) fact.generateCertificate(input);
+        return (RSAPublicKey)cert.getPublicKey();
+    }
+
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> OAuth </category>
+            
+            <category> OIDC </category>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+            <tag> spring </tag>
+            
+            <tag> OIDC </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在spring中使用cors]]></title>
+      <url>/2018/11/06/spring-cors/</url>
+      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
+<p>解决方案：</p>
+<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+@Configuration
+public class WebCorsConfig {
+
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        config.addAllowedMethod(&quot;*&quot;);
+        source.registerCorsConfiguration(&quot;/**&quot;, config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[倒鸭子]]></title>
       <url>/2018/09/30/daoyazi/</url>
       <content type="html"><![CDATA[<h1 id="倒鸭子台词"><a href="#倒鸭子台词" class="headerlink" title="倒鸭子台词"></a>倒鸭子台词</h1><ul>
