@@ -3,13 +3,13 @@
   
     
     <entry>
-      <title></title>
+      <title><![CDATA[微服务下的权限设计]]></title>
       <url>/2020/07/24/micro-service-authorization/</url>
       <content type="html"><![CDATA[<p><code>本文优先发表于CIO Talk微信公众号（微信号: CIO_China_Lab）</code></p>
 <p>随着微服务架构的流行，越来越多的应用基于微服务架构设计和实现，同时带来了新的问题，传统单体应用架构下，认证和授权容易完成，但是微服务架构下，如何能更好的完成认证和授权，尤其在传统应用的微服务化转型过程中，如何更好的迁移，在不重新实现原有的权限管理系统的情况下，能够更优雅的实现复杂微服务架构下的认证和授权，本文将对上述问题做一些探讨。 </p>
 <h1 id="微服务场景会为认证和授权带来哪些问题"><a href="#微服务场景会为认证和授权带来哪些问题" class="headerlink" title="微服务场景会为认证和授权带来哪些问题"></a>微服务场景会为认证和授权带来哪些问题</h1><p>在传统的单体架构应用中，当用户登录时，应用程序的安全模块验证用户的身份。在验证用户是合法的之后，为用户创建会话（session），并且将会话ID（session ID）与之相关联。服务器端会话存储登录用户信息，例如用户名，角色和权限。服务器将会话ID返回给客户端（浏览器）。客户端（浏览器）将会话ID记录为cookie，并在后续请求中将其发送到应用程序。然后，应用程序可以使用会话ID来验证用户的身份，而无需每次都输入用户名和密码进行身份验证。当客户端（浏览器）访问应用程序时，会话ID与HTTP请求一起发送到应用程序。程序的安全模块通常会使用授权拦截器，此拦截器首先确定会话ID是否存在。如果会话ID存在，则它知道用户已登录。然后，通过查询用户权限，确定用户是否可以执行请求。 </p>
-<p><img src="https://uploader.shimo.im/f/KymO6F9OxzVi11xV.png!thumbnail" alt="图片"></p>
-<p><img src="https://uploader.shimo.im/f/bYfyEwkWaR0Jq7Uj.png!thumbnail" alt="图片"> </p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQBGD.png" alt="UjQBGD.png"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQDRe.png" alt="UjQDRe.png"></p>
 <p>在微服务架构下，应用由多个微服务组成，每个微服务在原始的单体应用程序中实现单一业务逻辑，并且前后端的分离使得客户端变成一个纯前端应用。在这种场景下，对每个微服务（包括纯前端的客户端应用）的访问请求进行身份验证和授权会面临以下问题： </p>
 <ul>
 <li>客户端拆分成独立的纯前端应用程序（单页应用），前端应用需要以一种安全的方式在浏览器中获取用户的身份信息和权限信息，并与服务端微服务程序共享。如果涉及到微前端的架构，前端由多个可独立部署的子应用组成，如何在多个微前端之间共享相同的登录信息、权限及其有效性？ </li>
@@ -31,7 +31,7 @@
 <p>单一的系统授权往往是伴随认证完成的，但是在开放 API 的多系统架构下，授权需要由不同的系统来完成，例如 OAuth2.0。 </p>
 <p>在流行的技术和框架中，这些概念都无法孤立的被实现，因此在现实中使用这些技术时，大家往往对 OAuth2.0 是认证还是授权这种概念争论不休。下面我们会介绍在API开发中常常使用的几种认证和授权技术：OAuth2.0，OpenId Connect和JWT。 </p>
 <h2 id="OAuth2-0、OpenId-Connect（OIDC）和JWT"><a href="#OAuth2-0、OpenId-Connect（OIDC）和JWT" class="headerlink" title="OAuth2.0、OpenId Connect（OIDC）和JWT"></a>OAuth2.0、OpenId Connect（OIDC）和JWT</h2><h3 id="OAuth2-0"><a href="#OAuth2-0" class="headerlink" title="OAuth2.0"></a>OAuth2.0</h3><h4 id="什么是OAuth2-0"><a href="#什么是OAuth2-0" class="headerlink" title="什么是OAuth2.0"></a>什么是OAuth2.0</h4><p>在第三方登录已经如此普遍的今天，相信大家一定都见过下面的这种界面： </p>
-<p><img src="https://uploader.shimo.im/f/b8Aig5VMUJBlz2Ec.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQcqI.png" alt="UjQcqI.png"></p>
 <p>第三方登录让我们可以在一个app上无需注册新用户，就能使用我们的微信、qq等社交账号进行登录，app可以获取到我们社交账号上的头像、邮箱等信息。 </p>
 <p>而这种现在看来已经非常普遍的操作，其背后就是OAuth2.0协议在支撑。 </p>
 <p>在详细讲解OAuth2.0之前，需要了解几个专用名词。 </p>
@@ -49,7 +49,7 @@
 <p>如果要开发一个能检测代码质量的工具，面向的用户都是GitHub的使用者，那么如何才能让用户在不暴露GitHub的账号和密码的情况下，也能获得用户存储在GitHub的代码库的内容呢？ </p>
 <p>简单来说，OAuth2.0就是让”Client”安全可控地获取”用户”的授权，与”Resource “进行互动。 </p>
 <p>回到我们的场景中，我们要开发的代码检测工具就是Client，我们的用户就是Resource Owner，GitHub的登录系统就是Authorization ，GitHub的repo就是Resource 。在OAuth2.0框架下，用户在访问代码质量检查工具时，会先通过GitHub的Authorization 进行登录，GitHub的Authorization 会返回一个包含用户标识、且有时效性的token，通过这个token，代码质量检查工具可以访问GitHub的Resource 来获取用户代码库的内容。 </p>
-<p><img src="https://uploader.shimo.im/f/z9a7ayXuG7tA7Xax.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQRdP.png" alt="UjQRdP.png"></p>
 <h4 id="OAuth2-0的核心"><a href="#OAuth2-0的核心" class="headerlink" title="OAuth2.0的核心"></a>OAuth2.0的核心</h4><p>从我们的例子种不难发现，OAuth2.0的关键之处，在于Client如何和Authorization 进行交互，获取token。 </p>
 <p>OAuth2.0协议为我们提供了以下endpoint： </p>
 <ul>
@@ -65,21 +65,21 @@
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/5RqrooqKgXoZYsxK.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQ5Rg.png" alt="UjQ5Rg.png"></p>
 <ul>
 <li>刷新模式（Refresh Token Grant Type） <ul>
 <li>通常在请求到access token时，都会携带有一个refresh token，因为access token是有有效时长的，所以我们需要用一个不会过期的refresh token来刷新access token，在用户无需重新登录的情况下，让client也能保持使用正确有效的access token。 </li>
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/CIJsmjq57rnfBRQP.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQIzQ.png" alt="UjQIzQ.png"></p>
 <ul>
 <li>隐藏模式（Implict Grant Type） <ul>
 <li>在前后端分离的架构中，client只有一个运行在浏览器上的前端的单页应用，不包含后端。因为JavaScript应用的特殊性，我们无法安全的将client secret存储在纯前端应用里，并且因为请求全部从浏览器发起，我们无法保证传统的授权码模式的两步请求中，是否会有中间人攻击。因此需要一种不通过client secret和两步请求就可以获取access token的方式，这就是隐藏模式。在此模式中，access token将作为redirect url的fragment返回到client，并且出于安全性考虑，将不会返回refresh token，因此我们不能用传统的refresh token模式来刷新access token，只能通过silent refresh的方式刷新。 </li>
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/kust2ytAdQrHfK6w.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQTMj.png" alt="UjQTMj.png"></p>
 <pre><code>* silent refresh 
 * slient refresh是隐藏模式的一种特殊的刷新方式，其原理是运用html中iframe的特性，在access token过期之前，使用一个隐藏的iframe来重新用隐藏模式申请一次token，若authorization 的session不过期，便无需用户重新输入其登录信息就能获取一个新的access token。 
 </code></pre><ul>
@@ -88,34 +88,34 @@
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/5kBVJldN8fAHTjT0.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQHLn.png" alt="UjQHLn.png"></p>
 <ul>
 <li>密码模式（Password Grant Type） <ul>
 <li>如果你高度信任某个应用，OAuth2.0也允许用户直接使用用户名和密码，该应用通过用户提供的密码，申请token，这种方式称为密码模式。密码模式无需浏览器作为代理，可以直接通过post请求获得token。 </li>
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/SotT7vlluG1Te35E.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQOoV.png" alt="UjQOoV.png"></p>
 <ul>
 <li>凭证模式（Client Credentials Grant Type） <ul>
 <li>当你的应用只需要代表应用本身，而不是某个用户，来获取resource 的资源时，就可以使用凭证模式。这种模式不需要任何用户信息，返回的token也不携带任何用户信息。凭证模式也无需浏览器作为代理，可以直接通过post请求获得token。 </li>
 </ul>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/8mn7peq8k8S0tyQ9.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjQvJU.png" alt="UjQvJU.png"></p>
 <p>而client在获取到access token之后，需要将access token携带于authorization bearer token header，再向resource 发出相应的资源请求。client也可以使用introspection endpoint来验证token是否有效。 </p>
 <h3 id="OpenId-Connect（OIDC）"><a href="#OpenId-Connect（OIDC）" class="headerlink" title="OpenId Connect（OIDC）"></a>OpenId Connect（OIDC）</h3><p>尽管在今天很多OAuth2.0的使用中都包含身份信息，但OAuth2.0实际上是一个授权（authorization）的协议，并不包含认证（authentication）的内容。 </p>
 <p>OAuth2.0框架明确不提供有关已授权应用程序的用户的任何信息。OAuth2.0是一个委派框架，允许第三方应用程序代表用户行事，而无需应用程序知道用户的身份。 </p>
 <p>而OpenId的诞生就是为了解决认证问题的：OpenId基于OAuth2.0，在兼容OAuth2.0协议的基础上，它构建了一个身份层，用于验证并为client展示身份信息。 </p>
-<p><img src="https://uploader.shimo.im/f/q92Gi5xbvQuD3mfs.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlpQJ.png" alt="UjlpQJ.png"></p>
 <p>OpenID Connect的核心基于一个名为“ID token”的概念。authorization 将返回新的token类型，它对用户的身份验证信息进行编码。与仅旨在由资源服务器理解的access token相反，ID token旨在被第三方应用程序理解。当client发出OpenID Connect请求时，它可以请求ID token以及access token。 </p>
 <p>OpenID Connect的ID token采用JSON Web Token（JWT）的形式，JWT是一个JSON有效负载，使用发行者的私钥进行签名，并且可以由应用程序进行解析和验证。 </p>
-<p><img src="https://uploader.shimo.im/f/O1lqwm2JDhk5bcoE.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlCLR.png" alt="UjlCLR.png"></p>
 <p>得益于JWT的自解析性，client可以不申请introspection endpoint就可以解析出ID token所包含的身份信息。JWT内部是一些定义的属性名称，它们为应用程序提供信息。它们用简写名称表示，以保持JWT的整体大小。这包括用户的唯一标识符（sub即“subject”的缩写），发出token的服务器的标识符（iss即“issuer”的缩写），请求此token的client的标识符（aud即“audience”的缩写），以及少数属性，例如token的生命周期，以及用户在多长时间之前获得主要身份验证提示。 </p>
-<p><img src="https://uploader.shimo.im/f/IKwsbSHlVOPwE0Gl.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlFdx.png" alt="UjlFdx.png"></p>
 <h3 id="JWT（Json-Web-Token）"><a href="#JWT（Json-Web-Token）" class="headerlink" title="JWT（Json Web Token）"></a>JWT（Json Web Token）</h3><p>JWT（Json Web Token）是一个非常轻巧的规范。这个规范允许我们使用JWT在两个组织之间传递安全可靠的信息。 </p>
 <p>首先，我们需要理解的是，JWT实际上是一个统称，它实际上是包含两部分JWS（Json Web Signature）和JWE（Json Web Encryption）。 </p>
-<p><img src="https://uploader.shimo.im/f/0PvsYcWZunQ1DbXo.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlEFK.png" alt="UjlEFK.png"></p>
 <h4 id="JWS（Json-Web-Signature）"><a href="#JWS（Json-Web-Signature）" class="headerlink" title="JWS（Json Web Signature）"></a>JWS（Json Web Signature）</h4><p>Json Web Signature是一个有着简单的统一表达形式的字符串： </p>
 <p>JWS包含三部分： </p>
 <ul>
@@ -138,7 +138,7 @@
 <li>JWS签名（signature）使用密钥secret进行加密，生成签名。 </li>
 </ul>
 <p>JWS的主要目的是保证了数据在传输过程中不被修改，验证数据的完整性。但由于仅采用Base64对消息内容编码，因此不保证数据的不可泄露性。所以不适合用于传输敏感数据。并且加密数据只用于签名部分，所以JWS具有自解析性。 </p>
-<p><img src="https://uploader.shimo.im/f/jWeDwVkLskd2vAN8.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlmSe.png" alt="UjlmSe.png"></p>
 <h4 id="JWE（Json-Web-Encryption）"><a href="#JWE（Json-Web-Encryption）" class="headerlink" title="JWE（Json Web Encryption）"></a>JWE（Json Web Encryption）</h4><p>Json Web Encryption是一个JWS的扩展，它是一串用加密算法加密过的token，在没有密钥的情况下，它能像JWS一样的解析。 </p>
 <p>JWE包含五部分： </p>
 <ul>
@@ -155,15 +155,15 @@
 <li><p>JWE规范引入了两个新元素（enc和zip），它们包含在JWE令牌的JOSE头中，enc元素定义了秘文的加密算法，它应该是一个AEAD（Authenticated Encryption with Associated Data）模式的对称算法， zip元素定义了压缩算法，alg元素定义了用来加密cek（Content Encryption Key）的加密算法。 </p>
 </li>
 </ul>
-<p><img src="https://uploader.shimo.im/f/0fG4hRqAOCC0pLcq.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/Ujluyd.png" alt="Ujluyd.png"></p>
 <h1 id="微服务架构下的认证和授权的探讨"><a href="#微服务架构下的认证和授权的探讨" class="headerlink" title="微服务架构下的认证和授权的探讨"></a>微服务架构下的认证和授权的探讨</h1><p>通过对以上OAuth2.0，OIDC以及JWT/JWE的相关介绍，下面来探讨如何实现一个基于上述框架和协议的微服务认证和授权系统。 </p>
 <p>在大型的系统架构中，往往存在多个产品共存的情况，网站因业务需求拆分成多个自成体系的微服务架构，但为了统一用户体验，这些独立的微服务架构往往共享一个身份认证服务。例如笔者所在的公司，拥有许多独立产品和服务，他们共享同一个认证服务器，支持OIDC协议，对用户身份认证，而每个产品和服务内部，在微服务架构下，则有着自己独立的授权逻辑。 </p>
 <p>从传统单体架构到微服务架构的演变过程中，同一应用间的微服务调用，不同应用间的微服务调用，使得微服务组成了一个矩阵，相互之间存在交叉调用，每个独立的微服务又要对自己提供的服务实现权限控制，不止是系统权限，更多的是业务权限控制。如何能够基于原有的认证和权限管理系统，实现在同一微服务中，同时支持同应用之间的权限管理和不同应用之间的权限管理，是我们要探讨的主要问题。 </p>
-<p><img src="https://uploader.shimo.im/f/VeCE7ZC2i06fqnOk.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlQeI.png" alt="UjlQeI.png"></p>
 <h2 id="认证与授权的剥离"><a href="#认证与授权的剥离" class="headerlink" title="认证与授权的剥离"></a>认证与授权的剥离</h2><p>基于这样的架构基础，身份认证统一管理，应用和服务通过统一的身份认证服务完成用户登陆，剥离身份认证和用户授权，是构建微服务认证体系的第一步。 </p>
 <p>现代应用中，前后端分离已是常态，独立的前端单页应用是用户进入站点的第一步，也扮演着client的角色，因此前端单页应用将会在微服务体系中扮演者获得身份信息的重要角色。由独立的前端应用（client）获取代表身份的token后，后端就无需再与身份验证服务做复杂的交互。 </p>
 <p>我们可以使用前文所介绍的PKCE模式，安全的为前端应用授权。而后端只需要在网关层面拦截所有的请求验证身份即可，此时，前端应用就是身份验证服务（OIDC ）的client，后端网关将成为身份验证服务（OIDC ）的resource 。 </p>
-<p><img src="https://uploader.shimo.im/f/bxWwBAakRyiNQuws.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/Ujl1TP.png" alt="Ujl1TP.png"></p>
 <p>值得一提的是，在微前端概念高速发展的今天，我们同样需要在每个微前端项目中统一用户的身份和权限，借助浏览器localstorage对于不同域名的独立封闭性，我们可以使用类似cloudflare的工具帮助组装部署在不同服务器之上的前端应用共享同一域名，并以此来共享微前端不同系统之间的用户token。 </p>
 <h2 id="服务端用户权限系统的建构"><a href="#服务端用户权限系统的建构" class="headerlink" title="服务端用户权限系统的建构"></a>服务端用户权限系统的建构</h2><p>在网关完成身份认证的工作后，整个认证（authentication）的流程就已完成，接下来我们要面临的则是如何在后端微服务之间统一用户权限。 </p>
 <p>网关进行身份验证后，授权服务不需要让用户重新输入身份信息，因此应该由一个简单的api请求来完成。借助于OAuth2.0协议，我们可以使用密码流程（password grant type）来为用户进行授权。用户密码即为可自验证的ID token，而非用户的真正密码，我们借助密码流程的优势，构建一个支持解析用户ID token，并符合OAuth2.0协议标准的授权服务。 </p>
@@ -172,12 +172,12 @@
 <p>此时，后端网关是授权服务（OAuth ）的client，而后端其他的微服务将成为授权服务（OAuth ）的resource 。 </p>
 <p>微服务在收到具体的业务请求后，会使用client secret解析JWE token，而无需再与授权服务进行交互。 </p>
 <p>而之后的服务间调用，也将一直携带着此JWE token，以提供权限凭证。 </p>
-<p><img src="https://uploader.shimo.im/f/JTrIGAsmNekbP79J.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlGY8.png" alt="UjlGY8.png"></p>
 <h2 id="第三方系统间权限系统的建构"><a href="#第三方系统间权限系统的建构" class="headerlink" title="第三方系统间权限系统的建构"></a>第三方系统间权限系统的建构</h2><p>对于一个微服务系统来说，我们不仅仅要处理来自用户的请求，还经常会与其他系统进行交互，因此，我们的权限系统也需要提供一种在不提供用户身份访问系统的方式，这就是system-partner模式。 </p>
 <p>得益于OAuth2.0协议中的凭证模式（client credentials grant type），我们可以要求对我们发起请求的第三方系统在身份认证服务（OIDC ）中去申请一个不包含用户信息的client credentials token，而后端网关会解析client credentials token，并从token解析出的grant_type=client_credentials字段来识别出system-partner的请求，并验证system-partner client id的白名单，之后去我们的授权服务（OAuth ）去申请一个system-partner的权限。 </p>
 <p>通过OAuth token endpoint中携带的additional parameter，授权服务（OAuth ）会识别出system-partner的请求，赋予其一个system-partner的权限，并包装成JWE token，返回第三方系统。 </p>
 <p>在第三方系统得到了client credentials token和JWE token后，可以以与之前相同的方式发往我们的微服务，微服务会在解析token时识别出其system partner的权限，执行相应的业务逻辑。 </p>
-<p><img src="https://uploader.shimo.im/f/6GLRnCUblvuMHuEo.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlNlQ.png" alt="UjlNlQ.png"></p>
 <h2 id="基于OAuth2-0的授权中心实现"><a href="#基于OAuth2-0的授权中心实现" class="headerlink" title="基于OAuth2.0的授权中心实现"></a>基于OAuth2.0的授权中心实现</h2><p>在实现中，我们使用spring security作为技术基础，完全遵循OAuth2.0协议，将其进行改造，让spring security支持我们的自定义的token encode方式，并重新实现了user details provider来扩展权限系统。并且得益于JWE的使用，我们无需提供具体的storage来保存token，redis仅仅用于在token有效期内避免再次与权限服务交互，加速接口请求速度。 </p>
 <p>一个好的微服务权限系统应该至少具有三层结构的权限体系： </p>
 <ul>
@@ -187,16 +187,16 @@
 </ul>
 <p>其中前两层只包含权限的名字和id，而第三层因为涉及到具体的权限数据，我们将其设计成为开放接口，由开发者自行封装响应的权限获取实现逻辑。这样做的好处是，我们可以在请求权限token时使用一些additional parameter来自主的切换我们想要的权限获取逻辑（例如system-partner的实现）。 </p>
 <p>同时，additional parameter和开放权限接口相互配合，不同的微服务系统就可以使用同一个authorization 来提供不同的权限，这样可以更容易集中化管理用户权限，并节省开发资源。 </p>
-<p><img src="https://uploader.shimo.im/f/Gf1d5xJ88Zs60phR.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlUyj.png" alt="UjlUyj.png"></p>
 <p>秉承着避免与authorization 交互的原则，JWE token使用client secret作为密钥进行加密，因此resource 可以通过client secret对获得的JWE token进行自解析，并由全局的http intercepter来决定用户是否有权限访问服务或着服务的某个endpoint，以及endpoint背后与权限有关的业务逻辑。微服务可以自行用各种开源的JWE工具进行解析，也符合微服务跨语言的基本特性。 </p>
-<p><img src="https://uploader.shimo.im/f/NiVs1jxO6kcmaj9W.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlrkV.png" alt="UjlrkV.png"></p>
 <h2 id="一次性token"><a href="#一次性token" class="headerlink" title="一次性token"></a>一次性token</h2><p>对于一个庞大的微服务系统来说，可能不仅仅有浏览器、移动端，还包括类似于CLI（Command-Line Interface）的应用程序。因为此类应用程序的特殊性，他们无法正常的通过页面重定向的方式与认证服务和授权服务交流，因此，我们设计了一种一次性token的交互模式。 </p>
 <p>用户会被要求用浏览器申请一个特殊的url，得到一个有限时长的一次性token，CLI应用可以使用这一个token来正常的从网关访问后端微服务。 </p>
-<p><img src="https://uploader.shimo.im/f/5RsBaULesqI5jC55.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlyfU.png" alt="UjlyfU.png"></p>
 <p>其背后是一个独立的OAuth client在做支撑，这个OAuth client会以授权码模式先申请身份认证服务（OIDC ），得到ID token后再在后端直接申请授权服务（OAuth ）获取JWE token，并将两个token保存在redis中，并生成一个unique ID作为一次性token返回。同时用一个job来进行token过期前的刷新，以确保一次性token可以在其较长的有效时间内一直保持其有效性。 </p>
-<p><img src="https://uploader.shimo.im/f/BuZMUhmqQ6eb9H8g.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/UjlRX9.png" alt="UjlRX9.png"></p>
 <p>而微服务网关在接收并识别出一次性token后，会直接请求这个特殊的OAuth client来获取其真正的ID token和JWE token，再进行验证并申请转发微服务。 </p>
-<p><img src="https://uploader.shimo.im/f/ufqdbftD2MhB2A5Z.png!thumbnail" alt="图片"></p>
+<p><img src="https://s1.ax1x.com/2020/07/24/Ujlh01.png" alt="Ujlh01.png"></p>
 <p>这种方式巧妙的避免了类似CLI应用在界面交互上的限制，并能以一个较长的时间使用一个token来作为用户凭证访问微服务，拓展了这个微服务系统的涵盖范围。 </p>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>本文详细描写了在微服务架构下，针对不同的应用场景，如何实现基于OIDC协议和OAUTH2.0框架的认证和授权，通过引入JWE token，将用户授权信息在微服务架构下以自解析的方式完成权限传递，使得单个微服务能够更加容易的将用户权限用于自身的业务逻辑中。基于标准协议和框架的设计，使得该系统可以很容易的集成到现有的认证和授权系统中，而不需要对原有认证和授权系统做大的修改，这样的设计也减少了复杂微服务系统对于授权系统的依赖，更加简洁和高效。 </p>
 <p>参考资料： </p>
@@ -207,6 +207,18 @@
 <p><a href="https://www.jianshu.com/p/50ade6f2e4fd" target="_blank" rel="noopener">https://www.jianshu.com/p/50ade6f2e4fd</a></p>
 ]]></content>
       
+        <categories>
+            
+            <category> OAuth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> OAuth </tag>
+            
+        </tags>
         
     </entry>
     
