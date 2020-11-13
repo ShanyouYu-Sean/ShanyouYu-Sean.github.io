@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-07-24T04:53:20.412Z</updated>
+  <updated>2020-11-12T16:19:16.124Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s中的jvm</title>
+    <link href="http://seanthefish.com/2020/11/12/jvm-in-container/"/>
+    <id>http://seanthefish.com/2020/11/12/jvm-in-container/</id>
+    <published>2020-11-12T02:00:00.000Z</published>
+    <updated>2020-11-12T16:19:16.124Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;最近遇到了Java应用在k8s中频繁重启的问题，记录一下。&lt;/p&gt;
+&lt;p&gt;起因是因为一个bug，使我们的一个请求会大量申请许多新空对象，但这些空对象并没有被即使的回收，直接导致了pod级别的oomkille，或者直接被驱逐，于是开始了调查。&lt;/p&gt;
+&lt;p&gt;在Java
+        
+      
+    
+    </summary>
+    
+      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
+    
+    
+      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>微服务下的权限设计</title>
@@ -518,32 +546,6 @@
         
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
 &lt;h3 id=&quot;授权列表&quot;&gt;&lt;a
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--访问令牌</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-12/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-12/</id>
-    <published>2018-07-13T04:00:00.000Z</published>
-    <updated>2018-07-27T05:43:22.151Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
         
       
     
