@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            tomcat classloader源码详解 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,classLoader">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/15/tomcat-classloader/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/15/tomcat-classloader/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="tomcat classloader源码详解 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="classLoader"> 
+
+    
+        <meta property="article:published_time" content="Sun Nov 15 2020 12:14:47 GMT+0800">
+        <meta property="article:modified_time" content="Tue Nov 17 2020 19:03:38 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/15/tomcat-classloader/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/15/tomcat-classloader/index.html",
+    "headline": "tomcat classloader源码详解",
+    "datePublished": "Sun Nov 15 2020 12:14:47 GMT+0800",
+    "dateModified": "Tue Nov 17 2020 19:03:38 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",classLoader小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#源码"><span class="post-toc-number">1.</span> <span class="post-toc-text">源码</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                tomcat classloader源码详解
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 15, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAAC2UlEQVR42u3aUXLcIBAE0L3/pZMLRNruQUlkePpSebWCh6vcZobPryOvDzY2NjY2NjY2NvYr2Z/4+sOLgk+vnrx6//07V+aMjY2NvTf7y5/+4JmrJ69gK6MPv4WNjY19APs+VJIh8wldxkwQZu2csbGxsbHv76NtwCi02k0ONjY2NvZ6gCVhdr9dWV96bGxs7JPZCWB9irNQ/M+1NGxsbOzXs/Om6Xvu/2l/GxsbG/vF7PbK4yQvDM2er2eOjY2NvSl7Vu5PSv8rDdokROt5YmNjY2/KfgqcH7iZxdJsU4SNjY19DjsZbHZAp12ylbh6rKiEjY2N/QPZSWjNhmw3J+2iDxu92NjY2BuxZ2Wj9eL+eskp/xY2Njb2OexZSWhWyp9tM/IGc9QVwcbGxt6I3ZZ72iBpAy9pDLS/MGxsbOwT2G3JZnatFLNmLWFsbGzsvdmzJVjfMCTHbpJRilYENjY29qbs+0dXFigp67c/b/HY2NjY57DzrcJTsHyh28bAUqMXGxsb+wey63/o1xuuo4ZuUqL68h5sbGzsrdlJCK3/JCn3z1rI0UJgY2Njb8qeFW5WmgGzhm47N2xsbOxz2G1I5EHyQEG/DLMvTWhsbGzsTdnt5Na3HLPDlCvHerCxsbH3ZudTnMVPXujPI3BYrsLGxsbelJ1sMJLAyA/6tKH1WEkLGxsb+2B2C2ifyUfM74sdGDY2NvZG7HxrURTly6hbWcov88fGxsY+kt1Gy0oz4KnWMjY2NvZp7Pa6bwzk023bD8mxnqKohI2Njb0R+6ljlDk1D7a2hPRlRGxsbOyt2bPQagMpPxKUhOX9HOodGDY2NvYW7HZj0Abbert31hLGxsbGxm7vZ42H9lt1+QkbGxsbuy3izGImaAYMWxfY2NjYB7CT1+Wf5q3ZWRO3XSBsbGzsvdmzYk37ZNsqaEPxL/a3sbGxsV/MPufCxsbGxsbGxsbGfs31GyV9NDYMdpj4AAAAAElFTkSuQmCC">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/classLoader/">classLoader</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=tomcat classloader源码详解&url=http://seanthefish.com/2020/11/15/tomcat-classloader/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/15/tomcat-classloader/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=tomcat classloader源码详解&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/15/tomcat-classloader/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><pre><code class="java">public void init() throws Exception {
+
+        // 初始化，后文会说这个方法
+        initClassLoaders();
+
+        // 设置线程类加载器
+        Thread.currentThread().setContextClassLoader(catalinaLoader);
+
+        SecurityClassLoad.securityClassLoad(catalinaLoader);
+
+        // Load our startup class and call its process() method
+        // 通过之前初始化的classloader反射实例化Catalina类的实例
+        Class&lt;?&gt; startupClass =
+            catalinaLoader.loadClass
+            (&quot;org.apache.catalina.startup.Catalina&quot;);
+        Object startupInstance = startupClass.newInstance();
+        // Set the shared extensions class loader
+        if (log.isDebugEnabled())
+            log.debug(&quot;Setting startup class properties&quot;);
+        String methodName = &quot;setParentClassLoader&quot;;
+        Class&lt;?&gt; paramTypes[] = new Class[1];
+        paramTypes[0] = Class.forName(&quot;java.lang.ClassLoader&quot;);
+        Object paramValues[] = new Object[1];
+        paramValues[0] = sharedLoader;
+        Method method =
+            startupInstance.getClass().getMethod(methodName, paramTypes);
+
+        // Catalina#setParentClassLoader为sharedLoader
+        // 因为sharedLoader默认就是commonloader
+        // 当然Catalina默认也是commonloader
+        // 为啥不直接设置成commonclassloader呢？
+        // 因为webappclassloader会把自己的parentclassloader设置成Catalina的ParentClassLoader
+        // 注意是Catalina对象的爹是sharedLoader
+        // catalinaLoader的爹仍旧是commonloader
+        // 为啥这样？Catalina对象由catalinaLoader加载，Catalina对象的爹是sharedLoader，catalinaLoader的爹却是commonloader？ 求解
+        method.invoke(startupInstance, paramValues);
+
+        catalinaDaemon = startupInstance;
+
+    }
+</code></pre>
+<p>initClassLoader()方法：</p>
+<pre><code class="java">private void initClassLoaders() {
+        try {
+            // 默认情况下common.loader是有值的
+            // common.loader=&quot;${catalina.base}/lib&quot;,&quot;${catalina.base}/lib/*.jar&quot;,&quot;${catalina.home}/lib&quot;,&quot;${catalina.home}/lib/*.jar&quot;
+            commonLoader = createClassLoader(&quot;common&quot;, null);
+            if( commonLoader == null ) {
+                // no config file, default to this loader - we might be in a &#39;single&#39; env.
+                commonLoader = this.getClass().getClassLoader();
+            }
+            // catalinaLoader和sharedLoader实际上有共同的父类加载器commonLoader
+            // 而如果server.loader, shared.loader为空
+            // 那么此时的catalinaLoader,sharedLoader其实是同一个ClassLoader ———— commonclassloader
+            catalinaLoader = createClassLoader(&quot;server&quot;, commonLoader);
+            sharedLoader = createClassLoader(&quot;shared&quot;, commonLoader);
+        } catch (Throwable t) {
+            log.error(&quot;Class loader creation threw exception&quot;, t);
+            System.exit(1);
+        }
+}
+</code></pre>
+<p>createClassLoader()方法：</p>
+<pre><code class="java">private ClassLoader createClassLoader(String name, ClassLoader parent) throws Exception {
+
+    String value = CatalinaProperties.getProperty(name + &quot;.loader&quot;);
+    // 判断如果catalina.properties中没有配置对应的loader属性的话，直接返回父加载器
+    // 而默认情况下，server.loader, shared.loader为空，那么此时的catalinaLoader,sharedLoader其实是同一个ClassLoader ————commonloader
+    if ((value == null) || (value.equals(&quot;&quot;)))
+        return parent;
+
+    value = replace(value);
+
+    List&lt;Repository&gt; repositories = new ArrayList&lt;Repository&gt;();
+
+    StringTokenizer tokenizer = new StringTokenizer(value, &quot;,&quot;);
+    while (tokenizer.hasMoreElements()) {
+        String repository = tokenizer.nextToken().trim();
+        if (repository.length() == 0) {
+            continue;
+        }
+
+        // Check for a JAR URL repository
+        try {
+            @SuppressWarnings(&quot;unused&quot;)
+            URL url = new URL(repository);
+            repositories.add(
+                    new Repository(repository, RepositoryType.URL));
+            continue;
+        } catch (MalformedURLException e) {
+            // Ignore
+        }
+
+        // Local repository
+        if (repository.endsWith(&quot;*.jar&quot;)) {
+            repository = repository.substring
+                (0, repository.length() - &quot;*.jar&quot;.length());
+            repositories.add(
+                    new Repository(repository, RepositoryType.GLOB));
+        } else if (repository.endsWith(&quot;.jar&quot;)) {
+            repositories.add(
+                    new Repository(repository, RepositoryType.JAR));
+        } else {
+            repositories.add(
+                    new Repository(repository, RepositoryType.DIR));
+        }
+    }
+    //这里返回的是一个UrlClassLoader实例
+    //最终调用org.apache.catalina.startup.ClassLoaderFactory#createClassLoader静态工厂方法创建了URLClassloader的实例
+    //而具体的URL其实就是*.loader属性配置的内容
+    ClassLoader classLoader = ClassLoaderFactory.createClassLoader
+        (repositories, parent);
+
+
+    return classLoader;
+
+}
+</code></pre>
+<p>查看org.apache.catalina.startup.Catalina#getParentClassLoader调用栈，我们看到在StandardContext的startInternal方法中调用了它，那么我们查看一下它的代码，包含了如下代码片段：</p>
+<pre><code class="java">if (getLoader() == null) {
+    // 初始化WebappLoader，把他的爹设置为sharedloader
+            WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
+            webappLoader.setDelegate(getDelegate());
+            setLoader(webappLoader);
+}
+try {
+
+    if (ok) {
+
+        // Start our subordinate components, if any
+        if ((loader != null) &amp;&amp; (loader instanceof Lifecycle))
+            ((Lifecycle) loader).start();
+        //other code    
+    }
+catch(Exception e){
+}
+</code></pre>
+<p>因为WebappLoader符合Tomcat组件生命周期管理的模板方法模式，因此会调用到它的startInternal方法。我们接下来就来看看WebappLoader的startInternal，我们摘取一部分与本篇相关的代码片段如下：</p>
+<pre><code class="java">classLoader = createClassLoader();
+classLoader.setResources(container.getResources());
+// 设置是否配置委派模式
+classLoader.setDelegate(this.delegate);
+classLoader.setSearchExternalFirst(searchExternalFirst);
+</code></pre>
+<p>从上的代码可以看到调用了createClassLoader方法创建一个classLoader，那么我们再看来看看createClassLoader的代码：</p>
+<pre><code class="java">private WebappClassLoader createClassLoader()
+    throws Exception {
+
+// classLoader是WebappLoader的实例变量，其值为org.apache.catalina.loader.WebappClassLoader，其实就是通过反射调用了WebappClassLoader的构造函数，然后传递了sharedLoader作为其父亲加载器。
+    Class&lt;?&gt; clazz = Class.forName(loaderClass);
+    WebappClassLoader classLoader = null;
+
+    if (parentClassLoader == null) {
+        parentClassLoader = container.getParentClassLoader();
+    }
+    Class&lt;?&gt;[] argTypes = { ClassLoader.class };
+    Object[] args = { parentClassLoader };
+    Constructor&lt;?&gt; constr = clazz.getConstructor(argTypes);
+    classLoader = (WebappClassLoader) constr.newInstance(args);
+
+    return classLoader;
+
+}
+</code></pre>
+<p>进一步来分析一下WebAppClassLoader的代码，在Java自定义类加载器，一般情况下，我们只需要重写findClass方法就好了，而对于WebAppClassLoader，通过查看源代码，我们发现loadClass和findClass方法都进行了重写，那么我们首先就来看看它的loadClass方法,它的代码如下：</p>
+<pre><code class="java">public synchronized Class&lt;?&gt; loadClass(String name, boolean resolve)
+    throws ClassNotFoundException {
+
+    if (log.isDebugEnabled())
+        log.debug(&quot;loadClass(&quot; + name + &quot;, &quot; + resolve + &quot;)&quot;);
+    Class&lt;?&gt; clazz = null;
+
+    // Log access to stopped classloader
+    if (!started) {
+        try {
+            throw new IllegalStateException();
+        } catch (IllegalStateException e) {
+            log.info(sm.getString(&quot;webappClassLoader.stopped&quot;, name), e);
+        }
+    }
+
+    // (0) Check our previously loaded local class cache
+    // 首先从当前ClassLoader的本地缓存中加载类，如果找到则返回。
+    clazz = findLoadedClass0(name);
+    if (clazz != null) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Returning class from cache&quot;);
+        if (resolve)
+            resolveClass(clazz);
+        return (clazz);
+    }
+
+    // (0.1) Check our previously loaded class cache
+    // 在本地缓存没有的情况下，调用ClassLoader的findLoadedClass方法查看jvm是否已经加载过此类，如果已经加载则直接返回。
+    clazz = findLoadedClass(name);
+    if (clazz != null) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Returning class from cache&quot;);
+        if (resolve)
+            resolveClass(clazz);
+        return (clazz);
+    }
+
+    // (0.2) Try loading the class with the system class loader, to prevent
+    //       the webapp from overriding J2SE classes
+    // 通过系统的来加载器加载此类，这里防止应用写的类覆盖了J2SE的类,这句代码非常关键，如果不写的话，就会造成你自己写的类有可能会把J2SE的类给替换调，另外假如你写了一个javax.servlet.Servlet类，放在当前应用的WEB-INF/class中，如果没有此句代码的保证，那么你自己写的类就会替换到Tomcat容器Lib中包含的类。
+    try {
+        clazz = system.loadClass(name);
+        if (clazz != null) {
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+    } catch (ClassNotFoundException e) {
+        // Ignore
+    }
+
+    // (0.5) Permission to access this class when using a SecurityManager
+    if (securityManager != null) {
+        int i = name.lastIndexOf(&#39;.&#39;);
+        if (i &gt;= 0) {
+            try {
+                securityManager.checkPackageAccess(name.substring(0,i));
+            } catch (SecurityException se) {
+                String error = &quot;Security Violation, attempt to use &quot; +
+                    &quot;Restricted Class: &quot; + name;
+                log.info(error, se);
+                throw new ClassNotFoundException(error, se);
+            }
+        }
+    }
+
+    // 判断是否需要委托给父类加载器进行加载，delegate属性默认为false，那么delegatedLoad的值就取决于filter的返回值了，filter方法中根据包名来判断是否需要进行委托加载，默认情况下会返回false.因此delegatedLoad为false
+    boolean delegateLoad = delegate || filter(name);
+
+    // (1) Delegate to our parent if requested
+    // 因为delegatedLoad为false,那么此时不会委托父加载器去加载，这里其实是没有遵循parent-first的加载机制。
+    if (delegateLoad) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Delegating to parent classloader1 &quot; + parent);
+        ClassLoader loader = parent;
+        if (loader == null)
+            loader = system;
+        try {
+            clazz = Class.forName(name, false, loader);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug(&quot;  Loading class from parent&quot;);
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+    }
+
+    // (2) Search local repositories
+    if (log.isDebugEnabled())
+        log.debug(&quot;  Searching local repositories&quot;);
+    // 调用findClass方法在webapp级别进行加载
+    try {
+        clazz = findClass(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug(&quot;  Loading class from local repository&quot;);
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+    } catch (ClassNotFoundException e) {
+        // Ignore
+    }
+
+    // (3) Delegate to parent unconditionally
+    // 如果还是没有加载到类，并且不采用委托机制的话，则通过父类加载器去加载。
+    if (!delegateLoad) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Delegating to parent classloader at end: &quot; + parent);
+        ClassLoader loader = parent;
+        if (loader == null)
+            loader = system;
+        try {
+            clazz = Class.forName(name, false, loader);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug(&quot;  Loading class from parent&quot;);
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+    }
+
+    throw new ClassNotFoundException(name);
+
+}
+</code></pre>
+<p>接着在来分析一下findClass，通过分析findClass的代码，最终会调用org.apache.catalina.loader.WebappClassLoader#findClassInternal方法，那我们就来分析一下它的代码：</p>
+<pre><code class="java">protected Class&lt;?&gt; findClassInternal(String name)
+    throws ClassNotFoundException {
+
+    //
+    if (!validate(name))
+        throw new ClassNotFoundException(name);
+
+    String tempPath = name.replace(&#39;.&#39;, &#39;/&#39;);
+    String classPath = tempPath + &quot;.class&quot;;
+
+    ResourceEntry entry = null;
+
+    if (securityManager != null) {
+        PrivilegedAction&lt;ResourceEntry&gt; dp =
+            new PrivilegedFindResourceByName(name, classPath);
+        entry = AccessController.doPrivileged(dp);
+    } else {
+        // 通过名称去当前webappClassLoader的仓库中查找对应的类文件
+        entry = findResourceInternal(name, classPath);
+    }
+
+    if (entry == null)
+        throw new ClassNotFoundException(name);
+
+    Class&lt;?&gt; clazz = entry.loadedClass;
+    if (clazz != null)
+        return clazz;
+
+    synchronized (this) {
+        clazz = entry.loadedClass;
+        if (clazz != null)
+            return clazz;
+
+        if (entry.binaryContent == null)
+            throw new ClassNotFoundException(name);
+
+        try {
+            // 将找到的类文件通过defineClass转变为Jvm可以识别的Class对象返回
+            clazz = defineClass(name, entry.binaryContent, 0,
+                    entry.binaryContent.length,
+                    new CodeSource(entry.codeBase, entry.certificates));
+        } catch (UnsupportedClassVersionError ucve) {
+            throw new UnsupportedClassVersionError(
+                    ucve.getLocalizedMessage() + &quot; &quot; +
+                    sm.getString(&quot;webappClassLoader.wrongVersion&quot;,
+                            name));
+        }
+        entry.loadedClass = clazz;
+        entry.binaryContent = null;
+        entry.source = null;
+        entry.codeBase = null;
+        entry.manifest = null;
+        entry.certificates = null;
+    }
+
+    return clazz;
+
+}
+</code></pre>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/15/tomcat-classloader/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/15/tomcat-classloader/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/14/classloader-classpath-hell/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

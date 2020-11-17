@@ -3,8 +3,532 @@
   
     
     <entry>
+      <title><![CDATA[tomcat classloader源码详解]]></title>
+      <url>/2020/11/15/tomcat-classloader/</url>
+      <content type="html"><![CDATA[<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><pre><code class="java">public void init() throws Exception {
+
+        // 初始化，后文会说这个方法
+        initClassLoaders();
+
+        // 设置线程类加载器
+        Thread.currentThread().setContextClassLoader(catalinaLoader);
+
+        SecurityClassLoad.securityClassLoad(catalinaLoader);
+
+        // Load our startup class and call its process() method
+        // 通过之前初始化的classloader反射实例化Catalina类的实例
+        Class&lt;?&gt; startupClass =
+            catalinaLoader.loadClass
+            (&quot;org.apache.catalina.startup.Catalina&quot;);
+        Object startupInstance = startupClass.newInstance();
+        // Set the shared extensions class loader
+        if (log.isDebugEnabled())
+            log.debug(&quot;Setting startup class properties&quot;);
+        String methodName = &quot;setParentClassLoader&quot;;
+        Class&lt;?&gt; paramTypes[] = new Class[1];
+        paramTypes[0] = Class.forName(&quot;java.lang.ClassLoader&quot;);
+        Object paramValues[] = new Object[1];
+        paramValues[0] = sharedLoader;
+        Method method =
+            startupInstance.getClass().getMethod(methodName, paramTypes);
+
+        // Catalina#setParentClassLoader为sharedLoader
+        // 因为sharedLoader默认就是commonloader
+        // 当然Catalina默认也是commonloader
+        // 为啥不直接设置成commonclassloader呢？
+        // 因为webappclassloader会把自己的parentclassloader设置成Catalina的ParentClassLoader
+        // 注意是Catalina对象的爹是sharedLoader
+        // catalinaLoader的爹仍旧是commonloader
+        // 为啥这样？Catalina对象由catalinaLoader加载，Catalina对象的爹是sharedLoader，catalinaLoader的爹却是commonloader？ 求解
+        method.invoke(startupInstance, paramValues);
+
+        catalinaDaemon = startupInstance;
+
+    }
+</code></pre>
+<p>initClassLoader()方法：</p>
+<pre><code class="java">private void initClassLoaders() {
+        try {
+            // 默认情况下common.loader是有值的
+            // common.loader=&quot;${catalina.base}/lib&quot;,&quot;${catalina.base}/lib/*.jar&quot;,&quot;${catalina.home}/lib&quot;,&quot;${catalina.home}/lib/*.jar&quot;
+            commonLoader = createClassLoader(&quot;common&quot;, null);
+            if( commonLoader == null ) {
+                // no config file, default to this loader - we might be in a &#39;single&#39; env.
+                commonLoader = this.getClass().getClassLoader();
+            }
+            // catalinaLoader和sharedLoader实际上有共同的父类加载器commonLoader
+            // 而如果server.loader, shared.loader为空
+            // 那么此时的catalinaLoader,sharedLoader其实是同一个ClassLoader ———— commonclassloader
+            catalinaLoader = createClassLoader(&quot;server&quot;, commonLoader);
+            sharedLoader = createClassLoader(&quot;shared&quot;, commonLoader);
+        } catch (Throwable t) {
+            log.error(&quot;Class loader creation threw exception&quot;, t);
+            System.exit(1);
+        }
+}
+</code></pre>
+<p>createClassLoader()方法：</p>
+<pre><code class="java">private ClassLoader createClassLoader(String name, ClassLoader parent) throws Exception {
+
+    String value = CatalinaProperties.getProperty(name + &quot;.loader&quot;);
+    // 判断如果catalina.properties中没有配置对应的loader属性的话，直接返回父加载器
+    // 而默认情况下，server.loader, shared.loader为空，那么此时的catalinaLoader,sharedLoader其实是同一个ClassLoader ————commonloader
+    if ((value == null) || (value.equals(&quot;&quot;)))
+        return parent;
+
+    value = replace(value);
+
+    List&lt;Repository&gt; repositories = new ArrayList&lt;Repository&gt;();
+
+    StringTokenizer tokenizer = new StringTokenizer(value, &quot;,&quot;);
+    while (tokenizer.hasMoreElements()) {
+        String repository = tokenizer.nextToken().trim();
+        if (repository.length() == 0) {
+            continue;
+        }
+
+        // Check for a JAR URL repository
+        try {
+            @SuppressWarnings(&quot;unused&quot;)
+            URL url = new URL(repository);
+            repositories.add(
+                    new Repository(repository, RepositoryType.URL));
+            continue;
+        } catch (MalformedURLException e) {
+            // Ignore
+        }
+
+        // Local repository
+        if (repository.endsWith(&quot;*.jar&quot;)) {
+            repository = repository.substring
+                (0, repository.length() - &quot;*.jar&quot;.length());
+            repositories.add(
+                    new Repository(repository, RepositoryType.GLOB));
+        } else if (repository.endsWith(&quot;.jar&quot;)) {
+            repositories.add(
+                    new Repository(repository, RepositoryType.JAR));
+        } else {
+            repositories.add(
+                    new Repository(repository, RepositoryType.DIR));
+        }
+    }
+    //这里返回的是一个UrlClassLoader实例
+    //最终调用org.apache.catalina.startup.ClassLoaderFactory#createClassLoader静态工厂方法创建了URLClassloader的实例
+    //而具体的URL其实就是*.loader属性配置的内容
+    ClassLoader classLoader = ClassLoaderFactory.createClassLoader
+        (repositories, parent);
+
+
+    return classLoader;
+
+}
+</code></pre>
+<p>查看org.apache.catalina.startup.Catalina#getParentClassLoader调用栈，我们看到在StandardContext的startInternal方法中调用了它，那么我们查看一下它的代码，包含了如下代码片段：</p>
+<pre><code class="java">if (getLoader() == null) {
+    // 初始化WebappLoader，把他的爹设置为sharedloader
+            WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
+            webappLoader.setDelegate(getDelegate());
+            setLoader(webappLoader);
+}
+try {
+
+    if (ok) {
+
+        // Start our subordinate components, if any
+        if ((loader != null) &amp;&amp; (loader instanceof Lifecycle))
+            ((Lifecycle) loader).start();
+        //other code    
+    }
+catch(Exception e){
+}
+</code></pre>
+<p>因为WebappLoader符合Tomcat组件生命周期管理的模板方法模式，因此会调用到它的startInternal方法。我们接下来就来看看WebappLoader的startInternal，我们摘取一部分与本篇相关的代码片段如下：</p>
+<pre><code class="java">classLoader = createClassLoader();
+classLoader.setResources(container.getResources());
+// 设置是否配置委派模式
+classLoader.setDelegate(this.delegate);
+classLoader.setSearchExternalFirst(searchExternalFirst);
+</code></pre>
+<p>从上的代码可以看到调用了createClassLoader方法创建一个classLoader，那么我们再看来看看createClassLoader的代码：</p>
+<pre><code class="java">private WebappClassLoader createClassLoader()
+    throws Exception {
+
+// classLoader是WebappLoader的实例变量，其值为org.apache.catalina.loader.WebappClassLoader，其实就是通过反射调用了WebappClassLoader的构造函数，然后传递了sharedLoader作为其父亲加载器。
+    Class&lt;?&gt; clazz = Class.forName(loaderClass);
+    WebappClassLoader classLoader = null;
+
+    if (parentClassLoader == null) {
+        parentClassLoader = container.getParentClassLoader();
+    }
+    Class&lt;?&gt;[] argTypes = { ClassLoader.class };
+    Object[] args = { parentClassLoader };
+    Constructor&lt;?&gt; constr = clazz.getConstructor(argTypes);
+    classLoader = (WebappClassLoader) constr.newInstance(args);
+
+    return classLoader;
+
+}
+</code></pre>
+<p>进一步来分析一下WebAppClassLoader的代码，在Java自定义类加载器，一般情况下，我们只需要重写findClass方法就好了，而对于WebAppClassLoader，通过查看源代码，我们发现loadClass和findClass方法都进行了重写，那么我们首先就来看看它的loadClass方法,它的代码如下：</p>
+<pre><code class="java">public synchronized Class&lt;?&gt; loadClass(String name, boolean resolve)
+    throws ClassNotFoundException {
+
+    if (log.isDebugEnabled())
+        log.debug(&quot;loadClass(&quot; + name + &quot;, &quot; + resolve + &quot;)&quot;);
+    Class&lt;?&gt; clazz = null;
+
+    // Log access to stopped classloader
+    if (!started) {
+        try {
+            throw new IllegalStateException();
+        } catch (IllegalStateException e) {
+            log.info(sm.getString(&quot;webappClassLoader.stopped&quot;, name), e);
+        }
+    }
+
+    // (0) Check our previously loaded local class cache
+    // 首先从当前ClassLoader的本地缓存中加载类，如果找到则返回。
+    clazz = findLoadedClass0(name);
+    if (clazz != null) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Returning class from cache&quot;);
+        if (resolve)
+            resolveClass(clazz);
+        return (clazz);
+    }
+
+    // (0.1) Check our previously loaded class cache
+    // 在本地缓存没有的情况下，调用ClassLoader的findLoadedClass方法查看jvm是否已经加载过此类，如果已经加载则直接返回。
+    clazz = findLoadedClass(name);
+    if (clazz != null) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Returning class from cache&quot;);
+        if (resolve)
+            resolveClass(clazz);
+        return (clazz);
+    }
+
+    // (0.2) Try loading the class with the system class loader, to prevent
+    //       the webapp from overriding J2SE classes
+    // 通过系统的来加载器加载此类，这里防止应用写的类覆盖了J2SE的类,这句代码非常关键，如果不写的话，就会造成你自己写的类有可能会把J2SE的类给替换调，另外假如你写了一个javax.servlet.Servlet类，放在当前应用的WEB-INF/class中，如果没有此句代码的保证，那么你自己写的类就会替换到Tomcat容器Lib中包含的类。
+    try {
+        clazz = system.loadClass(name);
+        if (clazz != null) {
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+    } catch (ClassNotFoundException e) {
+        // Ignore
+    }
+
+    // (0.5) Permission to access this class when using a SecurityManager
+    if (securityManager != null) {
+        int i = name.lastIndexOf(&#39;.&#39;);
+        if (i &gt;= 0) {
+            try {
+                securityManager.checkPackageAccess(name.substring(0,i));
+            } catch (SecurityException se) {
+                String error = &quot;Security Violation, attempt to use &quot; +
+                    &quot;Restricted Class: &quot; + name;
+                log.info(error, se);
+                throw new ClassNotFoundException(error, se);
+            }
+        }
+    }
+
+    // 判断是否需要委托给父类加载器进行加载，delegate属性默认为false，那么delegatedLoad的值就取决于filter的返回值了，filter方法中根据包名来判断是否需要进行委托加载，默认情况下会返回false.因此delegatedLoad为false
+    boolean delegateLoad = delegate || filter(name);
+
+    // (1) Delegate to our parent if requested
+    // 因为delegatedLoad为false,那么此时不会委托父加载器去加载，这里其实是没有遵循parent-first的加载机制。
+    if (delegateLoad) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Delegating to parent classloader1 &quot; + parent);
+        ClassLoader loader = parent;
+        if (loader == null)
+            loader = system;
+        try {
+            clazz = Class.forName(name, false, loader);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug(&quot;  Loading class from parent&quot;);
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+    }
+
+    // (2) Search local repositories
+    if (log.isDebugEnabled())
+        log.debug(&quot;  Searching local repositories&quot;);
+    // 调用findClass方法在webapp级别进行加载
+    try {
+        clazz = findClass(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug(&quot;  Loading class from local repository&quot;);
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+    } catch (ClassNotFoundException e) {
+        // Ignore
+    }
+
+    // (3) Delegate to parent unconditionally
+    // 如果还是没有加载到类，并且不采用委托机制的话，则通过父类加载器去加载。
+    if (!delegateLoad) {
+        if (log.isDebugEnabled())
+            log.debug(&quot;  Delegating to parent classloader at end: &quot; + parent);
+        ClassLoader loader = parent;
+        if (loader == null)
+            loader = system;
+        try {
+            clazz = Class.forName(name, false, loader);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug(&quot;  Loading class from parent&quot;);
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+    }
+
+    throw new ClassNotFoundException(name);
+
+}
+</code></pre>
+<p>接着在来分析一下findClass，通过分析findClass的代码，最终会调用org.apache.catalina.loader.WebappClassLoader#findClassInternal方法，那我们就来分析一下它的代码：</p>
+<pre><code class="java">protected Class&lt;?&gt; findClassInternal(String name)
+    throws ClassNotFoundException {
+
+    //
+    if (!validate(name))
+        throw new ClassNotFoundException(name);
+
+    String tempPath = name.replace(&#39;.&#39;, &#39;/&#39;);
+    String classPath = tempPath + &quot;.class&quot;;
+
+    ResourceEntry entry = null;
+
+    if (securityManager != null) {
+        PrivilegedAction&lt;ResourceEntry&gt; dp =
+            new PrivilegedFindResourceByName(name, classPath);
+        entry = AccessController.doPrivileged(dp);
+    } else {
+        // 通过名称去当前webappClassLoader的仓库中查找对应的类文件
+        entry = findResourceInternal(name, classPath);
+    }
+
+    if (entry == null)
+        throw new ClassNotFoundException(name);
+
+    Class&lt;?&gt; clazz = entry.loadedClass;
+    if (clazz != null)
+        return clazz;
+
+    synchronized (this) {
+        clazz = entry.loadedClass;
+        if (clazz != null)
+            return clazz;
+
+        if (entry.binaryContent == null)
+            throw new ClassNotFoundException(name);
+
+        try {
+            // 将找到的类文件通过defineClass转变为Jvm可以识别的Class对象返回
+            clazz = defineClass(name, entry.binaryContent, 0,
+                    entry.binaryContent.length,
+                    new CodeSource(entry.codeBase, entry.certificates));
+        } catch (UnsupportedClassVersionError ucve) {
+            throw new UnsupportedClassVersionError(
+                    ucve.getLocalizedMessage() + &quot; &quot; +
+                    sm.getString(&quot;webappClassLoader.wrongVersion&quot;,
+                            name));
+        }
+        entry.loadedClass = clazz;
+        entry.binaryContent = null;
+        entry.source = null;
+        entry.codeBase = null;
+        entry.manifest = null;
+        entry.certificates = null;
+    }
+
+    return clazz;
+
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> classLoader </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> classLoader </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[classloader详解]]></title>
+      <url>/2020/11/14/classloader-classpath-hell/</url>
+      <content type="html"><![CDATA[<h2 id="类加载的顺序"><a href="#类加载的顺序" class="headerlink" title="类加载的顺序"></a>类加载的顺序</h2><p><img src="https://s3.ax1x.com/2020/11/17/DVLBkt.png" alt="DVLBkt.png"></p>
+<p>六种情况必须立即对类进行“初始化”(而加载、验证、准备自然需要在此之 前开始):</p>
+<ul>
+<li>遇到new、getstatic、putstatic或invokestatic这四条字节码指令时，如果类型没有进行过初始 化，则需要先触发其初始化阶段。能够生成这四条指令的典型Java代码场景有:<ul>
+<li>使用new关键字实例化对象的时候。</li>
+<li>读取或设置一个类型的静态字段(被final修饰、已在编译期把结果放入常量池的静态字段除外)<br>的时候。</li>
+<li>调用一个类型的静态方法的时候。</li>
+</ul>
+</li>
+<li>使用java.lang.reflect包的方法对类型进行反射调用的时候，如果类型没有进行过初始化，则需 要先触发其初始化。</li>
+<li>当初始化类的时候，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</li>
+<li>当虚拟机启动时，用户需要指定一个要执行的主类(包含main()方法的那个类)，虚拟机会先初始化这个主类。</li>
+<li>当使用JDK 7新加入的动态语言支持时，如果一个java.lang.invoke.MethodHandle实例最后的解 析结果为REF_getStatic、REF_putStatic、REF_invokeStatic、REF_newInvokeSpecial四种类型的方法句柄，并且这个方法句柄对应的类没有进行过初始化，则需要先触发其初始化。</li>
+<li>当一个接口中定义了JDK 8新加入的默认方法(被default关键字修饰的接口方法)时，如果有这个接口的实现类发生了初始化，那该接口要在其之前被初始化。</li>
+</ul>
+<p><code>static{}</code>代码块会执行<code>&lt;clinit&gt;()</code>，并在方法构造器<code>&lt;init&gt;()</code>之前执行，注意<code>static{}</code>可以访问和赋值在他之前生命的静态变量，但对于其后生命的变量只能赋值，不能访问。父类永远先于子类执行。</p>
+<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>对于任意一个类，都必须由加载它的类加载器和这个类本身一起共同确立其在Java虚拟机中的唯一性。即，比较两个类是否“相等”，只有在这两个类是由同一个类加载器加载的前提下才有意义，否则，即使这两个类来源于同一个Class文件，被同一个Java虚拟机加载，只要加载它们的类加载器不同，那这两个类就必定不相等。</p>
+<h3 id="双亲委派"><a href="#双亲委派" class="headerlink" title="双亲委派"></a>双亲委派</h3><p>站在Java虚拟机的角度来看，只存在两种不同的类加载器:</p>
+<ul>
+<li>一种是启动类加载器(Bootstrap ClassLoader)，这个类加载器使用C++语言实现，是虚拟机自身的一部分;</li>
+<li>另外一种就是其他所有 的类加载器，这些类加载器都由Java语言实现，独立存在于虚拟机外部，并且全都继承自抽象类 java.lang.ClassLoader。</li>
+</ul>
+<p>站在Java开发者的角度来说，绝大多数Java程序都会使用到以下3个系统提供的类加载器来进行加载：</p>
+<ul>
+<li>启动类加载器(Bootstrap Class Loader):前面已经介绍过，这个类加载器负责加载存放在<code>&lt;JAVA_HOME&gt;\lib</code>目录，或者被<code>-Xbootclasspath</code>参数所指定的路径中存放的，而且是Java虚拟机能够识别的(按照文件名识别，如rt.jar、tools.jar，名字不符合的类库即使放在lib目录中也不会被加载)类库加载到虚拟机的内存中。启动类加载器无法被Java程序直接引用，用户在编写自定义类加载器时，如果需要把加载请求委派给引导类加载器去处理，那直接使用null代替即可。</li>
+<li>扩展类加载器(Extension Class Loader):这个类加载器是在类<code>sun.misc.Launcher$ExtClassLoader</code>以Java代码的形式实现的。它负责加载<code>&lt;JAVA_HOM E&gt;\lib\ext</code>目录中，或者被<code>java.ext.dirs</code>系统变量所 指定的路径中所有的类库。根据“扩展类加载器”这个名称，就可以推断出这是一种Java系统类库的扩展机制，JDK的开发团队允许用户将具有通用性的类库放置在ext目录里以扩展Java SE的功能，在JDK 9之后，这种扩展机制被模块化带来的天然的扩展能力所取代。由于扩展类加载器是由Java代码实现的，开发者可以直接在程序中使用扩展类加载器来加载Class文件。</li>
+<li>应用程序类加载器(Application Class Loader):这个类加载器由<br><code>sun.misc.Launcher$AppClassLoader</code>来实现。由于应用程序类加载器是ClassLoader类中的<code>getSystemClassLoader()</code>方法的返回值，所以也称它为“系统类加载器”。它负责加载用户类路径(ClassPath)上所有的类库，开发者同样可以直接在代码中使用这个类加载器。如果应用程序中没有自定义过自己的类加载器，一般情况下这个就是程序中默认的类加载器。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZCFu6.png" alt="DZCFu6.png"></p>
+<p>双亲委派模型的工作过程是:如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传送到最顶层的启动类加载器中，只有当父加载器反馈自己无法完成这个加载请求(它的搜索范围中没有找到所需的类)时，子加载器才会尝试自己去完成加载。</p>
+<p>使用双亲委派模型来组织类加载器之间的关系，一个显而易见的好处就是Java中的类随着它的类加载器一起具备了一种带有优先级的层次关系。相同包名的同名类只能在一个类加载器中加载，从而避免混乱。</p>
+<pre><code class="java">protected synchronized Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    // 首先，检查请求的类是否已经被加载过了 
+    Class c = findLoadedClass(name); 
+    if (c == null) {
+        try {
+            if (parent != null) {
+                c = parent.loadClass(name, false);
+            } else {
+            c = findBootstrapClassOrNull(name); }
+        } catch (ClassNotFoundException e) {
+        // 如果父类加载器抛出ClassNotFoundException 
+        // 说明父类加载器无法完成加载请求
+        }
+        if (c == null) {
+            // 在父类加载器无法加载时
+            // 再调用本身的findClass方法来进行类加载 
+            c = findClass(name);
+        } 
+    }
+    if (resolve) { 
+        resolveClass(c);
+    }
+    return c; 
+}
+</code></pre>
+<h3 id="破坏双亲委派"><a href="#破坏双亲委派" class="headerlink" title="破坏双亲委派"></a>破坏双亲委派</h3><h4 id="自定义classloader"><a href="#自定义classloader" class="headerlink" title="自定义classloader"></a>自定义classloader</h4><p>类加载器的概念和抽象类java.lang.ClassLoader无法避免loadClass()被子类覆盖，只能通过protected方法findClass()，并引导用写的类加载逻辑时尽可能去重写这个方法，而不是在loadClass()中编写代码。按照loadClass()方法的逻辑，如果父类加载失败，会自动调用自己的findClass()方法来完成加载，这样既不影响用户按照自己的意愿去加载类，又可以保证新写出来的类加载器是符合双亲委派规则的。</p>
+<h4 id="线程上下文类加载器-Thread-Context-ClassLoader"><a href="#线程上下文类加载器-Thread-Context-ClassLoader" class="headerlink" title="线程上下文类加载器 (Thread Context ClassLoader)"></a>线程上下文类加载器 (Thread Context ClassLoader)</h4><p>以jndi为例：<br>JNDI存在的目的就是对资源进行查找和集中管理，它需要调用由其他厂商实现并部署在应用程 序的ClassPath下的JNDI服务提供者接口(Service Provider Interface，SPI)的代码，但启动类加载器是绝不可能认识、加载这些代码的。</p>
+<p>为了解决这个困境，Java的设计团队只好引入了一个不太优雅的设计:线程上下文类加载器(Thread Context ClassLoader)。这个类加载器可以通过java.lang.Thread类的setContextClassLoader()方法进行设置，如果创建线程时还未设置，它将会从父线程中继承一个，如果在应用程序的全局范围内都没有设置过的话，那这个类加载器默认就是应用程序类加载器。</p>
+<p>如果不做任何的设置，Java 应用的线程的上下文类加载器默认就是系统上下文类加载器。在SPI接口的代码中使用线程上下文类加载器，就可以成功的加载到SPI实现的类。</p>
+<p>JNDI服务使用这个线程上下文类加载器去加载所需的SPI服务代码，这是一种父类加载器去请求子类加载器完成类加载的行为，这种行为实际上是打通了双亲委派模型的层次结构来逆向使用类加载器，已经违背了双亲委派模型的一般性原则。</p>
+<h4 id="OSGi"><a href="#OSGi" class="headerlink" title="OSGi"></a>OSGi</h4><p>OSGi实现模块化热部署的关键是它自定义的类加载器机制的实现，每一个程序模块(OSGi中称为 Bundle)都有一个自己的类加载器，当需要更换一个Bundle时，就把Bundle连同类加载器一起换掉以实 现代码的热替换。在OSGi环境下，类加载器不再双亲委派模型推荐的树状结构，而是进一步发展为更加复杂的网状结构。</p>
+<h4 id="Java9中的模块化"><a href="#Java9中的模块化" class="headerlink" title="Java9中的模块化"></a>Java9中的模块化</h4><p>一篇详细讲解模块化的文章<br><a href="http://seanthefish.com/2018/03/29/module-system/">http://seanthefish.com/2018/03/29/module-system/</a></p>
+<p>jdk9提出了与“类路径”(ClassPath)相对应的“模块路径”(M odulePath)的概念。某个类库到底是模块还是传统的JAR包，只取决于它存放在哪种路径上。只要是放在类路径上的JAR文件，无论其中是否包含模块化信息(是否包含了module-info.class文件)，它都会被当作传统的JAR包来对待;相应地，只 要放在模块路径上的JAR文件，即使没有使用JMOD后缀，甚至说其中并不包含module-info.class文 件，它也仍然会被当作一个模块来对待。</p>
+<ul>
+<li>JAR文件在类路径的访问规则:所有类路径下的JAR文件及其他资源文件，都被视为自动打包在一个匿名模块(Unnamed Module)里，这个匿名模块几乎是没有任何隔离的，它可以看到和使用类路 径上所有的包、JDK系统模块中所有的导出包，以及模块路径上所有模块中导出的包。</li>
+<li>模块在模块路径的访问规则:模块路径下的具名模块(Named Module)只能访问到它依赖定义中列明依赖的模块和包，匿名模块里所有的内容对具名模块来说都是不可见的，即具名模块看不见传统JAR包的内容。</li>
+<li>JAR文件在模块路径的访问规则:如果把一个传统的、不包含模块定义的JAR文件放置到模块路径中，它就会变成一个自动模块(Automatic Module)。尽管不包含module-info.class，但自动模块将默认依赖于整个模块路径中的所有模块，因此可以访问到所有模块导出的包，自动模块也默认导出自己所有的包。</li>
+</ul>
+<p>在模块化的java9中：</p>
+<ul>
+<li>扩展类加载器(Extension Class Loader)被平台类加载器(Platform Class Loader)取代。</li>
+<li>平台类加载器和应用程序类加载器都不再派生自java.net.URLClassLoader，如果有程序直接 依赖了这种继承关系，或者依赖了URLClassLoader类的特定方法，那代码很可能会在JDK 9及更高版 本的JDK中崩溃。</li>
+<li>JDK 9中虽然仍然维持着三层类加载器和双亲委派的架构，但类加载的委派关系也发生了变动。当平台及应用程序类加载器收到类加载请求，在委派给父加载器加载前，要先判断该类是否能够归属到某一个系统模块中，如果可以找到这样的归属关系，就要优先委派给负责那个模块的加载器完成加载。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZZ78S.png" alt="DZZ78S.png"></p>
+<h2 id="tomcat"><a href="#tomcat" class="headerlink" title="tomcat"></a>tomcat</h2><p>Tomcat的类加载机制是违反了双亲委托原则的，对于一些未加载的非基础类(Object,String等)，各个web应用自己的类加载器(WebAppClassLoader)会优先加载，加载不到时再交给commonClassLoader走双亲委托。</p>
+<p>首先要了解的是，tomcat有两中类加载器模式：</p>
+<p>默认情况下：</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZJNi4.png" alt="DZJNi4.png"></p>
+<p>高级模式：</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZJRWd.png" alt="DZJRWd.png"></p>
+<p>根据conf/catalina.properties文件中common.loader，server.loader，shared.loader的值来初始化commonLoader,catalinaLoader,sharedLoader，其中catalinaLoader,sharedLoader的父亲加载器是commonLoader，默认情况下，这3个ClassLoader是同一个实例变量。</p>
+<p>tomcat容器不希望它下面的webapps之间能互相访问到，所以不能用jvm中的appClassLoarder去加载。所以tomcat新建一个sharedClassLoader（它的parent是commonClassLoader，commonClassLoader的parent是jvm中的appClassLoarder，默认情况下，sharedClassLoader和commonClassLoader是同一个UrlClassLoader实例），这是catalina容器使用的ClassLoader。对于每个webapp，为其新建一个webappClassLoader，用于加载webapp下面的类，这样webapp之间就不能相互访问了。tomcat的ClassLoader不完全遵循双亲委派，首先用webappClassLoader去加载某个类，如果找不到，再交给parent。而对于java核心库，不在tomcat的ClassLoader的加载范围。</p>
+<ul>
+<li>commonLoader：Tomcat最基本的类加载器，加载路径（/common/*）中的class可以被Tomcat容器本身以及各个Webapp访问；</li>
+<li>catalinaLoader：Tomcat容器私有的类加载器，加载路径（/server/*）中的class对于Webapp不可见；</li>
+<li>sharedLoader：各个Webapp共享的类加载器，加载路径（/shared/*（在tomcat 6之后已经合并到根目录下的lib目录下））中的class对于所有Webapp可见，但是对于Tomcat容器不可见；</li>
+<li>WebappClassLoader：各个Webapp私有的类加载器，加载路径（/WebApp/WEB-INF/*中的Java类库）中的class只对当前Webapp可见；</li>
+</ul>
+<p>当应用需要到某个类时，默认会按照下面的顺序进行类加载（不使用委派模式）：</p>
+<ul>
+<li>使用bootstrapclassloader加载器加载</li>
+<li>使用webapppclassloader加载器在WEB-INF/classes中加载</li>
+<li>使用webapppclassloader加载器在WEB-INF/lib中加载</li>
+<li>使用appclassloader（systemclassloader）加载器加载</li>
+<li>使用commonclassloader在CATALINA_HOME/lib中加载</li>
+</ul>
+<p>使用委派模式的话（配置<code>&lt;Loader delegate=&quot;true&quot;/&gt;</code>）:</p>
+<ul>
+<li>使用bootstrapclassloader加载器加载</li>
+<li>使用appclassloader（systemclassloader）加载器加载</li>
+<li>使用commonclassloader在CATALINA_HOME/lib中加载</li>
+<li>使用webapppclassloader加载器在WEB-INF/classes中加载</li>
+<li>使用webapppclassloader加载器在WEB-INF/lib中加载</li>
+</ul>
+<h2 id="was"><a href="#was" class="headerlink" title="was"></a>was</h2><p>简单说一下was，直接上图</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZ0PDs.png" alt="DZ0PDs.png"></p>
+<p>was里分为Parent_first和Parent_last模式</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZ03Ux.png" alt="DZ03Ux.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZ0aKH.png" alt="DZ0aKH.png"></p>
+<p>同时在was的appclassloader级别（即为ear）和webmoduleclassloader级别（即为war）都分别具备隔离和共享两种classloader模式。</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZ0LM4.png" alt="DZ0LM4.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZ0vZR.png" alt="DZ0vZR.png"></p>
+<p>Shared Library模式</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZBALd.png" alt="DZBALd.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZBZdI.png" alt="DZBZdI.png"></p>
+<p>独立的shared library模式（有自己的classloader，且必须为PARENT_LAST模式）</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZBJwn.png" alt="DZBJwn.png"></p>
+<p>常见问题：<br>（图片里说的很清楚，故不做多余解释，这些问题也可以引申到其他的服务器中）</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZB0lF.png" alt="DZB0lF.png"><br>Solution:<br> Create a shared library to hold the test1.jar file and associate the shared library with both EAR1 and EAR2.</p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZB46e.png" alt="DZB46e.png"><br>Solution:<br> Place the dependent jars, test3.jar, in the same classloader as test1.jar so that both jar files are loaded by the same class loaderand visible to each other. </p>
+<p><img src="https://s3.ax1x.com/2020/11/17/DZB7TI.png" alt="DZB7TI.png"><br>Solution:<br> Set the application class loader mode to parent_last so the correct version from the EAR file to be picked up first.<br> Or remove the duplicate class (wrong version) from the shared library.</p>
+<p>又想起了曾经被was支配的恐惧。<br>打fatjar还是最简单有效的。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> classLoader </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> classLoader </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[gc调优]]></title>
-      <url>/2020/11/12/improve-gc/</url>
+      <url>/2020/11/13/improve-gc/</url>
       <content type="html"><![CDATA[<p>先贴个图</p>
 <p><img src="https://s3.ax1x.com/2020/11/16/DAwfZ6.png" alt="DAwfZ6.png"></p>
 <h2 id="如何阅读gclog："><a href="#如何阅读gclog：" class="headerlink" title="如何阅读gclog："></a>如何阅读gclog：</h2><p>以其中一行为例来解读下日志信息：</p>
@@ -195,41 +719,6 @@
 <li>虚引用(Phantom references) —— 请确保在程序中调用了虚引用的 clear 方法。编程中很容易忽略某些虚引用, 或者清理的速度跟不上生产的速度, 又或者清除引用队列的线程挂了, 就会对GC 造成很大压力, 最终可能引起 OutOfMemoryError。</li>
 <li>软引用(Soft references) —— 如果确定问题的根源是软引用, 唯一的解决办法是修改程序源码, 改变内部实现逻辑。</li>
 </ul>
-]]></content>
-      
-        <categories>
-            
-            <category> k8s </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> k8s </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[k8s中的jvm]]></title>
-      <url>/2020/11/12/jvm-in-container/</url>
-      <content type="html"><![CDATA[<p>最近遇到了Java应用在k8s中频繁重启的问题，记录一下。</p>
-<p>起因是因为一个bug，使我们的一个请求会大量申请许多新空对象，但这些空对象并没有被即使的回收，直接导致了pod级别的oomkille，或者直接被驱逐，于是开始了调查。</p>
-<p>在Java 8u131和Java 9之前，JVM不能识别容器设置的内存或cpu限制。所以按照jvm的管理，最大堆的大小会设置为虚拟机内存的四分之一。我们当前node使用的虚拟机是64g的，因此xmx就被设置为了16g，但是我们并没有在pod中做memory limits的限制，当前node上又跑了许多其他的应用，这导致k8s无法给pod申请足够的内存，jvm的堆大小冲破了pod的实际可分配内存，直接被oomkilled并重启。被干掉的pod会留下一个Evicted状态的尸体，但这个pod尸体里没有events可以看，这增加了debug的难度。</p>
-<p>仅仅在pod层面增加memory limits并不能解决问题，我们的jvm无法感知到容器的内存变化，仍旧以虚拟机内存的四分之一来设置最大堆的大小。<br>我们确实可以通过简单设置xmx和pod的resource limits来解决，但是并不优雅，应用资源与容器资源强耦合，忘改一处即可能带来灾难。因此我们来探索下有没有其他方式。</p>
-<p>Java 8u131首先实现了称为的实验功能UseCGroupMemoryLimitForHeap。这是第一次尝试，但存在缺陷，为应用添加UnlockExperimentalVMOptions和UseCGroupMemoryLimitForHeap参数后，jvm确实可以感知到容器内存，并控制应用的实际堆大小。但是这并没有充分利用我们为容器分配的内存，jvm提供-XX:MaxRAMFraction标志来帮助更好的计算堆大小。</p>
-<p>MaxRAMFraction默认值是4（即除以4），但不幸的是，它是一个分数，而不是一个百分比，因此很难设置一个能有效利用可用内存的值，但是为什么我们不设置MaxRAMFraction为1，使其使用100％的可用内存呢？因为容器中可能正在运行其他进程，或者一些通过shell链接到容器的工具。</p>
-<p>Java 10附带了对容器环境的更好支持。如果你在Linux容器中运行Java应用程序，JVM将使用该UseContainerSupport选项自动检测内存限制。然后，您可以控制以下选项，InitialRAMPercentage，MaxRAMPercentage和MinRAMPercentage。这时，我们使用的是百分比而不是分数，这将更加准确。而这几个参数已经向下移植到Java 8u191。</p>
-<p>UseContainerSupport默认情况下是激活的。MaxRAMPercentage是25%，MinRAMPercentage是50%。这里min竟然比max大，不知道为啥。<br>我们可以设置-XX:MinRAMPercentage=50.0，-XX:MaxRAMPercentage=80.0来是我们的应用感知，并充分利用pod的resource limits。<br>需要注意的是，UseCGroupMemoryLimitForHeap虽然仍可以在最新版本的Java8中使用，但是已经被视为弃用的参数了。</p>
-<p>此外，在docker容器中运行JVM时，使用HeapDumpOnOutOfMemoryError参数可能是一个更明智的选择，因为，如果内存不足，jvm会将堆内存转储写入磁盘。默认情况下，堆内存会转储到VM的工作目录中的一个名为java_pid.hprof的文件中。您可以使用-XX:HeapDumpPath=来指定备用文件名或目录。例如，-XX:HeapDumpPath=/disk2/dumps将在/disk2/dumps目录中生成堆转储文件。请确保Java进程对堆转储的目录具有写入的访问权限。<br>接着在说一下cpu，pod可以给cpu的limits的限制，来确保pod可以调度到几个cpu核心，而jvm会根据cpu的核心数来设置是否使用ParallelGC，以及几个ParallelGCThreads。</p>
-<p>但是如果我们不为pod设置cpu限制的话，jvm也并不能感知到虚拟机所有的可用cpu，而是认为只有一核，并关闭ParallelGC功能。因此在我们需要ParallelGC功能时，我们最好还设置cpu的限制。</p>
-<p>而且通过查阅一些资料，发现cpu核数对jvm的工作线程也有着影响。<code>Runtime.getRuntime().availableProcessors()</code>，这段的代码常用于Java库，它会根据CPU的个数产生工作线程。如果没有正确设置docker中的参数，对实际的程序性能会产生很大的影响。availableProcessors就是根据核数而定的。</p>
-<p>题外话：<br>一个完整的jdk对gc和jvm问题的排查十分重要。jinfo，jstat都是十分有用的工具，并且学会看gclog也十分重要。</p>
-<p>一个小细节，我一直认为java -XX:+PrintFlagsFinal打印出的内容就是实际应用所在jvm进程的环境变量，但事实上，java -XX:+PrintFlagsFinal会单独建立一个进程，你打印出的东西都是这个命令所在进程的变量，而不是应用所在进程的变量。正确排查应用所在的jvm的进程的jvm变量还得用jinfo。</p>
-<p>此外，我们安装了阿里的Arthas来进行jvm故障的排查，很有用。但考虑到有的时候我们也想在生产环境安装Arthas，但是不希望为生产环境的应用安装完整的jdk，怎么办？可以使用sidecar的方式来安装Arthas，然后通过shareProcessNamespace: true参数来在pod中share不同容器里的进程，这样sidecar里的Arthas就可以attach到你应用的pid了。详见：<a href="https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。" target="_blank" rel="noopener">https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。</a></p>
-<p>先说到这，下回总结下gc的问题。</p>
 ]]></content>
       
         <categories>
@@ -445,6 +934,41 @@
 <h3 id="ZGC收集器"><a href="#ZGC收集器" class="headerlink" title="ZGC收集器"></a>ZGC收集器</h3><p>ZGC收集器是一款基于Region内存布局的，(暂时) 不设分代的，使用了读屏障、染色指针和内存多重映射等技术来实现可并发的标记-整理算法的，以低延迟为首要目标的一款垃圾收集器。接下来，笔者将逐项来介绍ZGC的这些技术特点。</p>
 <p>（有点复杂，不展开了，记住Region分为大中小，整个收集过程都全程可并发，短暂停顿也只与GC Roots大小相关而与堆内存大小无关，完全没有使用记忆集，它甚至连分代都没有，不需要维护记忆集的写屏障，而用读屏障）</p>
 <h2 id="gc调优"><a href="#gc调优" class="headerlink" title="gc调优"></a>gc调优</h2><p>单开一篇文章说吧，这一篇太长了</p>
+]]></content>
+      
+        <categories>
+            
+            <category> k8s </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> k8s </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[k8s中的jvm]]></title>
+      <url>/2020/11/11/jvm-in-container/</url>
+      <content type="html"><![CDATA[<p>最近遇到了Java应用在k8s中频繁重启的问题，记录一下。</p>
+<p>起因是因为一个bug，使我们的一个请求会大量申请许多新空对象，但这些空对象并没有被即使的回收，直接导致了pod级别的oomkille，或者直接被驱逐，于是开始了调查。</p>
+<p>在Java 8u131和Java 9之前，JVM不能识别容器设置的内存或cpu限制。所以按照jvm的管理，最大堆的大小会设置为虚拟机内存的四分之一。我们当前node使用的虚拟机是64g的，因此xmx就被设置为了16g，但是我们并没有在pod中做memory limits的限制，当前node上又跑了许多其他的应用，这导致k8s无法给pod申请足够的内存，jvm的堆大小冲破了pod的实际可分配内存，直接被oomkilled并重启。被干掉的pod会留下一个Evicted状态的尸体，但这个pod尸体里没有events可以看，这增加了debug的难度。</p>
+<p>仅仅在pod层面增加memory limits并不能解决问题，我们的jvm无法感知到容器的内存变化，仍旧以虚拟机内存的四分之一来设置最大堆的大小。<br>我们确实可以通过简单设置xmx和pod的resource limits来解决，但是并不优雅，应用资源与容器资源强耦合，忘改一处即可能带来灾难。因此我们来探索下有没有其他方式。</p>
+<p>Java 8u131首先实现了称为的实验功能UseCGroupMemoryLimitForHeap。这是第一次尝试，但存在缺陷，为应用添加UnlockExperimentalVMOptions和UseCGroupMemoryLimitForHeap参数后，jvm确实可以感知到容器内存，并控制应用的实际堆大小。但是这并没有充分利用我们为容器分配的内存，jvm提供-XX:MaxRAMFraction标志来帮助更好的计算堆大小。</p>
+<p>MaxRAMFraction默认值是4（即除以4），但不幸的是，它是一个分数，而不是一个百分比，因此很难设置一个能有效利用可用内存的值，但是为什么我们不设置MaxRAMFraction为1，使其使用100％的可用内存呢？因为容器中可能正在运行其他进程，或者一些通过shell链接到容器的工具。</p>
+<p>Java 10附带了对容器环境的更好支持。如果你在Linux容器中运行Java应用程序，JVM将使用该UseContainerSupport选项自动检测内存限制。然后，您可以控制以下选项，InitialRAMPercentage，MaxRAMPercentage和MinRAMPercentage。这时，我们使用的是百分比而不是分数，这将更加准确。而这几个参数已经向下移植到Java 8u191。</p>
+<p>UseContainerSupport默认情况下是激活的。MaxRAMPercentage是25%，MinRAMPercentage是50%。这里min竟然比max大，不知道为啥。<br>我们可以设置-XX:MinRAMPercentage=50.0，-XX:MaxRAMPercentage=80.0来是我们的应用感知，并充分利用pod的resource limits。<br>需要注意的是，UseCGroupMemoryLimitForHeap虽然仍可以在最新版本的Java8中使用，但是已经被视为弃用的参数了。</p>
+<p>此外，在docker容器中运行JVM时，使用HeapDumpOnOutOfMemoryError参数可能是一个更明智的选择，因为，如果内存不足，jvm会将堆内存转储写入磁盘。默认情况下，堆内存会转储到VM的工作目录中的一个名为java_pid.hprof的文件中。您可以使用-XX:HeapDumpPath=来指定备用文件名或目录。例如，-XX:HeapDumpPath=/disk2/dumps将在/disk2/dumps目录中生成堆转储文件。请确保Java进程对堆转储的目录具有写入的访问权限。<br>接着在说一下cpu，pod可以给cpu的limits的限制，来确保pod可以调度到几个cpu核心，而jvm会根据cpu的核心数来设置是否使用ParallelGC，以及几个ParallelGCThreads。</p>
+<p>但是如果我们不为pod设置cpu限制的话，jvm也并不能感知到虚拟机所有的可用cpu，而是认为只有一核，并关闭ParallelGC功能。因此在我们需要ParallelGC功能时，我们最好还设置cpu的限制。</p>
+<p>而且通过查阅一些资料，发现cpu核数对jvm的工作线程也有着影响。<code>Runtime.getRuntime().availableProcessors()</code>，这段的代码常用于Java库，它会根据CPU的个数产生工作线程。如果没有正确设置docker中的参数，对实际的程序性能会产生很大的影响。availableProcessors就是根据核数而定的。</p>
+<p>题外话：<br>一个完整的jdk对gc和jvm问题的排查十分重要。jinfo，jstat都是十分有用的工具，并且学会看gclog也十分重要。</p>
+<p>一个小细节，我一直认为java -XX:+PrintFlagsFinal打印出的内容就是实际应用所在jvm进程的环境变量，但事实上，java -XX:+PrintFlagsFinal会单独建立一个进程，你打印出的东西都是这个命令所在进程的变量，而不是应用所在进程的变量。正确排查应用所在的jvm的进程的jvm变量还得用jinfo。</p>
+<p>此外，我们安装了阿里的Arthas来进行jvm故障的排查，很有用。但考虑到有的时候我们也想在生产环境安装Arthas，但是不希望为生产环境的应用安装完整的jdk，怎么办？可以使用sidecar的方式来安装Arthas，然后通过shareProcessNamespace: true参数来在pod中share不同容器里的进程，这样sidecar里的Arthas就可以attach到你应用的pid了。详见：<a href="https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。" target="_blank" rel="noopener">https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。</a></p>
+<p>先说到这，下回总结下gc的问题。</p>
 ]]></content>
       
         <categories>
@@ -4691,33 +5215,6 @@ java --patch-module java.base=mypatches/java.base ...
             <tag> Java 9 </tag>
             
             <tag> Java module </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[也来谈谈classloader和classpath hell问题]]></title>
-      <url>/2018/01/11/classloader-classpath-hell/</url>
-      <content type="html"><![CDATA[<p>classpath hell, 也叫 <a href="https://en.wikipedia.org/wiki/Java_Classloader#JAR_hell" target="_blank" rel="noopener">jar hell</a>。<br>先来简单翻译一下wiki：<br>Java Classloader 是 Java Runtime Environment 的一部分，它动态地将 Java 类加载到 jvm 中。类通常是按需加载的（即只有在需要实例化这个类时才会被加载）。因为有了 classloader 的存在，java runtime 不再需要知道有哪些文件。一个 java 类通常只会被加载一次。<br>当jvm启动时，会用到三个 classloader：</p>
-<ol>
-<li>Bootstrap class loader</li>
-<li>Extensions class loader</li>
-<li>System class loader</li>
-</ol>
-<p>bootstrap class loader是 jvm 的一部分，会加载 <java_home>/jre/lib 下的所有类。</java_home></p>
-]]></content>
-      
-        <categories>
-            
-            <category> classLoader </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> classLoader </tag>
             
         </tags>
         
