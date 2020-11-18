@@ -1358,6 +1358,31 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
     </entry>
     
     <entry>
+      <title><![CDATA[jvm与并发]]></title>
+      <url>/2020/11/11/jvm-multithread/</url>
+      <content type="html"><![CDATA[<p>“内存模型”，它可以理解为在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象。不同架构的物理机器可以拥有不一样的内存模型，而Java虚拟机也有自己的内存模型，并且与这里介绍的内存访问操作及硬件的缓存访问操作具有高度的可类比性。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 并发 </category>
+            
+            <category> jvm </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> jvm </tag>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[k8s中的jvm]]></title>
       <url>/2020/11/11/jvm-in-container/</url>
       <content type="html"><![CDATA[<p>最近遇到了Java应用在k8s中频繁重启的问题，记录一下。</p>
@@ -1611,6 +1636,678 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         <tags>
             
             <tag> OAuth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[前端login重构]]></title>
+      <url>/2020/06/11/fe-login-refactor/</url>
+      <content type="html"><![CDATA[<h1 id="记录一下前端login部分重构案例"><a href="#记录一下前端login部分重构案例" class="headerlink" title="记录一下前端login部分重构案例"></a>记录一下前端login部分重构案例</h1><p>前端是用的angular6搭建，因为需要连接ibmid登录，所以在网上找了一个符合openid connect标准的库<a href="https://github.com/manfredsteyer/angular-oauth2-oidc" target="_blank" rel="noopener">angular-oauth-oidc</a>, 结果就开始了长达一年的漫长重构之路。</p>
+<p>enable前端的openid connect的登录倒还好说，熟悉openid connect标准的同学应该都清楚前端spa应用应该使用<a href="https://tools.ietf.org/html/rfc6749#section-4.2" target="_blank" rel="noopener">implicit flow</a>（因为oauth协议更新，现在已经不建议用implicit flow，而是<a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">PKCE auth code flow</a>，这是后话，我会在后文提及）。因此登录并不是难事，angular-oauth-oidc有详细的文档告诉我们怎么enable implicit flow。但坑体现在登录以外的地方。</p>
+<h2 id="坑-1-有关discovery-endpoint的坑"><a href="#坑-1-有关discovery-endpoint的坑" class="headerlink" title="坑#1 - 有关discovery endpoint的坑"></a>坑#1 - 有关discovery endpoint的坑</h2><p>angular-oauth-oidc默认的推荐使用方式是应用自动通过<a href="https://openid.net/specs/openid-connect-discovery-1_0.html" target="_blank" rel="noopener">openid discovery endpoint</a>去加载所需的配置，对于我们开发者来说，只需要配clientid和redirecturl就可以。但是ibmid在之前使用idaas的一年时间里，都不提供discovery endpoint，因此我们只能hardcode在代码里这部分配置，因此也使得在启动框架的时候略显繁琐。代码如下：</p>
+<pre><code class="typescript">this.oauthService.configure(authConfig);
+this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+this.oauthService.setupAutomaticSilentRefresh();
+this.oauthService.tryLogin();
+</code></pre>
+<pre><code class="typescript">export const authConfig: AuthConfig = {
+
+  clientId: environment.clientId,
+  redirectUri: window.location.origin + &#39;/it-infrastructure/z/resources/tools/danube/login&#39;,
+  postLogoutRedirectUri: &#39;&#39;,
+  loginUrl: environment.loginUrl,
+  scope: &#39;openid&#39;,
+  oidc: true,
+  requestAccessToken: true,
+  issuer: environment.issuer,
+  tokenEndpoint: environment.tokenEndpoint,
+  userinfoEndpoint: environment.userinfoEndpoint,
+  responseType: &#39;id_token token&#39;,
+  silentRefreshRedirectUri: window.location.origin + &#39;/it-infrastructure/z/resources/tools/danube/silent-refresh&#39;,
+  requireHttps: &#39;remoteOnly&#39;,
+  jwks: environment.jwks,
+  timeoutFactor: 0.9,
+  siletRefreshTimeout: 100000,
+  useIdTokenHintForSilentRefresh: true,
+  clearHashAfterLogin: false,
+  silentRefreshShowIFrame: false,
+  showDebugInformation: true
+};
+</code></pre>
+<p>而现在，ibmid移到了cloud identity上，并且加了discovery endpoint，本以为以后就不用hardcode配置了，结果，新的ibmid的discovery endpoint竟然不支持cors，看起来ibmid在设计之初就没有考虑过前端spa或是移动端的使用，十分失望，我只能再继续hardcode。至于cors，我已经跟ibmid team的人说过要加上（一定得加上因为以后如果前端想要用PKCE auth code就必须支持cors），不知道他们什么时候跟进。</p>
+<h2 id="坑-2-有关前端认证id-token的坑"><a href="#坑-2-有关前端认证id-token的坑" class="headerlink" title="坑#2 - 有关前端认证id-token的坑"></a>坑#2 - 有关前端认证id-token的坑</h2><p>同样是因为以前ibmid的idaas不支持jwkset endpoint，长时间以来我们都没办法在前端认证id-token（即<code>this.oauthService.tokenValidationHandler = new NullValidationHandler()</code>），只能靠后端验证，知道后来cloud identity加上jwkset endpoint才得已解决。但是，以为上文提到的cors的问题，我们只能把jwkset hardcode在environment文件里，十分丑陋。</p>
+<pre><code class="typescript">    jwks:
+      {
+        &quot;keys&quot;: [
+          {
+            &quot;kty&quot;: &quot;xxx&quot;,
+            &quot;kid&quot;: &quot;xxx&quot;,
+            &quot;use&quot;: &quot;xxx&quot;,
+            &quot;alg&quot;: &quot;xxx&quot;,
+            &quot;n&quot;: &quot;xxx&quot;,
+            &quot;e&quot;: &quot;xxx&quot;,
+            &quot;x5c&quot;: [
+              &quot;xxxx&quot;
+            ],
+            &quot;x5t#S256&quot;: &quot;xxx&quot;
+          }
+        ]
+      },
+</code></pre>
+<h2 id="坑-3-关于回调URL的坑"><a href="#坑-3-关于回调URL的坑" class="headerlink" title="坑#3 - 关于回调URL的坑"></a>坑#3 - 关于回调URL的坑</h2><p>angular-oauth-oidc推荐使用静态页面的url作为回调url（即index.html），但这会导致一个问题，就是我们回调回应用后，都会有一个一闪而过的画面，因就是我们回调回index.html之后，还得route到我们当初访问的url上，这个就会出现index.html一闪而过的现象（一般来说一闪而过很快，肉眼看不见，但我们回调回应用后还有后续操作，所以变得很明显），解决这个坑就是不应静态的index.html来作为回调url，而是给一个route，我们这是/login，angular会捕获这个路由显示一个loading页面，知道后续操作完毕，跳转到当初访问的url。</p>
+<p>同样是因为我们做了一些后续操作后再跳转，我们就必须保证这些后续操作无论成功失败都必须跳转，否则就会一直卡在loading页面了，所以必须对回调之后的操作进行异常捕捉，处理后再跳转。</p>
+<h2 id="坑-4-有关同步代码的坑"><a href="#坑-4-有关同步代码的坑" class="headerlink" title="坑#4 - 有关同步代码的坑"></a>坑#4 - 有关同步代码的坑</h2><p>先说一下什么是ram-guards，这是我们的一个微服务的权限处理系统，接受一个oauth idtoken并认证，然后返回一个能代表权限的token。</p>
+<p>这部分不是ibmid的锅，是我们自己的。我们在oauth server redirect回我们的应用后，需要作两件事情，一是去获得我们的权限ram-guards-token，二是跳转到当初我们希望route的url中去，这就要求跳转必须在后去权限之后发生，获取权限就不能异步请求，只能同步请求。<br>angular httpclient返回的是一个异步observable，把它变成同步很简单，只需要使用observable.toPromise，然后在套上aysnc/await语法糖就可以。但这块有两个问题需要注意，一是我长时间以为aysnc/await语法糖就可以保证代码同步，就像java的synchronized一样，结果并不是，aysnc/await只是一个语法糖，而且不论aysnc方法内是否返回promise，aysnc都会将整个方法包装成一个promise，真正想在同步后执行的代码还得放在.then()里面。因此得出教训，aysnc/await固然好用，但必须完全理解其含义并谨慎使用。</p>
+<p>再就是我们在得到ram-guards-token后必须解析它，ram-guards-token是一个jwe所以我们用了另外一个库<a href="https://github.com/cisco/node-jose" target="_blank" rel="noopener">node-jose</a>, 这个库推荐我们这样解析jwe：</p>
+<pre><code class="typescript">jose.JWK.asKey({
+      &#39;kty&#39;: &#39;oct&#39;,
+      &#39;use&#39;: &#39;enc&#39;,
+      &#39;k&#39;: ramGuardsClientSecret,
+      &#39;alg&#39;: &#39;A128CBC-HS256&#39;
+    })
+    .then(key =&gt; {
+        jose.JWE.createDecrypt(key)
+            .decrypt(ramGuardsResponse.access_token)
+            .then(result =&gt; {
+                const claims = new TextDecoder().decode(result.plaintext);
+                localStorage.setItem(&#39;Ram-Guards-Details&#39;, claims);
+            });
+    });
+</code></pre>
+<p>那么问题来了，promise直接return后.then()就OK，那promise套一个promise呢？这种情况下想要同步必须给两个promise都套上return才行。</p>
+<h2 id="坑-5-有关解析ram-guards-token的坑"><a href="#坑-5-有关解析ram-guards-token的坑" class="headerlink" title="坑#5 - 有关解析ram-guards-token的坑"></a>坑#5 - 有关解析ram-guards-token的坑</h2><p>其实不算坑，更多是一个bug，以为ram-guards-token用的是一个加密的jwe，前端要想解析据必须使用它的secret，而在spa里报漏secret是非常危险的，因此这一块需要改成使用oauth推荐的introspect endpoint来通过后端解析token，多加了一次请求，但保证了应用的安全性，这一部分已经加到了ram-guards里，后续我们需要改一下。</p>
+<h2 id="坑-6-有关silent-refresh的坑"><a href="#坑-6-有关silent-refresh的坑" class="headerlink" title="坑#6 - 有关silent-refresh的坑"></a>坑#6 - 有关silent-refresh的坑</h2><p>天坑！！！</p>
+<p>首先说一下什么是silent-refresh，以为implicit是不使用clientsecret申请token的方式，因此我们无法通过正常的refresh token的方式刷新token，所以才有了silent-refresh，即在前端临时加一个看不见的iframe，在iframe的src里指向authorize endpoint；然后通过auth server那一端未过期的session进行自动的登录并重定向回我们的iframe，然后iframe向parent window发通知更新应用存储的token，并把iframe自己给干掉。（about <a href="https://www.scottbrady91.com/OpenID-Connect/Silent-Refresh-Refreshing-Access-Tokens-when-using-the-Implicit-Flow" target="_blank" rel="noopener">slient-refresh</a>）</p>
+<p>所以说这一连串骚操作都是建立在iframe的基础上的，但是偏偏ibmid也有它的骚操作，不允许从iframe申请的跨域请求，回报Refused to display in a iframe的错，即response里面会有<code>Content-Security-Policy: frame-ancestors &#39;self&#39;</code>(<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors" target="_blank" rel="noopener">CSP: frame-ancestors</a>)，这说明ibmid压根就没考虑过silent-refresh的场景啊，再次验证了我之前的推测，ibmid就没想过前端spa和移动端应用会用它。</p>
+<p>因此，我们必须想办法进行silent-refresh，我做了一个实验，发现只有在iframe的src中请求的是静态页面（即xxx.html）的时候，浏览器才会报Refused to display in a iframe的错，而非静态页面的url，即使response中包含<code>Content-Security-Policy: frame-ancestors &#39;self&#39;</code>，也不会报错（暂不清楚这是为啥，希望有大神可以帮忙解答），因此我们就可以通过把silent-refresh的回调URL交给angular的route来捕获处理。到这为止，angular-oauth-oidc的slient-refresh部分的文档就完全没啥用了，我们需要按照我们的思路来实验。</p>
+<p>既然silent-refresh的回调URL交给angular的route来捕获处理，我们就要给silent-refresh的回调URL一个component，当然这个component啥也不用做，我们要做的是在appcomponent中区分出监听tokenreceived事件，区分出哪些是iframe内部接收的，那些事iframe外部接受的。</p>
+<p>最开始是没有iframe的，只有页面进行登录，登录成功后我们要开始一个timer去检查token啥时候会过期，以便我们在token过期之前去开始slient-refresh。</p>
+<p>当token过期时，token_expires事件将会被触发，然后angular-oauth-oidc框架会自动创建一个看不见的iframe去申请我们的silent-refresh url /silent-refresh，然后authserver会重定向回iframe，而iframe内部接收的，就是一次silent-refresh的请求，也就不需要开始timer去看它是否会过期（因为iframe内部的只作为refresh token之用），我们在接收到之后需要同样的去refresh ram-guards-token，然后手动通知iframe的parent window token已经刷新成功，再把这个iframe自己干掉。</p>
+<p>而iframe外部在接收到token更新成功的事件后，就会出发silently_refreshed的事件，从而使这一次slient-refresh流程成功。</p>
+<p>因此，我们代码的关键就是：</p>
+<p>1.在appcomponent中区分出哪次token-received事件是第一次申请token的，哪一次是silent-refresh token的。</p>
+<p>2.区分出当前appcomponent是在iframe内部还是在iframe外部。</p>
+<p>3.处理所有的silent-refresh异常，以避免silent-refresh失败</p>
+<p>这里需要重点说一下的是silent-refresh异常，总结了一下，大概分四种：</p>
+<p>1.silent_refresh_error，即auth-server返回了login_required的error，通常是因为auth-server那一端session过期的缘故(<a href="https://openid.net/specs/openid-connect-session-1_0.html#ChangeNotification" target="_blank" rel="noopener">about1</a>, <a href="https://openid.net/specs/openid-connect-core-1_0.html#AuthError" target="_blank" rel="noopener">about2</a>)</p>
+<p>2.token_error，原因同上，只是silent_refresh_error一定伴随着token_error，但token_error不一定是silent-refresh造成的，也有可能是第一次申请token造成的</p>
+<p>3.silent_refresh_timeout，在silent-refresh的timeout时间内，iframe没能通知到parent window refresh成功</p>
+<p>4.invalid_nonce_in_state，两次authorize申请同时发生，框架不能正确的验证nonce，通常是因为一次silent_refresh没有成功而又开始了一次authorize请求</p>
+<p>按道理来说，我们应该根据这四种不同的error去设计不同的解决方案，silent_refresh_timeout，invalid_nonce_in_state是重启timer，silent_refresh_error，token_error是强制用户重新登录，但angular-oauth-oidc框架无法重启timer，我们就只能粗暴的都强制用户重新登录了。这个可以通过后续更改源码来实现。</p>
+<p>还有一点需要注意的是，虽然文档中说angular-oauth-oidc的trylogin的几个回调方法都已经过时了，要使用events来监听事件，但我发现events监听到的事件并不能返回token的info，所以我们还得用trylogin的回调，这个也可以通过改源码来解决。</p>
+<p>大概就是这些个坑，还有一些细节优化啥的就不一一概述了，我这里贴一下关键的源码：</p>
+<p>app.component.ts:</p>
+<pre><code class="typescript">private configureIbmId() {
+    this.oauthService.configure(authConfig);
+    this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+    let iframeOrNot;
+    if (window.location !== window.parent.location) {
+      iframeOrNot = &#39;inside-iframe&#39;;
+    } else {
+      iframeOrNot = &#39;outside-iframe&#39;;
+      // only need auto silent refresh outside the iframe
+      this.oauthService.setupAutomaticSilentRefresh();
+    }
+    this.oauthService.events.subscribe( event =&gt; {
+      if (event instanceof OAuthErrorEvent) {
+        // normally , we will face four kind of errors:
+        //
+        // silent_refresh_error: response login_required error, force user to re login
+        // token_error: response response login_required error, force user to re login
+        // silent_refresh_timeout: iframe failed to notify parent window, kill old RefreshTimer, setup a new RefreshTimer
+        // invalid_nonce_in_state: two authorize post happens at the same time, kill old RefreshTimer, setup a new RefreshTimer
+        //
+        // TODO: when received error, auto silent refresh will stop, we can make it restart by modify setupRefreshTimer() in angular-oauth2-oidc to subscribe a error event for different conditions
+        // since setupAutomaticSilentRefresh() cannot produce the same behaviour as setupRefreshTimer() (will cause invalid_nonce_in_state error), for now, we will force user to re login in all error conditions
+        console.error(iframeOrNot, event.type, event);
+        this.oauthService.logOut();
+        this.authorizationService.removeStorage();
+      } else {
+        console.log(iframeOrNot, event.type, event);
+      }
+    });
+    this.oauthService.tryLogin({
+      onTokenReceived: (info) =&gt; {
+        this.isLogged = this.loginService.isLoggedIn();
+        if (!this.authorizationService.neverCallRamGuardsBefore()) {
+          // refresh logs will always be:
+          //
+          // outside-iframe token_expires
+          // inside-iframe token_received
+          // inside-iframe id token refreshed
+          // inside-iframe ram-guards token refreshed
+          // outside-iframe token_received
+          // outside-iframe silently_refreshed
+          //
+          // if these logs appear:
+          //
+          // outside-iframe id token refreshed
+          // outside-iframe ram-guards token refreshed
+          //
+          // this means for some unknown reason, oauth server redirect to out client at outside iframe and ram guards tokens are still in local storage
+          // for example: id token expired or not valid while ram guards token still there outside iframe
+          // not sure why this happens but we should be able to handle this situation
+          //
+          // refresh token in a iframe
+          console.log(iframeOrNot, &#39;id token refreshed&#39;, info);
+          this.authorizationService.syncRefreshAuthorization()
+            .then(res =&gt; {
+              const ramGuardsResponse: RamGuardsResponse = res.body;
+              this.authorizationService.setStorage(ramGuardsResponse).then(() =&gt; {
+                console.log(iframeOrNot, &#39;ram-guards token refreshed&#39;, ramGuardsResponse);
+                // notify parent and remove iframe
+                window.parent.postMessage(location.hash , location.origin + &#39;/it-infrastructure/z/resources/tools/danube&#39;);
+                if (iframeOrNot === &#39;inside-iframe&#39; &amp;&amp; frameElement) {
+                  frameElement.remove();
+                } else {
+                  // handle the unexpected situation mentioned before
+                  this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+                }
+              });
+            })
+            .catch(err =&gt; {
+              // do nothing wait for next time refresh
+              console.error(iframeOrNot, &#39;ram-guards token refreshed error, waiting for next time refresh&#39;, err);
+              // notify parent and remove iframe
+              window.parent.postMessage(location.hash , location.origin + &#39;/it-infrastructure/z/resources/tools/danube&#39;);
+              if (iframeOrNot === &#39;inside-iframe&#39; &amp;&amp; frameElement) {
+                frameElement.remove();
+              } else {
+                // handle the unexpected situation mentioned before
+                this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+              }
+            });
+        } else {
+          // get token first time
+          console.log(iframeOrNot, &#39;id token received&#39;, info);
+          this.authorizationService.syncAuthorization()
+            .then(res =&gt; {
+              const ramGuardsResponse: RamGuardsResponse = res.body;
+              this.authorizationService.setStorage(ramGuardsResponse).then(() =&gt; {
+                console.log(iframeOrNot, &#39;ram-guards token received&#39;, ramGuardsResponse);
+                this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+              });
+            }).catch(err =&gt; {
+              this.authorizationService.setRamGuardsError(err.body);
+              console.error(iframeOrNot, &#39;ram-guards token received error&#39;, err);
+              this.router.navigate([&#39;dashboard&#39;]);
+            });
+        }
+      }
+    });
+  }
+</code></pre>
+<p>login.service.ts:</p>
+<pre><code class="typescript">import { Injectable } from &#39;@angular/core&#39;;
+import { OAuthService } from &#39;angular-oauth2-oidc&#39;;
+import { RouterStateSnapshot } from &#39;@angular/router&#39;;
+
+
+@Injectable({
+  providedIn: &#39;root&#39;
+})
+export class LoginService {
+
+  constructor(private oauthService: OAuthService) { }
+
+  public login() {
+    this.oauthService.initImplicitFlow();
+  }
+
+  public loginWithRedirectUrl(redirectUrl: string) {
+    this.oauthService.initImplicitFlow(redirectUrl);
+  }
+
+  public getIdToken() {
+    return this.oauthService.getIdToken();
+  }
+
+  public isLoggedIn() {
+    return this.oauthService.hasValidIdToken();
+  }
+
+  public async syncRefreshIdToken() {
+    return await this.oauthService.silentRefresh();
+  }
+}
+</code></pre>
+<p>authorization.service.ts:</p>
+<pre><code class="typescript">declare var TextDecoder: any;
+
+import {Injectable} from &#39;@angular/core&#39;;
+import {HttpClient, HttpResponse} from &#39;@angular/common/http&#39;;
+import {Observable} from &#39;rxjs&#39;;
+import {timeout} from &#39;rxjs/operators&#39;;
+import {RamGuardsResponse} from &#39;./RamGuardsResponse&#39;;
+import * as jose from &#39;node-jose&#39;;
+import {environment} from &#39;src/environments/environment&#39;;
+
+const authorizationServiceUrl  = environment.authorizationServiceUrl;
+const ramGuardsClientSecret  = environment.ramGuardsClientSecret;
+
+@Injectable({
+  providedIn: &#39;root&#39;
+})
+export class AuthorizationService {
+
+  constructor(private http: HttpClient) {
+  }
+
+  public authorize(): Observable&lt;HttpResponse&lt;RamGuardsResponse&gt;&gt; {
+    return this.http.post&lt;RamGuardsResponse&gt;(
+      authorizationServiceUrl + &#39;/oauth/token?grant_type=password&#39;,
+      null,
+      {
+        observe: &#39;response&#39;
+      }
+    ).pipe(timeout(120000));
+  }
+
+  public refreshToken(token: String): Observable&lt;HttpResponse&lt;RamGuardsResponse&gt;&gt; {
+    return this.http.post&lt;RamGuardsResponse&gt;(
+      authorizationServiceUrl + &#39;/oauth/token?grant_type=refresh_token&amp;refresh_token=&#39; + token,
+      null,
+      {
+        observe: &#39;response&#39;
+      }
+    ).pipe(timeout(120000));
+  }
+
+  public async syncAuthorization() {
+    return await this.authorize().toPromise();
+  }
+
+  public checkAuthorization(id: number) {
+    if (localStorage.getItem(&#39;Ram-Guards-Details&#39;)) {
+      return JSON.parse(localStorage.getItem(&#39;Ram-Guards-Details&#39;)).authorities.some(auth =&gt; {
+        return auth.roles.some(role =&gt; {
+          return role.id === id;
+        });
+      });
+    }
+    return false;
+  }
+
+  public isAuthorized() {
+    if (localStorage.getItem(&#39;Ram-Guards-Access-Token&#39;) &amp;&amp; localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;)) {
+      const expiresAt = localStorage.getItem(&#39;Ram-Guards-Expire-At&#39;);
+      const now = new Date();
+      return !(expiresAt &amp;&amp; parseInt(expiresAt, 10) &lt; now.getTime());
+    }
+    return false;
+  }
+
+  public isRamGuardsError() {
+    return !!localStorage.getItem(&#39;Ram-Guards-Error&#39;);
+  }
+
+  public setRamGuardsError(msg: any) {
+    localStorage.setItem(&#39;Ram-Guards-Error&#39;, &#39;Error: &#39; + msg);
+  }
+
+  public isAnonymous() {
+    if (localStorage.getItem(&#39;Ram-Guards-Details&#39;)) {
+      return JSON.parse(localStorage.getItem(&#39;Ram-Guards-Details&#39;)).authorities[0].name === &#39;anonymous&#39;;
+    }
+    return true;
+  }
+
+  public setStorage (ramGuardsResponse: RamGuardsResponse) {
+    this.removeStorage();
+    this.setAuthorizationBasicStorage(ramGuardsResponse);
+    return jose.JWK.asKey({
+      &#39;kty&#39;: &#39;oct&#39;,
+      &#39;use&#39;: &#39;enc&#39;,
+      &#39;k&#39;: ramGuardsClientSecret,
+      &#39;alg&#39;: &#39;A128CBC-HS256&#39;
+    })
+    .then(key =&gt; {
+      return jose.JWE.createDecrypt(key)
+      .decrypt(ramGuardsResponse.access_token)
+      .then(result =&gt; {
+        const claims = new TextDecoder().decode(result.plaintext);
+        localStorage.setItem(&#39;Ram-Guards-Details&#39;, claims);
+      });
+    });
+  }
+
+  public setAuthorizationBasicStorage(ramGuardsResponse: RamGuardsResponse) {
+    localStorage.setItem(&#39;Ram-Guards-Access-Token&#39;, ramGuardsResponse.access_token);
+    localStorage.setItem(&#39;Ram-Guards-Refresh-Token&#39;, ramGuardsResponse.refresh_token);
+    localStorage.setItem(
+      &#39;Ram-Guards-Expire-At&#39;,
+      (new Date().valueOf() + Math.floor(ramGuardsResponse.expires_in * 1000)).toString()
+    );
+    localStorage.setItem(
+      &#39;Ram-Guards-Expire-Time&#39;,
+      ramGuardsResponse.expires_in.toString()
+    );
+  }
+
+  public removeStorage () {
+    localStorage.removeItem(&#39;Ram-Guards-Error&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Access-Token&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Refresh-Token&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Expire-At&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Expire-Time&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Details&#39;);
+  }
+
+  public async syncRefreshAuthorization() {
+    return await this.refreshToken(localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;)).toPromise();
+  }
+
+  public getRamGuardsToken() {
+    return localStorage.getItem(&#39;Ram-Guards-Access-Token&#39;);
+  }
+
+  public getRamGuardsRefreshToken() {
+    return localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;);
+  }
+
+  public neverCallRamGuardsBefore() {
+    return !localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;);
+  }
+}
+</code></pre>
+<h2 id="后记-解决silent-refresh的更优方案"><a href="#后记-解决silent-refresh的更优方案" class="headerlink" title="后记 - 解决silent-refresh的更优方案"></a>后记 - 解决silent-refresh的更优方案</h2><p>虽然silent-refresh可以解决refresh token的问题，但只是在oauthserver那一端session不过期的情况下，而且因为在iframe中申请authorize endpoint时添加了prompt=none的参数，ibmid的login的页面不会出现，一旦session过期，silent refresh必然会失败。那么有没有更优的方案呢？很简单，就是用上问提到的pkce auth code flow，这部分我问过ibmid的人了，说他们实现了，但没有默认enable，需要申请，考虑到他们还没加cors，现在就没申请，就看他们什么时候加cors了，到时候在申请使用pkce auth code flow。</p>
+<p>关于pkce auth code flow的学习看<a href="https://espressocoder.com/2019/10/28/secure-your-spa-with-authorization-code-flow-with-pkce/" target="_blank" rel="noopener">这篇教程</a>，我就不展开了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>实践论，实践出真知，照着文档一知半解的写肯定会出错，要想写好代码就要了解全局，oauth oidc协议得懂，angular-oauth-oidc的源码也得阅读，有了这些认识后还得加以大量的实践来验证，不断的重构和完善，才能搞出好的代码。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> fe </category>
+            
+            <category> oauth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> fe </tag>
+            
+            <tag> oauth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[一次艰难的troubleshooting]]></title>
+      <url>/2020/05/11/troubleshooting-ram-guards/</url>
+      <content type="html"><![CDATA[<h1 id="一次艰难的troubleshooting"><a href="#一次艰难的troubleshooting" class="headerlink" title="一次艰难的troubleshooting"></a>一次艰难的troubleshooting</h1><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>先说一下什么是ram-guards，这是我们的一个微服务的权限处理系统，接受一个oauth idtoken并认证，然后返回一个能代表权限的token。</p>
+<p>起因是最近对ram-guards做升级，增加了切换application id的功能，使ram-guards可以通过ram系统为不同的app提供不同的权限服务（以前只服务于一个项目）。</p>
+<p>本身这只是个微小的改动，加一个参数就好，但是在spring security的设计体系中，下面的这个简单的接口承担着装配用户以及权限的核心</p>
+<pre><code class="java">public interface UserDetailsService {
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+}
+</code></pre>
+<p>但这个接口有个很大的缺点，就是只有一个string做参数，为了满足我们多个参数的需求，又不想丑陋的在string里split，我决定把这个接口用我自定义的接口代替。简单来说就是写一个能接收自定义object的接口，并为这个自定义接口提供一个AuthenticationProvider，注册到spring security的AuthenticationManager中，同时重写DefaultTokenServices中refreshtoken所用的PreAuthenticatedAuthenticationProvider，并将tokenservice和AuthenticationManager注册到AuthorizationServerEndpointsConfigurer中。</p>
+<p>因为这部分改动不是本文的重点，在这里不展开说了。</p>
+<p>从代码角度来说我对这部分改动还是很自信的，因为自己经过多轮测试并且其他team也一直在使用这套代码进行权限获取，但就是这些很自信的改动，在dev环境上跑出了问题。</p>
+<h2 id="troubleshooting"><a href="#troubleshooting" class="headerlink" title="troubleshooting"></a>troubleshooting</h2><p>新版本的ram-guards上了dev环境之后，测试在dev上跑了bdd，结果大批量的fail掉了，报的错误是前端没有拿到用户的权限。但是奇怪的是，手工测试却并没有出现问题，而且老版本的ram-guards bdd也从来没有fail过。因为对自己的盲目自信以及function测试并没有出现问题，我最先把怀疑指向了bdd的代码会不会有问题，但经过一番查验，并没有发现bdd的代码有问题。</p>
+<p>此时我便陷入了僵局，一般情况下，系统有问题通常都会要求有稳定的复现，但这是一个复现不了，只会在bdd中才发生的问题。在不断的查验中，终于意识到bdd场景是并发进行的，十多个bdd脚本在一秒内并发，这是手工测试所不能复现的场景，会不会是新版本代码在并发场景下会出问题？带着这种怀疑，我决定做一次压测。</p>
+<p>压测工具为ab，进行API压测，以单秒并发100次请求为标准进行压测，果然，dev上的新版本出现了大批量的API fail，test上的老版本则全部通过。</p>
+<p>既然是压测出的问题，首先想到的肯定是不同环境上的资源分配是不是影响因素，于是便在dev上也部署了一份老版本ram-guards的代码到同一个node上，在进行压测，发现并没有问题。</p>
+<p>那这样来看就不是环境资源配置的问题了，那代码会哪里出问题呢，功能都OK，但一上并发就挂。我便仔细分析了下log，发现压测中，最先挂的是数据库连接池，总会报出数据库连接失败的错误。先说明下，ram-guards本身是不需要数据库的支持的，这里的数据库只是用来记录audit log用的。我们处于成本控制，使用了最大连结数只能有100个的cloud db，而每个service都有记录audit log的需求，所以我限制了每个service在log db上只能开2个active连接的连接池。那么会不会是连接池数量太少引起的性能问题呢？</p>
+<p>如果仅仅是连接池数量太少导致的，那么老版本的代码在并发场景下应该也会出问题，虽然增加连接数也可能解决问题，但这并不像是rootcause。那会不会是代码优化后执行速度过快，导致单秒写入数据库的请求增多，进而把连接池压垮？亦或者是代码重构后，写入数据库的次数和内容增多，导致单个commit处理时间过长，把数据库连接池压垮？翻来覆去没想出问题所在，我决定开debug log看一下，因为全局的debug log太多，反而不好定位问题，这里我只开启跟log db有关的debug：</p>
+<pre><code class="yaml">logging:
+  level:
+    ROOT: info
+    com.ibm.ram.guards: debug
+    org.springframework.orm.jpa: debug
+    org.hibernate: debug
+    org.postgresql: debug
+    com.zaxxer.hikari: debug
+</code></pre>
+<p>在开启debug后，仔细对着了log的不同，发现了蹊跷。</p>
+<p>这是老版本代码在并发场景下的log：</p>
+<pre><code class="log">2020-06-16 07:13:49.971 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.982 DEBUG 1 --- [nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Reset (autoCommit) on connection org.postgresql.jdbc.PgConnection@100d71db
+2020-06-16 07:13:49.971  INFO 1 --- [nio-8080-exec-5] g.a.o.c.RamGuardsJweAccessTokenConverter : CP01-log user: ...
+2020-06-16 07:13:49.981 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+</code></pre>
+<p>这是新版本代码在并发场景下的log：</p>
+<pre><code class="log">2020-06-16 07:13:31.550 DEBUG 1 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Pool stats (total=2, active=0, idle=2, waiting=0)
+2020-06-16 07:13:49.886 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Creating new transaction with name [org.springframework.security.oauth2.provider.token.DefaultTokenServices.createAccessToken]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2020-06-16 07:13:49.887 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Opened new EntityManager [SessionImpl(256287368&lt;open&gt;)] for JPA transaction
+2020-06-16 07:13:49.887 DEBUG 1 --- [nio-8080-exec-5] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+2020-06-16 07:13:49.887 DEBUG 1 --- [nio-8080-exec-5] o.h.e.t.internal.TransactionImpl         : begin
+2020-06-16 07:13:49.891 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.891 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@1ee8f5f6]
+2020-06-16 07:13:49.892  INFO 1 --- [nio-8080-exec-5] c.i.d.s.authorization.aop.AuditLogAop    : CP01-log user: ...
+2020-06-16 07:13:49.913 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.934 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+2020-06-16 07:13:49.934 DEBUG 1 --- [nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Reset (autoCommit) on connection org.postgresql.jdbc.PgConnection@100d71db
+2020-06-16 07:13:49.908  INFO 1 --- [nio-8080-exec-5] g.a.o.c.RamGuardsJweAccessTokenConverter : user: ...
+2020-06-16 07:13:49.935 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.955 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+2020-06-16 07:13:49.955 DEBUG 1 --- [nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Reset (autoCommit) on connection org.postgresql.jdbc.PgConnection@100d71db
+2020-06-16 07:13:49.935  INFO 1 --- [nio-8080-exec-5] g.a.o.c.RamGuardsJweAccessTokenConverter : CP01-log user: ...
+2020-06-16 07:13:49.958 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.969 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+2020-06-16 07:13:49.969 DEBUG 1 --- [nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Reset (autoCommit) on connection org.postgresql.jdbc.PgConnection@100d71db
+2020-06-16 07:13:49.958  INFO 1 --- [nio-8080-exec-5] g.a.o.c.RamGuardsJweAccessTokenConverter : user: ...
+2020-06-16 07:13:49.971 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = false
+2020-06-16 07:13:49.981 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+2020-06-16 07:13:49.982 DEBUG 1 --- [nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Reset (autoCommit) on connection org.postgresql.jdbc.PgConnection@100d71db
+2020-06-16 07:13:49.971  INFO 1 --- [nio-8080-exec-5] g.a.o.c.RamGuardsJweAccessTokenConverter : CP01-log user: ...
+2020-06-16 07:13:49.984 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Initiating transaction commit
+2020-06-16 07:13:49.984 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Committing JPA transaction on EntityManager [SessionImpl(256287368&lt;open&gt;)]
+2020-06-16 07:13:49.984 DEBUG 1 --- [nio-8080-exec-5] o.h.e.t.internal.TransactionImpl         : committing
+2020-06-16 07:13:49.984 DEBUG 1 --- [nio-8080-exec-5] org.postgresql.jdbc.PgConnection         :   setAutoCommit = true
+2020-06-16 07:13:49.985 DEBUG 1 --- [nio-8080-exec-5] o.s.orm.jpa.JpaTransactionManager        : Closing JPA EntityManager [SessionImpl(256287368&lt;open&gt;)] after transaction
+</code></pre>
+<p>可以明显的看到，在代码更新后，每次向数据库写log的时候都加上了声明式事务，而在这个事务中我们一共写了5次log，才将数据库连接释放。而在并发场景下，后进来的线程也会开启事务，但是数据库连接池却没有可有连接给支撑，在timeout时间过了之后，就会报大批量连接不上数据库的错误。这是rootcause，那为什么莫名其妙会加上事务呢？</p>
+<p>经过仔细研读spring security代码，发现一个以前没有注意到的事情，就是DefaultTokenService重的createAccessToken()方法上有@Transactional注解，而我们写log的代码又正好是在这个方法内执行的：</p>
+<pre><code class="java">public class DefaultTokenServices implements AuthorizationServerTokenServices, ResourceServerTokenServices,
+        ConsumerTokenServices, InitializingBean {
+
+    @Transactional
+    public OAuth2AccessToken createAccessToken(OAuth2Authentication authentication) throws AuthenticationException {
+
+        OAuth2AccessToken existingAccessToken = tokenStore.getAccessToken(authentication);
+        OAuth2RefreshToken refreshToken = null;
+        if (existingAccessToken != null) {
+            if (existingAccessToken.isExpired()) {
+                if (existingAccessToken.getRefreshToken() != null) {
+                    refreshToken = existingAccessToken.getRefreshToken();
+                    // The token store could remove the refresh token when the
+                    // access token is removed, but we want to
+                    // be sure...
+                    tokenStore.removeRefreshToken(refreshToken);
+                }
+                tokenStore.removeAccessToken(existingAccessToken);
+            }
+            else {
+                // Re-store the access token in case the authentication has changed
+                tokenStore.storeAccessToken(existingAccessToken, authentication);
+                return existingAccessToken;
+            }
+        }
+
+        // Only create a new refresh token if there wasn&#39;t an existing one
+        // associated with an expired access token.
+        // Clients might be holding existing refresh tokens, so we re-use it in
+        // the case that the old access token
+        // expired.
+        if (refreshToken == null) {
+            refreshToken = createRefreshToken(authentication);
+        }
+        // But the refresh token itself might need to be re-issued if it has
+        // expired.
+        else if (refreshToken instanceof ExpiringOAuth2RefreshToken) {
+            ExpiringOAuth2RefreshToken expiring = (ExpiringOAuth2RefreshToken) refreshToken;
+            if (System.currentTimeMillis() &gt; expiring.getExpiration().getTime()) {
+                refreshToken = createRefreshToken(authentication);
+            }
+        }
+
+        OAuth2AccessToken accessToken = createAccessToken(authentication, refreshToken);
+        tokenStore.storeAccessToken(accessToken, authentication);
+        // In case it was modified
+        refreshToken = accessToken.getRefreshToken();
+        if (refreshToken != null) {
+            tokenStore.storeRefreshToken(refreshToken, authentication);
+        }
+        return accessToken;
+
+    }
+}
+</code></pre>
+<p>为什么createAccessToken方法要加事务呢？因为在许多场景下，accesstoken是有持久化的需求的。因为ram-guards用的是jwt(jwe)格式的，它能够自解析，所以我们不需要持久化。但如果是一个普通的token，就需要使用JdbcTokenStore来存库了。</p>
+<p>那么现在有三个问题：</p>
+<ol>
+<li>为什么我们的代码里开启了事务（还是log-db上的事务）</li>
+</ol>
+<p>spring boot在引入任何db的datasource时，会自动通过HibernateJpaAutoConfiguration-&gt;HibernateJpaConfiguration-&gt;JpaBaseConfiguration.transactionManager()来建立一个transactionManager的bean，并通过TransactionAutoConfiguration去进行自动配置。transactionManager会扫描所有bean中有@Transactional注解的方法，并以aop的方式去开启事务。</p>
+<ol>
+<li>为什么以前的代码没有使用事务，现在的代码却使用了</li>
+</ol>
+<p>这就得直接上代码了。</p>
+<p>老版本的代码：</p>
+<pre><code class="java">    @Bean
+    @Primary
+    public DefaultTokenServices tokenServices() throws Exception {
+        final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenStore(tokenStore());
+        defaultTokenServices.setSupportRefreshToken(true);
+        return defaultTokenServices;
+    }
+
+    @Override
+    public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        final TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+        tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(accessTokenConverter()));
+        endpoints
+                .requestValidator(requestValidator())
+                .tokenStore(tokenStore())
+                .tokenEnhancer(tokenEnhancerChain)
+                .authenticationManager(authenticationManagerBean)
+                .userDetailsService(refreshUserDetailsService);
+    }
+</code></pre>
+<p>新版本的代码：</p>
+<pre><code class="java">    @Bean
+    @Primary
+    public DefaultTokenServices tokenServices() throws Exception {
+        final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenStore(tokenStore());
+        defaultTokenServices.setSupportRefreshToken(true);
+        PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
+        provider.setPreAuthenticatedUserDetailsService(token -&gt; {
+            UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) token.getPrincipal();
+            RamGuardsUser ramGuardsUser = new RamGuardsUser();
+            ramGuardsUser.setUsername(authenticationToken.getPrincipal().toString());
+            Map&lt;String, Object&gt; details = (Map&lt;String, Object&gt;) authenticationToken.getDetails();
+            if (details!=null){
+                ramGuardsUser.setIsSystemPartner(Boolean.parseBoolean(details.get(&quot;system_partner&quot;).toString()));
+            }
+            ramGuardsUser.setDetails(details);
+            ramGuardsUser.setCredentials(authenticationToken.getCredentials());
+            return refreshUserDetailsService.loadUserByRamGuardsUser(ramGuardsUser);
+        });
+        defaultTokenServices.setAuthenticationManager(new ProviderManager(Collections.singletonList(provider)));
+        defaultTokenServices.setTokenEnhancer(accessTokenConverter());
+        defaultTokenServices.setTokenStore(tokenStore());
+        return defaultTokenServices;
+    }
+
+    @Override
+    public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        endpoints
+                .tokenServices(tokenServices())
+                .requestValidator(requestValidator())
+                .authenticationManager(authenticationManagerBean);
+    }
+</code></pre>
+<p>打眼一看好像没什么不同，但仔细看一下就会发现，老版本代码中，DefaultTokenServices虽然注册成为了bean，但却并没有把这个bean提供给AuthorizationServerEndpointsConfigurer，而当AuthorizationServerEndpointsConfigurer中的tokenservice没有值的时候，事实上会调用createDefaultTokenServices方法去创建一个不是bean的DefaultTokenServices实例，代码如下：</p>
+<pre><code class="java">   public AuthorizationServerTokenServices getDefaultAuthorizationServerTokenServices() {
+        if (defaultTokenServices != null) {
+            return defaultTokenServices;
+        }
+        this.defaultTokenServices = createDefaultTokenServices();
+        return this.defaultTokenServices;
+    }
+
+    private DefaultTokenServices createDefaultTokenServices() {
+        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        tokenServices.setTokenStore(tokenStore());
+        tokenServices.setSupportRefreshToken(true);
+        tokenServices.setReuseRefreshToken(reuseRefreshToken);
+        tokenServices.setClientDetailsService(clientDetailsService());
+        tokenServices.setTokenEnhancer(tokenEnhancer());
+        addUserDetailsService(tokenServices, this.userDetailsService);
+        return tokenServices;
+    }
+</code></pre>
+<p>而我们代码中所使用的tokenservice，恰恰就是AuthorizationServerEndpointsConfigurer中的tokenservice。</p>
+<p>所以说，在老版本代码中，我们使用的tokenservice并不是spring的一个bean，所以事务也就不会开启，而新版本代码中使用的是一个bean，所以也就启用了事务。</p>
+<ol>
+<li>我们既然不需要事务，如何把这个事务去掉</li>
+</ol>
+<p>找到了rootcause之后，解决就变得简单了许多，摆在我面前有两个方案：1、将TransactionAutoConfiguration给exclude出去，不让spring boot自动装配。2、不把DefaultTokenServices注册为bean。</p>
+<p>最后选择了方案2，因为我认为既然ram-guards没有被持久化的需求，就不应该被任何transactionManager扫描到。同时，我也把记录auditlog的方法从createAccessToken方法中拿了出来，在TokenEndpoint中以aop的方式切入记log，这样也减少了数据库的写入次数。</p>
+<p>至此，这个issue算是解决了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>说一下我们记audit log的方式，直接通过db log appender去写入数据库事实上是一个开销很大的方式，尤其是在我们log db可用连接资源还十分有限的情况下。这个我们暂时讨论，会在后期优化中用kafka，批量记入到kafka中，在批量写入db进行持久化，减小db的开销。</p>
+<p>以后要多做一些API压测（ab或者jmeter），来保证接口在一个标准下不挂，可以以单实例qps为多少来制定这个标准，来保证我们接口的稳定性。</p>
+<p>个人认为很有价值的一次troubleshooting，后记中提出的问题都值得我们进行实践。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> fe </category>
+            
+            <category> oauth </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> fe </tag>
+            
+            <tag> oauth </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[JPA在多表联查上的一些坑]]></title>
+      <url>/2020/04/11/jpa-improve/</url>
+      <content type="html"><![CDATA[<h2 id="JPA的使用场景-（仅针对查询）"><a href="#JPA的使用场景-（仅针对查询）" class="headerlink" title="JPA的使用场景 （仅针对查询）"></a>JPA的使用场景 （仅针对查询）</h2><p>最基本的场景</p>
+<p>这种情况比较简单，一般针对一张数据库表建立对应的Java \@Entity class，把针对表的SQL操作转化为JPA 的JPQL / Native SQL / Criteria API 即可。</p>
+<p>如果表有单一主键就更简单了，把它作为JPA的\@Id字段。如果没有单一主键，需要确定一个唯一性索引（可能是一列或多列）来作为JPA 的\Id 字段或字段组合。</p>
+<p>多表联查的场景</p>
+<p>对于多张表的联合查询，就没法做到Java \@Entity class和数据库表(\@Table)一一对应了。这个时候可以针对多张数据库表建立一个数据库视图View, 然后使</p>
+<p>Java \@Entity class和 View (\@Table) 对应，其中\@Table里指定View的名字。</p>
+<p>有些时候，可能会因为权限或其他原因，没法对数据库表建View。这个时候可以仅把\@Entity class作为对接SQL 查询结果的实体类。在这个实体类中只加\@Entity 不加\@Table 的annation.</p>
+<p>如果是用JPA Native SQL 的方式，此用法有点类似于Mybatis。</p>
+<h2 id="多表联查中的一些坑"><a href="#多表联查中的一些坑" class="headerlink" title="多表联查中的一些坑"></a>多表联查中的一些坑</h2><p>确定JPA \@Id 字段或字段组合<br>对于多表联查的情况，如果多个表中有一个是主表，并且主表有主键或唯一性索引的话，比较简单，其实和单表查询的情况相同；</p>
+<p>如果多个表中没有明显的主表，而且联合查询的结果集的唯一性字段来自于多个表，就稍微复杂了，需要基于对业务数据的理解 / 猜测 + 排除法多次尝试了。从而确定一个最小的字段组合来代表结果集的唯一性索引。</p>
+<p>(系统的遗留代码中有很多多表联查，且表没有主键的情况)</p>
+<p>实践中发现，如果指定的\@Id字段或字段组合不唯一，JPA返回的数据记录总数看似正确，数据其实是不准确的。</p>
+<p>\@Id 字段组合中有字段/列有空值的情况<br>JPA \@Id 字段组合中有字段为NULL 值会导致JPA返回一个NULL Object，这种情况下，如果直接对JPA返回的结果做操作，则会抛出意想不到的NullPointerException。</p>
+<p>对于\@Id 字段组合中有字段为NULL 值的情况，其实可以分为两种：</p>
+<p>错误数据 - 判断错误数据的标准是什么呢？在全部数据中占比很小（比如1 万条数据里有十几条某列为空值的情况）；基于对业务的理解，某些值为空是业务无意义的。<br>有效数据 - 占比高，比如80%的数据某个列都是NULL，这个肯定不是错误数据了 (也可能是当初数据库设计的问题？？？)<br>其实针对以上两种情况，处理方式也有区别：</p>
+<p>对于错误数据，可以考虑在做SQL查询的时候去过滤。<br>对于有效数据，可能需要借助 SQL COALESCE() 函数 来对数据进行转换。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> jpa </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> jpa </tag>
             
         </tags>
         
@@ -1922,7 +2619,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     <entry>
       <title><![CDATA[OAuth教程]]></title>
       <url>/2018/07/14/oauth-guide/</url>
-      <content type="html"><![CDATA[<p>翻译了oauth.com上的教程，地址：<code>http://seanthefish.com/oauth-guide/#/</code></p>
+      <content type="html"><![CDATA[<p>翻译了oauth.com上的教程，地址：<a href="http://seanthefish.com/oauth-guide/#/">http://seanthefish.com/oauth-guide/#/</a></p>
 ]]></content>
       
         <categories>

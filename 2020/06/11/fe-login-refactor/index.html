@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            前端login重构 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,fe,oauth">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/06/11/fe-login-refactor/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/06/11/fe-login-refactor/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="前端login重构 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="fe"> <meta property="og:article:tag" content="oauth"> 
+
+    
+        <meta property="article:published_time" content="Thu Jun 11 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Nov 18 2020 16:30:27 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/06/11/fe-login-refactor/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/06/11/fe-login-refactor/index.html",
+    "headline": "前端login重构",
+    "datePublished": "Thu Jun 11 2020 10:00:00 GMT+0800",
+    "dateModified": "Wed Nov 18 2020 16:30:27 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",fe,oauth小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#记录一下前端login部分重构案例"><span class="post-toc-number">1.</span> <span class="post-toc-text">记录一下前端login部分重构案例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-1-有关discovery-endpoint的坑"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">坑#1 - 有关discovery endpoint的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-2-有关前端认证id-token的坑"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">坑#2 - 有关前端认证id-token的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-3-关于回调URL的坑"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">坑#3 - 关于回调URL的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-4-有关同步代码的坑"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">坑#4 - 有关同步代码的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-5-有关解析ram-guards-token的坑"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">坑#5 - 有关解析ram-guards-token的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#坑-6-有关silent-refresh的坑"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">坑#6 - 有关silent-refresh的坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#后记-解决silent-refresh的更优方案"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">后记 - 解决silent-refresh的更优方案</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">总结</span></a></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                前端login重构
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>6月 11, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACaElEQVR42u3aUXLDIAwFwNz/0u0JcJ8kjN3M+quTNsCmM6A89Pn56ueDh4eHh4eHh4f3Mt4nflbvqr6+Grn6ruVceHh4eEd4f2y1i4lXpGvkaumrvymvDQ8PD+8gL58y2eJXi8uPh+ra8PDw8N7Pmy968rHi4eHhfQcvPwbyMAIPDw/vzbzkC38e716P/NKsBQ8PDy/m9bbvMz8fvd/Dw8PDC3jllqbL0nneRpAcBjf2lOHh4eEFvOrlVo7pjdYbAQ8PD+8pXrKt581Y+WHQu2YbZS14eHh4A96k2E2aruaHQTXexcPDw7ubV73Ir5a519t9fiwVZsTDw8M7wuu9kvMmpXk15MXDw8M7w6tu1r1rsGqhnLPx8PDwTvKSzTq/Bqt+ZNXfRv8GPDw8vCO86qXUvMiehxGFlBoPDw9vKy+JWasNAdVIotdGUO6MwMPDw9vEy5/8eiwZp3rlVmhKwMPDw7uZ11v0vDWqN2MUXuDh4eEd4eUlbLUUTkrwZA0besrw8PDwjvRz9gLZariQUzf3lOHh4eGNeb0lVi/+kzK9Gk/g4eHhPcWrFsp5s2leuFcL+ua5h4eHh7eJV11QHiv0wojmtRkeHh7eQ7xk0DykyIvpBP/H0YKHh4d3M6/XelVtEaiW2qNQAw8PD+9m3nxTzovdXY0IzaYrPDw8vK28yVaeB6zXpEmZjoeHh/cUrxfFTrb4edSLh4eH9794SeCbHwYJIyr38fDw8F7JqwYTu8r36OPDw8PDO8irhgt5oTwvzQ/FuHh4eHg3XICVJ2sx8iIeDw8P7zzv+x48PDw8PDw8PLwXPL80RGejhbqv8wAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/fe/">fe</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/oauth/">oauth</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=前端login重构&url=http://seanthefish.com/2020/06/11/fe-login-refactor/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/06/11/fe-login-refactor/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=前端login重构&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/06/11/fe-login-refactor/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="记录一下前端login部分重构案例"><a href="#记录一下前端login部分重构案例" class="headerlink" title="记录一下前端login部分重构案例"></a>记录一下前端login部分重构案例</h1><p>前端是用的angular6搭建，因为需要连接ibmid登录，所以在网上找了一个符合openid connect标准的库<a href="https://github.com/manfredsteyer/angular-oauth2-oidc" target="_blank" rel="noopener">angular-oauth-oidc</a>, 结果就开始了长达一年的漫长重构之路。</p>
+<p>enable前端的openid connect的登录倒还好说，熟悉openid connect标准的同学应该都清楚前端spa应用应该使用<a href="https://tools.ietf.org/html/rfc6749#section-4.2" target="_blank" rel="noopener">implicit flow</a>（因为oauth协议更新，现在已经不建议用implicit flow，而是<a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">PKCE auth code flow</a>，这是后话，我会在后文提及）。因此登录并不是难事，angular-oauth-oidc有详细的文档告诉我们怎么enable implicit flow。但坑体现在登录以外的地方。</p>
+<h2 id="坑-1-有关discovery-endpoint的坑"><a href="#坑-1-有关discovery-endpoint的坑" class="headerlink" title="坑#1 - 有关discovery endpoint的坑"></a>坑#1 - 有关discovery endpoint的坑</h2><p>angular-oauth-oidc默认的推荐使用方式是应用自动通过<a href="https://openid.net/specs/openid-connect-discovery-1_0.html" target="_blank" rel="noopener">openid discovery endpoint</a>去加载所需的配置，对于我们开发者来说，只需要配clientid和redirecturl就可以。但是ibmid在之前使用idaas的一年时间里，都不提供discovery endpoint，因此我们只能hardcode在代码里这部分配置，因此也使得在启动框架的时候略显繁琐。代码如下：</p>
+<pre><code class="typescript">this.oauthService.configure(authConfig);
+this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+this.oauthService.setupAutomaticSilentRefresh();
+this.oauthService.tryLogin();
+</code></pre>
+<pre><code class="typescript">export const authConfig: AuthConfig = {
+
+  clientId: environment.clientId,
+  redirectUri: window.location.origin + &#39;/it-infrastructure/z/resources/tools/danube/login&#39;,
+  postLogoutRedirectUri: &#39;&#39;,
+  loginUrl: environment.loginUrl,
+  scope: &#39;openid&#39;,
+  oidc: true,
+  requestAccessToken: true,
+  issuer: environment.issuer,
+  tokenEndpoint: environment.tokenEndpoint,
+  userinfoEndpoint: environment.userinfoEndpoint,
+  responseType: &#39;id_token token&#39;,
+  silentRefreshRedirectUri: window.location.origin + &#39;/it-infrastructure/z/resources/tools/danube/silent-refresh&#39;,
+  requireHttps: &#39;remoteOnly&#39;,
+  jwks: environment.jwks,
+  timeoutFactor: 0.9,
+  siletRefreshTimeout: 100000,
+  useIdTokenHintForSilentRefresh: true,
+  clearHashAfterLogin: false,
+  silentRefreshShowIFrame: false,
+  showDebugInformation: true
+};
+</code></pre>
+<p>而现在，ibmid移到了cloud identity上，并且加了discovery endpoint，本以为以后就不用hardcode配置了，结果，新的ibmid的discovery endpoint竟然不支持cors，看起来ibmid在设计之初就没有考虑过前端spa或是移动端的使用，十分失望，我只能再继续hardcode。至于cors，我已经跟ibmid team的人说过要加上（一定得加上因为以后如果前端想要用PKCE auth code就必须支持cors），不知道他们什么时候跟进。</p>
+<h2 id="坑-2-有关前端认证id-token的坑"><a href="#坑-2-有关前端认证id-token的坑" class="headerlink" title="坑#2 - 有关前端认证id-token的坑"></a>坑#2 - 有关前端认证id-token的坑</h2><p>同样是因为以前ibmid的idaas不支持jwkset endpoint，长时间以来我们都没办法在前端认证id-token（即<code>this.oauthService.tokenValidationHandler = new NullValidationHandler()</code>），只能靠后端验证，知道后来cloud identity加上jwkset endpoint才得已解决。但是，以为上文提到的cors的问题，我们只能把jwkset hardcode在environment文件里，十分丑陋。</p>
+<pre><code class="typescript">    jwks:
+      {
+        &quot;keys&quot;: [
+          {
+            &quot;kty&quot;: &quot;xxx&quot;,
+            &quot;kid&quot;: &quot;xxx&quot;,
+            &quot;use&quot;: &quot;xxx&quot;,
+            &quot;alg&quot;: &quot;xxx&quot;,
+            &quot;n&quot;: &quot;xxx&quot;,
+            &quot;e&quot;: &quot;xxx&quot;,
+            &quot;x5c&quot;: [
+              &quot;xxxx&quot;
+            ],
+            &quot;x5t#S256&quot;: &quot;xxx&quot;
+          }
+        ]
+      },
+</code></pre>
+<h2 id="坑-3-关于回调URL的坑"><a href="#坑-3-关于回调URL的坑" class="headerlink" title="坑#3 - 关于回调URL的坑"></a>坑#3 - 关于回调URL的坑</h2><p>angular-oauth-oidc推荐使用静态页面的url作为回调url（即index.html），但这会导致一个问题，就是我们回调回应用后，都会有一个一闪而过的画面，因就是我们回调回index.html之后，还得route到我们当初访问的url上，这个就会出现index.html一闪而过的现象（一般来说一闪而过很快，肉眼看不见，但我们回调回应用后还有后续操作，所以变得很明显），解决这个坑就是不应静态的index.html来作为回调url，而是给一个route，我们这是/login，angular会捕获这个路由显示一个loading页面，知道后续操作完毕，跳转到当初访问的url。</p>
+<p>同样是因为我们做了一些后续操作后再跳转，我们就必须保证这些后续操作无论成功失败都必须跳转，否则就会一直卡在loading页面了，所以必须对回调之后的操作进行异常捕捉，处理后再跳转。</p>
+<h2 id="坑-4-有关同步代码的坑"><a href="#坑-4-有关同步代码的坑" class="headerlink" title="坑#4 - 有关同步代码的坑"></a>坑#4 - 有关同步代码的坑</h2><p>先说一下什么是ram-guards，这是我们的一个微服务的权限处理系统，接受一个oauth idtoken并认证，然后返回一个能代表权限的token。</p>
+<p>这部分不是ibmid的锅，是我们自己的。我们在oauth server redirect回我们的应用后，需要作两件事情，一是去获得我们的权限ram-guards-token，二是跳转到当初我们希望route的url中去，这就要求跳转必须在后去权限之后发生，获取权限就不能异步请求，只能同步请求。<br>angular httpclient返回的是一个异步observable，把它变成同步很简单，只需要使用observable.toPromise，然后在套上aysnc/await语法糖就可以。但这块有两个问题需要注意，一是我长时间以为aysnc/await语法糖就可以保证代码同步，就像java的synchronized一样，结果并不是，aysnc/await只是一个语法糖，而且不论aysnc方法内是否返回promise，aysnc都会将整个方法包装成一个promise，真正想在同步后执行的代码还得放在.then()里面。因此得出教训，aysnc/await固然好用，但必须完全理解其含义并谨慎使用。</p>
+<p>再就是我们在得到ram-guards-token后必须解析它，ram-guards-token是一个jwe所以我们用了另外一个库<a href="https://github.com/cisco/node-jose" target="_blank" rel="noopener">node-jose</a>, 这个库推荐我们这样解析jwe：</p>
+<pre><code class="typescript">jose.JWK.asKey({
+      &#39;kty&#39;: &#39;oct&#39;,
+      &#39;use&#39;: &#39;enc&#39;,
+      &#39;k&#39;: ramGuardsClientSecret,
+      &#39;alg&#39;: &#39;A128CBC-HS256&#39;
+    })
+    .then(key =&gt; {
+        jose.JWE.createDecrypt(key)
+            .decrypt(ramGuardsResponse.access_token)
+            .then(result =&gt; {
+                const claims = new TextDecoder().decode(result.plaintext);
+                localStorage.setItem(&#39;Ram-Guards-Details&#39;, claims);
+            });
+    });
+</code></pre>
+<p>那么问题来了，promise直接return后.then()就OK，那promise套一个promise呢？这种情况下想要同步必须给两个promise都套上return才行。</p>
+<h2 id="坑-5-有关解析ram-guards-token的坑"><a href="#坑-5-有关解析ram-guards-token的坑" class="headerlink" title="坑#5 - 有关解析ram-guards-token的坑"></a>坑#5 - 有关解析ram-guards-token的坑</h2><p>其实不算坑，更多是一个bug，以为ram-guards-token用的是一个加密的jwe，前端要想解析据必须使用它的secret，而在spa里报漏secret是非常危险的，因此这一块需要改成使用oauth推荐的introspect endpoint来通过后端解析token，多加了一次请求，但保证了应用的安全性，这一部分已经加到了ram-guards里，后续我们需要改一下。</p>
+<h2 id="坑-6-有关silent-refresh的坑"><a href="#坑-6-有关silent-refresh的坑" class="headerlink" title="坑#6 - 有关silent-refresh的坑"></a>坑#6 - 有关silent-refresh的坑</h2><p>天坑！！！</p>
+<p>首先说一下什么是silent-refresh，以为implicit是不使用clientsecret申请token的方式，因此我们无法通过正常的refresh token的方式刷新token，所以才有了silent-refresh，即在前端临时加一个看不见的iframe，在iframe的src里指向authorize endpoint；然后通过auth server那一端未过期的session进行自动的登录并重定向回我们的iframe，然后iframe向parent window发通知更新应用存储的token，并把iframe自己给干掉。（about <a href="https://www.scottbrady91.com/OpenID-Connect/Silent-Refresh-Refreshing-Access-Tokens-when-using-the-Implicit-Flow" target="_blank" rel="noopener">slient-refresh</a>）</p>
+<p>所以说这一连串骚操作都是建立在iframe的基础上的，但是偏偏ibmid也有它的骚操作，不允许从iframe申请的跨域请求，回报Refused to display in a iframe的错，即response里面会有<code>Content-Security-Policy: frame-ancestors &#39;self&#39;</code>(<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors" target="_blank" rel="noopener">CSP: frame-ancestors</a>)，这说明ibmid压根就没考虑过silent-refresh的场景啊，再次验证了我之前的推测，ibmid就没想过前端spa和移动端应用会用它。</p>
+<p>因此，我们必须想办法进行silent-refresh，我做了一个实验，发现只有在iframe的src中请求的是静态页面（即xxx.html）的时候，浏览器才会报Refused to display in a iframe的错，而非静态页面的url，即使response中包含<code>Content-Security-Policy: frame-ancestors &#39;self&#39;</code>，也不会报错（暂不清楚这是为啥，希望有大神可以帮忙解答），因此我们就可以通过把silent-refresh的回调URL交给angular的route来捕获处理。到这为止，angular-oauth-oidc的slient-refresh部分的文档就完全没啥用了，我们需要按照我们的思路来实验。</p>
+<p>既然silent-refresh的回调URL交给angular的route来捕获处理，我们就要给silent-refresh的回调URL一个component，当然这个component啥也不用做，我们要做的是在appcomponent中区分出监听tokenreceived事件，区分出哪些是iframe内部接收的，那些事iframe外部接受的。</p>
+<p>最开始是没有iframe的，只有页面进行登录，登录成功后我们要开始一个timer去检查token啥时候会过期，以便我们在token过期之前去开始slient-refresh。</p>
+<p>当token过期时，token_expires事件将会被触发，然后angular-oauth-oidc框架会自动创建一个看不见的iframe去申请我们的silent-refresh url /silent-refresh，然后authserver会重定向回iframe，而iframe内部接收的，就是一次silent-refresh的请求，也就不需要开始timer去看它是否会过期（因为iframe内部的只作为refresh token之用），我们在接收到之后需要同样的去refresh ram-guards-token，然后手动通知iframe的parent window token已经刷新成功，再把这个iframe自己干掉。</p>
+<p>而iframe外部在接收到token更新成功的事件后，就会出发silently_refreshed的事件，从而使这一次slient-refresh流程成功。</p>
+<p>因此，我们代码的关键就是：</p>
+<p>1.在appcomponent中区分出哪次token-received事件是第一次申请token的，哪一次是silent-refresh token的。</p>
+<p>2.区分出当前appcomponent是在iframe内部还是在iframe外部。</p>
+<p>3.处理所有的silent-refresh异常，以避免silent-refresh失败</p>
+<p>这里需要重点说一下的是silent-refresh异常，总结了一下，大概分四种：</p>
+<p>1.silent_refresh_error，即auth-server返回了login_required的error，通常是因为auth-server那一端session过期的缘故(<a href="https://openid.net/specs/openid-connect-session-1_0.html#ChangeNotification" target="_blank" rel="noopener">about1</a>, <a href="https://openid.net/specs/openid-connect-core-1_0.html#AuthError" target="_blank" rel="noopener">about2</a>)</p>
+<p>2.token_error，原因同上，只是silent_refresh_error一定伴随着token_error，但token_error不一定是silent-refresh造成的，也有可能是第一次申请token造成的</p>
+<p>3.silent_refresh_timeout，在silent-refresh的timeout时间内，iframe没能通知到parent window refresh成功</p>
+<p>4.invalid_nonce_in_state，两次authorize申请同时发生，框架不能正确的验证nonce，通常是因为一次silent_refresh没有成功而又开始了一次authorize请求</p>
+<p>按道理来说，我们应该根据这四种不同的error去设计不同的解决方案，silent_refresh_timeout，invalid_nonce_in_state是重启timer，silent_refresh_error，token_error是强制用户重新登录，但angular-oauth-oidc框架无法重启timer，我们就只能粗暴的都强制用户重新登录了。这个可以通过后续更改源码来实现。</p>
+<p>还有一点需要注意的是，虽然文档中说angular-oauth-oidc的trylogin的几个回调方法都已经过时了，要使用events来监听事件，但我发现events监听到的事件并不能返回token的info，所以我们还得用trylogin的回调，这个也可以通过改源码来解决。</p>
+<p>大概就是这些个坑，还有一些细节优化啥的就不一一概述了，我这里贴一下关键的源码：</p>
+<p>app.component.ts:</p>
+<pre><code class="typescript">private configureIbmId() {
+    this.oauthService.configure(authConfig);
+    this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+    let iframeOrNot;
+    if (window.location !== window.parent.location) {
+      iframeOrNot = &#39;inside-iframe&#39;;
+    } else {
+      iframeOrNot = &#39;outside-iframe&#39;;
+      // only need auto silent refresh outside the iframe
+      this.oauthService.setupAutomaticSilentRefresh();
+    }
+    this.oauthService.events.subscribe( event =&gt; {
+      if (event instanceof OAuthErrorEvent) {
+        // normally , we will face four kind of errors:
+        //
+        // silent_refresh_error: response login_required error, force user to re login
+        // token_error: response response login_required error, force user to re login
+        // silent_refresh_timeout: iframe failed to notify parent window, kill old RefreshTimer, setup a new RefreshTimer
+        // invalid_nonce_in_state: two authorize post happens at the same time, kill old RefreshTimer, setup a new RefreshTimer
+        //
+        // TODO: when received error, auto silent refresh will stop, we can make it restart by modify setupRefreshTimer() in angular-oauth2-oidc to subscribe a error event for different conditions
+        // since setupAutomaticSilentRefresh() cannot produce the same behaviour as setupRefreshTimer() (will cause invalid_nonce_in_state error), for now, we will force user to re login in all error conditions
+        console.error(iframeOrNot, event.type, event);
+        this.oauthService.logOut();
+        this.authorizationService.removeStorage();
+      } else {
+        console.log(iframeOrNot, event.type, event);
+      }
+    });
+    this.oauthService.tryLogin({
+      onTokenReceived: (info) =&gt; {
+        this.isLogged = this.loginService.isLoggedIn();
+        if (!this.authorizationService.neverCallRamGuardsBefore()) {
+          // refresh logs will always be:
+          //
+          // outside-iframe token_expires
+          // inside-iframe token_received
+          // inside-iframe id token refreshed
+          // inside-iframe ram-guards token refreshed
+          // outside-iframe token_received
+          // outside-iframe silently_refreshed
+          //
+          // if these logs appear:
+          //
+          // outside-iframe id token refreshed
+          // outside-iframe ram-guards token refreshed
+          //
+          // this means for some unknown reason, oauth server redirect to out client at outside iframe and ram guards tokens are still in local storage
+          // for example: id token expired or not valid while ram guards token still there outside iframe
+          // not sure why this happens but we should be able to handle this situation
+          //
+          // refresh token in a iframe
+          console.log(iframeOrNot, &#39;id token refreshed&#39;, info);
+          this.authorizationService.syncRefreshAuthorization()
+            .then(res =&gt; {
+              const ramGuardsResponse: RamGuardsResponse = res.body;
+              this.authorizationService.setStorage(ramGuardsResponse).then(() =&gt; {
+                console.log(iframeOrNot, &#39;ram-guards token refreshed&#39;, ramGuardsResponse);
+                // notify parent and remove iframe
+                window.parent.postMessage(location.hash , location.origin + &#39;/it-infrastructure/z/resources/tools/danube&#39;);
+                if (iframeOrNot === &#39;inside-iframe&#39; &amp;&amp; frameElement) {
+                  frameElement.remove();
+                } else {
+                  // handle the unexpected situation mentioned before
+                  this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+                }
+              });
+            })
+            .catch(err =&gt; {
+              // do nothing wait for next time refresh
+              console.error(iframeOrNot, &#39;ram-guards token refreshed error, waiting for next time refresh&#39;, err);
+              // notify parent and remove iframe
+              window.parent.postMessage(location.hash , location.origin + &#39;/it-infrastructure/z/resources/tools/danube&#39;);
+              if (iframeOrNot === &#39;inside-iframe&#39; &amp;&amp; frameElement) {
+                frameElement.remove();
+              } else {
+                // handle the unexpected situation mentioned before
+                this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+              }
+            });
+        } else {
+          // get token first time
+          console.log(iframeOrNot, &#39;id token received&#39;, info);
+          this.authorizationService.syncAuthorization()
+            .then(res =&gt; {
+              const ramGuardsResponse: RamGuardsResponse = res.body;
+              this.authorizationService.setStorage(ramGuardsResponse).then(() =&gt; {
+                console.log(iframeOrNot, &#39;ram-guards token received&#39;, ramGuardsResponse);
+                this.router.navigate([info &amp;&amp; info.state ? info.state : &#39;dashboard&#39;]);
+              });
+            }).catch(err =&gt; {
+              this.authorizationService.setRamGuardsError(err.body);
+              console.error(iframeOrNot, &#39;ram-guards token received error&#39;, err);
+              this.router.navigate([&#39;dashboard&#39;]);
+            });
+        }
+      }
+    });
+  }
+</code></pre>
+<p>login.service.ts:</p>
+<pre><code class="typescript">import { Injectable } from &#39;@angular/core&#39;;
+import { OAuthService } from &#39;angular-oauth2-oidc&#39;;
+import { RouterStateSnapshot } from &#39;@angular/router&#39;;
+
+
+@Injectable({
+  providedIn: &#39;root&#39;
+})
+export class LoginService {
+
+  constructor(private oauthService: OAuthService) { }
+
+  public login() {
+    this.oauthService.initImplicitFlow();
+  }
+
+  public loginWithRedirectUrl(redirectUrl: string) {
+    this.oauthService.initImplicitFlow(redirectUrl);
+  }
+
+  public getIdToken() {
+    return this.oauthService.getIdToken();
+  }
+
+  public isLoggedIn() {
+    return this.oauthService.hasValidIdToken();
+  }
+
+  public async syncRefreshIdToken() {
+    return await this.oauthService.silentRefresh();
+  }
+}
+</code></pre>
+<p>authorization.service.ts:</p>
+<pre><code class="typescript">declare var TextDecoder: any;
+
+import {Injectable} from &#39;@angular/core&#39;;
+import {HttpClient, HttpResponse} from &#39;@angular/common/http&#39;;
+import {Observable} from &#39;rxjs&#39;;
+import {timeout} from &#39;rxjs/operators&#39;;
+import {RamGuardsResponse} from &#39;./RamGuardsResponse&#39;;
+import * as jose from &#39;node-jose&#39;;
+import {environment} from &#39;src/environments/environment&#39;;
+
+const authorizationServiceUrl  = environment.authorizationServiceUrl;
+const ramGuardsClientSecret  = environment.ramGuardsClientSecret;
+
+@Injectable({
+  providedIn: &#39;root&#39;
+})
+export class AuthorizationService {
+
+  constructor(private http: HttpClient) {
+  }
+
+  public authorize(): Observable&lt;HttpResponse&lt;RamGuardsResponse&gt;&gt; {
+    return this.http.post&lt;RamGuardsResponse&gt;(
+      authorizationServiceUrl + &#39;/oauth/token?grant_type=password&#39;,
+      null,
+      {
+        observe: &#39;response&#39;
+      }
+    ).pipe(timeout(120000));
+  }
+
+  public refreshToken(token: String): Observable&lt;HttpResponse&lt;RamGuardsResponse&gt;&gt; {
+    return this.http.post&lt;RamGuardsResponse&gt;(
+      authorizationServiceUrl + &#39;/oauth/token?grant_type=refresh_token&amp;refresh_token=&#39; + token,
+      null,
+      {
+        observe: &#39;response&#39;
+      }
+    ).pipe(timeout(120000));
+  }
+
+  public async syncAuthorization() {
+    return await this.authorize().toPromise();
+  }
+
+  public checkAuthorization(id: number) {
+    if (localStorage.getItem(&#39;Ram-Guards-Details&#39;)) {
+      return JSON.parse(localStorage.getItem(&#39;Ram-Guards-Details&#39;)).authorities.some(auth =&gt; {
+        return auth.roles.some(role =&gt; {
+          return role.id === id;
+        });
+      });
+    }
+    return false;
+  }
+
+  public isAuthorized() {
+    if (localStorage.getItem(&#39;Ram-Guards-Access-Token&#39;) &amp;&amp; localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;)) {
+      const expiresAt = localStorage.getItem(&#39;Ram-Guards-Expire-At&#39;);
+      const now = new Date();
+      return !(expiresAt &amp;&amp; parseInt(expiresAt, 10) &lt; now.getTime());
+    }
+    return false;
+  }
+
+  public isRamGuardsError() {
+    return !!localStorage.getItem(&#39;Ram-Guards-Error&#39;);
+  }
+
+  public setRamGuardsError(msg: any) {
+    localStorage.setItem(&#39;Ram-Guards-Error&#39;, &#39;Error: &#39; + msg);
+  }
+
+  public isAnonymous() {
+    if (localStorage.getItem(&#39;Ram-Guards-Details&#39;)) {
+      return JSON.parse(localStorage.getItem(&#39;Ram-Guards-Details&#39;)).authorities[0].name === &#39;anonymous&#39;;
+    }
+    return true;
+  }
+
+  public setStorage (ramGuardsResponse: RamGuardsResponse) {
+    this.removeStorage();
+    this.setAuthorizationBasicStorage(ramGuardsResponse);
+    return jose.JWK.asKey({
+      &#39;kty&#39;: &#39;oct&#39;,
+      &#39;use&#39;: &#39;enc&#39;,
+      &#39;k&#39;: ramGuardsClientSecret,
+      &#39;alg&#39;: &#39;A128CBC-HS256&#39;
+    })
+    .then(key =&gt; {
+      return jose.JWE.createDecrypt(key)
+      .decrypt(ramGuardsResponse.access_token)
+      .then(result =&gt; {
+        const claims = new TextDecoder().decode(result.plaintext);
+        localStorage.setItem(&#39;Ram-Guards-Details&#39;, claims);
+      });
+    });
+  }
+
+  public setAuthorizationBasicStorage(ramGuardsResponse: RamGuardsResponse) {
+    localStorage.setItem(&#39;Ram-Guards-Access-Token&#39;, ramGuardsResponse.access_token);
+    localStorage.setItem(&#39;Ram-Guards-Refresh-Token&#39;, ramGuardsResponse.refresh_token);
+    localStorage.setItem(
+      &#39;Ram-Guards-Expire-At&#39;,
+      (new Date().valueOf() + Math.floor(ramGuardsResponse.expires_in * 1000)).toString()
+    );
+    localStorage.setItem(
+      &#39;Ram-Guards-Expire-Time&#39;,
+      ramGuardsResponse.expires_in.toString()
+    );
+  }
+
+  public removeStorage () {
+    localStorage.removeItem(&#39;Ram-Guards-Error&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Access-Token&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Refresh-Token&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Expire-At&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Expire-Time&#39;);
+    localStorage.removeItem(&#39;Ram-Guards-Details&#39;);
+  }
+
+  public async syncRefreshAuthorization() {
+    return await this.refreshToken(localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;)).toPromise();
+  }
+
+  public getRamGuardsToken() {
+    return localStorage.getItem(&#39;Ram-Guards-Access-Token&#39;);
+  }
+
+  public getRamGuardsRefreshToken() {
+    return localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;);
+  }
+
+  public neverCallRamGuardsBefore() {
+    return !localStorage.getItem(&#39;Ram-Guards-Refresh-Token&#39;);
+  }
+}
+</code></pre>
+<h2 id="后记-解决silent-refresh的更优方案"><a href="#后记-解决silent-refresh的更优方案" class="headerlink" title="后记 - 解决silent-refresh的更优方案"></a>后记 - 解决silent-refresh的更优方案</h2><p>虽然silent-refresh可以解决refresh token的问题，但只是在oauthserver那一端session不过期的情况下，而且因为在iframe中申请authorize endpoint时添加了prompt=none的参数，ibmid的login的页面不会出现，一旦session过期，silent refresh必然会失败。那么有没有更优的方案呢？很简单，就是用上问提到的pkce auth code flow，这部分我问过ibmid的人了，说他们实现了，但没有默认enable，需要申请，考虑到他们还没加cors，现在就没申请，就看他们什么时候加cors了，到时候在申请使用pkce auth code flow。</p>
+<p>关于pkce auth code flow的学习看<a href="https://espressocoder.com/2019/10/28/secure-your-spa-with-authorization-code-flow-with-pkce/" target="_blank" rel="noopener">这篇教程</a>，我就不展开了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>实践论，实践出真知，照着文档一知半解的写肯定会出错，要想写好代码就要了解全局，oauth oidc协议得懂，angular-oauth-oidc的源码也得阅读，有了这些认识后还得加以大量的实践来验证，不断的重构和完善，才能搞出好的代码。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/06/11/fe-login-refactor/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/06/11/fe-login-refactor/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/07/24/micro-service-authorization/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/05/11/troubleshooting-ram-guards/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

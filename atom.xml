@@ -198,6 +198,37 @@
   </entry>
   
   <entry>
+    <title>jvm与并发</title>
+    <link href="http://seanthefish.com/2020/11/11/jvm-multithread/"/>
+    <id>http://seanthefish.com/2020/11/11/jvm-multithread/</id>
+    <published>2020-11-11T02:00:00.000Z</published>
+    <updated>2020-11-18T08:01:14.084Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;“内存模型”，它可以理解为在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象。不同架构的物理机器可以拥有不一样的内存模型，而Java虚拟机也有自己的内存模型，并且与这里介绍的内存访问操作及硬件的缓存访问操作具有高度的可类比性。&lt;/p&gt;
+
+        
+      
+    
+    </summary>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
+    
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
     <title>k8s中的jvm</title>
     <link href="http://seanthefish.com/2020/11/11/jvm-in-container/"/>
     <id>http://seanthefish.com/2020/11/11/jvm-in-container/</id>
@@ -252,6 +283,92 @@
     
     
       <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>前端login重构</title>
+    <link href="http://seanthefish.com/2020/06/11/fe-login-refactor/"/>
+    <id>http://seanthefish.com/2020/06/11/fe-login-refactor/</id>
+    <published>2020-06-11T02:00:00.000Z</published>
+    <updated>2020-11-18T08:30:27.754Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;记录一下前端login部分重构案例&quot;&gt;&lt;a href=&quot;#记录一下前端login部分重构案例&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="fe" scheme="http://seanthefish.com/categories/fe/"/>
+    
+      <category term="oauth" scheme="http://seanthefish.com/categories/fe/oauth/"/>
+    
+    
+      <category term="fe" scheme="http://seanthefish.com/tags/fe/"/>
+    
+      <category term="oauth" scheme="http://seanthefish.com/tags/oauth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一次艰难的troubleshooting</title>
+    <link href="http://seanthefish.com/2020/05/11/troubleshooting-ram-guards/"/>
+    <id>http://seanthefish.com/2020/05/11/troubleshooting-ram-guards/</id>
+    <published>2020-05-11T02:00:00.000Z</published>
+    <updated>2020-11-18T08:41:13.481Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;一次艰难的troubleshooting&quot;&gt;&lt;a href=&quot;#一次艰难的troubleshooting&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="fe" scheme="http://seanthefish.com/categories/fe/"/>
+    
+      <category term="oauth" scheme="http://seanthefish.com/categories/fe/oauth/"/>
+    
+    
+      <category term="fe" scheme="http://seanthefish.com/tags/fe/"/>
+    
+      <category term="oauth" scheme="http://seanthefish.com/tags/oauth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JPA在多表联查上的一些坑</title>
+    <link href="http://seanthefish.com/2020/04/11/jpa-improve/"/>
+    <id>http://seanthefish.com/2020/04/11/jpa-improve/</id>
+    <published>2020-04-11T02:00:00.000Z</published>
+    <updated>2020-11-18T08:49:41.831Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;JPA的使用场景-（仅针对查询）&quot;&gt;&lt;a href=&quot;#JPA的使用场景-（仅针对查询）&quot; class=&quot;headerlink&quot; title=&quot;JPA的使用场景 （仅针对查询）&quot;&gt;&lt;/a&gt;JPA的使用场景
+        
+      
+    
+    </summary>
+    
+      <category term="jpa" scheme="http://seanthefish.com/categories/jpa/"/>
+    
+    
+      <category term="jpa" scheme="http://seanthefish.com/tags/jpa/"/>
     
   </entry>
   
@@ -347,7 +464,7 @@
     <link href="http://seanthefish.com/2018/07/14/oauth-guide/"/>
     <id>http://seanthefish.com/2018/07/14/oauth-guide/</id>
     <published>2018-07-13T21:00:00.000Z</published>
-    <updated>2018-07-27T09:38:00.503Z</updated>
+    <updated>2020-11-18T07:17:34.299Z</updated>
     
     <summary type="html">
     
@@ -355,8 +472,7 @@
       
         
         
-          &lt;p&gt;翻译了oauth.com上的教程，地址：&lt;code&gt;http://seanthefish.com/oauth-guide/#/&lt;/code&gt;&lt;/p&gt;
-
+          &lt;p&gt;翻译了oauth.com上的教程，地址：&lt;a
         
       
     
@@ -456,113 +572,6 @@
     <id>http://seanthefish.com/2018/07/13/oauth-guide-23/</id>
     <published>2018-07-13T15:00:00.000Z</published>
     <updated>2018-07-27T08:51:12.803Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--OpenID Connect</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-22/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-22/</id>
-    <published>2018-07-13T14:00:00.000Z</published>
-    <updated>2018-07-27T09:35:37.510Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;OAuth
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--OAuth 1和2之间的差异</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-21/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-21/</id>
-    <published>2018-07-13T13:00:00.000Z</published>
-    <updated>2018-07-27T07:33:42.986Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;OAuth
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--术语参考</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-20/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-20/</id>
-    <published>2018-07-13T12:00:00.000Z</published>
-    <updated>2018-07-27T07:10:18.043Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;角色&quot;&gt;&lt;a
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--创建文档</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-19/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-19/</id>
-    <published>2018-07-13T11:00:00.000Z</published>
-    <updated>2018-07-27T07:05:55.171Z</updated>
     
     <summary type="html">
     
