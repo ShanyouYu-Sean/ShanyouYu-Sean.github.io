@@ -3,6 +3,27 @@
   
     
     <entry>
+      <title><![CDATA[字节码增强技术]]></title>
+      <url>/2020/11/17/class-file-improve/</url>
+      <content type="html"><![CDATA[<p>不总结了，详见这篇文章：<a href="https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html" target="_blank" rel="noopener">https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> jvm </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> jvm </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[gc调优-2]]></title>
       <url>/2020/11/16/improve-gc-2/</url>
       <content type="html"><![CDATA[<p>文章节选自<br><a href="https://tech.meituan.com/2020/11/12/java-9-cms-gc.html" target="_blank" rel="noopener">https://tech.meituan.com/2020/11/12/java-9-cms-gc.html</a><br><a href="https://tech.meituan.com/2017/12/29/jvm-optimize.html" target="_blank" rel="noopener">https://tech.meituan.com/2017/12/29/jvm-optimize.html</a></p>

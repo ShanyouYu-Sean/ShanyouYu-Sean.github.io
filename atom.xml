@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-18T06:27:31.336Z</updated>
+  <updated>2020-11-18T07:04:14.159Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>字节码增强技术</title>
+    <link href="http://seanthefish.com/2020/11/17/class-file-improve/"/>
+    <id>http://seanthefish.com/2020/11/17/class-file-improve/</id>
+    <published>2020-11-17T02:00:00.000Z</published>
+    <updated>2020-11-18T07:04:14.159Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;不总结了，详见这篇文章：&lt;a href=&quot;https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="jvm" scheme="http://seanthefish.com/categories/jvm/"/>
+    
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+  </entry>
   
   <entry>
     <title>gc调优-2</title>
@@ -545,33 +571,6 @@
         
         
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--令牌自解析endpoint（Token Introspection Endpoint）</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-18/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-18/</id>
-    <published>2018-07-13T10:00:00.000Z</published>
-    <updated>2018-07-27T06:41:11.185Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;当OAuth
         
       
     
