@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-18T07:04:14.159Z</updated>
+  <updated>2020-11-20T10:32:26.853Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>jvm与并发</title>
+    <link href="http://seanthefish.com/2020/11/18/jvm-multithread/"/>
+    <id>http://seanthefish.com/2020/11/18/jvm-multithread/</id>
+    <published>2020-11-18T02:00:00.000Z</published>
+    <updated>2020-11-20T10:32:26.853Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;Java中的内存并发模型&quot;&gt;&lt;a href=&quot;#Java中的内存并发模型&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
+    
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>字节码增强技术</title>
@@ -47,7 +77,7 @@
     <link href="http://seanthefish.com/2020/11/16/improve-gc-2/"/>
     <id>http://seanthefish.com/2020/11/16/improve-gc-2/</id>
     <published>2020-11-16T02:00:00.000Z</published>
-    <updated>2020-11-18T06:27:31.336Z</updated>
+    <updated>2020-11-19T09:37:40.724Z</updated>
     
     <summary type="html">
     
@@ -198,37 +228,6 @@
   </entry>
   
   <entry>
-    <title>jvm与并发</title>
-    <link href="http://seanthefish.com/2020/11/11/jvm-multithread/"/>
-    <id>http://seanthefish.com/2020/11/11/jvm-multithread/</id>
-    <published>2020-11-11T02:00:00.000Z</published>
-    <updated>2020-11-18T08:01:14.084Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;“内存模型”，它可以理解为在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象。不同架构的物理机器可以拥有不一样的内存模型，而Java虚拟机也有自己的内存模型，并且与这里介绍的内存访问操作及硬件的缓存访问操作具有高度的可类比性。&lt;/p&gt;
-
-        
-      
-    
-    </summary>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
-    
-    
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
     <title>k8s中的jvm</title>
     <link href="http://seanthefish.com/2020/11/11/jvm-in-container/"/>
     <id>http://seanthefish.com/2020/11/11/jvm-in-container/</id>
@@ -373,32 +372,6 @@
   </entry>
   
   <entry>
-    <title>在spring中使用cors</title>
-    <link href="http://seanthefish.com/2018/11/06/spring-cors/"/>
-    <id>http://seanthefish.com/2018/11/06/spring-cors/</id>
-    <published>2018-11-06T06:00:00.000Z</published>
-    <updated>2018-11-06T08:56:33.319Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;网上有很多教程，基本上都是清一色的&lt;code&gt;@CrossOrigin&lt;/code&gt;，&lt;code&gt;@CrossOrigin&lt;/code&gt;在和spring security一起用的时候不生效，因为filter chain
-        
-      
-    
-    </summary>
-    
-      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
-    
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
-    
-  </entry>
-  
-  <entry>
     <title>使用oidc id token验证spring security resource server</title>
     <link href="http://seanthefish.com/2018/11/06/spring-security-jwt/"/>
     <id>http://seanthefish.com/2018/11/06/spring-security-jwt/</id>
@@ -427,9 +400,35 @@
     
       <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
     
+      <category term="OIDC" scheme="http://seanthefish.com/tags/OIDC/"/>
+    
       <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
     
-      <category term="OIDC" scheme="http://seanthefish.com/tags/OIDC/"/>
+  </entry>
+  
+  <entry>
+    <title>在spring中使用cors</title>
+    <link href="http://seanthefish.com/2018/11/06/spring-cors/"/>
+    <id>http://seanthefish.com/2018/11/06/spring-cors/</id>
+    <published>2018-11-06T06:00:00.000Z</published>
+    <updated>2018-11-06T08:56:33.319Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;网上有很多教程，基本上都是清一色的&lt;code&gt;@CrossOrigin&lt;/code&gt;，&lt;code&gt;@CrossOrigin&lt;/code&gt;在和spring security一起用的时候不生效，因为filter chain
+        
+      
+    
+    </summary>
+    
+      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
+    
+    
+      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
     
   </entry>
   
