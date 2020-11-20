@@ -52,7 +52,7 @@
     
     <title>
         
-            自旋锁 | 
+            thread，threadlocal，InheritableThreadLocal源码详解 | 
         
         小鱼肖恩
     </title>
@@ -63,7 +63,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,cas,并发">
+    <meta name="keywords" content="小鱼肖恩,并发">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -224,7 +224,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/19/cas-spin/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/20/thread-source-code/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -243,16 +243,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2020/11/19/cas-spin/">
+    <meta property="og:url" content="http://seanthefish.com/2020/11/20/thread-source-code/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="自旋锁 | 小鱼肖恩">
+    <meta property="og:title" content="thread，threadlocal，InheritableThreadLocal源码详解 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="cas"> <meta property="og:article:tag" content="并发"> 
+    <meta property="og:article:tag" content="并发"> 
 
     
-        <meta property="article:published_time" content="Thu Nov 19 2020 12:14:47 GMT+0800">
-        <meta property="article:modified_time" content="Fri Nov 20 2020 20:44:59 GMT+0800">
+        <meta property="article:published_time" content="Fri Nov 20 2020 12:14:47 GMT+0800">
+        <meta property="article:modified_time" content="Sat Nov 21 2020 00:58:01 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -260,7 +260,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2020/11/19/cas-spin/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2020/11/20/thread-source-code/index.html" />
     
 
     <!-- Structured-data for SEO -->
@@ -272,10 +272,10 @@
 {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2020/11/19/cas-spin/index.html",
-    "headline": "自旋锁",
-    "datePublished": "Thu Nov 19 2020 12:14:47 GMT+0800",
-    "dateModified": "Fri Nov 20 2020 20:44:59 GMT+0800",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/20/thread-source-code/index.html",
+    "headline": "thread，threadlocal，InheritableThreadLocal源码详解",
+    "datePublished": "Fri Nov 20 2020 12:14:47 GMT+0800",
+    "dateModified": "Sat Nov 21 2020 00:58:01 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -293,7 +293,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": ",cas,并发小鱼肖恩",
+    "keywords": ",并发小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -376,7 +376,7 @@
     </button>
 
     <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
-        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#自旋锁"><span class="post-toc-number">1.</span> <span class="post-toc-text">自旋锁</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Ticket锁"><span class="post-toc-number">2.</span> <span class="post-toc-text">Ticket锁</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CLHLock"><span class="post-toc-number">3.</span> <span class="post-toc-text">CLHLock</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MCSLock"><span class="post-toc-number">4.</span> <span class="post-toc-text">MCSLock</span></a></li></ol>
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Thread-源码解析"><span class="post-toc-number">1.</span> <span class="post-toc-text">Thread 源码解析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#threadlocal"><span class="post-toc-number">2.</span> <span class="post-toc-text">threadlocal</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InheritableThreadLocal父子线程共享变量"><span class="post-toc-number">3.</span> <span class="post-toc-text">InheritableThreadLocal父子线程共享变量</span></a></li></ol>
     </ul>
     
 
@@ -408,7 +408,7 @@
         
     
             <p class="article-headline-p">
-                自旋锁
+                thread，threadlocal，InheritableThreadLocal源码详解
             </p>
         </div>
 
@@ -427,7 +427,7 @@
     <!-- Author Name & Date -->
     <div>
         <strong>Sean Yu</strong>
-        <span>11月 19, 2020</span>
+        <span>11月 20, 2020</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -449,7 +449,7 @@
 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
     <li class="mdl-menu__item">在其它设备中阅读本文章</li>
     
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACcUlEQVR42u3aQXKDMAwF0Nz/0u0BOtAv2VZI5rHKNMTwWCD1W6+frz5eeHh4eHh4eHh4D+O94qNwgT/nJ2vmv/pnHTw8PLwRXvV2ry5/9e39msnnwqPEw8PDG+Rd3e7VOflfeuWhem94eHh4T+blhSEpFdXHioeHh/fpvGSdJEpIigQeHh7e03jJP/x5GUjWzAOLoawFDw8PL+b1Xt8zn0f39/Dw8PACXnmkaYFdXWfD0BUeHh7eAV7+Is6HCXqbXvcbafkQGB4eHt4Mr/DjOHjNG/dq5FGOcfHw8PCO8fKXe7UMrKyZt+l4eHh47+Ili+bRQ3Vc4P6hR9tmeHh4eId5K3HASozbG01Imng8PDy807xkSHRXbLErjPjnHDw8PLzDvLwA3C9dHY1Kwt9eJIGHh4c3w1spEs2wtVgYmqMDeHh4eOO8/EbzEHadWs5a8PDw8A7wVsKCvCFeGUTIAxE8PDy807x8gyratg8GrfKS0GzW8fDw8A7zku356lF9BHnU2xy6wsPDw9vKqw5RJe11MjiVN8rV9h0PDw9vhtdrr3NqNWJY2WbDw8PDm+T1IoNeINs7szx0hYeHh3eYl7/We4MF1Sa7t/GGh4eHN89LXv2bN/vjI3mseHh4eKd5vc2t/BH0QuFkhcJMGR4eHt5W3uaXcryFVg01lmbK8PDw8A7wdhWDPIRdLy2FwoCHh4d3jJeHqtUB02rsm5QoPDw8vM/i5aFtcuvJ1UcLAx4eHt6xwrAyEJC373nbjYeHhzfPSy7Zi3GTdrnaXuPh4eG9l1eNABJ8dTut12rj4eHhzfO+78DDw8PDw8PDw3vA8Qu4Pz7azPEgJgAAAABJRU5ErkJggg==">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAAC3UlEQVR42u3awW7bMBAE0Pz/T7fXHup6ZskmMvl0CgyL4pOBLHaWX7+uvL6wsbGxsbGxsbGxH8n+iq+/LPTH56+++Wqd5POXgNGesbGxsc9mv/nX/wIzW2Hl3qW7sLGxsS9g/7uoJMUjKUJvykxcFPM9Y2NjY2O3rUJewJJmI2+BsLGxsbFnBWyl/LRFERsbGxt7PVRqm5CkdOXr/1iWho2Njf14dj40fc7f3zrfxsbGxn4wu73aYz2zlZOCVK+PjY2NfSi7HeImDcZ6rJ83PPmrx8bGxr6BnReSdlt59FOERG10hY2NjX0oO2kJ2rB+GN+X5Sr5MbCxsbFvYLfHHGej37YI5WOADYNebGxs7A9nrxSVnN2WvfZI0FLdxsbGxv5wdr7RvKjMXsquhqfI0rCxsbEPYu8axLZtQx4/zV40NjY29g3s5DHDweqmkfAsTsLGxsa+h91GRW00P/tm3pYUd2FjY2Mfyl4pYC1p1uq0Q+IoVMLGxsa+jN2G+O2YNtlP/sNsK2DY2NjYH8huI5u8wOTxUH5XO3jAxsbGPpW9coymbTzaI0Gboy5sbGzso9mzx68cwWnL5+ZQCRsbG/sgdl7MZvHT0kbLYlYc2cHGxsY+mr0SOeUHbpJ1Zgd0hgUMGxsb+2PZuw5T5gODXYPkOq7CxsbGvoC9Euu0m2iDp+STN2tiY2NjH81uW4uVwzor49soPEpCJWxsbOxD2esHdNrx8OyJw2YJGxsb+wL2bNG9R3mS8e3sCCY2Njb2qexZ3JMcyplh6tA/L4HY2NjYh7KXSkJZZnYNmIdPxMbGxj6a3bYieVnKo/yVJuebQiVsbGzsx7PbiL/Fr7zQttBuGPRiY2NjH81eKVf5s/KnR/ETNjY2NvZou22DkcRY+RgDGxsb+zZ2vkTeVLRHc9rIKX9B2NjY2GezZ2FN2660o4L8O/99vo2NjY39YPY9FzY2NjY2NjY2NvZjrt8IClz/0XYE/wAAAABJRU5ErkJggg==">
     
 </ul>
 
@@ -463,7 +463,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        <a class="post_tag-link" href="/tags/cas/">cas</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/并发/">并发</a>
+        <a class="post_tag-link" href="/tags/并发/">并发</a>
     </ul>
     
 
@@ -480,7 +480,7 @@
 
     <!-- Share Weibo -->
     
-        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=自旋锁&url=http://seanthefish.com/2020/11/19/cas-spin/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=thread，threadlocal，InheritableThreadLocal源码详解&url=http://seanthefish.com/2020/11/20/thread-source-code/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
             <li class="mdl-menu__item">
                 分享到微博
             </li>
@@ -495,7 +495,7 @@
 
     <!-- Share Google+ -->
     
-        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/19/cas-spin/index.html" target="_blank">
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/20/thread-source-code/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 Google+
             </li>
@@ -507,7 +507,7 @@
 
     <!-- Share QQ -->
     
-        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=自旋锁&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/19/cas-spin/index.html" target="_blank">
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=thread，threadlocal，InheritableThreadLocal源码详解&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/20/thread-source-code/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 QQ
             </li>
@@ -526,158 +526,500 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        <h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁是采用让当前线程不停地的在循环体内执行实现的，当循环的条件被其他线程改变时 才能进入临界区。如下</p>
-<pre><code class="java">public class SpinLock {
-
-  private AtomicReference&lt;Thread&gt; sign =new AtomicReference&lt;&gt;();
-
-  public void lock(){
-    Thread current = Thread.currentThread();
-    while(!sign .compareAndSet(null, current)){
-    }
+        <h2 id="Thread-源码解析"><a href="#Thread-源码解析" class="headerlink" title="Thread 源码解析"></a>Thread 源码解析</h2><p>构造方法：</p>
+<p>所有构造方法都调用了init（），直接看此方法：</p>
+<pre><code class="java">private void init(ThreadGroup g, Runnable target, String name,
+                    long stackSize, AccessControlContext acc) {
+      if (name == null) {
+          throw new NullPointerException(&quot;name cannot be null&quot;);
+      }
+      this.name = name.toCharArray();
+      // 父线程
+      Thread parent = currentThread();
+      SecurityManager security = System.getSecurityManager();
+      if (g == null) {
+          // 实际是Thread.currentThread().getThreadGroup();
+          // 拿到threadgroup以后会对其进行操作
+          // threadgroup里面有nUnstartedThreads代表未启动线程数
+          // nthreads启动线程数
+          // threads[]线程的数组
+          /* Determine if it&#39;s an applet or not */
+          /* If there is a security manager, ask the security manager
+             what to do. */
+          if (security != null) {
+              g = security.getThreadGroup();
+          }
+          /* If the security doesn&#39;t have a strong opinion of the matter
+             use the parent thread group. */
+          if (g == null) {
+              g = parent.getThreadGroup();
+          }
+      }
+      /* checkAccess regardless of whether or not threadgroup is
+         explicitly passed in. */
+      g.checkAccess();
+      /*
+       * Do we have the required permissions?
+       */
+      if (security != null) {
+          if (isCCLOverridden(getClass())) {
+              security.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
+          }
+      }
+      // 在ThreadGroup中标记增加了一个未启动的线程，里面操作很简单，nUnstartedThreads++;
+      g.addUnstarted();
+      this.group = g;
+      // 继承父线程的属性
+      this.daemon = parent.isDaemon();
+      this.priority = parent.getPriority();
+      if (security == null || isCCLOverridden(parent.getClass()))
+          this.contextClassLoader = parent.getContextClassLoader();
+      else
+          this.contextClassLoader = parent.contextClassLoader;
+      this.inheritedAccessControlContext =
+              acc != null ? acc : AccessController.getContext();
+      this.target = target;
+      // 再设置线程优先级
+      setPriority(priority);
+      // 设置inheritableThreadLocals用于父子线程变量共享
+      if (parent.inheritableThreadLocals != null)
+          this.inheritableThreadLocals =
+              ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+      /* Stash the specified stack size in case the VM cares */
+      // 给这个线程设置的栈的大小,默认为0 
+      this.stackSize = stackSize;
+      // 设置线程id
+      tid = nextThreadID();
   }
+</code></pre>
+<p>start（）：</p>
+<pre><code class="java"> public synchronized void start() {
+        /**
+         * This method is not invoked for the main method thread or &quot;system&quot;
+         * group threads created/set up by the VM. Any new functionality added
+         * to this method in the future may have to also be added to the VM.
+         *
+         * A zero status value corresponds to state &quot;NEW&quot;.
+         */
+        // 一个新建的未启动的线程的threadStatus必须为0
+        // 0 就代表“new”
+        if (threadStatus != 0)
+            throw new IllegalThreadStateException();
 
-  public void unlock (){
-    Thread current = Thread.currentThread();
-    sign .compareAndSet(current, null);
+        /* Notify the group that this thread is about to be started
+         * so that it can be added to the group&#39;s list of threads
+         * and the group&#39;s unstarted count can be decremented. */
+        // 将当前线程加入group
+        // group中的启动线程数++ 未启动线程数--
+        group.add(this);
+
+        boolean started = false;
+        try {
+            // 调用native方法
+            start0();
+            started = true;
+        } finally {
+            try {
+                if (!started) {
+                    group.threadStartFailed(this);
+                }
+            } catch (Throwable ignore) {
+                /* do nothing. If start0 threw a Throwable then
+                  it will be passed up the call stack */
+            }
+        }
+    }
+</code></pre>
+<p>exit（）：</p>
+<pre><code class="java">/**
+ * This method is called by the system to give a Thread
+ * a chance to clean up before it actually exits.
+ */
+private void exit() {
+    if (group != null) {
+        group.threadTerminated(this);
+        group = null;
+    }
+    /* Aggressively null out all reference fields: see bug 4006245 */
+    target = null;
+    /* Speed the release of some of these resources */
+    threadLocals = null;
+    inheritableThreadLocals = null;
+    inheritedAccessControlContext = null;
+    blocker = null;
+    uncaughtExceptionHandler = null;
+}
+</code></pre>
+<p>exit（）方法没啥可说的，更重要的是其中调用的group.threadTerminated(this);</p>
+<pre><code class="java"> /**
+     * Notifies the group that the thread {@code t} has terminated.
+     *
+     * &lt;p&gt; Destroy the group if all of the following conditions are
+     * true: this is a daemon thread group; there are no more alive
+     * or unstarted threads in the group; there are no subgroups in
+     * this thread group.
+     *
+     * @param  t
+     *         the Thread that has terminated
+     */
+void threadTerminated(Thread t) {
+        synchronized (this) {
+            // 从group中删除当前线程
+            remove(t);
+
+            if (nthreads == 0) {
+                // 唤醒其他线程
+                // 这就是为什么被join挂起的线程会被唤醒
+                notifyAll();
+            }
+            if (daemon &amp;&amp; (nthreads == 0) &amp;&amp;
+                (nUnstartedThreads == 0) &amp;&amp; (ngroups == 0))
+            {
+                destroy();
+            }
+        }
+    }
+</code></pre>
+<p>sleep（）：</p>
+<pre><code class="java">public static void sleep(long millis, int nanos)
+    throws InterruptedException {
+        if (millis &lt; 0) {
+            throw new IllegalArgumentException(&quot;timeout value is negative&quot;);
+        }
+        if (nanos &lt; 0 || nanos &gt; 999999) {
+            throw new IllegalArgumentException(
+                                &quot;nanosecond timeout value out of range&quot;);
+        }
+        if (nanos &gt;= 500000 || (nanos != 0 &amp;&amp; millis == 0)) {
+            millis++;
+        }
+        // 直接调用native方法
+        sleep(millis);
+    }
+</code></pre>
+<p>stop（）：<br>stop( )方法是停止线程的执行，这个方法是一个不推荐使用的方法，已经被废弃了，因为使用该方法会出现异常情况。<br>因为它是天生不安全的。停止一个线程会导致它解锁它所锁定的所有monitor（当一个ThreadDeath Exception沿着栈向上传播时会解锁monitor），如果这些被释放的锁所保护的objects有任何一个进入一个不一致的状态，其他将要访问该objects的线程也会以一种不一致的状态来访问这些objects。这种objects称为“被损坏了”。当线程对被损坏的objects上做操作时，可能会产生意想不到的结果，这些行为可能是很严重的，并且难以探测到，</p>
+<pre><code class="java">@Deprecated
+  public final void stop() {
+      SecurityManager security = System.getSecurityManager();
+      if (security != null) {
+        //检查是否有权限
+          checkAccess();
+          if (this != Thread.currentThread()) {
+              security.checkPermission(SecurityConstants.STOP_THREAD_PERMISSION);
+          }
+      }
+      // A zero status value corresponds to &quot;NEW&quot;, it can&#39;t change to
+      // not-NEW because we hold the lock.
+      if (threadStatus != 0) {
+          resume(); // Wake up thread if it was suspended; no-op otherwise
+      }
+      // The VM can handle all thread states
+      stop0(new ThreadDeath());
   }
-}
 </code></pre>
-<h2 id="Ticket锁"><a href="#Ticket锁" class="headerlink" title="Ticket锁"></a>Ticket锁</h2><p>Ticket锁主要解决的是访问顺序的问题, 每次都要查询一个serviceNum服务号，影响性能（必须要到主内存读取，并阻止其他cpu修改）。</p>
-<pre><code class="java">package com.alipay.titan.dcc.dal.entity;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class TicketLock {
-    private AtomicInteger                     serviceNum = new AtomicInteger();
-    private AtomicInteger                     ticketNum  = new AtomicInteger();
-    private static final ThreadLocal&lt;Integer&gt; LOCAL      = new ThreadLocal&lt;Integer&gt;();
-
-    public void lock() {
-        int myticket = ticketNum.getAndIncrement();
-        LOCAL.set(myticket);
-        while (myticket != serviceNum.get()) {
-        }
-
-    }
-
-    public void unlock() {
-        int myticket = LOCAL.get();
-        serviceNum.compareAndSet(myticket, myticket + 1);
-    }
-}
+<p>join（）：</p>
+<p>join方法是等待该线程执行，直到超时或者终止，可以作为线程通信的一种方式，A线程调用B线程的join（阻塞），等待B完成后再往下执行。 join（）方法中重载了多个方法，但是主要的方法是下面的方法。</p>
+<pre><code class="java">public final synchronized void join(long millis)
+   throws InterruptedException {
+       //得到当前的系统给时间
+       long base = System.currentTimeMillis();
+       long now = 0;
+       if (millis &lt; 0) {
+           throw new IllegalArgumentException(&quot;timeout value is negative&quot;);
+       }
+       if (millis == 0) {
+           //如果是活跃的的
+           while (isAlive()) {
+           //无限期的等待
+               wait(0);
+           }
+       } else {
+           while (isAlive()) {
+               long delay = millis - now;
+               if (delay &lt;= 0) {
+                   break;
+               }
+               //有限期的进行等待
+               wait(delay);
+               now = System.currentTimeMillis() - base;
+           }
+       }
+   }
 </code></pre>
-<h2 id="CLHLock"><a href="#CLHLock" class="headerlink" title="CLHLock"></a>CLHLock</h2><p>CLHlock是连表结构，不停的查询前驱变量，导致不适合在NUMA 架构下使用（在这种结构下，每个线程分布在不同的物理内存区域）</p>
-<pre><code class="java">public class CLHLock {
-
-    public static class QNode {
-        volatile boolean locked;
-    }
-
-    // 尾巴，是所有线程共有的一个。所有线程进来后，把自己设置为tail
-    private final AtomicReference&lt;QNode&gt; tail;
-    // 前驱节点，每个线程独有一个。
-    private final ThreadLocal&lt;QNode&gt; myPred;
-    // 当前节点，表示自己，每个线程独有一个。
-    private final ThreadLocal&lt;QNode&gt; myNode;
-
-    public CLHLock() {
-        // 初始状态 tail指向一个node(head)节点
-        this.tail = new AtomicReference&lt;&gt;(new QNode());
-        this.myNode = ThreadLocal.withInitial(QNode::new);
-        this.myPred = new ThreadLocal&lt;&gt;();
-    }
-
-    public void lock() {
-        // 获取当前线程的代表节点
-        QNode node = myNode.get();
-        // 将自己的状态设置为true表示获取锁。
-        node.locked = true;
-        // 将自己放在队列的尾巴，并且返回以前的值。第一次进将获取构造函数中的那个new QNode
-        QNode pred = tail.getAndSet(node);
-        // 把旧的节点放入前驱节点。
-        myPred.set(pred);
-        // 判断前驱节点的状态，然后走掉。
-        while (pred.locked) {
+<p>interrupt():</p>
+<pre><code class="java">public void interrupt() {
+    if (this != Thread.currentThread())
+        checkAccess();
+    synchronized (blockerLock) {
+        Interruptible b = blocker;
+        if (b != null) {
+            interrupt0();           // Just to set the interrupt flag
+            b.interrupt(this);
+            return;
         }
     }
-
-    public void unlock() {
-        // unlock. 获取自己的node。把自己的locked设置为false。
-        QNode node = myNode.get();
-        node.locked = false;
-    }
+    interrupt0();
 }
 </code></pre>
-<p>CLH队列锁的优点是空间复杂度低（如果有n个线程，L个锁，每个线程每次只获取一个锁，那么需要的存储空间是O（L+n），n个线程有n个myNode，L个锁有L个tail），CLH的一种变体被应用在了JAVA并发框架中。唯一的缺点是在NUMA系统结构下性能很差，在这种系统结构下，每个线程有自己的内存，如果前趋结点的内存位置比较远，自旋判断前趋结点的locked域，性能将大打折扣，但是在SMP系统结构下该法还是非常有效的。一种解决NUMA系统结构的思路是MCS队列锁。</p>
-<h2 id="MCSLock"><a href="#MCSLock" class="headerlink" title="MCSLock"></a>MCSLock</h2><p>MCS 的实现是基于链表的，每个申请锁的线程都是链表上的一个节点，这些线程会一直轮询自己的本地变量，来知道它自己是否获得了锁。已经获得了锁的线程在释放锁的时候，负责通知其它线程，这样 CPU 之间缓存的同步操作就减少了很多，仅在线程通知另外一个线程的时候发生，降低了系统总线和内存的开销。实现如下所示：</p>
-<pre><code class="java">public class MCSLock {
+<p>interrupt()方法是中断当前的线程， 其实Thread类中有三个方法，比较容易混淆，在这里解释一下。</p>
+<ul>
+<li>interrupt: 置为中断状态</li>
+<li>isInterrupt: 线程是否中断</li>
+<li>interrupted: 返回线程的上次的中断状态，并清除中断状态。</li>
+</ul>
+<p>一般来说，阻塞函数：如Thread.sleep、Thread.join、Object.wait等在检查到线程的中断状态的时候，会抛出InteruptedExeption, 同时会清除线程的中断状态。</p>
+<p>对于InterruptedException的处理，可以有两种情况：</p>
+<p>外层代码可以处理这个异常，直接抛出这个异常即可<br>如果不能抛出这个异常，比如在run()方法内，因为在得到这个异常的同时，线程的中断状态已经被清除了，需要保留线程的中断状态，则需要调用<code>Thread.currentThread().interrupt()</code></p>
+<h2 id="threadlocal"><a href="#threadlocal" class="headerlink" title="threadlocal"></a>threadlocal</h2><p>以下内容参考： <a href="https://juejin.cn/post/6844903552477822989" target="_blank" rel="noopener">https://juejin.cn/post/6844903552477822989</a>  <a href="https://www.jianshu.com/p/9d289d33f696" target="_blank" rel="noopener">https://www.jianshu.com/p/9d289d33f696</a></p>
+<p>threadLocal是每线程独有的</p>
+<p><img src="https://s3.ax1x.com/2020/11/20/DlmQnP.png" alt="DlmQnP.png"></p>
+<p>每个Thread维护一个ThreadLocalMap，存储在ThreadLocalMap内的就是一个以Entry为元素的数组，Entry就是一个key-value结构，key为ThreadLocal，value为存储的值。类比HashMap的实现，其实就是每个线程借助于一个哈希表，存储线程独立的值。</p>
+<p>这里ThreadLocal和key之间的线是虚线，因为Entry是继承了WeakReference实现的，当ThreadLocalRef销毁时，指向堆中ThreadLocal实例的唯一一条强引用消失了，只有Entry有一条指向ThreadLocal实例的弱引用，那么这里ThreadLocal实例是可以被GC掉的。这时Entry里的key为null了，但是enrty本身还是有一个强引用链：Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value，如果线程迟迟没有死亡，那么永远无法回收，造成内存泄漏。下面会讲。</p>
+<p>ThreadLocalMap用来存储用户的value，这个map的引用在Thread类里，是全线程唯一的。</p>
+<pre><code class="java">static class ThreadLocalMap {
+    // 注意虚引用
+    static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+        /** The value associated with this ThreadLocal. */
+        Object value;
 
-    public static class Node{
-        // 后继节点
-        volatile   Node next;
-        // 默认false
-        volatile   boolean locked;
+        Entry(ThreadLocal&lt;?&gt; k, Object v) {
+            super(k);
+            value = v;
+        }
+    }
+    /**
+     * The table, resized as necessary.
+     * table.length MUST always be a power of two.
+     */
+    // 主要数据结构就是一个Entry的数组table；
+    private Entry[] table;
+
+    ...
+</code></pre>
+<p>几个方法一起说了：</p>
+<pre><code class="java">
+public void set(T value) {
+    // 获取当前的Thread对象，通过getMap获取Thread内的ThreadLocalMap
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null)
+            map.set(this, value);
+        else
+            createMap(t, value);
     }
 
-    // 指向最后加入的线程
-    final AtomicReference&lt;Node&gt; tail = new AtomicReference&lt;&gt;(null);
 
-    ThreadLocal&lt;Node&gt; current;
-
-    public MCSLock(){
-        //初始化当前节点的node
-        current= ThreadLocal.withInitial(Node::new);
-    }
-    public void lock() throws InterruptedException {
-
-        // 获取当前线程的Node
-        Node own = current.get();
-
-        // 把自己设为尾节点， 并取回旧节点
-        Node preNode = tail.getAndSet(own);
-
-        // 如果旧节点不为null，说明有线程已经占用
-        if(preNode != null){
-            // 设置当前节点为需要占用状态；
-            own.locked = true;
-            // 把前面节点的next指向自己
-            preNode.next = own;
-
-            // 在自己的节点上自旋等待前驱通知
-            while(own.locked){
-
+public T get() {
+    // 获取当前的Thread对象，通过getMap获取Thread内的ThreadLocalMap
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null) {
+            // 如果map已经存在，以当前的ThreadLocal为键，获取Entry对象，并从从Entry中取出值
+            ThreadLocalMap.Entry e = map.getEntry(this);
+            if (e != null) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                T result = (T)e.value;
+                return result;
             }
-
-
         }
-
+        // 否则，调用setInitialValue进行初始化。
+        return setInitialValue();
     }
 
-    public void unlock(){
-        // 获取自己的节点
-        Node own=current.get();
-        //
-        if(own.next==null){
-            // 判断是不是自身是不是最后一个线程
-            if(tail.compareAndSet(own,null)){
-                // 是的话就结束
-                return;
+ThreadLocalMap getMap(Thread t) {
+        // ThreadLocalMap在当前线程被所有ThreadLocal共享
+        return t.threadLocals;
+}
+
+void createMap(Thread t, T firstValue) {
+    // 初始化map,构建table与Enrty
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
+}
+
+private T setInitialValue() {
+    // 首先是调用initialValue生成一个初始的value值，深入initialValue函数，我们可知它就是返回一个null；
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    // 然后还是在get以下Map
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+    // 如果map存在，则直接map.set
+        map.set(this, value);
+    else
+    // 如果不存在则会调用createMap创建ThreadLocalMap
+        createMap(t, value);
+    return value;
+}
+</code></pre>
+<p>每一个ThreadLocal对象是如何区分的：</p>
+<pre><code class="java">    //java提供的,可以用原子方式更新的 int值的类。
+    private static AtomicInteger nextHashCode = new AtomicInteger();
+    private static final int HASH_INCREMENT = 0x61c88647;
+    private final int threadLocalHashCode = nextHashCode();
+
+    private static int nextHashCode() {
+        //原子性加一
+        return nextHashCode.getAndAdd(HASH_INCREMENT);
+    }
+</code></pre>
+<p>对于每一个ThreadLocal对象，都有一个final的int值threadLocalHashCode；AtomicInteger 是static修饰的，全局唯一，每一次加一之后的值仍然可用，并且保证原子性。所以，每一个线程的ThreadLocal对象都有唯一的threadLocalHashCode值。</p>
+<p>为什么不使用当前线程作为key？</p>
+<p>上面知道，每一个线程周期，都有一个全线程唯一的map用于存储value，如果线程内多个ThreadLocal对象set了value，那么以当前线程作为键是不能保证key的唯一性的；而每一个ThreadLocal对象都可以由threadLocalHashCode进行唯一区分，所以key使用为ThreadLocal方便存取。</p>
+<p>解决内存泄漏</p>
+<pre><code class="java">private Entry getEntry(ThreadLocal&lt;?&gt; key) {
+    // 首先是计算索引位置i
+    int i = key.threadLocalHashCode &amp; (table.length - 1);
+    Entry e = table[i];
+    if (e != null &amp;&amp; e.get() == key)
+    // 根据获取Entry，如果Entry存在且Entry的key恰巧等于ThreadLocal，那么直接返回Entry对象；
+        return e;
+    else
+    // 否则，也就是在此位置上找不到对应的Entry，那么就调用getEntryAfterMiss。
+        return getEntryAfterMiss(key, i, e);
+}
+
+
+private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    while (e != null) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == key)
+        // 如果k==key,那么代表找到了这个所需要的Entry，直接返回；
+            return e;
+        if (k == null)
+        // 如果k==null，那么证明这个Entry中key已经为null,那么这个Entry就是一个过期对象，这里调用expungeStaleEntry清理该Entry。
+        // 这里解决了内存泄漏问题
+        // ThreadLocal实例由于只有Entry中的一条弱引用指着，那么就会被GC掉，Entry的key没了，value可能会内存泄露的
+        // 其实在每一个get，set操作时都会不断清理掉这种key为null的Entry的。
+            expungeStaleEntry(i);
+        else
+            i = nextIndex(i, len);
+        e = tab[i];
+    }
+    return null;
+}
+
+private int expungeStaleEntry(int staleSlot) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    // expunge entry at staleSlot
+    // 这段主要是将i位置上的Entry的value设为null，Entry的引用也设为null，那么系统GC的时候自然会清理掉这块内存；
+    tab[staleSlot].value = null;
+    tab[staleSlot] = null;
+    size--;
+
+    // Rehash until we encounter null
+    // 这段就是扫描位置staleSlot之后，null之前的Entry数组，清除每一个key为null的Entry，同时若是key不为空，做rehash，调整其位置。
+    Entry e;
+    int i;
+    for (i = nextIndex(staleSlot, len);
+         (e = tab[i]) != null;
+         i = nextIndex(i, len)) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == null) {
+            e.value = null;
+            tab[i] = null;
+            size--;
+        } else {
+            int h = k.threadLocalHashCode &amp; (len - 1);
+            if (h != i) {
+                tab[i] = null;
+
+                // Unlike Knuth 6.4 Algorithm R, we must scan until
+                // null because multiple entries could have been stale.
+                while (tab[h] != null)
+                    h = nextIndex(h, len);
+                tab[h] = e;
             }
-
         }
-        // 在判断过程中，又有线程进来
-        while (own.next==null){
+    }
+    return i;
+}
+</code></pre>
+<p>我们发现无论是set,get还是remove方法，过程中key为null的Entry都会被擦除，那么Entry内的value也就没有强引用链，GC时就会被回收。那么怎么会存在内存泄露呢？但是以上的思路是假设你调用get或者set方法了，很多时候我们都没有调用过，所以最佳实践就是*<br>1 .使用者需要手动调用remove函数，删除不再使用的ThreadLocal.<br>2 .还有尽量将ThreadLocal设置成private static的，这样ThreadLocal会尽量和线程本身一起消亡。</p>
+<h2 id="InheritableThreadLocal父子线程共享变量"><a href="#InheritableThreadLocal父子线程共享变量" class="headerlink" title="InheritableThreadLocal父子线程共享变量"></a>InheritableThreadLocal父子线程共享变量</h2><p>InheritableThreadLocal的源码非常简单，继承自ThreadLocal，重写其中三个方法。</p>
+<pre><code class="java">public class InheritableThreadLocal&lt;T&gt; extends ThreadLocal&lt;T&gt; {
+    public InheritableThreadLocal() {
+    }
 
-        }
-        // 本身解锁，通知它的后继节点可以工作了，不用再自旋了
-        own.next.locked = false;
-        own.next=null;// for gc
+    protected T childValue(T var1) {
+        return var1;
+    }
+
+    ThreadLocalMap getMap(Thread var1) {
+        return var1.inheritableThreadLocals;
+    }
+
+    void createMap(Thread var1, T var2) {
+        var1.inheritableThreadLocals = new ThreadLocalMap(this, var2);
     }
 }
 </code></pre>
-<p>MCS 的能够保证较高的效率，降低不必要的性能消耗，并且它是公平的自旋锁。</p>
-<p>CLH 锁与 MCS 锁的原理大致相同，都是各个线程轮询各自关注的变量，来避免多个线程对同一个变量的轮询，从而从 CPU 缓存一致性的角度上减少了系统的消耗。<br>CLH 锁与 MCS 锁最大的不同是，MCS 轮询的是当前队列节点的变量，而 CLH 轮询的是当前节点的前驱节点的变量，来判断前一个线程是否释放了锁。</p>
+<p>InheritableThreadLocal获取的也是ThreadLocalMap, 解决父子线程共享变量的地方实际在thread类里，上文说过：</p>
+<pre><code class="java">/* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+
+    /*
+     * InheritableThreadLocal values pertaining to this thread. This map is
+     * maintained by the InheritableThreadLocal class.
+     */
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+
+private void init(ThreadGroup g, Runnable target, String name,
+                      long stackSize, AccessControlContext acc,
+                      boolean inheritThreadLocals) {
+        //..........
+        Thread parent = currentThread();
+        //..........
+        // 如果父线程的inheritableThreadLocals != null
+        if (inheritThreadLocals &amp;&amp; parent.inheritableThreadLocals != null)
+        // 新线程：`this.inheritableThreadLocals=ThreadLocal.createInheritedMap(parent.inheritableThreadLocals)`
+        // 传入父线程的inheritableThreadLocals 
+            this.inheritableThreadLocals =
+                ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+        /* Stash the specified stack size in case the VM cares */
+        this.stackSize = stackSize;
+
+        /* Set thread ID */
+        tid = nextThreadID();
+    }
+</code></pre>
+<pre><code class="java">    static ThreadLocalMap createInheritedMap(ThreadLocalMap parentMap) {
+        return new ThreadLocalMap(parentMap);
+    }
+
+    // 实际上就是构造了一个新的包含所有parentMap元素的新map
+    private ThreadLocalMap(ThreadLocalMap parentMap) {
+        // 得到parent的数组
+        Entry[] parentTable = parentMap.table;
+        int len = parentTable.length;
+        setThreshold(len);
+        table = new Entry[len];
+
+        for (int j = 0; j &lt; len; j++) {
+            Entry e = parentTable[j];
+            if (e != null) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                ThreadLocal&lt;Object&gt; key = (ThreadLocal&lt;Object&gt;) e.get();
+                if (key != null) {
+                    // InheritableThreadLocal重写了这个方法返回原值
+                    Object value = key.childValue(e.value);
+                    Entry c = new Entry(key, value);
+                    //计算hash位置，与ThreadLocal的set方法一样
+                    int h = key.threadLocalHashCode &amp; (len - 1);
+                    while (table[h] != null)
+                        h = nextIndex(h, len);
+                    table[h] = c;
+                    size++;
+                }
+            }   
+        }
+    }
+</code></pre>
 
         
     
@@ -732,8 +1074,8 @@ public class TicketLock {
 
 <script type="text/javascript">
     var disqus_config = function () {
-        this.page.url = 'http://seanthefish.com/2020/11/19/cas-spin/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://seanthefish.com/2020/11/19/cas-spin/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = 'http://seanthefish.com/2020/11/20/thread-source-code/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/20/thread-source-code/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 </script>
 
@@ -782,21 +1124,13 @@ public class TicketLock {
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2020/11/20/thread-source-code/" id="post_nav-newer" class="prev-content">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                <i class="material-icons">arrow_back</i>
-            </button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            新篇
-        </a>
-    
 
     <!-- Section Spacer -->
     <div class="section-spacer"></div>
 
     <!-- Next Nav -->
     
-        <a href="/2020/11/18/jvm-multithread/" id="post_nav-older" class="next-content">
+        <a href="/2020/11/19/cas-spin/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
