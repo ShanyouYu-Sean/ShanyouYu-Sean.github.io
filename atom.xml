@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-20T10:32:26.853Z</updated>
+  <updated>2020-11-20T12:30:51.485Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>自旋锁</title>
+    <link href="http://seanthefish.com/2020/11/19/cas-spin/"/>
+    <id>http://seanthefish.com/2020/11/19/cas-spin/</id>
+    <published>2020-11-19T04:14:47.000Z</published>
+    <updated>2020-11-20T12:30:51.485Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;自旋锁&quot;&gt;&lt;a href=&quot;#自旋锁&quot; class=&quot;headerlink&quot; title=&quot;自旋锁&quot;&gt;&lt;/a&gt;自旋锁&lt;/h2&gt;&lt;p&gt;自旋锁是采用让当前线程不停地的在循环体内执行实现的，当循环的条件被其他线程改变时
+        
+      
+    
+    </summary>
+    
+      <category term="cas" scheme="http://seanthefish.com/categories/cas/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/cas/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>jvm与并发</title>
@@ -40,9 +70,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
     
     
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
-    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
     
   </entry>
   
@@ -372,6 +402,32 @@
   </entry>
   
   <entry>
+    <title>在spring中使用cors</title>
+    <link href="http://seanthefish.com/2018/11/06/spring-cors/"/>
+    <id>http://seanthefish.com/2018/11/06/spring-cors/</id>
+    <published>2018-11-06T06:00:00.000Z</published>
+    <updated>2018-11-06T08:56:33.319Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;网上有很多教程，基本上都是清一色的&lt;code&gt;@CrossOrigin&lt;/code&gt;，&lt;code&gt;@CrossOrigin&lt;/code&gt;在和spring security一起用的时候不生效，因为filter chain
+        
+      
+    
+    </summary>
+    
+      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
+    
+    
+      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用oidc id token验证spring security resource server</title>
     <link href="http://seanthefish.com/2018/11/06/spring-security-jwt/"/>
     <id>http://seanthefish.com/2018/11/06/spring-security-jwt/</id>
@@ -400,35 +456,9 @@
     
       <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
     
+      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
+    
       <category term="OIDC" scheme="http://seanthefish.com/tags/OIDC/"/>
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在spring中使用cors</title>
-    <link href="http://seanthefish.com/2018/11/06/spring-cors/"/>
-    <id>http://seanthefish.com/2018/11/06/spring-cors/</id>
-    <published>2018-11-06T06:00:00.000Z</published>
-    <updated>2018-11-06T08:56:33.319Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;网上有很多教程，基本上都是清一色的&lt;code&gt;@CrossOrigin&lt;/code&gt;，&lt;code&gt;@CrossOrigin&lt;/code&gt;在和spring security一起用的时候不生效，因为filter chain
-        
-      
-    
-    </summary>
-    
-      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
-    
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
     
   </entry>
   
@@ -553,32 +583,6 @@
         
           &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;OAuth 2.0核心框架（RFC
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--IndieAuth</title>
-    <link href="http://seanthefish.com/2018/07/13/oauth-guide-23/"/>
-    <id>http://seanthefish.com/2018/07/13/oauth-guide-23/</id>
-    <published>2018-07-13T15:00:00.000Z</published>
-    <updated>2018-07-27T08:51:12.803Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot;
         
       
     
