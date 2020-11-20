@@ -144,10 +144,9 @@ public class TicketLock {
                 return;
             }
 
-            // 在判断过程中，又有线程进来
-            while (own.next==null){
-
-            }
+        }
+        // 在判断过程中，又有线程进来
+        while (own.next==null){
 
         }
         // 本身解锁，通知它的后继节点可以工作了，不用再自旋了
@@ -1086,9 +1085,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> jvm </tag>
-            
             <tag> classLoader </tag>
+            
+            <tag> jvm </tag>
             
         </tags>
         
@@ -1234,9 +1233,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> jvm </tag>
-            
             <tag> classLoader </tag>
+            
+            <tag> jvm </tag>
             
         </tags>
         
