@@ -52,7 +52,7 @@
     
     <title>
         
-            OAuth教程--使用PKCE保护移动应用程序 | 
+            thread，threadlocal，InheritableThreadLocal源码详解 | 
         
         小鱼肖恩
     </title>
@@ -63,7 +63,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,OAuth">
+    <meta name="keywords" content="小鱼肖恩,并发">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -224,7 +224,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2018/07/13/oauth-guide-17/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/15/thread-source-code/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -243,16 +243,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2018/07/13/oauth-guide-17/">
+    <meta property="og:url" content="http://seanthefish.com/2020/11/15/thread-source-code/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="OAuth教程--使用PKCE保护移动应用程序 | 小鱼肖恩">
+    <meta property="og:title" content="thread，threadlocal，InheritableThreadLocal源码详解 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="OAuth"> 
+    <meta property="og:article:tag" content="并发"> 
 
     
-        <meta property="article:published_time" content="Fri Jul 13 2018 17:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Fri Jul 27 2018 14:22:58 GMT+0800">
+        <meta property="article:published_time" content="Sun Nov 15 2020 12:14:47 GMT+0800">
+        <meta property="article:modified_time" content="Sat Nov 21 2020 00:30:53 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -260,7 +260,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2018/07/13/oauth-guide-17/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2020/11/15/thread-source-code/index.html" />
     
 
     <!-- Structured-data for SEO -->
@@ -272,10 +272,10 @@
 {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2018/07/13/oauth-guide-17/index.html",
-    "headline": "OAuth教程--使用PKCE保护移动应用程序",
-    "datePublished": "Fri Jul 13 2018 17:00:00 GMT+0800",
-    "dateModified": "Fri Jul 27 2018 14:22:58 GMT+0800",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/15/thread-source-code/index.html",
+    "headline": "thread，threadlocal，InheritableThreadLocal源码详解",
+    "datePublished": "Sun Nov 15 2020 12:14:47 GMT+0800",
+    "dateModified": "Sat Nov 21 2020 00:30:53 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -293,7 +293,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": ",OAuth小鱼肖恩",
+    "keywords": ",并发小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -376,7 +376,7 @@
     </button>
 
     <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
-        <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#授权请求"><span class="post-toc-number">1.</span> <span class="post-toc-text">授权请求</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#错误响应"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">错误响应</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#授权码交换"><span class="post-toc-number">2.</span> <span class="post-toc-text">授权码交换</span></a></li></ol>
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Thread-源码解析"><span class="post-toc-number">1.</span> <span class="post-toc-text">Thread 源码解析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#threadlocal"><span class="post-toc-number">2.</span> <span class="post-toc-text">threadlocal</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InheritableThreadLocal父子线程共享变量"><span class="post-toc-number">3.</span> <span class="post-toc-text">InheritableThreadLocal父子线程共享变量</span></a></li></ol>
     </ul>
     
 
@@ -408,7 +408,7 @@
         
     
             <p class="article-headline-p">
-                OAuth教程--使用PKCE保护移动应用程序
+                thread，threadlocal，InheritableThreadLocal源码详解
             </p>
         </div>
 
@@ -427,7 +427,7 @@
     <!-- Author Name & Date -->
     <div>
         <strong>Sean Yu</strong>
-        <span>7月 13, 2018</span>
+        <span>11月 15, 2020</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -449,7 +449,7 @@
 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
     <li class="mdl-menu__item">在其它设备中阅读本文章</li>
     
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACaklEQVR42u3aQW7DMAwEwPz/0+0Diri7lKW6wfhUoImt8UFilnx9ffT1wsPDw8PDw8PDexjvFV8/v/X2AW/+e33nd0+p14aHh4d3hPfLVnvJu8Zc3/MaOVwbHh4e3kFe/sh8Q185Htq14eHh4T2Z1xbW+UGCh4eH96m89jPDheLh4eE9npdv8fmikzs/KGvBw8PDi3l5k+n830f7e3h4eHgBrx5pWngFSQPs5qErPDw8vA28fCNOSuFkcKoNfJP14OHh4f0Vr21cJaFqEuwmAwrF4AIeHh7eZl47BHBvkLEedkS/GPDw8PBu5bVldL1NX273eRixJaXGw8PDu7VDdFczbMZYCXzx8PDwdvPyY+D6FSThbD0EMAss8PDw8I7wkpI3L4XzeLf9bxQZ4+Hh4W3mzZr0s2ZVUiK3Iwt4eHh453nJpp+3svJoIz9I8heNh4eHd5KXx6mzgLUdGshLfDw8PLzzvB1beREcxK9saaYMDw8PbwMvDx1mZXfeBmu/i4eHh3eelw9RtaMAs0NiJcDFw8PDO89bKX/XY4h26GoY4+Lh4eHdymsPibxxNRvbykt8PDw8vL/iJSFpzpi1uNqy+7ZzDw8PD+8mXhs0rN8hDzhu+MWAh4eHN+K1V7uVzwLiWaiBh4eHd4b3iq9r5GwgNf/8cOgKDw8PbxuvjR6GW/bKKNXKwYCHh4e3jde2tfKFFtt6GQrj4eHh/S/erPxNlpsEFnh4eHj/i9eW2sXIVAyrwwg8PDy8DbwkjMgb/MmGPjuK8PDw8J7Amz14FiW0L6tup+Hh4eFt5n3ehYeHh4eHh4eH94DrG7Gpr1sQemsaAAAAAElFTkSuQmCC">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAAC4klEQVR42u3aQXLkIAwF0L7/pWe2U5WJ+3/hTjnwWKUcG3gsokji9efI8cLGxsbGxsbGxsZ+JPsVj/9M9M/z63e+zpM8/xYw2jM2Njb23uw3f/q/TnEJzt9fX734ChsbG/sA9nVQud5Evrk3YSYIZu2esbGxsbHzlGMW8K6PJlkLGxsbG7tlX4exPETl3yb7wcbGxsZOCjSvcrSlpdnBfbyWho2Njf14dg54zs8/2t/GxsbGfjC7Hfm//u3zvJA03Dk2Njb2puw8MKxc2WmLQUkQzS+JYmNjY5/DvrfJGm0lDkuzEhU2Njb2Cew2SchLTuurtA2DpaISNjY29kbs78LYvVdt8t8OEw9sbGzsY9htYzUvRV0nNskRJLMt9bexsbGxN2KvLzBLEmYNiWFrGRsbG3tr9spGZ2lDkk7MjruO29jY2Ni/nH0XuJ0tbwnPyknY2NjY57DbxfK2QdL6zQtVN3yFjY2NvSm73crKhchZSjNb601RCRsbG3sjdr5Angwk1CS85fsZxm1sbGzsLdgrDdc8XLVlpllS9GYebGxs7E3Z7WWdtimbH0oS5GZHgI2NjX0yexZO8pZAfonnh4pK2NjY2L+QnbQHVtKGpY2WwWx4UwkbGxt7I/asWJ8nJG1iM7ugUwcwbGxs7F/ObpOHWbBp05j8yIpyFTY2NvYB7DaRmL3TBq38yZs5sbGxsbdmf6K09In2bXsxCBsbG/s09srVnHyjefkpD1fDohI2Njb2duykVNSGt5WmQhvk6qISNjY29hbsWbmnSABKTF30z0MgNjY29qbspZBQtnLvajDngQ0bGxv7HHbedl25WNMWle66KoSNjY19Drst8V/DZiFqfXwbXLGxsbGxb0o/8rXyw43KT9jY2NjYy++0hzhrGH8wgGFjY2M/np1PkQPaqzltyaloXWBjY2NvzW6LNW1KMGsVtGnPB/vb2NjY2A9mnzOwsbGxsbGxsbGxHzP+Aly7PhCVRbylAAAAAElFTkSuQmCC">
     
 </ul>
 
@@ -463,7 +463,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        <a class="post_tag-link" href="/tags/OAuth/">OAuth</a>
+        <a class="post_tag-link" href="/tags/并发/">并发</a>
     </ul>
     
 
@@ -480,7 +480,7 @@
 
     <!-- Share Weibo -->
     
-        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=OAuth教程--使用PKCE保护移动应用程序&url=http://seanthefish.com/2018/07/13/oauth-guide-17/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=thread，threadlocal，InheritableThreadLocal源码详解&url=http://seanthefish.com/2020/11/15/thread-source-code/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
             <li class="mdl-menu__item">
                 分享到微博
             </li>
@@ -495,7 +495,7 @@
 
     <!-- Share Google+ -->
     
-        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2018/07/13/oauth-guide-17/index.html" target="_blank">
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/15/thread-source-code/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 Google+
             </li>
@@ -507,7 +507,7 @@
 
     <!-- Share QQ -->
     
-        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=OAuth教程--使用PKCE保护移动应用程序&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2018/07/13/oauth-guide-17/index.html" target="_blank">
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=thread，threadlocal，InheritableThreadLocal源码详解&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/15/thread-source-code/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 QQ
             </li>
@@ -526,27 +526,500 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        <p><strong>本文是oauth.com上的教程的翻译。（<a href="https://www.oauth.com" target="_blank" rel="noopener">原文地址</a>）</strong></p>
-<p>用于代码交换的证明密钥（PKCE，发音为pixie）扩展描述了一种,公共客户端用于减轻拦截授权代码的威胁的技术。该技术涉及客户端首先创建秘钥，然后在交换访问令牌的授权码时再次使用该秘钥。这样，如果代码被截获，它将不能被使用，因为令牌请求依赖于初始秘钥。</p>
-<p>完整规范以<a href="https://tools.ietf.org/html/rfc7636" target="_blank" rel="noopener">RFC7636</a>的形式提供。我们将在下面介绍协议的摘要。</p>
-<h3 id="授权请求"><a href="#授权请求" class="headerlink" title="授权请求"></a>授权请求</h3><p>当原生应用程序开始授权请求时，客户端首先创建所谓的“代码验证程序” ，而不是立即启动浏览器。这是使用随机字符串A-Z，a-z，0-9和标点字符-._~（连字符，期间，下划线和波浪线）来进行加密，长字符43和128之间。</p>
-<p>一旦应用程序生成了代码验证程序，它就会使用它来创建代码验证。对于可以执行SHA256哈希的设备，代码验证是代码验证程序的SHA256哈希的BASE64-URL编码字符串。允许无法执行SHA256哈希的客户端使用普通代码验证程序字符串作为验证。</p>
-<p>现在客户端有一个代码验证字符串，它包含了一个参数，该参数指示用于生成验证的方法（plain或S256）以及授权请求的标准参数。这意味着完整的授权请求将包括以下参数。</p>
-<blockquote>
-<p><strong>response_type = code</strong> - 表示您的服务器希望收到授权代码<br><strong>client_id =</strong> - 首次创建应用程序时收到的客户端ID<br><strong>redirect_uri =</strong> - 表示授权完成后返回用户的URL，例如org.example.app://redirect<br><strong>state = 1234zyx</strong> - 应用程序生成的随机字符串，稍后您将验证该字符串<br><strong>code_challenge = XXXXXXXXX</strong> - 如前所述生成的代码验证<br><strong>code_challenge_method = S256</strong> - plain或者S256，取决于验证是普通验证者字符串还是字符串的SHA256哈希。如果省略此参数，则服务器将采用plain。</p>
-</blockquote>
-<p>授权服务器应识别code_challenge请求中的参数，并将其与其生成的授权码相关联。将其与授权码一起存储在数据库中，或者如果您使用自编码授权码，则可以将其包含在代码本身中。服务器正常返回授权码，并且不包括返回数据中的验证。</p>
-<h4 id="错误响应"><a href="#错误响应" class="headerlink" title="错误响应"></a>错误响应</h4><p>授权服务器可以要求公共客户端必须使用PKCE扩展。这实际上是允许公共客户端在不使用客户端密钥的情况下拥有安全授权流的唯一方法。由于对应于公共客户端，授权服务器应该知道特定客户端ID，因此它可以拒绝对不包含代码验证的公共客户端的授权请求。</p>
-<p>如果授权服务器要求公共客户端使用PKCE，并且授权请求缺少代码验证，则服务器应返回错误响应，<code>error=invalid_request</code>并且应该使用<code>error_description</code>或者<code>error_uri</code>解释错误的性质。</p>
-<h3 id="授权码交换"><a href="#授权码交换" class="headerlink" title="授权码交换"></a>授权码交换</h3><p>本机应用程序将用授权码交换访问令牌。除了授权码请求中定义的参数之外，客户端还将发送<code>code_verifier</code>参数。完整的访问令牌请求将包括以下参数：</p>
-<blockquote>
-<p><strong>grant_type = authorization_code</strong> - 表示此令牌请求的授权类型<br><strong>code</strong> - 客户端将发送它在重定向中获得的授权代码<br><strong>redirect_uri</strong> - 初始授权请求中使用的重定向URL<br><strong>client_id</strong> - 应用程序注册的客户端ID<br><strong>code_verifier</strong> - 应用程序最初在授权请求之前生成的PKCE请求的代码验证程序。</p>
-</blockquote>
-<p>除了验证标准参数之外，授权服务器还将验证<code>code_verifier</code>请求中的内容。由于<code>code_challenge</code>和<code>code_challenge_method</code>用授权码相关联，因此服务器应该已经知道使用哪种方法（普通或SHA256）验证<code>code_verifier</code>。</p>
-<p>如果方法是plain，那么授权服务器只需要检查提供的<code>code_verifier</code>是否与预期的<code>code_challenge</code>字符串匹配。</p>
-<p>如果方法是S256，那么授权服务器应该使用提供的<code>code_verifier</code>, 并使用客户端最初使用的相同方法对其进行转换。这意味着计算其SHA256哈希值并对其进行base64-url编码，然后将其与存储的<code>code_challenge</code>字符串进行比较。</p>
-<p>如果验证程序与期望值匹配，则服务器可以正常继续，发出访问令牌并进行适当响应。如果出现问题，则服务器会响应<code>invalid_grant</code>错误。</p>
-<p>PKCE扩展不会添加任何新响应，因此即使授权服务器不支持，客户端也可以始终使用PKCE扩展。</p>
+        <h2 id="Thread-源码解析"><a href="#Thread-源码解析" class="headerlink" title="Thread 源码解析"></a>Thread 源码解析</h2><p>构造方法：</p>
+<p>所有构造方法都调用了init（），直接看此方法：</p>
+<pre><code class="java">private void init(ThreadGroup g, Runnable target, String name,
+                    long stackSize, AccessControlContext acc) {
+      if (name == null) {
+          throw new NullPointerException(&quot;name cannot be null&quot;);
+      }
+      this.name = name.toCharArray();
+      // 父线程
+      Thread parent = currentThread();
+      SecurityManager security = System.getSecurityManager();
+      if (g == null) {
+          // 实际是Thread.currentThread().getThreadGroup();
+          // 拿到threadgroup以后会对其进行操作
+          // threadgroup里面有nUnstartedThreads代表未启动线程数
+          // nthreads启动线程数
+          // threads[]线程的数组
+          /* Determine if it&#39;s an applet or not */
+          /* If there is a security manager, ask the security manager
+             what to do. */
+          if (security != null) {
+              g = security.getThreadGroup();
+          }
+          /* If the security doesn&#39;t have a strong opinion of the matter
+             use the parent thread group. */
+          if (g == null) {
+              g = parent.getThreadGroup();
+          }
+      }
+      /* checkAccess regardless of whether or not threadgroup is
+         explicitly passed in. */
+      g.checkAccess();
+      /*
+       * Do we have the required permissions?
+       */
+      if (security != null) {
+          if (isCCLOverridden(getClass())) {
+              security.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
+          }
+      }
+      // 在ThreadGroup中标记增加了一个未启动的线程，里面操作很简单，nUnstartedThreads++;
+      g.addUnstarted();
+      this.group = g;
+      // 继承父线程的属性
+      this.daemon = parent.isDaemon();
+      this.priority = parent.getPriority();
+      if (security == null || isCCLOverridden(parent.getClass()))
+          this.contextClassLoader = parent.getContextClassLoader();
+      else
+          this.contextClassLoader = parent.contextClassLoader;
+      this.inheritedAccessControlContext =
+              acc != null ? acc : AccessController.getContext();
+      this.target = target;
+      // 再设置线程优先级
+      setPriority(priority);
+      // 设置inheritableThreadLocals用于父子线程变量共享
+      if (parent.inheritableThreadLocals != null)
+          this.inheritableThreadLocals =
+              ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+      /* Stash the specified stack size in case the VM cares */
+      // 给这个线程设置的栈的大小,默认为0 
+      this.stackSize = stackSize;
+      // 设置线程id
+      tid = nextThreadID();
+  }
+</code></pre>
+<p>start（）：</p>
+<pre><code class="java"> public synchronized void start() {
+        /**
+         * This method is not invoked for the main method thread or &quot;system&quot;
+         * group threads created/set up by the VM. Any new functionality added
+         * to this method in the future may have to also be added to the VM.
+         *
+         * A zero status value corresponds to state &quot;NEW&quot;.
+         */
+        // 一个新建的未启动的线程的threadStatus必须为0
+        // 0 就代表“new”
+        if (threadStatus != 0)
+            throw new IllegalThreadStateException();
+
+        /* Notify the group that this thread is about to be started
+         * so that it can be added to the group&#39;s list of threads
+         * and the group&#39;s unstarted count can be decremented. */
+        // 将当前线程加入group
+        // group中的启动线程数++ 未启动线程数--
+        group.add(this);
+
+        boolean started = false;
+        try {
+            // 调用native方法
+            start0();
+            started = true;
+        } finally {
+            try {
+                if (!started) {
+                    group.threadStartFailed(this);
+                }
+            } catch (Throwable ignore) {
+                /* do nothing. If start0 threw a Throwable then
+                  it will be passed up the call stack */
+            }
+        }
+    }
+</code></pre>
+<p>exit（）：</p>
+<pre><code class="java">/**
+ * This method is called by the system to give a Thread
+ * a chance to clean up before it actually exits.
+ */
+private void exit() {
+    if (group != null) {
+        group.threadTerminated(this);
+        group = null;
+    }
+    /* Aggressively null out all reference fields: see bug 4006245 */
+    target = null;
+    /* Speed the release of some of these resources */
+    threadLocals = null;
+    inheritableThreadLocals = null;
+    inheritedAccessControlContext = null;
+    blocker = null;
+    uncaughtExceptionHandler = null;
+}
+</code></pre>
+<p>exit（）方法没啥可说的，更重要的是其中调用的group.threadTerminated(this);</p>
+<pre><code class="java"> /**
+     * Notifies the group that the thread {@code t} has terminated.
+     *
+     * &lt;p&gt; Destroy the group if all of the following conditions are
+     * true: this is a daemon thread group; there are no more alive
+     * or unstarted threads in the group; there are no subgroups in
+     * this thread group.
+     *
+     * @param  t
+     *         the Thread that has terminated
+     */
+void threadTerminated(Thread t) {
+        synchronized (this) {
+            // 从group中删除当前线程
+            remove(t);
+
+            if (nthreads == 0) {
+                // 唤醒其他线程
+                // 这就是为什么被join挂起的线程会被唤醒
+                notifyAll();
+            }
+            if (daemon &amp;&amp; (nthreads == 0) &amp;&amp;
+                (nUnstartedThreads == 0) &amp;&amp; (ngroups == 0))
+            {
+                destroy();
+            }
+        }
+    }
+</code></pre>
+<p>sleep（）：</p>
+<pre><code class="java">public static void sleep(long millis, int nanos)
+    throws InterruptedException {
+        if (millis &lt; 0) {
+            throw new IllegalArgumentException(&quot;timeout value is negative&quot;);
+        }
+        if (nanos &lt; 0 || nanos &gt; 999999) {
+            throw new IllegalArgumentException(
+                                &quot;nanosecond timeout value out of range&quot;);
+        }
+        if (nanos &gt;= 500000 || (nanos != 0 &amp;&amp; millis == 0)) {
+            millis++;
+        }
+        // 直接调用native方法
+        sleep(millis);
+    }
+</code></pre>
+<p>stop（）：<br>stop( )方法是停止线程的执行，这个方法是一个不推荐使用的方法，已经被废弃了，因为使用该方法会出现异常情况。<br>因为它是天生不安全的。停止一个线程会导致它解锁它所锁定的所有monitor（当一个ThreadDeath Exception沿着栈向上传播时会解锁monitor），如果这些被释放的锁所保护的objects有任何一个进入一个不一致的状态，其他将要访问该objects的线程也会以一种不一致的状态来访问这些objects。这种objects称为“被损坏了”。当线程对被损坏的objects上做操作时，可能会产生意想不到的结果，这些行为可能是很严重的，并且难以探测到，</p>
+<pre><code class="java">@Deprecated
+  public final void stop() {
+      SecurityManager security = System.getSecurityManager();
+      if (security != null) {
+        //检查是否有权限
+          checkAccess();
+          if (this != Thread.currentThread()) {
+              security.checkPermission(SecurityConstants.STOP_THREAD_PERMISSION);
+          }
+      }
+      // A zero status value corresponds to &quot;NEW&quot;, it can&#39;t change to
+      // not-NEW because we hold the lock.
+      if (threadStatus != 0) {
+          resume(); // Wake up thread if it was suspended; no-op otherwise
+      }
+      // The VM can handle all thread states
+      stop0(new ThreadDeath());
+  }
+</code></pre>
+<p>join（）：</p>
+<p>join方法是等待该线程执行，直到超时或者终止，可以作为线程通信的一种方式，A线程调用B线程的join（阻塞），等待B完成后再往下执行。 join（）方法中重载了多个方法，但是主要的方法是下面的方法。</p>
+<pre><code class="java">public final synchronized void join(long millis)
+   throws InterruptedException {
+       //得到当前的系统给时间
+       long base = System.currentTimeMillis();
+       long now = 0;
+       if (millis &lt; 0) {
+           throw new IllegalArgumentException(&quot;timeout value is negative&quot;);
+       }
+       if (millis == 0) {
+           //如果是活跃的的
+           while (isAlive()) {
+           //无限期的等待
+               wait(0);
+           }
+       } else {
+           while (isAlive()) {
+               long delay = millis - now;
+               if (delay &lt;= 0) {
+                   break;
+               }
+               //有限期的进行等待
+               wait(delay);
+               now = System.currentTimeMillis() - base;
+           }
+       }
+   }
+</code></pre>
+<p>interrupt():</p>
+<pre><code class="java">public void interrupt() {
+    if (this != Thread.currentThread())
+        checkAccess();
+    synchronized (blockerLock) {
+        Interruptible b = blocker;
+        if (b != null) {
+            interrupt0();           // Just to set the interrupt flag
+            b.interrupt(this);
+            return;
+        }
+    }
+    interrupt0();
+}
+</code></pre>
+<p>interrupt()方法是中断当前的线程， 其实Thread类中有三个方法，比较容易混淆，在这里解释一下。</p>
+<ul>
+<li>interrupt: 置为中断状态</li>
+<li>isInterrupt: 线程是否中断</li>
+<li>interrupted: 返回线程的上次的中断状态，并清除中断状态。</li>
+</ul>
+<p>一般来说，阻塞函数：如Thread.sleep、Thread.join、Object.wait等在检查到线程的中断状态的时候，会抛出InteruptedExeption, 同时会清除线程的中断状态。</p>
+<p>对于InterruptedException的处理，可以有两种情况：</p>
+<p>外层代码可以处理这个异常，直接抛出这个异常即可<br>如果不能抛出这个异常，比如在run()方法内，因为在得到这个异常的同时，线程的中断状态已经被清除了，需要保留线程的中断状态，则需要调用<code>Thread.currentThread().interrupt()</code></p>
+<h2 id="threadlocal"><a href="#threadlocal" class="headerlink" title="threadlocal"></a>threadlocal</h2><p>以下内容参考： <a href="https://juejin.cn/post/6844903552477822989" target="_blank" rel="noopener">https://juejin.cn/post/6844903552477822989</a>  <a href="https://www.jianshu.com/p/9d289d33f696" target="_blank" rel="noopener">https://www.jianshu.com/p/9d289d33f696</a></p>
+<p>threadLocal是每线程独有的</p>
+<p><img src="https://s3.ax1x.com/2020/11/20/DlmQnP.png" alt="DlmQnP.png"></p>
+<p>每个Thread维护一个ThreadLocalMap，存储在ThreadLocalMap内的就是一个以Entry为元素的数组，Entry就是一个key-value结构，key为ThreadLocal，value为存储的值。类比HashMap的实现，其实就是每个线程借助于一个哈希表，存储线程独立的值。</p>
+<p>这里ThreadLocal和key之间的线是虚线，因为Entry是继承了WeakReference实现的，当ThreadLocalRef销毁时，指向堆中ThreadLocal实例的唯一一条强引用消失了，只有Entry有一条指向ThreadLocal实例的弱引用，那么这里ThreadLocal实例是可以被GC掉的。这时Entry里的key为null了，但是enrty本身还是有一个强引用链：Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value，如果线程迟迟没有死亡，那么永远无法回收，造成内存泄漏。下面会讲。</p>
+<p>ThreadLocalMap用来存储用户的value，这个map的引用在Thread类里，是全线程唯一的。</p>
+<pre><code class="java">static class ThreadLocalMap {
+    // 注意虚引用
+    static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+        /** The value associated with this ThreadLocal. */
+        Object value;
+
+        Entry(ThreadLocal&lt;?&gt; k, Object v) {
+            super(k);
+            value = v;
+        }
+    }
+    /**
+     * The table, resized as necessary.
+     * table.length MUST always be a power of two.
+     */
+    // 主要数据结构就是一个Entry的数组table；
+    private Entry[] table;
+
+    ...
+</code></pre>
+<p>几个方法一起说了：</p>
+<pre><code class="java">
+public void set(T value) {
+    // 获取当前的Thread对象，通过getMap获取Thread内的ThreadLocalMap
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null)
+            map.set(this, value);
+        else
+            createMap(t, value);
+    }
+
+
+public T get() {
+    // 获取当前的Thread对象，通过getMap获取Thread内的ThreadLocalMap
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null) {
+            // 如果map已经存在，以当前的ThreadLocal为键，获取Entry对象，并从从Entry中取出值
+            ThreadLocalMap.Entry e = map.getEntry(this);
+            if (e != null) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                T result = (T)e.value;
+                return result;
+            }
+        }
+        // 否则，调用setInitialValue进行初始化。
+        return setInitialValue();
+    }
+
+ThreadLocalMap getMap(Thread t) {
+        // ThreadLocalMap在当前线程被所有ThreadLocal共享
+        return t.threadLocals;
+}
+
+void createMap(Thread t, T firstValue) {
+    // 初始化map,构建table与Enrty
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
+}
+
+private T setInitialValue() {
+    // 首先是调用initialValue生成一个初始的value值，深入initialValue函数，我们可知它就是返回一个null；
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    // 然后还是在get以下Map
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+    // 如果map存在，则直接map.set,这个函数会放在后文说；
+        map.set(this, value);
+    else
+    // 如果不存在则会调用createMap创建ThreadLocalMap
+        createMap(t, value);
+    return value;
+}
+</code></pre>
+<p>每一个ThreadLocal对象是如何区分的：</p>
+<pre><code class="java">    //java提供的,可以用原子方式更新的 int值的类。
+    private static AtomicInteger nextHashCode = new AtomicInteger();
+    private static final int HASH_INCREMENT = 0x61c88647;
+    private final int threadLocalHashCode = nextHashCode();
+
+    private static int nextHashCode() {
+        //原子性加一
+        return nextHashCode.getAndAdd(HASH_INCREMENT);
+    }
+</code></pre>
+<p>对于每一个ThreadLocal对象，都有一个final的int值threadLocalHashCode；AtomicInteger 是static修饰的，全局唯一，每一次加一之后的值仍然可用，并且保证原子性。所以，每一个线程的ThreadLocal对象都有唯一的threadLocalHashCode值。</p>
+<p>为什么不使用当前线程作为key？</p>
+<p>上面知道，每一个线程周期，都有一个全线程唯一的map用于存储value，如果线程内多个ThreadLocal对象set了value，那么以当前线程作为键是不能保证key的唯一性的；而每一个ThreadLocal对象都可以由threadLocalHashCode进行唯一区分，所以key使用为ThreadLocal方便存取。</p>
+<p>解决内存泄漏</p>
+<pre><code class="java">private Entry getEntry(ThreadLocal&lt;?&gt; key) {
+    // 首先是计算索引位置i
+    int i = key.threadLocalHashCode &amp; (table.length - 1);
+    Entry e = table[i];
+    if (e != null &amp;&amp; e.get() == key)
+    // 根据获取Entry，如果Entry存在且Entry的key恰巧等于ThreadLocal，那么直接返回Entry对象；
+        return e;
+    else
+    // 否则，也就是在此位置上找不到对应的Entry，那么就调用getEntryAfterMiss。
+        return getEntryAfterMiss(key, i, e);
+}
+
+
+private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    while (e != null) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == key)
+        // 如果k==key,那么代表找到了这个所需要的Entry，直接返回；
+            return e;
+        if (k == null)
+        // 如果k==null，那么证明这个Entry中key已经为null,那么这个Entry就是一个过期对象，这里调用expungeStaleEntry清理该Entry。
+        // 这里解决了内存泄漏问题
+        // ThreadLocal实例由于只有Entry中的一条弱引用指着，那么就会被GC掉，Entry的key没了，value可能会内存泄露的
+        // 其实在每一个get，set操作时都会不断清理掉这种key为null的Entry的。
+            expungeStaleEntry(i);
+        else
+            i = nextIndex(i, len);
+        e = tab[i];
+    }
+    return null;
+}
+
+private int expungeStaleEntry(int staleSlot) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    // expunge entry at staleSlot
+    // 这段主要是将i位置上的Entry的value设为null，Entry的引用也设为null，那么系统GC的时候自然会清理掉这块内存；
+    tab[staleSlot].value = null;
+    tab[staleSlot] = null;
+    size--;
+
+    // Rehash until we encounter null
+    // 这段就是扫描位置staleSlot之后，null之前的Entry数组，清除每一个key为null的Entry，同时若是key不为空，做rehash，调整其位置。
+    Entry e;
+    int i;
+    for (i = nextIndex(staleSlot, len);
+         (e = tab[i]) != null;
+         i = nextIndex(i, len)) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == null) {
+            e.value = null;
+            tab[i] = null;
+            size--;
+        } else {
+            int h = k.threadLocalHashCode &amp; (len - 1);
+            if (h != i) {
+                tab[i] = null;
+
+                // Unlike Knuth 6.4 Algorithm R, we must scan until
+                // null because multiple entries could have been stale.
+                while (tab[h] != null)
+                    h = nextIndex(h, len);
+                tab[h] = e;
+            }
+        }
+    }
+    return i;
+}
+</code></pre>
+<p>我们发现无论是set,get还是remove方法，过程中key为null的Entry都会被擦除，那么Entry内的value也就没有强引用链，GC时就会被回收。那么怎么会存在内存泄露呢？但是以上的思路是假设你调用get或者set方法了，很多时候我们都没有调用过，所以最佳实践就是*<br>1 .使用者需要手动调用remove函数，删除不再使用的ThreadLocal.<br>2 .还有尽量将ThreadLocal设置成private static的，这样ThreadLocal会尽量和线程本身一起消亡。</p>
+<h2 id="InheritableThreadLocal父子线程共享变量"><a href="#InheritableThreadLocal父子线程共享变量" class="headerlink" title="InheritableThreadLocal父子线程共享变量"></a>InheritableThreadLocal父子线程共享变量</h2><p>InheritableThreadLocal的源码非常简单，继承自ThreadLocal，重写其中三个方法。</p>
+<pre><code class="java">public class InheritableThreadLocal&lt;T&gt; extends ThreadLocal&lt;T&gt; {
+    public InheritableThreadLocal() {
+    }
+
+    protected T childValue(T var1) {
+        return var1;
+    }
+
+    ThreadLocalMap getMap(Thread var1) {
+        return var1.inheritableThreadLocals;
+    }
+
+    void createMap(Thread var1, T var2) {
+        var1.inheritableThreadLocals = new ThreadLocalMap(this, var2);
+    }
+}
+</code></pre>
+<p>InheritableThreadLocal获取的也是ThreadLocalMap, 解决父子线程共享变量的地方实际在thread类里，上文说过：</p>
+<pre><code class="java">/* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+
+    /*
+     * InheritableThreadLocal values pertaining to this thread. This map is
+     * maintained by the InheritableThreadLocal class.
+     */
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+
+private void init(ThreadGroup g, Runnable target, String name,
+                      long stackSize, AccessControlContext acc,
+                      boolean inheritThreadLocals) {
+        //..........
+        Thread parent = currentThread();
+        //..........
+        // 如果父线程的inheritableThreadLocals != null
+        if (inheritThreadLocals &amp;&amp; parent.inheritableThreadLocals != null)
+        // 新线程：`this.inheritableThreadLocals=ThreadLocal.createInheritedMap(parent.inheritableThreadLocals)`
+        // 传入父线程的inheritableThreadLocals 
+            this.inheritableThreadLocals =
+                ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+        /* Stash the specified stack size in case the VM cares */
+        this.stackSize = stackSize;
+
+        /* Set thread ID */
+        tid = nextThreadID();
+    }
+</code></pre>
+<pre><code class="java">    static ThreadLocalMap createInheritedMap(ThreadLocalMap parentMap) {
+        return new ThreadLocalMap(parentMap);
+    }
+
+    // 实际上就是构造了一个新的包含所有parentMap元素的新map
+    private ThreadLocalMap(ThreadLocalMap parentMap) {
+        // 得到parent的数组
+        Entry[] parentTable = parentMap.table;
+        int len = parentTable.length;
+        setThreshold(len);
+        table = new Entry[len];
+
+        for (int j = 0; j &lt; len; j++) {
+            Entry e = parentTable[j];
+            if (e != null) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                ThreadLocal&lt;Object&gt; key = (ThreadLocal&lt;Object&gt;) e.get();
+                if (key != null) {
+                    // InheritableThreadLocal重写了这个方法返回原值
+                    Object value = key.childValue(e.value);
+                    Entry c = new Entry(key, value);
+                    //计算hash位置，与ThreadLocal的set方法一样
+                    int h = key.threadLocalHashCode &amp; (len - 1);
+                    while (table[h] != null)
+                        h = nextIndex(h, len);
+                    table[h] = c;
+                    size++;
+                }
+            }   
+        }
+    }
+</code></pre>
 
         
     
@@ -601,8 +1074,8 @@
 
 <script type="text/javascript">
     var disqus_config = function () {
-        this.page.url = 'http://seanthefish.com/2018/07/13/oauth-guide-17/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://seanthefish.com/2018/07/13/oauth-guide-17/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = 'http://seanthefish.com/2020/11/15/thread-source-code/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/15/thread-source-code/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 </script>
 
@@ -651,7 +1124,7 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2018/07/13/oauth-guide-18/" id="post_nav-newer" class="prev-content">
+        <a href="/2020/11/16/improve-gc-2/" id="post_nav-newer" class="prev-content">
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
                 <i class="material-icons">arrow_back</i>
             </button>
@@ -665,7 +1138,7 @@
 
     <!-- Next Nav -->
     
-        <a href="/2018/07/13/oauth-guide-16/" id="post_nav-older" class="next-content">
+        <a href="/2020/11/15/tomcat-classloader/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
