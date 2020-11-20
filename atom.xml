@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-20T12:30:51.485Z</updated>
+  <updated>2020-11-20T12:35:39.757Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://seanthefish.com/2020/11/19/cas-spin/"/>
     <id>http://seanthefish.com/2020/11/19/cas-spin/</id>
     <published>2020-11-19T04:14:47.000Z</published>
-    <updated>2020-11-20T12:30:51.485Z</updated>
+    <updated>2020-11-20T12:35:39.757Z</updated>
     
     <summary type="html">
     
@@ -158,9 +158,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
     
     
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
-    
       <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
     
   </entry>
   
@@ -188,9 +188,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
     
     
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
-    
       <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
     
   </entry>
   

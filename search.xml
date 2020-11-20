@@ -126,15 +126,10 @@ public class TicketLock {
             // 在自己的节点上自旋等待前驱通知
             while(own.locked){
 
-                System.out.println(Thread.currentThread().getName()+&quot; 开始自旋....  &quot;);
-                Thread.sleep(2000);
-
             }
 
 
         }
-
-        System.out.println(Thread.currentThread().getName()+&quot; 获得了锁....  &quot;);
 
     }
 
@@ -1091,9 +1086,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -1239,9 +1234,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
