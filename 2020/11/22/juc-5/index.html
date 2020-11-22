@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            juc之ReentrantReadWriteLock | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,并发,juc">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/22/juc-5/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/22/juc-5/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="juc之ReentrantReadWriteLock | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="并发"> <meta property="og:article:tag" content="juc"> 
+
+    
+        <meta property="article:published_time" content="Sun Nov 22 2020 12:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Sun Nov 22 2020 22:01:08 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/22/juc-5/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/22/juc-5/index.html",
+    "headline": "juc之ReentrantReadWriteLock",
+    "datePublished": "Sun Nov 22 2020 12:00:00 GMT+0800",
+    "dateModified": "Sun Nov 22 2020 22:01:08 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",并发,juc小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#写锁"><span class="post-toc-number">1.</span> <span class="post-toc-text">写锁</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#lock-获取写锁"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">lock 获取写锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#release-释放写锁"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">release 释放写锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#tryLock-获取写锁"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">tryLock 获取写锁</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#读锁"><span class="post-toc-number">2.</span> <span class="post-toc-text">读锁</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#lock-获取读锁"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">lock 获取读锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#unlock-释放读锁"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">unlock 释放读锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#tryLock-获取读锁"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">tryLock 获取读锁</span></a></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                juc之ReentrantReadWriteLock
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 22, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACZUlEQVR42u3aW24CMRAEQO5/6eQEkO7xA4JqvxBatC5/7Jieefx89fXAw8PDw8PDw8P7MN4jvp79qv3+9T0b1oaHh4d3hffHqza+Z9cGrawNDw8P7ybv2YKe3TP7VV4e2qfg4eHhfTLv9St+vSTg4eHhfR9vZXH5ARoPDw/v83nJH/5ZCJuEFyshCB4eHt59Xh7C3v98tb+Hh4eHF/DqkaagQfX6dT+7czh0hYeHh3eAt96mysPc5Og8Ww8eHh7eTV776m8flgcQeeRRxLh4eHh4h3mvX+75A5I7Vxpsw8KAh4eHd5G3a+ltnJEUlQ2FAQ8PD2/TVFIbTMza/EeiYTw8PLzDvOTxs0W0m9LeU48O4OHh4W3iJY+P2k5lRDsMGpItxsPDw7vOa5eYLz3ZiGRV9WQEHh4e3gHeroh2RpqNEQxjXDw8PLxNvLy91JaK2XBAXh7w8PDw3sWbLXd27F4fERgeqfHw8PAO8/KgNokMksZYPiY7HLrCw8PDO8BrW1YtIC8GswAXDw8P7yZvFkDMNiVpdyUBbh3j4uHh4W3lzaKBvDCsRLf1ZuHh4eFd562MlrZDq21ouyFrwcPDw9vKm5Hy2Dc5Orelpc5a8PDw8JZ57ZU8rA0s2iGDYugKDw8P7wBvJURYOY6vH6zrBhgeHh7eVl5SDPJmVXvsTtpdS4UBDw8P7xhvZZA0j3Fn8W5SivDw8PD+F28ltG2/f0NhwMPDw9vEa8OClbg2OXbj4eHh3eclkcGu+DVvpLUDBHh4eHh3eG0EsNLmn21W0k7Dw8PDu8P7vgsPDw8PDw8PD+8Drl9L2KWBvln0HwAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/juc/">juc</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/并发/">并发</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=juc之ReentrantReadWriteLock&url=http://seanthefish.com/2020/11/22/juc-5/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/22/juc-5/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=juc之ReentrantReadWriteLock&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/22/juc-5/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>ReentrantLock提供了标准的互斥操作，但在应用中，我们对一个资源的访问有两种方式：读和写，读操作一般不会影响数据的一致性问题。但如果我们使用ReentrantLock，则在需要在读操作的时候也独占锁，这会导致并发效率大大降低。JUC包提供了读写锁ReentrantReadWriteLock，使得读写锁分离，在上述情境下，应用读写锁相对于使用独占锁，并发性能得到较大提高。</p>
+<p>我们先来大致了解一下ReentrantReadWriteLock的性质：</p>
+<ul>
+<li><p>基本性质：读锁是一个共享锁，写锁是一个独占锁。读锁能同时被多个线程获取，写锁只能被一个线程获取。读锁和写锁不能同时存在。</p>
+</li>
+<li><p>重入性：一个线程可以多次重复获取读锁和写锁。</p>
+</li>
+<li><p>锁降级：一个线程在已经获取写锁的情况下，可以再次获取读锁，如果线程又释放了写锁，就完成了一次锁降级。</p>
+</li>
+<li><p>锁升级：ReentrantReadWriteLock不支持锁升级。一个线程在获取读锁的情况下，如果试图去获取写锁，将会导致死锁（后面会详细说明）。</p>
+</li>
+<li><p>获取锁中断：提供了可中断的lock方法。</p>
+</li>
+<li><p>重入数：读锁和写锁的重入上限为65535（所有线程获取的锁的总数，为什么是这个值后面会详细说明）。</p>
+</li>
+<li><p>公平性：ReentrantReadWriteLock提供了公平&amp;非公平两种工作模式。</p>
+</li>
+</ul>
+<p>ReentrantReadWriteLock实现了ReadWriteLock接口：</p>
+<pre><code class="java">public interface ReadWriteLock {  
+    Lock readLock();  
+    Lock writeLock();  
+}
+</code></pre>
+<p>这个接口之有两个方法，分别返回读锁和写锁。ReentrantReadWriteLock定义了两个内部类：readLock&amp;writeLock。</p>
+<p>ReentrantReadWriteLock提供了两种自定义的同步器：FairSync&amp;NonfairSync：</p>
+<pre><code class="java">　　static final class NonfairSync extends Sync {
+        private static final long serialVersionUID = -8159625535654395037L;
+        final boolean writerShouldBlock() {
+            return false; // writers can always barge
+        }
+        final boolean readerShouldBlock() {
+            return apparentlyFirstQueuedIsExclusive();
+        }
+    }
+
+    static final class FairSync extends Sync {
+        private static final long serialVersionUID = -2274990926593161451L;
+        final boolean writerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+        final boolean readerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+    }
+</code></pre>
+<p>他们都继承自父类同步器Sync，而他们只定义了writerShouldBlock&amp;readerShouldBlock方法。这两个方法用在获取锁的操作中，表示要获取锁的线程需要到等待队列中，还是可以直接尝试获取。后面我们会详细分析。</p>
+<p>在自定义的同步器Sync中，定义了锁数量的记录方式:</p>
+<pre><code class="java">        static final int SHARED_SHIFT   = 16;
+        static final int SHARED_UNIT    = (1 &lt;&lt; SHARED_SHIFT);
+        static final int MAX_COUNT      = (1 &lt;&lt; SHARED_SHIFT) - 1;
+        static final int EXCLUSIVE_MASK = (1 &lt;&lt; SHARED_SHIFT) - 1;
+
+        /** Returns the number of shared holds represented in count  */
+        static int sharedCount(int c)    { return c &gt;&gt;&gt; SHARED_SHIFT; }
+        /** Returns the number of exclusive holds represented in count  */
+        static int exclusiveCount(int c) { return c &amp; EXCLUSIVE_MASK; }
+</code></pre>
+<p>可见，ReentrantReadWriteLock用一个32位无符号数记录锁的数量，高16位记录共享锁（读锁）的数量，第16位记录独占锁（写锁）的数量，因此锁的数量上限都是65535。</p>
+<h2 id="写锁"><a href="#写锁" class="headerlink" title="写锁"></a>写锁</h2><h3 id="lock-获取写锁"><a href="#lock-获取写锁" class="headerlink" title="lock 获取写锁"></a>lock 获取写锁</h3><pre><code class="java">public void lock() {
+            sync.acquire(1);
+        }
+</code></pre>
+<p>acquire方法不再赘述。这里重点关注自定义同步器Sync重写的tryAcquire方法： </p>
+<pre><code class="java">protected final boolean tryAcquire(int acquires) {
+            /*
+             * Walkthrough:
+             * 1. If read count nonzero or write count nonzero
+             *    and owner is a different thread, fail.
+             * 2. If count would saturate, fail. (This can only
+             *    happen if count is already nonzero.)
+             * 3. Otherwise, this thread is eligible for lock if
+             *    it is either a reentrant acquire or
+             *    queue policy allows it. If so, update state
+             *    and set owner.
+             */
+            Thread current = Thread.currentThread();
+            int c = getState();
+            int w = exclusiveCount(c);
+            if (c != 0) {
+                // (Note: if c != 0 and w == 0 then shared count != 0)
+                if (w == 0 || current != getExclusiveOwnerThread())
+                    return false;
+                if (w + exclusiveCount(acquires) &gt; MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                // Reentrant acquire
+                setState(c + acquires);
+                return true;
+            }
+            if (writerShouldBlock() ||
+                !compareAndSetState(c, c + acquires))
+                return false;
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+</code></pre>
+<p>首先调用获取了一下state值，然后调用exclusiveCount方法获取当前写锁的数量。</p>
+<p>然后做了一个判断，当c！=0时：如果w==0（即读锁的数量！=0），直接返回false。因为我们前面已经说过，读锁和写锁不能同时存在。当c！=0且W！=0的时候，有写锁存在，如果写锁不是由当前线程持有（注意，写锁是独占锁，只能由一个线程持有），直接返回false。如果是当前线程持有写锁，说明当前线程正在试图“重入”写锁。调用setState更新status值。注意，由于写锁是独占锁，因此执行到setState这一步时不可能出现竞争，因此不用调用CAS操作，直接setState即可。</p>
+<p>注意：如果一个线程在持有读锁的情况下去申请写锁（试图锁升级），会导致死锁。tryAcquire在这种情况下返回false，AQS的acquire方法会将当前线程放入等待队列去等待写锁，在获取写锁之前不会释放锁持有的读锁，而读锁和写锁不能同时存在，发生死锁，他将永远不能获取这个写锁，其他线程也不能获取写锁，但读锁可被正常获取，只是永远不能获取写锁了。</p>
+<p>如果c==0时，说明不存在任何锁。调用writerShouldBlock方法判断一下此时线程是否应该进入等待队列。注意：公平模式&amp;非公平模式下的writerShouldBlock是不同的，非公平模式下，writerShouldBlock方法直接返回false，这也符合非公平的语义：</p>
+<pre><code class="java"> final boolean writerShouldBlock() {
+            return false; // writers can always barge
+        }
+</code></pre>
+<p>而公平模式下，则调用方法，判断下等待队列中，当前线程之前是否有其他线程正在等待：</p>
+<pre><code class="java">final boolean writerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+</code></pre>
+<p>注意，如果有，那么我们当时获取status的值的时候，这些线程还没来得及更改status值（因为我们当时获取的status为0），原因可能是应为刚到，或者刚被唤醒，在自旋中，还没有成功获取锁。 </p>
+<pre><code class="java">    public final boolean hasQueuedPredecessors() {
+        // The correctness of this depends on head being initialized
+        // before tail and on head.next being accurate if the current
+        // thread is first in queue.
+        Node t = tail; // Read fields in reverse initialization order
+        Node h = head;
+        Node s;
+        return h != t &amp;&amp;
+            ((s = h.next) == null || s.thread != Thread.currentThread());
+    }
+</code></pre>
+<p>返回true必须满足两个条件：</p>
+<ul>
+<li>队列非空</li>
+<li>第一个等待线程（head.next）为空 或 不为空但不是当前线程。head.next为空的情形是：在我们获取head之后，head就被队列中下一个等待线程线程踢出队列了，next被置为空，那么踢他出去的这个线程一定不是当前线程，说明有其他线程等待在队列中。</li>
+</ul>
+<p>我们回到tryAcquire方法中，当发现writerShouldBlock为true，或者writerShouldBlock为false但在CAS操作中失败时（由于这里的获取写锁不是重入，因此可能有多个线程同时竞争写锁），返回false。如果CAS成功，则调用setExclusiveOwnerThread将当前持有写锁的线程设置为当前线程。</p>
+<h3 id="release-释放写锁"><a href="#release-释放写锁" class="headerlink" title="release 释放写锁"></a>release 释放写锁</h3><pre><code class="java">public void unlock() {
+            sync.release(1);
+        }
+</code></pre>
+<p>与ReentrantLock一样，unlock方法调用AQS提供的release方法,这里重点关注自定义同步器Sync重写的tryRelease方法：</p>
+<pre><code class="java">protected final boolean tryRelease(int releases) {
+            if (!isHeldExclusively())
+                throw new IllegalMonitorStateException();
+            int nextc = getState() - releases;
+            boolean free = exclusiveCount(nextc) == 0;
+            if (free)
+                setExclusiveOwnerThread(null);
+            setState(nextc);
+            return free;
+        }
+</code></pre>
+<p>首先，我们需要清楚一点：tryRelease方法的返回值表示当前释放操作完成后，剩余写锁数量是否等于0（即完成此释放后，写锁是否可用）。这与同样是可重入的ReentrantLock的tryRelease方法一样，ReentrantLock的tryRelease方法返回值的意义也是剩余写锁数量是否等于0（即完成此释放后，写锁是否可用）。</p>
+<h3 id="tryLock-获取写锁"><a href="#tryLock-获取写锁" class="headerlink" title="tryLock 获取写锁"></a>tryLock 获取写锁</h3><pre><code class="java">public boolean tryLock( ) {
+            return sync.tryWriteLock();
+        }
+</code></pre>
+<p>WriteLock的tryLock方法调用自定义同步器Sync的tryWriteLock方法实现：</p>
+<pre><code class="java">final boolean tryWriteLock() {
+            Thread current = Thread.currentThread();
+            int c = getState();
+            if (c != 0) {
+                int w = exclusiveCount(c);
+                if (w == 0 || current != getExclusiveOwnerThread())
+                    return false;
+                if (w == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+            }
+            if (!compareAndSetState(c, c + 1))
+                return false;
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+</code></pre>
+<p>tryWriteLock方法看上去跟tryAcquire方法真的很像。唯一的区别在于，tryWriteLock忽略的writerShouldBlock方法，即，默认调用tryLock方法的时机，就是需要我们去“抢”写锁的时机。</p>
+<h2 id="读锁"><a href="#读锁" class="headerlink" title="读锁"></a>读锁</h2><h3 id="lock-获取读锁"><a href="#lock-获取读锁" class="headerlink" title="lock 获取读锁"></a>lock 获取读锁</h3><pre><code class="java">public void lock() {
+            sync.acquireShared(1);
+        }
+</code></pre>
+<p>ReadLock的lock方法调用AQS提供的acquireShared方法来实现, 我们重点关注自定义同步器Sync重写的tryAcquireShared方法： </p>
+<pre><code class="java">protected final int tryAcquireShared(int unused) {
+            /*
+             * Walkthrough:
+             * 1. If write lock held by another thread, fail.
+             * 2. Otherwise, this thread is eligible for
+             *    lock wrt state, so ask if it should block
+             *    because of queue policy. If not, try
+             *    to grant by CASing state and updating count.
+             *    Note that step does not check for reentrant
+             *    acquires, which is postponed to full version
+             *    to avoid having to check hold count in
+             *    the more typical non-reentrant case.
+             * 3. If step 2 fails either because thread
+             *    apparently not eligible or CAS fails or count
+             *    saturated, chain to version with full retry loop.
+             */
+            Thread current = Thread.currentThread();
+            int c = getState();
+            if (exclusiveCount(c) != 0 &amp;&amp;
+                getExclusiveOwnerThread() != current)
+                return -1;
+            int r = sharedCount(c);
+            if (!readerShouldBlock() &amp;&amp;
+                r &lt; MAX_COUNT &amp;&amp;
+                compareAndSetState(c, c + SHARED_UNIT)) {
+                if (r == 0) {
+                    firstReader = current;
+                    firstReaderHoldCount = 1;
+                } else if (firstReader == current) {
+                    firstReaderHoldCount++;
+                } else {
+                    HoldCounter rh = cachedHoldCounter;
+                    if (rh == null || rh.tid != getThreadId(current))
+                        cachedHoldCounter = rh = readHolds.get();
+                    else if (rh.count == 0)
+                        readHolds.set(rh);
+                    rh.count++;
+                }
+                return 1;
+            }
+            return fullTryAcquireShared(current);
+        }
+</code></pre>
+<p>方法首先检测了一下当前是否有其他线程持有写锁，如果是的话，直接返回-1，表示获取失败。后续AQS的acquireShared方法会将当前线程放入等待队列中。</p>
+<p>然后方法做了这样一个判断，如果当前线程可以直接参与竞争读锁的话，就调用CAS操作将status值加一个SHARED_UNIT，注意，这里不是加1, 是因为status的高16位代表读锁的数量。</p>
+<p>OK，我们必须在这里暂停一下，我们需要详细解释一下几个成员变量：</p>
+<pre><code class="java">static final class HoldCounter {
+    int count = 0;
+    // Use id, not reference, to avoid garbage retention
+    final long tid = getThreadId(Thread.currentThread());
+}
+
+static final class ThreadLocalHoldCounter extends ThreadLocal&lt;HoldCounter&gt; {
+    public HoldCounter initialValue() {
+        return new HoldCounter();
+    }
+}
+
+private transient ThreadLocalHoldCounter readHolds;
+private transient HoldCounter cachedHoldCounter;
+
+private transient Thread firstReader = null;
+private transient int firstReaderHoldCount;
+</code></pre>
+<p>HoldCounter是一个final的内部类，有两个成员：tid&amp;count，分别代表一个线程ID和线程对应的一个计数值。</p>
+<p>ThreadLocalHoldCounter是一个final的内部类，它继承自<code>ThreadLocal&lt;HoldCounter&gt;</code>，它重写了initialValue方法，ThreadLocalHoldCounter对象对某一个线程第一次调用get方法是，会调用initialValue方法初始化这个线程响应的本地变量，并加入到map中。</p>
+<p>readHolds存在的作用是：记录所有持有读锁的线程所持有读锁的数量。对于写锁来说，它是独占锁，我们可以通过status的低16位+独占写锁的线程来记录关于写锁的所有信息，即它被谁持有&amp;被重入的数量。而读锁是一个共享锁，任何线程都可能持有它，因此，我们必须对每个线程都记录一下它所持有的共享锁（读锁）的数量。本地变量ThreadLocal来实现这个记录是非常合适的。</p>
+<p>cachedHoldCounter是一个缓存。很多情况下，一个线程获取读锁之后要更新一下它对应的记录值（线程对应的HoldCounter对象），然后有很大可能在很短的时间内就释放掉读锁，这时候需要再次更新HoldCounter，甚至需要从readHolds中删除（如果重入的读锁都被释放掉的话），需要调用readHolds的get方法，这是有一定开销的。因此，设置cachedHoldCounter作为一个缓存，在某个线程需要这个记录值的时候，先检查cachedHoldCounter对应的线程是否是这个线程自己，如果不是的话，再熊readHolds中get出来，这提高了效率。</p>
+<p>firsReader&amp;firstReaderHoldCount，这两个值记录了第一个获取读锁的线程和它持有的读锁的数量（可重入的嘛），这两个值在读锁全部释放之后要清空，以便记录下一次首先获取读锁的线程和其锁数目。这两个值存在的意义是：很多时候，读锁只被一个线程获取，这时候我们规定，第一个获取读锁的线程的计数不放入readHolds中，而是单独用这两个计数值来记录，这就避免了当只有一个线程操作读锁的时候，频繁地在readHolds上读取，提高了效率。</p>
+<p>注意区别：</p>
+<ul>
+<li>cachedHoldCounter提高的是一个线程获取-释放之间没有其他线程来获取或释放锁时的效率；</li>
+<li>firsReader&amp;firstReaderHoldCount提高的是只有一个线程操作锁时的效率。</li>
+</ul>
+<p>这时候我们再回到tryAcquireShared方法，当CAS操作成功后，需要去更新刚刚说过的计数值。具体细节代码已经很清楚，不再赘述。</p>
+<p>如果CAS失败或readerShouldBlock方法返回true，我们调用fullTryAcquireShared方法继续试图获取读锁。fullTryAcquireShared方法是tryAcquireShared方法的完整版，或者叫升级版，它处理了CAS失败的情况和readerShouldBlock返回true的情况。</p>
+<p>在分析fullTryAcquireShared方法之前，我们先来看一下readerShouldBlock方法：</p>
+<p>在公平模式下，根据等待队列中在当前线程之前有没有等待线程来判断：</p>
+<pre><code class="java"> final boolean readerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+</code></pre>
+<p>而在非公平模式下：</p>
+<pre><code class="java">  final boolean readerShouldBlock() {
+            return apparentlyFirstQueuedIsExclusive();
+        }
+</code></pre>
+<p>调用了apparentlyFirstQueuedIsExclusive方法：</p>
+<pre><code class="java">final boolean apparentlyFirstQueuedIsExclusive() {
+        Node h, s;
+        return (h = head) != null &amp;&amp;
+            (s = h.next)  != null &amp;&amp;
+            !s.isShared()         &amp;&amp;
+            s.thread != null;
+    }
+</code></pre>
+<p>这个方法返回是否队列的head.next正在等待独占锁（写锁）。当然这个方法执行的过程中队列的形态可能发生变化。这个方法的意思是：读锁不应该让写锁始终等待。</p>
+<p>好了，我们现在来看fullTryAcquireShared方法：</p>
+<pre><code class="java">/**
+         * Full version of acquire for reads, that handles CAS misses
+         * and reentrant reads not dealt with in tryAcquireShared.
+         */
+        final int fullTryAcquireShared(Thread current) {
+            /*
+             * This code is in part redundant with that in
+             * tryAcquireShared but is simpler overall by not
+             * complicating tryAcquireShared with interactions between
+             * retries and lazily reading hold counts.
+             */
+            HoldCounter rh = null;
+            for (;;) {
+                int c = getState();
+                if (exclusiveCount(c) != 0) {
+                    if (getExclusiveOwnerThread() != current)
+                        return -1;
+                    // else we hold the exclusive lock; blocking here
+                    // would cause deadlock.
+                } else if (readerShouldBlock()) {
+                    // Make sure we&#39;re not acquiring read lock reentrantly
+                    if (firstReader == current) {
+                        // assert firstReaderHoldCount &gt; 0;
+                    } else {
+                        if (rh == null) {
+                            rh = cachedHoldCounter;
+                            if (rh == null || rh.tid != getThreadId(current)) {
+                                rh = readHolds.get();
+                                if (rh.count == 0)
+                                    readHolds.remove();
+                            }
+                        }
+                        if (rh.count == 0)
+                            return -1;
+                    }
+                }
+                if (sharedCount(c) == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                if (compareAndSetState(c, c + SHARED_UNIT)) {
+                    if (sharedCount(c) == 0) {
+                        firstReader = current;
+                        firstReaderHoldCount = 1;
+                    } else if (firstReader == current) {
+                        firstReaderHoldCount++;
+                    } else {
+                        if (rh == null)
+                            rh = cachedHoldCounter;
+                        if (rh == null || rh.tid != getThreadId(current))
+                            rh = readHolds.get();
+                        else if (rh.count == 0)
+                            readHolds.set(rh);
+                        rh.count++;
+                        cachedHoldCounter = rh; // cache for release
+                    }
+                    return 1;
+                }
+            }
+        }
+</code></pre>
+<p>我们可以看到：fullTryAcquireShared方法是tryAcquireShared方法的完整版，或者叫升级版，它处理了CAS失败的情况和readerShouldBlock返回true的情况。</p>
+<p>跟tryAcquireShared方法一样，首先检查是否有其他线程正在持有写锁，如果是，直接返回false。如果没有线程正在持有写锁，则调用readerShouldBlock检测当前线程是否应该进入等待队列。就算readerShouldBlock方法返回true，原因可能因为当前是公平模式或者队列的第一个等待线程（head.next）正在等待写锁，我们也不能直接返回false，因为返回false意味着当前线程将要进入等待队列（见AQS的acquireShared方法），原因是：</p>
+<ul>
+<li>如果当前线程正在持有读锁，且这次读锁的重入被放入等待队列，万一之前队列中有线程正在等待写锁，将会导致死锁；</li>
+<li>另一种情况是当前线程正在持有写锁，且这次读锁的“降级申请”被放入等待队列，如果队列中之前有线程正在等待锁，不论等待的是写锁还是读锁，都将导致死锁。</li>
+</ul>
+<p>因此，我们需要做一个判断，如果这次申请读锁是对读锁的一次重入（因为我们已经检测过没有写锁，因此只考虑上述第①种情况），我们将不能返回false（返回false意味着进队列），而是调用CAS操作去获取读锁，如果CAS失败，则一直自旋，直到成功获取，或者可以返回false去队列的时机的到来。</p>
+<p>我们可以这样提fullTryAcquireShared方法说句话：不是我不想进队列休息，实在是因为进队列有可能死锁，所以我才一直自旋！</p>
+<p>注意：判断重入的时候firstReader==当前线程即说明是一次重入，因为firstReader线程释放最后一个读锁的时候会将firstReader置为null，这里还不是null，说明依然持有读锁。</p>
+<p>另外还记得我们提过apparentlyFirstQueuedIsExclusive方法是不可靠的吗，它在检测的过程中队列结构可能被更改，head可能被踢出，方法可能因为head.next为null而返回false。而且它也只是检测第一个等待线程（head.next），如果有等待写锁的线程在后面，它也不能检测出来。不过没关系，这些都导致它返回false，返回false意味着fullTryAcquireShared可以去抢“锁”并不会影响正确性。</p>
+<h3 id="unlock-释放读锁"><a href="#unlock-释放读锁" class="headerlink" title="unlock 释放读锁"></a>unlock 释放读锁</h3><pre><code class="java">public void unlock() {
+            sync.releaseShared(1);
+        }
+</code></pre>
+<p>readLock的unlock方法调用AQS提供的releaseShared方法实现, 这里我们关注自定义同步器Sync重写的tryReleaseShared方法：</p>
+<pre><code class="java">protected final boolean tryReleaseShared(int unused) {
+            Thread current = Thread.currentThread();
+            if (firstReader == current) {
+                // assert firstReaderHoldCount &gt; 0;
+                if (firstReaderHoldCount == 1)
+                    firstReader = null;
+                else
+                    firstReaderHoldCount--;
+            } else {
+                HoldCounter rh = cachedHoldCounter;
+                if (rh == null || rh.tid != getThreadId(current))
+                    rh = readHolds.get();
+                int count = rh.count;
+                if (count &lt;= 1) {
+                    readHolds.remove();
+                    if (count &lt;= 0)
+                        throw unmatchedUnlockException();
+                }
+                --rh.count;
+            }
+            for (;;) {
+                int c = getState();
+                int nextc = c - SHARED_UNIT;
+                if (compareAndSetState(c, nextc))
+                    // Releasing the read lock has no effect on readers,
+                    // but it may allow waiting writers to proceed if
+                    // both read and write locks are now free.
+                    return nextc == 0;
+            }
+        }
+</code></pre>
+<p>分为三部分：</p>
+<ul>
+<li>如果是firstReader，对firstReader修改；②</li>
+<li>如果不是firstReader，修改readHolds；</li>
+<li>CAS自旋更新status值。</li>
+</ul>
+<p>注意：tryReleaseShared方法的返回值如果为true，表示status为0，即已经不存在任何锁，both读锁&amp;写锁。</p>
+<h3 id="tryLock-获取读锁"><a href="#tryLock-获取读锁" class="headerlink" title="tryLock 获取读锁"></a>tryLock 获取读锁</h3><pre><code class="java">public boolean tryLock() {
+            return sync.tryReadLock();
+        }
+</code></pre>
+<p>ReadLock的tryLock调用自定义同步器Sync的tryReadLock方法实现：</p>
+<pre><code class="java">final boolean tryReadLock() {
+            Thread current = Thread.currentThread();
+            for (;;) {
+                int c = getState();
+                if (exclusiveCount(c) != 0 &amp;&amp;
+                    getExclusiveOwnerThread() != current)
+                    return false;
+                int r = sharedCount(c);
+                if (r == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                if (compareAndSetState(c, c + SHARED_UNIT)) {
+                    if (r == 0) {
+                        firstReader = current;
+                        firstReaderHoldCount = 1;
+                    } else if (firstReader == current) {
+                        firstReaderHoldCount++;
+                    } else {
+                        HoldCounter rh = cachedHoldCounter;
+                        if (rh == null || rh.tid != getThreadId(current))
+                            cachedHoldCounter = rh = readHolds.get();
+                        else if (rh.count == 0)
+                            readHolds.set(rh);
+                        rh.count++;
+                    }
+                    return true;
+                }
+            }
+        }
+</code></pre>
+<p>与写锁的tryWriteLock方法类似，tryReadLock同样忽略了readerShouldBlock方法，因为调用这个方法就意味着：现在是适合抢占的时机。</p>
+<p>tryReadLock方法与tryAcquireShared方法十分类似，不同在于：当CAS失败时，tryAcquireShared方法调用fullAcquireShared处理CAS失败，而tryReadLock方法遇到CAS失败时，直接返回false，毕竟只是try嘛。</p>
+<p>总结：</p>
+<p>ReentrantReadWriteLock相比于其他锁，还是比较复杂的，因为他结合了共享锁和独占锁，并混合使用了他们。虽然ReentrantReadWriteLock通过精巧的设计尽量避免死锁的发生，但如果我们使用不当仍然可能发生死锁，比如我们在持有读锁的情况下去申请写，企图做锁升级。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/22/juc-5/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/22/juc-5/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/22/juc-4/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

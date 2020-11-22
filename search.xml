@@ -3,8 +3,1047 @@
   
     
     <entry>
-      <title><![CDATA[guc之aqs]]></title>
-      <url>/2020/11/22/guc-2/</url>
+      <title><![CDATA[juc之ReentrantReadWriteLock]]></title>
+      <url>/2020/11/22/juc-5/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>ReentrantLock提供了标准的互斥操作，但在应用中，我们对一个资源的访问有两种方式：读和写，读操作一般不会影响数据的一致性问题。但如果我们使用ReentrantLock，则在需要在读操作的时候也独占锁，这会导致并发效率大大降低。JUC包提供了读写锁ReentrantReadWriteLock，使得读写锁分离，在上述情境下，应用读写锁相对于使用独占锁，并发性能得到较大提高。</p>
+<p>我们先来大致了解一下ReentrantReadWriteLock的性质：</p>
+<ul>
+<li><p>基本性质：读锁是一个共享锁，写锁是一个独占锁。读锁能同时被多个线程获取，写锁只能被一个线程获取。读锁和写锁不能同时存在。</p>
+</li>
+<li><p>重入性：一个线程可以多次重复获取读锁和写锁。</p>
+</li>
+<li><p>锁降级：一个线程在已经获取写锁的情况下，可以再次获取读锁，如果线程又释放了写锁，就完成了一次锁降级。</p>
+</li>
+<li><p>锁升级：ReentrantReadWriteLock不支持锁升级。一个线程在获取读锁的情况下，如果试图去获取写锁，将会导致死锁（后面会详细说明）。</p>
+</li>
+<li><p>获取锁中断：提供了可中断的lock方法。</p>
+</li>
+<li><p>重入数：读锁和写锁的重入上限为65535（所有线程获取的锁的总数，为什么是这个值后面会详细说明）。</p>
+</li>
+<li><p>公平性：ReentrantReadWriteLock提供了公平&amp;非公平两种工作模式。</p>
+</li>
+</ul>
+<p>ReentrantReadWriteLock实现了ReadWriteLock接口：</p>
+<pre><code class="java">public interface ReadWriteLock {  
+    Lock readLock();  
+    Lock writeLock();  
+}
+</code></pre>
+<p>这个接口之有两个方法，分别返回读锁和写锁。ReentrantReadWriteLock定义了两个内部类：readLock&amp;writeLock。</p>
+<p>ReentrantReadWriteLock提供了两种自定义的同步器：FairSync&amp;NonfairSync：</p>
+<pre><code class="java">　　static final class NonfairSync extends Sync {
+        private static final long serialVersionUID = -8159625535654395037L;
+        final boolean writerShouldBlock() {
+            return false; // writers can always barge
+        }
+        final boolean readerShouldBlock() {
+            return apparentlyFirstQueuedIsExclusive();
+        }
+    }
+
+    static final class FairSync extends Sync {
+        private static final long serialVersionUID = -2274990926593161451L;
+        final boolean writerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+        final boolean readerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+    }
+</code></pre>
+<p>他们都继承自父类同步器Sync，而他们只定义了writerShouldBlock&amp;readerShouldBlock方法。这两个方法用在获取锁的操作中，表示要获取锁的线程需要到等待队列中，还是可以直接尝试获取。后面我们会详细分析。</p>
+<p>在自定义的同步器Sync中，定义了锁数量的记录方式:</p>
+<pre><code class="java">        static final int SHARED_SHIFT   = 16;
+        static final int SHARED_UNIT    = (1 &lt;&lt; SHARED_SHIFT);
+        static final int MAX_COUNT      = (1 &lt;&lt; SHARED_SHIFT) - 1;
+        static final int EXCLUSIVE_MASK = (1 &lt;&lt; SHARED_SHIFT) - 1;
+
+        /** Returns the number of shared holds represented in count  */
+        static int sharedCount(int c)    { return c &gt;&gt;&gt; SHARED_SHIFT; }
+        /** Returns the number of exclusive holds represented in count  */
+        static int exclusiveCount(int c) { return c &amp; EXCLUSIVE_MASK; }
+</code></pre>
+<p>可见，ReentrantReadWriteLock用一个32位无符号数记录锁的数量，高16位记录共享锁（读锁）的数量，第16位记录独占锁（写锁）的数量，因此锁的数量上限都是65535。</p>
+<h2 id="写锁"><a href="#写锁" class="headerlink" title="写锁"></a>写锁</h2><h3 id="lock-获取写锁"><a href="#lock-获取写锁" class="headerlink" title="lock 获取写锁"></a>lock 获取写锁</h3><pre><code class="java">public void lock() {
+            sync.acquire(1);
+        }
+</code></pre>
+<p>acquire方法不再赘述。这里重点关注自定义同步器Sync重写的tryAcquire方法： </p>
+<pre><code class="java">protected final boolean tryAcquire(int acquires) {
+            /*
+             * Walkthrough:
+             * 1. If read count nonzero or write count nonzero
+             *    and owner is a different thread, fail.
+             * 2. If count would saturate, fail. (This can only
+             *    happen if count is already nonzero.)
+             * 3. Otherwise, this thread is eligible for lock if
+             *    it is either a reentrant acquire or
+             *    queue policy allows it. If so, update state
+             *    and set owner.
+             */
+            Thread current = Thread.currentThread();
+            int c = getState();
+            int w = exclusiveCount(c);
+            if (c != 0) {
+                // (Note: if c != 0 and w == 0 then shared count != 0)
+                if (w == 0 || current != getExclusiveOwnerThread())
+                    return false;
+                if (w + exclusiveCount(acquires) &gt; MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                // Reentrant acquire
+                setState(c + acquires);
+                return true;
+            }
+            if (writerShouldBlock() ||
+                !compareAndSetState(c, c + acquires))
+                return false;
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+</code></pre>
+<p>首先调用获取了一下state值，然后调用exclusiveCount方法获取当前写锁的数量。</p>
+<p>然后做了一个判断，当c！=0时：如果w==0（即读锁的数量！=0），直接返回false。因为我们前面已经说过，读锁和写锁不能同时存在。当c！=0且W！=0的时候，有写锁存在，如果写锁不是由当前线程持有（注意，写锁是独占锁，只能由一个线程持有），直接返回false。如果是当前线程持有写锁，说明当前线程正在试图“重入”写锁。调用setState更新status值。注意，由于写锁是独占锁，因此执行到setState这一步时不可能出现竞争，因此不用调用CAS操作，直接setState即可。</p>
+<p>注意：如果一个线程在持有读锁的情况下去申请写锁（试图锁升级），会导致死锁。tryAcquire在这种情况下返回false，AQS的acquire方法会将当前线程放入等待队列去等待写锁，在获取写锁之前不会释放锁持有的读锁，而读锁和写锁不能同时存在，发生死锁，他将永远不能获取这个写锁，其他线程也不能获取写锁，但读锁可被正常获取，只是永远不能获取写锁了。</p>
+<p>如果c==0时，说明不存在任何锁。调用writerShouldBlock方法判断一下此时线程是否应该进入等待队列。注意：公平模式&amp;非公平模式下的writerShouldBlock是不同的，非公平模式下，writerShouldBlock方法直接返回false，这也符合非公平的语义：</p>
+<pre><code class="java"> final boolean writerShouldBlock() {
+            return false; // writers can always barge
+        }
+</code></pre>
+<p>而公平模式下，则调用方法，判断下等待队列中，当前线程之前是否有其他线程正在等待：</p>
+<pre><code class="java">final boolean writerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+</code></pre>
+<p>注意，如果有，那么我们当时获取status的值的时候，这些线程还没来得及更改status值（因为我们当时获取的status为0），原因可能是应为刚到，或者刚被唤醒，在自旋中，还没有成功获取锁。 </p>
+<pre><code class="java">    public final boolean hasQueuedPredecessors() {
+        // The correctness of this depends on head being initialized
+        // before tail and on head.next being accurate if the current
+        // thread is first in queue.
+        Node t = tail; // Read fields in reverse initialization order
+        Node h = head;
+        Node s;
+        return h != t &amp;&amp;
+            ((s = h.next) == null || s.thread != Thread.currentThread());
+    }
+</code></pre>
+<p>返回true必须满足两个条件：</p>
+<ul>
+<li>队列非空</li>
+<li>第一个等待线程（head.next）为空 或 不为空但不是当前线程。head.next为空的情形是：在我们获取head之后，head就被队列中下一个等待线程线程踢出队列了，next被置为空，那么踢他出去的这个线程一定不是当前线程，说明有其他线程等待在队列中。</li>
+</ul>
+<p>我们回到tryAcquire方法中，当发现writerShouldBlock为true，或者writerShouldBlock为false但在CAS操作中失败时（由于这里的获取写锁不是重入，因此可能有多个线程同时竞争写锁），返回false。如果CAS成功，则调用setExclusiveOwnerThread将当前持有写锁的线程设置为当前线程。</p>
+<h3 id="release-释放写锁"><a href="#release-释放写锁" class="headerlink" title="release 释放写锁"></a>release 释放写锁</h3><pre><code class="java">public void unlock() {
+            sync.release(1);
+        }
+</code></pre>
+<p>与ReentrantLock一样，unlock方法调用AQS提供的release方法,这里重点关注自定义同步器Sync重写的tryRelease方法：</p>
+<pre><code class="java">protected final boolean tryRelease(int releases) {
+            if (!isHeldExclusively())
+                throw new IllegalMonitorStateException();
+            int nextc = getState() - releases;
+            boolean free = exclusiveCount(nextc) == 0;
+            if (free)
+                setExclusiveOwnerThread(null);
+            setState(nextc);
+            return free;
+        }
+</code></pre>
+<p>首先，我们需要清楚一点：tryRelease方法的返回值表示当前释放操作完成后，剩余写锁数量是否等于0（即完成此释放后，写锁是否可用）。这与同样是可重入的ReentrantLock的tryRelease方法一样，ReentrantLock的tryRelease方法返回值的意义也是剩余写锁数量是否等于0（即完成此释放后，写锁是否可用）。</p>
+<h3 id="tryLock-获取写锁"><a href="#tryLock-获取写锁" class="headerlink" title="tryLock 获取写锁"></a>tryLock 获取写锁</h3><pre><code class="java">public boolean tryLock( ) {
+            return sync.tryWriteLock();
+        }
+</code></pre>
+<p>WriteLock的tryLock方法调用自定义同步器Sync的tryWriteLock方法实现：</p>
+<pre><code class="java">final boolean tryWriteLock() {
+            Thread current = Thread.currentThread();
+            int c = getState();
+            if (c != 0) {
+                int w = exclusiveCount(c);
+                if (w == 0 || current != getExclusiveOwnerThread())
+                    return false;
+                if (w == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+            }
+            if (!compareAndSetState(c, c + 1))
+                return false;
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+</code></pre>
+<p>tryWriteLock方法看上去跟tryAcquire方法真的很像。唯一的区别在于，tryWriteLock忽略的writerShouldBlock方法，即，默认调用tryLock方法的时机，就是需要我们去“抢”写锁的时机。</p>
+<h2 id="读锁"><a href="#读锁" class="headerlink" title="读锁"></a>读锁</h2><h3 id="lock-获取读锁"><a href="#lock-获取读锁" class="headerlink" title="lock 获取读锁"></a>lock 获取读锁</h3><pre><code class="java">public void lock() {
+            sync.acquireShared(1);
+        }
+</code></pre>
+<p>ReadLock的lock方法调用AQS提供的acquireShared方法来实现, 我们重点关注自定义同步器Sync重写的tryAcquireShared方法： </p>
+<pre><code class="java">protected final int tryAcquireShared(int unused) {
+            /*
+             * Walkthrough:
+             * 1. If write lock held by another thread, fail.
+             * 2. Otherwise, this thread is eligible for
+             *    lock wrt state, so ask if it should block
+             *    because of queue policy. If not, try
+             *    to grant by CASing state and updating count.
+             *    Note that step does not check for reentrant
+             *    acquires, which is postponed to full version
+             *    to avoid having to check hold count in
+             *    the more typical non-reentrant case.
+             * 3. If step 2 fails either because thread
+             *    apparently not eligible or CAS fails or count
+             *    saturated, chain to version with full retry loop.
+             */
+            Thread current = Thread.currentThread();
+            int c = getState();
+            if (exclusiveCount(c) != 0 &amp;&amp;
+                getExclusiveOwnerThread() != current)
+                return -1;
+            int r = sharedCount(c);
+            if (!readerShouldBlock() &amp;&amp;
+                r &lt; MAX_COUNT &amp;&amp;
+                compareAndSetState(c, c + SHARED_UNIT)) {
+                if (r == 0) {
+                    firstReader = current;
+                    firstReaderHoldCount = 1;
+                } else if (firstReader == current) {
+                    firstReaderHoldCount++;
+                } else {
+                    HoldCounter rh = cachedHoldCounter;
+                    if (rh == null || rh.tid != getThreadId(current))
+                        cachedHoldCounter = rh = readHolds.get();
+                    else if (rh.count == 0)
+                        readHolds.set(rh);
+                    rh.count++;
+                }
+                return 1;
+            }
+            return fullTryAcquireShared(current);
+        }
+</code></pre>
+<p>方法首先检测了一下当前是否有其他线程持有写锁，如果是的话，直接返回-1，表示获取失败。后续AQS的acquireShared方法会将当前线程放入等待队列中。</p>
+<p>然后方法做了这样一个判断，如果当前线程可以直接参与竞争读锁的话，就调用CAS操作将status值加一个SHARED_UNIT，注意，这里不是加1, 是因为status的高16位代表读锁的数量。</p>
+<p>OK，我们必须在这里暂停一下，我们需要详细解释一下几个成员变量：</p>
+<pre><code class="java">static final class HoldCounter {
+    int count = 0;
+    // Use id, not reference, to avoid garbage retention
+    final long tid = getThreadId(Thread.currentThread());
+}
+
+static final class ThreadLocalHoldCounter extends ThreadLocal&lt;HoldCounter&gt; {
+    public HoldCounter initialValue() {
+        return new HoldCounter();
+    }
+}
+
+private transient ThreadLocalHoldCounter readHolds;
+private transient HoldCounter cachedHoldCounter;
+
+private transient Thread firstReader = null;
+private transient int firstReaderHoldCount;
+</code></pre>
+<p>HoldCounter是一个final的内部类，有两个成员：tid&amp;count，分别代表一个线程ID和线程对应的一个计数值。</p>
+<p>ThreadLocalHoldCounter是一个final的内部类，它继承自<code>ThreadLocal&lt;HoldCounter&gt;</code>，它重写了initialValue方法，ThreadLocalHoldCounter对象对某一个线程第一次调用get方法是，会调用initialValue方法初始化这个线程响应的本地变量，并加入到map中。</p>
+<p>readHolds存在的作用是：记录所有持有读锁的线程所持有读锁的数量。对于写锁来说，它是独占锁，我们可以通过status的低16位+独占写锁的线程来记录关于写锁的所有信息，即它被谁持有&amp;被重入的数量。而读锁是一个共享锁，任何线程都可能持有它，因此，我们必须对每个线程都记录一下它所持有的共享锁（读锁）的数量。本地变量ThreadLocal来实现这个记录是非常合适的。</p>
+<p>cachedHoldCounter是一个缓存。很多情况下，一个线程获取读锁之后要更新一下它对应的记录值（线程对应的HoldCounter对象），然后有很大可能在很短的时间内就释放掉读锁，这时候需要再次更新HoldCounter，甚至需要从readHolds中删除（如果重入的读锁都被释放掉的话），需要调用readHolds的get方法，这是有一定开销的。因此，设置cachedHoldCounter作为一个缓存，在某个线程需要这个记录值的时候，先检查cachedHoldCounter对应的线程是否是这个线程自己，如果不是的话，再熊readHolds中get出来，这提高了效率。</p>
+<p>firsReader&amp;firstReaderHoldCount，这两个值记录了第一个获取读锁的线程和它持有的读锁的数量（可重入的嘛），这两个值在读锁全部释放之后要清空，以便记录下一次首先获取读锁的线程和其锁数目。这两个值存在的意义是：很多时候，读锁只被一个线程获取，这时候我们规定，第一个获取读锁的线程的计数不放入readHolds中，而是单独用这两个计数值来记录，这就避免了当只有一个线程操作读锁的时候，频繁地在readHolds上读取，提高了效率。</p>
+<p>注意区别：</p>
+<ul>
+<li>cachedHoldCounter提高的是一个线程获取-释放之间没有其他线程来获取或释放锁时的效率；</li>
+<li>firsReader&amp;firstReaderHoldCount提高的是只有一个线程操作锁时的效率。</li>
+</ul>
+<p>这时候我们再回到tryAcquireShared方法，当CAS操作成功后，需要去更新刚刚说过的计数值。具体细节代码已经很清楚，不再赘述。</p>
+<p>如果CAS失败或readerShouldBlock方法返回true，我们调用fullTryAcquireShared方法继续试图获取读锁。fullTryAcquireShared方法是tryAcquireShared方法的完整版，或者叫升级版，它处理了CAS失败的情况和readerShouldBlock返回true的情况。</p>
+<p>在分析fullTryAcquireShared方法之前，我们先来看一下readerShouldBlock方法：</p>
+<p>在公平模式下，根据等待队列中在当前线程之前有没有等待线程来判断：</p>
+<pre><code class="java"> final boolean readerShouldBlock() {
+            return hasQueuedPredecessors();
+        }
+</code></pre>
+<p>而在非公平模式下：</p>
+<pre><code class="java">  final boolean readerShouldBlock() {
+            return apparentlyFirstQueuedIsExclusive();
+        }
+</code></pre>
+<p>调用了apparentlyFirstQueuedIsExclusive方法：</p>
+<pre><code class="java">final boolean apparentlyFirstQueuedIsExclusive() {
+        Node h, s;
+        return (h = head) != null &amp;&amp;
+            (s = h.next)  != null &amp;&amp;
+            !s.isShared()         &amp;&amp;
+            s.thread != null;
+    }
+</code></pre>
+<p>这个方法返回是否队列的head.next正在等待独占锁（写锁）。当然这个方法执行的过程中队列的形态可能发生变化。这个方法的意思是：读锁不应该让写锁始终等待。</p>
+<p>好了，我们现在来看fullTryAcquireShared方法：</p>
+<pre><code class="java">/**
+         * Full version of acquire for reads, that handles CAS misses
+         * and reentrant reads not dealt with in tryAcquireShared.
+         */
+        final int fullTryAcquireShared(Thread current) {
+            /*
+             * This code is in part redundant with that in
+             * tryAcquireShared but is simpler overall by not
+             * complicating tryAcquireShared with interactions between
+             * retries and lazily reading hold counts.
+             */
+            HoldCounter rh = null;
+            for (;;) {
+                int c = getState();
+                if (exclusiveCount(c) != 0) {
+                    if (getExclusiveOwnerThread() != current)
+                        return -1;
+                    // else we hold the exclusive lock; blocking here
+                    // would cause deadlock.
+                } else if (readerShouldBlock()) {
+                    // Make sure we&#39;re not acquiring read lock reentrantly
+                    if (firstReader == current) {
+                        // assert firstReaderHoldCount &gt; 0;
+                    } else {
+                        if (rh == null) {
+                            rh = cachedHoldCounter;
+                            if (rh == null || rh.tid != getThreadId(current)) {
+                                rh = readHolds.get();
+                                if (rh.count == 0)
+                                    readHolds.remove();
+                            }
+                        }
+                        if (rh.count == 0)
+                            return -1;
+                    }
+                }
+                if (sharedCount(c) == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                if (compareAndSetState(c, c + SHARED_UNIT)) {
+                    if (sharedCount(c) == 0) {
+                        firstReader = current;
+                        firstReaderHoldCount = 1;
+                    } else if (firstReader == current) {
+                        firstReaderHoldCount++;
+                    } else {
+                        if (rh == null)
+                            rh = cachedHoldCounter;
+                        if (rh == null || rh.tid != getThreadId(current))
+                            rh = readHolds.get();
+                        else if (rh.count == 0)
+                            readHolds.set(rh);
+                        rh.count++;
+                        cachedHoldCounter = rh; // cache for release
+                    }
+                    return 1;
+                }
+            }
+        }
+</code></pre>
+<p>我们可以看到：fullTryAcquireShared方法是tryAcquireShared方法的完整版，或者叫升级版，它处理了CAS失败的情况和readerShouldBlock返回true的情况。</p>
+<p>跟tryAcquireShared方法一样，首先检查是否有其他线程正在持有写锁，如果是，直接返回false。如果没有线程正在持有写锁，则调用readerShouldBlock检测当前线程是否应该进入等待队列。就算readerShouldBlock方法返回true，原因可能因为当前是公平模式或者队列的第一个等待线程（head.next）正在等待写锁，我们也不能直接返回false，因为返回false意味着当前线程将要进入等待队列（见AQS的acquireShared方法），原因是：</p>
+<ul>
+<li>如果当前线程正在持有读锁，且这次读锁的重入被放入等待队列，万一之前队列中有线程正在等待写锁，将会导致死锁；</li>
+<li>另一种情况是当前线程正在持有写锁，且这次读锁的“降级申请”被放入等待队列，如果队列中之前有线程正在等待锁，不论等待的是写锁还是读锁，都将导致死锁。</li>
+</ul>
+<p>因此，我们需要做一个判断，如果这次申请读锁是对读锁的一次重入（因为我们已经检测过没有写锁，因此只考虑上述第①种情况），我们将不能返回false（返回false意味着进队列），而是调用CAS操作去获取读锁，如果CAS失败，则一直自旋，直到成功获取，或者可以返回false去队列的时机的到来。</p>
+<p>我们可以这样提fullTryAcquireShared方法说句话：不是我不想进队列休息，实在是因为进队列有可能死锁，所以我才一直自旋！</p>
+<p>注意：判断重入的时候firstReader==当前线程即说明是一次重入，因为firstReader线程释放最后一个读锁的时候会将firstReader置为null，这里还不是null，说明依然持有读锁。</p>
+<p>另外还记得我们提过apparentlyFirstQueuedIsExclusive方法是不可靠的吗，它在检测的过程中队列结构可能被更改，head可能被踢出，方法可能因为head.next为null而返回false。而且它也只是检测第一个等待线程（head.next），如果有等待写锁的线程在后面，它也不能检测出来。不过没关系，这些都导致它返回false，返回false意味着fullTryAcquireShared可以去抢“锁”并不会影响正确性。</p>
+<h3 id="unlock-释放读锁"><a href="#unlock-释放读锁" class="headerlink" title="unlock 释放读锁"></a>unlock 释放读锁</h3><pre><code class="java">public void unlock() {
+            sync.releaseShared(1);
+        }
+</code></pre>
+<p>readLock的unlock方法调用AQS提供的releaseShared方法实现, 这里我们关注自定义同步器Sync重写的tryReleaseShared方法：</p>
+<pre><code class="java">protected final boolean tryReleaseShared(int unused) {
+            Thread current = Thread.currentThread();
+            if (firstReader == current) {
+                // assert firstReaderHoldCount &gt; 0;
+                if (firstReaderHoldCount == 1)
+                    firstReader = null;
+                else
+                    firstReaderHoldCount--;
+            } else {
+                HoldCounter rh = cachedHoldCounter;
+                if (rh == null || rh.tid != getThreadId(current))
+                    rh = readHolds.get();
+                int count = rh.count;
+                if (count &lt;= 1) {
+                    readHolds.remove();
+                    if (count &lt;= 0)
+                        throw unmatchedUnlockException();
+                }
+                --rh.count;
+            }
+            for (;;) {
+                int c = getState();
+                int nextc = c - SHARED_UNIT;
+                if (compareAndSetState(c, nextc))
+                    // Releasing the read lock has no effect on readers,
+                    // but it may allow waiting writers to proceed if
+                    // both read and write locks are now free.
+                    return nextc == 0;
+            }
+        }
+</code></pre>
+<p>分为三部分：</p>
+<ul>
+<li>如果是firstReader，对firstReader修改；②</li>
+<li>如果不是firstReader，修改readHolds；</li>
+<li>CAS自旋更新status值。</li>
+</ul>
+<p>注意：tryReleaseShared方法的返回值如果为true，表示status为0，即已经不存在任何锁，both读锁&amp;写锁。</p>
+<h3 id="tryLock-获取读锁"><a href="#tryLock-获取读锁" class="headerlink" title="tryLock 获取读锁"></a>tryLock 获取读锁</h3><pre><code class="java">public boolean tryLock() {
+            return sync.tryReadLock();
+        }
+</code></pre>
+<p>ReadLock的tryLock调用自定义同步器Sync的tryReadLock方法实现：</p>
+<pre><code class="java">final boolean tryReadLock() {
+            Thread current = Thread.currentThread();
+            for (;;) {
+                int c = getState();
+                if (exclusiveCount(c) != 0 &amp;&amp;
+                    getExclusiveOwnerThread() != current)
+                    return false;
+                int r = sharedCount(c);
+                if (r == MAX_COUNT)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                if (compareAndSetState(c, c + SHARED_UNIT)) {
+                    if (r == 0) {
+                        firstReader = current;
+                        firstReaderHoldCount = 1;
+                    } else if (firstReader == current) {
+                        firstReaderHoldCount++;
+                    } else {
+                        HoldCounter rh = cachedHoldCounter;
+                        if (rh == null || rh.tid != getThreadId(current))
+                            cachedHoldCounter = rh = readHolds.get();
+                        else if (rh.count == 0)
+                            readHolds.set(rh);
+                        rh.count++;
+                    }
+                    return true;
+                }
+            }
+        }
+</code></pre>
+<p>与写锁的tryWriteLock方法类似，tryReadLock同样忽略了readerShouldBlock方法，因为调用这个方法就意味着：现在是适合抢占的时机。</p>
+<p>tryReadLock方法与tryAcquireShared方法十分类似，不同在于：当CAS失败时，tryAcquireShared方法调用fullAcquireShared处理CAS失败，而tryReadLock方法遇到CAS失败时，直接返回false，毕竟只是try嘛。</p>
+<p>总结：</p>
+<p>ReentrantReadWriteLock相比于其他锁，还是比较复杂的，因为他结合了共享锁和独占锁，并混合使用了他们。虽然ReentrantReadWriteLock通过精巧的设计尽量避免死锁的发生，但如果我们使用不当仍然可能发生死锁，比如我们在持有读锁的情况下去申请写，企图做锁升级。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之Condition]]></title>
+      <url>/2020/11/22/juc-4/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>Condition在JUC框架下提供了传统Java监视器风格的wait、notify和notifyAll相似的功能。</p>
+<p><img src="https://s3.ax1x.com/2020/11/22/DGpqBD.png" alt="DGpqBD.png"></p>
+<p>Condition队列与Sync队列（锁等待队列）有几点不同：</p>
+<ul>
+<li>Condition队列是一个单向链表，而Sync队列是一个双向链表；</li>
+<li>Sync队列在初始化的时候，会在队列头部添加一个空的dummy节点，它不持有任何线程，而Condition队列初始化时，头结点就开始持有等待线程了。</li>
+<li>Condition永远都是一个公平锁（顺序）的实现</li>
+</ul>
+<p>Condition必须被绑定到一个独占锁上使用。ReentrantLock中获取Condition的方法为：</p>
+<pre><code class="java">public Condition newCondition() {
+    return sync.newCondition();
+}
+
+final ConditionObject newCondition() {
+    return new ConditionObject();
+}
+</code></pre>
+<p>直接初始化并返回了一个AQS提供的ConditionObject对象。因此，Condition实际上是AQS框架的内容。ConditionObject通过维护两个成员变量：</p>
+<pre><code class="java">   /** First node of condition queue. */
+        private transient Node firstWaiter;
+        /** Last node of condition queue. */
+        private transient Node lastWaiter;
+</code></pre>
+<p>下面我们就来分析下Condition的工作流程。</p>
+<h2 id="await-在条件变量上等待"><a href="#await-在条件变量上等待" class="headerlink" title="await 在条件变量上等待"></a>await 在条件变量上等待</h2><p>分别是Condition队列的头结点和尾节点。Condition在调用await方法之前，必须先获取锁，注意，这个锁必须是一个独占锁。我们先来看一下await中用到的几个方法：</p>
+<p>addConditionWaiter:</p>
+<pre><code class="java">private Node addConditionWaiter() {
+            Node t = lastWaiter;
+            // If lastWaiter is cancelled, clean out.
+            if (t != null &amp;&amp; t.waitStatus != Node.CONDITION) {
+                unlinkCancelledWaiters();
+                t = lastWaiter;
+            }
+            Node node = new Node(Thread.currentThread(), Node.CONDITION);
+            if (t == null)
+                firstWaiter = node;
+            else
+                t.nextWaiter = node;
+            lastWaiter = node;
+            return node;
+        }
+</code></pre>
+<p>顾名思义，此方法在Condition队列中添加一个等待线程。首先，方法先检查一下队列尾节点是否还在等待Condition（如果被signal或者中断，waitStatus会被修改为0或者CANCELLED）。如果尾节点被取消或者中断，调用unlinkCancelledWaiters方法删除Condition队列中被cancel的节点。然后将当前线程封装在一个Node中，添加到Condition队列的尾部。这里由于我们在操纵Condition队列的时候已经获取了一个独占锁，因此不会发生竞争。</p>
+<p>我们有必要在这里提一下Node对象中的nextWaiter成员、SHARED成员和EXCLUSIVE成员：</p>
+<pre><code class="java">/** Marker to indicate a node is waiting in shared mode */
+        static final Node SHARED = new Node();
+        /** Marker to indicate a node is waiting in exclusive mode */
+        static final Node EXCLUSIVE = null;
+
+        Node nextWaiter;
+</code></pre>
+<p>nextWaiter在共享模式下，被设置为SHARED，SHARED为一个final的空节点，用来表示当前模式是共享模式；默认情况下nextWaiter是null，EXCLUSIVE成员是一个final的null，因此默认模式是独占模式。在Condition队列中nextWaiter被用来指向队列里的下一个等待线程。在一个线程从Condition队列中被移除之后，nextWaiter被设置为空（EXCLUSIVE）。这再次表明：Condition必须被绑定在一个独占锁上使用。</p>
+<p>我们来看一下unlinkCancelledWaiters方法：</p>
+<pre><code class="java">private void unlinkCancelledWaiters() {
+            Node t = firstWaiter;
+            Node trail = null;
+            while (t != null) {
+                Node next = t.nextWaiter;
+                if (t.waitStatus != Node.CONDITION) {
+                    t.nextWaiter = null;
+                    if (trail == null)
+                        firstWaiter = next;
+                    else
+                        trail.nextWaiter = next;
+                    if (next == null)
+                        lastWaiter = trail;
+                }
+                else
+                    trail = t;
+                t = next;
+            }
+        }
+</code></pre>
+<p>unlinkCancelledWaiters方法很简单，从头到尾遍历Condition队列，移除被cancel或被中断的节点。由于这里我们在操纵Condition队列的时候已经获取了所绑定的独占锁，因此不用担心竞争的发生。</p>
+<p>我们再来看一下fullyRelease方法，这个方法用来释放锁：</p>
+<pre><code class="java">final int fullyRelease(Node node) {
+        boolean failed = true;
+        try {
+            int savedState = getState();
+            if (release(savedState)) {
+                failed = false;
+                return savedState;
+            } else {
+                throw new IllegalMonitorStateException();
+            }
+        } finally {
+            if (failed)
+                node.waitStatus = Node.CANCELLED;
+        }
+    }
+</code></pre>
+<p>方法首先获取了state的值，这个值表示可锁被“重入”深度，并调用release释放全部的重入获取，如果成功，返回这个深度，如果失败，要将当前线程的waitStatus设置为CANCELLED。</p>
+<p>我们再来看一下isOnSyncQueue方法，这个方法返节点是否在Sync队列中等待锁：</p>
+<pre><code class="java">final boolean isOnSyncQueue(Node node) {
+        if (node.waitStatus == Node.CONDITION || node.prev == null)
+            return false;
+        if (node.next != null) // If has successor, it must be on queue
+            return true;
+        /*
+         * node.prev can be non-null, but not yet on queue because
+         * the CAS to place it on queue can fail. So we have to
+         * traverse from tail to make sure it actually made it.  It
+         * will always be near the tail in calls to this method, and
+         * unless the CAS failed (which is unlikely), it will be
+         * there, so we hardly ever traverse much.
+         */
+        return findNodeFromTail(node);
+    }
+</code></pre>
+<p>node从Condition队列移除的第一步，就是设置waitStatus为其他值，因此是否等于Node.CONDITON可以作为判断标志，如果等于，说明还在Condition队列中，即不再Sync队列里。在node被放入Sync队列时，第一步就是设置node的prev为当前获取到的尾节点，所以如果发现node的prev为null的话，可以确定node尚未被加入Sync队列。</p>
+<p>相似的，node被放入Sync队列的最后一步是设置node的next，如果发现node的next不为null，说明已经完成了放入Sync队列的过程，因此可以返回true。</p>
+<p>当我们执行完两个if而仍未返回时，node的prev一定不为null，next一定为null，这个时候可以认为node正处于放入Sync队列的执行CAS操作执行过程中。而这个CAS操作有可能失败，因此我们再给node一次机会，调用findNodeFromTail来检测：</p>
+<pre><code class="java">    private boolean findNodeFromTail(Node node) {
+        Node t = tail;
+        for (;;) {
+            if (t == node)
+                return true;
+            if (t == null)
+                return false;
+            t = t.prev;
+        }
+    }
+</code></pre>
+<p>findNodeFromTail方法从尾部遍历Sync队列，如果检查node是否在队列中，如果还不在，此时node也许在CAS自旋中，在不久的将来可能会进到Sync队列里。但我们已经等不了了，直接放回false。</p>
+<p>我们再来看一下checkInterruptWhileWaiting方法：</p>
+<pre><code class="java">/** Mode meaning to reinterrupt on exit from wait */
+        private static final int REINTERRUPT =  1;
+        /** Mode meaning to throw InterruptedException on exit from wait */
+        private static final int THROW_IE    = -1;
+
+        /**
+         * Checks for interrupt, returning THROW_IE if interrupted
+         * before signalled, REINTERRUPT if after signalled, or
+         * 0 if not interrupted.
+         */
+        private int checkInterruptWhileWaiting(Node node) {
+            return Thread.interrupted() ?
+                (transferAfterCancelledWait(node) ? THROW_IE : REINTERRUPT) :
+                0;
+        }
+</code></pre>
+<p>此方法在线程从park中醒来后调用，它的返回值有三种：0代表在park过程中没有发生中断；THORW_IE代表发生了中断，且在后续我们需要抛出中断异常；REINTERRUPT表示发生了中断，但在后续我们不抛出中断异常，而是“补上”这次中断。当没有发生中断时，我们返回0即可，当中断发生时，返回THROW_IE or REINTERRUPT由transferAfterCancelledWait方法判断：</p>
+<pre><code class="java">final boolean transferAfterCancelledWait(Node node) {
+        if (compareAndSetWaitStatus(node, Node.CONDITION, 0)) {
+            enq(node);
+            return true;
+        }
+        /*
+         * If we lost out to a signal(), then we can&#39;t proceed
+         * until it finishes its enq().  Cancelling during an
+         * incomplete transfer is both rare and transient, so just
+         * spin.
+         */
+        while (!isOnSyncQueue(node))
+            Thread.yield();
+        return false;
+    }
+</code></pre>
+<p>transferAfterCancelledWait方法并不在ConditionObject中定义，而是由AQS提供。这个方法根据是否中断发生时，是否有signal操作来“掺和”来返回结果。方法调用CAS操作将node的waitStatus从CONDITION设置为0，如果成功，说明当中断发生时，说明没有signal发生（signal的第一步是将node的waitStatus设置为0），在调用enq将线程放入Sync队列后直接返回true，表示中断先于signal发生，即中断在await等待过程中发生，根据await的语义，在遇到中断时需要抛出中断异常，返回true告诉上层方法返回THROW_IT，后续会根据这个返回值做抛出中断异常的处理。</p>
+<p>如果CAS操作失败，是否说明中断后于signal发生呢？只能说这时候我们不能确定中断和signal到底谁先发生，只是在我们做CAS操作的时候，他们俩已经都发生了（中断-&gt;interrupted检测-&gt;signal-&gt;CAS，或者signal-&gt;中断-&gt;interrupted检测-&gt;CAS都有可能），这时候我们无法判断到底顺序是怎样，这里的处理是不管怎样都返回false告诉上层方法返回REINTERRUPT，当做是signal先发生（线程被signal唤醒）来处理，后续根据这个返回值做“补上”中断的处理。在返回false之前，我们要先做一下等待，直到当前线程被成功放入Sync锁等待队列。</p>
+<p>因此，我们可以这样总结：transferAfterCancelledWait的返回值表示了线程是否因为中断从park中唤醒。</p>
+<p>至此，我们终于可以正式来看await方法了：</p>
+<pre><code class="java">        public final void await() throws InterruptedException {
+            if (Thread.interrupted())
+                throw new InterruptedException();
+            Node node = addConditionWaiter();
+            int savedState = fullyRelease(node);
+            int interruptMode = 0;
+            while (!isOnSyncQueue(node)) {
+                // 有趣的是这里this是conditionobject，而非thread
+                // 我试图debug代码，发现线程并不会stuck在这里
+                // LockSupport.park(this)会神奇的做一个移出condition队列，入队sync队列的操作，然后正常跳出循环获取锁
+                // 之后再dubug下去，发现代码并不能继续，而是又回到了await()方法里做与刚才同样的操作
+                // 这里百思不得其解，求大神解答
+                LockSupport.park(this);
+                if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+                    break;
+            }
+            if (acquireQueued(node, savedState) &amp;&amp; interruptMode != THROW_IE)
+                interruptMode = REINTERRUPT;
+            if (node.nextWaiter != null) // clean up if cancelled
+                unlinkCancelledWaiters();
+            if (interruptMode != 0)
+                reportInterruptAfterWait(interruptMode);
+        }
+</code></pre>
+<p>await方法是及时响应中断的。它首先检查了一下中断标志。然后调用addConditionWaiter将当前线程放入Condition队列的尾，并顺手清理了一下队列里的无用节点。紧接着调用fullyRelease方法释放当前线程持有的锁。然后是一个while循环，这个循环会循环检测线程的状态，直到线程被signal或者中断唤醒且被放入Sync锁等待队列。如果中断发生的话，还需要调用checkInterruptWhileWaiting方法，根据中断发生的时机确定后去处理这次中断的方式，如果发生中断，退出while循环。</p>
+<p>退出while循环后，我们调用acquireQueued方法来获取锁，注意，acquireQueued方法的返回值表示在等待获取锁的过程中是否发生中断，如果发生中断 且 原来没有需要做抛出处理的中断发生时，我们将后续处理方式设置为REINTERRUPT（如果原来在await状态有中断发生，即interrruptMode==THROW_IE，依然保持THROW_IE）。</p>
+<p>如果是应为中断从park中唤醒（interruptMode==THROT_IE），当前线程仍在Condition队列中，但waitStatus已经变成0了，这里在调用unlinkCancelledWaiters做一次清理。</p>
+<p>最后，根据interruptMode的值，调用reportInterruptAfterWait做出相应处理：</p>
+<pre><code class="java">
+        private void reportInterruptAfterWait(int interruptMode)
+            throws InterruptedException {
+            if (interruptMode == THROW_IE)
+                throw new InterruptedException();
+            else if (interruptMode == REINTERRUPT)
+                selfInterrupt();
+        }
+</code></pre>
+<p>如果interruptMod==0，donothing，如果是THROW_IE，说明在await状态下发生中断，抛出中断异常，如果是REINTERRUPT，说明是signal“掺和”了中断，我们无法分辨具体的先后顺序，于是统一按照先signal再中断来处理，即成功获取锁之后要调用selfInterrupt“补上”这次中断。</p>
+<h2 id="awaitNanos-限时的在条件变量上等待"><a href="#awaitNanos-限时的在条件变量上等待" class="headerlink" title="awaitNanos 限时的在条件变量上等待"></a>awaitNanos 限时的在条件变量上等待</h2><pre><code class="java">public final long awaitNanos(long nanosTimeout)
+                throws InterruptedException {
+            if (Thread.interrupted())
+                throw new InterruptedException();
+            Node node = addConditionWaiter();
+            int savedState = fullyRelease(node);
+            final long deadline = System.nanoTime() + nanosTimeout;
+            int interruptMode = 0;
+            while (!isOnSyncQueue(node)) {
+                if (nanosTimeout &lt;= 0L) {
+                    transferAfterCancelledWait(node);
+                    break;
+                }
+                if (nanosTimeout &gt;= spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+                    break;
+                nanosTimeout = deadline - System.nanoTime();
+            }
+            if (acquireQueued(node, savedState) &amp;&amp; interruptMode != THROW_IE)
+                interruptMode = REINTERRUPT;
+            if (node.nextWaiter != null)
+                unlinkCancelledWaiters();
+            if (interruptMode != 0)
+                reportInterruptAfterWait(interruptMode);
+            return deadline - System.nanoTime();
+        }
+</code></pre>
+<p>awaitNanos方法与await方法大致相同，区别在于每次park是定时的，当被唤醒时，比较一下剩余等待时间Timeout与spinForTimeoutThreshold阈值的大小，如果小于，将不再park。</p>
+<p>注意：当已经到达等待的deadline时，调用transferAfterCancelledWait方法，注意，此时可能发生中断（上次调用checkInterruptWhileWaiting之后被中断），再次的，我们无法判断这次中断与到时这两个的先后顺序，我们在这里的处理方式是直接忽略这次中断，统一认为是先到时后中断（体现在没有记录transferAfterCancelledWait方法的返回值），但在transferAfterCancelledWait方法中的处理是考虑了被中断的情况的，只不过这个中断标志位没有检测，留给后续来处理了。这个中断标志将会在调用acquireQueued方法并成功获取锁之后被检测并返回，最终影响interruptMode的值，并在reportInterruptAfterWait方法中被处理。可见，这次中断最终没有被遗漏，只是我们先处理的signal，回过头来再去处理它。</p>
+<p>最后方法的返回值是拍唤醒后的剩余等待时间，这个时间可能小于0。</p>
+<p>await(long time, TimeUnit unit)方法与awaitNanos方法十分类似，不再赘述。</p>
+<h2 id="awaitUtil-指定结束时刻的在条件变量上等待"><a href="#awaitUtil-指定结束时刻的在条件变量上等待" class="headerlink" title="awaitUtil 指定结束时刻的在条件变量上等待"></a>awaitUtil 指定结束时刻的在条件变量上等待</h2><pre><code class="java">public final boolean awaitUntil(Date deadline)
+                throws InterruptedException {
+            long abstime = deadline.getTime();
+            if (Thread.interrupted())
+                throw new InterruptedException();
+            Node node = addConditionWaiter();
+            int savedState = fullyRelease(node);
+            boolean timedout = false;
+            int interruptMode = 0;
+            while (!isOnSyncQueue(node)) {
+                if (System.currentTimeMillis() &gt; abstime) {
+                    timedout = transferAfterCancelledWait(node);
+                    break;
+                }
+                LockSupport.parkUntil(this, abstime);
+                if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+                    break;
+            }
+            if (acquireQueued(node, savedState) &amp;&amp; interruptMode != THROW_IE)
+                interruptMode = REINTERRUPT;
+            if (node.nextWaiter != null)
+                unlinkCancelledWaiters();
+            if (interruptMode != 0)
+                reportInterruptAfterWait(interruptMode);
+            return !timedout;
+        }
+</code></pre>
+<p>awaitUtil方法在原理上与awaitNanos方法是也十分相似，只不过park操作调用的是LockSupportparkUtil方法，且没有spinForTimeoutThreshold阈值的应用。在返回值上也有些许差别：返回值timedout记录了transferAfterCancelledWait方法的返回值——线程是否因为中断从park中唤醒，如果是的话，表示还没有到等待的deadline。</p>
+<h3 id="signal-唤醒Condition队列的头节点持有的线程"><a href="#signal-唤醒Condition队列的头节点持有的线程" class="headerlink" title="signal 唤醒Condition队列的头节点持有的线程"></a>signal 唤醒Condition队列的头节点持有的线程</h3><pre><code class="java">public final void signal() {
+            if (!isHeldExclusively())
+                throw new IllegalMonitorStateException();
+            Node first = firstWaiter;
+            if (first != null)
+                doSignal(first);
+        }
+</code></pre>
+<p>调用signal之前也需要获取锁，因此signal方法首先检测了一下当前线程是否获取了独占锁。然后调用doSignal唤醒队列中第一个等待线程。注意，这里的“唤醒”意思是将线程从Condition队列移到Sync队列，表示已经完成Condition的等待，具有了去竞争锁的资格。至此，我们可以发现，由于await会直接把线程放入Condition等待队列的尾部，因此Condition是公平的，即按照入列的顺序来signal。</p>
+<pre><code class="java">private void doSignal(Node first) {
+            do {
+                if ( (firstWaiter = first.nextWaiter) == null)
+                    lastWaiter = null;
+                first.nextWaiter = null;
+            } while (!transferForSignal(first) &amp;&amp;
+                     (first = firstWaiter) != null);
+        }
+</code></pre>
+<p>doSignal方法先将first节点从队列中摘下，然后调用transferForSignal去改变first节点的waitStatus（所谓唤醒线程），这个方法有可能失败，因为等待线程可能已经到时或者被中断，因此while循环这个操作直到成功唤醒或队列为空。我们来看下transferForSignal方法：</p>
+<pre><code class="java">final boolean transferForSignal(Node node) {
+        /*
+         * If cannot change waitStatus, the node has been cancelled.
+         */
+        if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+            return false;
+
+        /*
+         * Splice onto queue and try to set waitStatus of predecessor to
+         * indicate that thread is (probably) waiting. If cancelled or
+         * attempt to set waitStatus fails, wake up to resync (in which
+         * case the waitStatus can be transiently and harmlessly wrong).
+         */
+        Node p = enq(node);
+        int ws = p.waitStatus;
+        if (ws &gt; 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+            LockSupport.unpark(node.thread);
+        return true;
+    }
+</code></pre>
+<p>这个方法并不在ConditionObject中定义，而是由AQS提供。方法首先调用CAS操作修改node的waitStatus，如果失败，表示线程已经放弃等待（到时或被中断），直接返回false。如果成功，调用enq方法将它放入Sync锁等待队列，返回值p是node在Sync队列中的前驱节点。紧接着检测一下前驱p的waitStatus，如果发现不为SIGNAL，需要将node持有的线程（注意不是当前线程）unpark，这里必须搞清楚，node线程是在哪里park的，显然，他还在await方法的那个while循环里。unpark之后，node线程将会从while循环中退出，然后去调用acquireQueued方法，这个方法是一个自旋，弄得线程会在自旋过程中清除已经为CANCELLED状态的前驱，然后注册前驱节点的waitStatus为SIGNAL。</p>
+<p>至此，signal方法已经完成了所有该做的，“唤醒”的线程已经成功加入Sync队列并已经参与锁的竞争了，返回true。</p>
+<h2 id="signalAll-唤醒Condition队列的所有等待线程"><a href="#signalAll-唤醒Condition队列的所有等待线程" class="headerlink" title="signalAll 唤醒Condition队列的所有等待线程"></a>signalAll 唤醒Condition队列的所有等待线程</h2><pre><code class="java">public final void signalAll() {
+            if (!isHeldExclusively())
+                throw new IllegalMonitorStateException();
+            Node first = firstWaiter;
+            if (first != null)
+                doSignalAll(first);
+        }
+</code></pre>
+<p>signalAll方法同样先检测是否持有独占锁，然后对奥用doSignalAll方法：</p>
+<pre><code class="java">private void doSignalAll(Node first) {
+            lastWaiter = firstWaiter = null;
+            do {
+                Node next = first.nextWaiter;
+                first.nextWaiter = null;
+                transferForSignal(first);
+                first = next;
+            } while (first != null);
+        }
+</code></pre>
+<p>doSignalAll方法循环调用transferForSignal方法“唤醒”队列的头结点，直到队列为空。</p>
+<p>总结：ConditionObject由AQS提供，它实现了类似wiat、notify和notifyAll类似的功能。Condition必须与一个独占锁绑定使用，在await或signal之前必须现持有独占锁。Condition队列是一个单向链表，他是公平的，按照先进先出的顺序从队列中被“唤醒”，所谓唤醒指的是完成Condition对象上的等待，被移到Sync锁等待队列中，有参与竞争锁的资格（Sync队列有公平&amp;非公平两种模式，注意区别）。</p>
+<hr>
+<p>加餐：</p>
+<p>摘自  <a href="https://juejin.cn/post/6844903984197533704" target="_blank" rel="noopener">https://juejin.cn/post/6844903984197533704</a></p>
+<h2 id="Thread-sleep-和Object-wait-的区别"><a href="#Thread-sleep-和Object-wait-的区别" class="headerlink" title="Thread.sleep()和Object.wait()的区别"></a>Thread.sleep()和Object.wait()的区别</h2><ul>
+<li>Thread.sleep()不会释放占有的锁，Object.wait()会释放占有的锁；</li>
+<li>Thread.sleep()必须传入时间，Object.wait()可传可不传，不传表示一直阻塞下去；</li>
+<li>Thread.sleep()到时间了会自动唤醒，然后继续执行；</li>
+<li>Object.wait()不带时间的，需要另一个线程使用Object.notify()唤醒；</li>
+<li>Object.wait()带时间的，假如没有被notify，到时间了会自动唤醒，这时又分好两种情况，一是立即获取到了锁，线程自然会继续执行；二是没有立即获取锁，线程进入同步队列等待获取锁；</li>
+</ul>
+<h2 id="Thread-sleep-和Condition-await-的区别"><a href="#Thread-sleep-和Condition-await-的区别" class="headerlink" title="Thread.sleep()和Condition.await()的区别"></a>Thread.sleep()和Condition.await()的区别</h2><p>这个题目的回答思路跟Object.wait()是基本一致的，不同的是Condition.await()底层是调用LockSupport.park()来实现阻塞当前线程的。</p>
+<p>实际上，它在阻塞当前线程之前还干了两件事，一是把当前线程添加到条件队列中，二是“完全”释放锁，也就是让state状态变量变为0，然后才是调用LockSupport.park()阻塞当前线程。</p>
+<h2 id="Thread-sleep-和LockSupport-park-的区别"><a href="#Thread-sleep-和LockSupport-park-的区别" class="headerlink" title="Thread.sleep()和LockSupport.park()的区别"></a>Thread.sleep()和LockSupport.park()的区别</h2><ul>
+<li>从功能上来说，Thread.sleep()和LockSupport.park()方法类似，都是阻塞当前线程的执行，且都不会释放当前线程占有的锁资源；</li>
+<li>Thread.sleep()没法从外部唤醒，只能自己醒过来；</li>
+<li>LockSupport.park()方法可以被另一个线程调用LockSupport.unpark()方法唤醒；</li>
+<li>Thread.sleep()方法声明上抛出了InterruptedException中断异常，所以调用者需要捕获这个异常或者再抛出；</li>
+<li>LockSupport.park()方法不需要捕获中断异常；</li>
+<li>Thread.sleep()本身就是一个native方法；</li>
+<li>LockSupport.park()底层是调用的Unsafe的native方法；</li>
+</ul>
+<h2 id="Object-wait-和LockSupport-park-的区别"><a href="#Object-wait-和LockSupport-park-的区别" class="headerlink" title="Object.wait()和LockSupport.park()的区别"></a>Object.wait()和LockSupport.park()的区别</h2><ul>
+<li>Object.wait()方法需要在synchronized块中执行；</li>
+<li>LockSupport.park()可以在任意地方执行；</li>
+<li>Object.wait()方法声明抛出了中断异常，调用者需要捕获或者再抛出；</li>
+<li>LockSupport.park()不需要捕获中断异常；</li>
+<li>Object.wait()不带超时的，需要另一个线程执行notify()来唤醒，但不一定继续执行后续内容；</li>
+<li>LockSupport.park()不带超时的，需要另一个线程执行unpark()来唤醒，一定会继续执行后续内容；</li>
+<li>如果在wait()之前执行了notify()会怎样？抛出IllegalMonitorStateException异常；</li>
+<li>如果在park()之前执行了unpark()会怎样？线程不会被阻塞，直接跳过park()，继续执行后续内容；</li>
+</ul>
+<p>ps：LockSupport.park()不能重入，会死锁</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之ReentrantLock]]></title>
+      <url>/2020/11/22/juc-3/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>ReentrantLock是JUC包提供的一种可重入独占锁，它实现了Lock接口。与Semaphore类似，ReentrantLock也提供了两种工作模式：公平模式&amp;非公平模式，也是通过自定义两种同步器FairSync&amp;NonfairSync来实现的。</p>
+<h2 id="lock-不响应中断获取锁"><a href="#lock-不响应中断获取锁" class="headerlink" title="lock 不响应中断获取锁"></a>lock 不响应中断获取锁</h2><pre><code class="java">public void lock() {
+        sync.lock();
+    }
+</code></pre>
+<p>lock方法通过调用自定义同步器的同名方法来获取锁。注意：ReentrantLock自定义了两种同步器：FairSync&amp;NonfairSync，分别对应公平模式&amp;非公平模式。</p>
+<p>我们先来看一下非公平模式下的lock方法：</p>
+<pre><code class="java">final void lock() {
+            if (compareAndSetState(0, 1))
+                setExclusiveOwnerThread(Thread.currentThread());
+            else
+                acquire(1);
+        }
+</code></pre>
+<p>lock方法并没有直接调用AQS提供的acquire方法，而是先试探地获取了一下锁，CAS操作失败再去调用acquire方法。我的理解是为了提升性能。因为可能很多时候我们能在第一次试探获取时成功，而不需要经过acquire-&gt;tryAcquire-&gt;nonfairAcquire的调用过程：</p>
+<pre><code class="java">public final void acquire(int arg) {
+        if (!tryAcquire(arg) &amp;&amp;
+            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+            selfInterrupt();
+    }
+</code></pre>
+<p>AQS提供的acquire方法首先调用了我们自定义同步器重写的tryAcquire方法试图获取锁，如果失败的话先调用addWaiter方法将当前线程加入等待队列，然后对掉用acquireQueued方法进行自旋、检测获取锁的操作，直到成功获取锁。在自旋、检测的过程中如果被中断（注意：acquireQueued延迟处理中断），要在成功获取锁之后调用selfInterrupt方法“补上”这次中断。这里我们主要关注ReentrantLock重写的tryAcquire方法：</p>
+<pre><code class="java"> protected final boolean tryAcquire(int acquires) {
+            return nonfairTryAcquire(acquires);
+        }
+</code></pre>
+<p>nonfairSync的tryAcquire方法通过调用其父类Sync的nonfairTryAcquire方法实现：</p>
+<pre><code class="java">final boolean nonfairTryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc &lt; 0) // overflow
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+</code></pre>
+<p>nonfairTryAcquire方法首先判断锁是否被占用，如果锁可用，通过调用CAS操作试图获取锁，如果失败直接返回false；但如果锁被占用（state==0），并不代表没有机会，因为有可能占用锁的正是当前线程。如果正是当前线程占用了锁，让state做+1操作，然后返回true：这正是可重入的概念，一个已经获取锁的线程可以重复获取锁。</p>
+<p>我们再来看一下公平模式下的lock方法：</p>
+<pre><code class="java">final void lock() {
+            acquire(1);
+        }
+</code></pre>
+<p>fairSync的lock方法直接调用acquire，而没有想NonfairSync一样先试图获取，因为这样可能导致违反“公平”的语义：在已等待在队列中的线程之前获取了锁。</p>
+<p>由上面的分析可知，AQS的acquire方法调用了fairSync重写的tryAcquire方法：</p>
+<pre><code class="java">protected final boolean tryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (!hasQueuedPredecessors() &amp;&amp;
+                    compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc &lt; 0)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+</code></pre>
+<p>这与nonfairTryAcquire方法大同小异，主要区别在于，当发现锁未被占用的时候，还要判断一下等待队列中是否有先到的线程正在等待锁，如果有，直接返回false。这保证了公平性：线程按照申请锁的顺序获取锁。</p>
+<h2 id="lockInterruptibly-可响应中断获取锁"><a href="#lockInterruptibly-可响应中断获取锁" class="headerlink" title="lockInterruptibly 可响应中断获取锁"></a>lockInterruptibly 可响应中断获取锁</h2><pre><code class="java">public void lockInterruptibly() throws InterruptedException {
+        sync.acquireInterruptibly(1);
+    }
+</code></pre>
+<p>lockInterruptibly方法通过调用AQS提供的acquireInterruptibly方法实现：</p>
+<pre><code class="java">public final void acquireInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (!tryAcquire(arg))
+            doAcquireInterruptibly(arg);
+    }
+</code></pre>
+<p>acquireInterruptibly方法首先检测一下中断，然后调用重写的tryAcquire方法试图获取锁，如果失败，调用doAcquireInterruptibly方法进行自旋、检测获取锁操作：</p>
+<pre><code class="java">private void doAcquireInterruptibly(int arg)
+        throws InterruptedException {
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>doAcquireInterruptibly方法与acquireQueued方法的区别在于：</p>
+<ul>
+<li>doAcquireInterruptibly方法将addWaiter的调用写在了方法里，而acquireQueued方法没有；</li>
+<li>doAcquireInterruptibly在当前线程从park中被中断唤醒时，直接抛出中断异常，而acquireQueued方法则是用一个局部变量记录下这次中断，但不立即处理，等到成功获取锁/共享资源之后，反馈给上层，由上层调用selfInterrupt方法“补上”这次中断。</li>
+</ul>
+<p>这些区别与doAcquireSharedInterruptibly&amp;doAcquireShared方法之间的区别一致。</p>
+<h2 id="tryLock-amp-tryLock-Timeout-尝试获取锁"><a href="#tryLock-amp-tryLock-Timeout-尝试获取锁" class="headerlink" title="tryLock &amp; tryLock(Timeout) 尝试获取锁"></a>tryLock &amp; tryLock(Timeout) 尝试获取锁</h2><pre><code class="java">public boolean tryLock() {
+        return sync.nonfairTryAcquire(1);
+    }
+
+    public boolean tryLock(long timeout, TimeUnit unit)
+            throws InterruptedException {
+        return sync.tryAcquireNanos(1, unit.toNanos(timeout));
+    }
+</code></pre>
+<p>ReentrantLock提供了两种tryLock方法：限时&amp;不限时。我们注意到，不限时（立即返回）的tryLock方法，不管在公平还是非公平模式下，调用的都是Sync中的nonfairTryAcquire方法。因此，如果在公平模式下调用tryLock，即使队列中有等待线程，也可能获取成功。</p>
+<p>而限时（不立即返回）的tryLock(Timeout)方法则公国tryAcquireNanos提供了公平&amp;非公平两种模式的tryLock(Timeout)操作：</p>
+<pre><code class="java">public final boolean tryAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquire(arg) ||
+            doAcquireNanos(arg, nanosTimeout);
+    }
+</code></pre>
+<p>可以看到，tryAcquireNanos方法通过调用不同的重写的tryAcquire方法提供了两种模式下的不同操作。tryAcquire方法已经分析过，不再赘述。这里重点关注doAcquireNanos方法：</p>
+<pre><code class="java">private boolean doAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (nanosTimeout &lt;= 0L)
+            return false;
+        final long deadline = System.nanoTime() + nanosTimeout;
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return true;
+                }
+                nanosTimeout = deadline - System.nanoTime();
+                if (nanosTimeout &lt;= 0L)
+                    return false;
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    nanosTimeout &gt; spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if (Thread.interrupted())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>可以看到，doAcquireNanos方法是立即响应中断的（事实上doAcquireSharedNanos方法也是立即响应中断的），即限时（不立即返回）的尝试获取的方法都是及时响应中断的，没有延迟处理中断的版本。</p>
+<p>还有一点需要注意，当线程从park中被唤醒时，我们无法确定唤醒原因是被中断还是超时，因此需要检测一下中断标志。</p>
+<h2 id="unlock-释放锁"><a href="#unlock-释放锁" class="headerlink" title="unlock 释放锁"></a>unlock 释放锁</h2><p>公平&amp;非公平模式的unlock操作是一致的：</p>
+<pre><code class="java">public void unlock() {
+        sync.release(1);
+    }
+</code></pre>
+<pre><code class="java">
+        protected final boolean tryRelease(int releases) {
+            int c = getState() - releases;
+            if (Thread.currentThread() != getExclusiveOwnerThread())
+                throw new IllegalMonitorStateException();
+            boolean free = false;
+            if (c == 0) {
+                free = true;
+                setExclusiveOwnerThread(null);
+            }
+            setState(c);
+            return free;
+        }
+</code></pre>
+<p>tryRelease是在FairSync和NonfairSync的父类Sync中定义的，因此公平&amp;非公平模式下的release操作是统一的。tryRelease方法首先检测当前线程是否持有锁，然后计算一下释放之后锁是否可用（计数值state是否等于0），如果可用，释放&amp;设置持有锁线程为null&amp;返回true，如果不可用，释放&amp;返回返回false。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之aqs]]></title>
+      <url>/2020/11/22/juc-2/</url>
       <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
 <p>AbstractQueuedSynchronizer（AQS）是一个同步器框架，抽象类。在实现锁的时候，一般会实现一个继承自AQS的内部类sync，作为我们的自定义同步器。AQS内部维护了一个state成员和一个队列。其中state标识了共享资源的状态，队列则记录了等待资源的线程。</p>
 <p>以下这五个方法，在AQS中实现为直接抛出异常，这是我们自定义同步器需要重写的方法：</p>
@@ -344,6 +1383,35 @@ static final int PROPAGATE = -3;
     }
 </code></pre>
 <p>我们可以看到，调用tryReleaseShared成功释放共享资源之后，最终要再次调用doReleaseShared试图唤醒后面的等待线程。</p>
+<hr>
+<p>之前自己实现过一个分布式锁：<a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<p>redis实现的，具体怎么实现以后会单独开文章说。</p>
+<p>这里主要说下aqs：</p>
+<p>单实例的aqs，头节点永远是占有锁的节点，并永远在自旋。其他节点都可以放心休息。<br>而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，而也错误的进入了休息，这样这个队列就永远不会被唤醒。<br>因此，要解决问题，只需要保持每个实例的队列的头节点都永远在自旋即可。<br>简单改一下aqs中的一行就能实现：</p>
+<pre><code class="java">final boolean acquireQueued(final Node node, int arg) {
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null;
+                    failed = false;
+                    return interrupted;
+                }
+                // 就是这一行
+                if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                    interrupted = true;
+                }
+            }
+        } finally {
+            if (failed) {
+                cancelAcquire(node);
+            }
+        }
+    }
+</code></pre>
 ]]></content>
       
         <categories>
@@ -357,17 +1425,17 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
     </entry>
     
     <entry>
-      <title><![CDATA[guc之原子类]]></title>
-      <url>/2020/11/21/guc-1/</url>
+      <title><![CDATA[juc之原子类]]></title>
+      <url>/2020/11/21/juc-1/</url>
       <content type="html"><![CDATA[<hr>
 <p>给自己立的flag：</p>
 <p>预计这个系列会包括，原子类，AQS，ReentrantLock，Condition，ReentrantReadWriteLock，Semaphore，CountDownLatch，CyclicBarrier，Exchanger，BlockingQueue，ThreadPoolExecutor，FockJoin，ConcurrentHashMap，ConcurrentSkipListMap，CopyOnWriteArrayList。</p>
@@ -437,9 +1505,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -1127,9 +2195,9 @@ public class TicketLock {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> cas </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -1268,9 +2336,9 @@ private void doSomething(){
         
         <tags>
             
-            <tag> jvm </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> jvm </tag>
             
         </tags>
         
@@ -2042,9 +3110,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -2190,9 +3258,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
