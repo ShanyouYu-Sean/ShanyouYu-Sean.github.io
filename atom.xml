@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-20T16:58:01.987Z</updated>
+  <updated>2020-11-22T09:15:21.189Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,68 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>guc之aqs</title>
+    <link href="http://seanthefish.com/2020/11/22/guc-2/"/>
+    <id>http://seanthefish.com/2020/11/22/guc-2/</id>
+    <published>2020-11-22T02:00:00.000Z</published>
+    <updated>2020-11-22T09:15:21.189Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;今天说aqs，juc中的绝对核心。内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>guc之原子类</title>
+    <link href="http://seanthefish.com/2020/11/21/guc-1/"/>
+    <id>http://seanthefish.com/2020/11/21/guc-1/</id>
+    <published>2020-11-21T02:00:00.000Z</published>
+    <updated>2020-11-22T03:40:37.099Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;hr&gt;
+&lt;p&gt;给自己立的flag：&lt;/p&gt;
+&lt;p&gt;预计这个系列会包括，原子类，AQS，ReentrantLock，Condition，ReentrantReadWriteLock，Semaphore，CountDownLatch，CyclicBarrier，Exchanger，
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>thread，threadlocal，InheritableThreadLocal源码详解</title>
@@ -66,9 +128,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/cas/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
-    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
     
   </entry>
   
@@ -96,9 +158,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -528,60 +590,6 @@
         
         
           &lt;p&gt;翻译了oauth.com上的教程，地址：&lt;a
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--附录</title>
-    <link href="http://seanthefish.com/2018/07/14/oauth-guide-26/"/>
-    <id>http://seanthefish.com/2018/07/14/oauth-guide-26/</id>
-    <published>2018-07-13T19:00:00.000Z</published>
-    <updated>2018-07-27T09:18:40.998Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;规范&quot;&gt;&lt;a
-        
-      
-    
-    </summary>
-    
-      <category term="OAuth" scheme="http://seanthefish.com/categories/OAuth/"/>
-    
-    
-      <category term="OAuth" scheme="http://seanthefish.com/tags/OAuth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OAuth教程--工具和帮助文档</title>
-    <link href="http://seanthefish.com/2018/07/14/oauth-guide-25/"/>
-    <id>http://seanthefish.com/2018/07/14/oauth-guide-25/</id>
-    <published>2018-07-13T18:00:00.000Z</published>
-    <updated>2018-07-27T09:13:10.286Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;strong&gt;本文是oauth.com上的教程的翻译。（&lt;a href=&quot;https://www.oauth.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;原文地址&lt;/a&gt;）&lt;/strong&gt;&lt;/p&gt;
-&lt;h3
         
       
     
