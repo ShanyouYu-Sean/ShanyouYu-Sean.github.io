@@ -3,6 +3,724 @@
   
     
     <entry>
+      <title><![CDATA[juc之CyclicBarrier]]></title>
+      <url>/2020/11/22/juc-8/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<h2 id="CyclicBarrier是什么？"><a href="#CyclicBarrier是什么？" class="headerlink" title="CyclicBarrier是什么？"></a>CyclicBarrier是什么？</h2><p>字面意思回环栅栏，通过它可以实现让一组线程等待至某个状态之后再全部同时执行。<br>叫做回环是因为当所有等待线程都被释放以后，CyclicBarrier可以被重用。<br>叫做栅栏，大概是描述所有线程被栅栏挡住了，当都达到时，一起跳过栅栏执行，也算形象。我们可以把这个状态就叫做barrier。</p>
+<p>举个报旅行团旅行的例子。<br>出发时，导游会在机场收了护照和签证，办理集体出境手续，所以，要等大家都到齐才能出发，出发前再把护照和签证发到大家手里。<br>对应CyclicBarrier使用。<br>每个人到达后进入barrier状态。<br>都到达后，唤起大家一起出发去旅行。<br>旅行出发前，导游还会有个发护照和签证的动作。</p>
+<pre><code class="java">/**
+ * 旅行线程
+ * Created by jiapeng on 2018/1/7.
+ */
+public class TravelTask implements Runnable{
+
+    private CyclicBarrier cyclicBarrier;
+    private String name;
+    private int arriveTime;//赶到的时间
+
+    public TravelTask(CyclicBarrier cyclicBarrier,String name,int arriveTime){
+        this.cyclicBarrier = cyclicBarrier;
+        this.name = name;
+        this.arriveTime = arriveTime;
+    }
+
+    @Override
+    public void run() {
+        try {
+            //模拟达到需要花的时间
+            Thread.sleep(arriveTime * 1000);
+            System.out.println(name +&quot;到达集合点&quot;);
+            cyclicBarrier.await();
+            System.out.println(name +&quot;开始旅行啦～～&quot;);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+/**
+ * 导游线程，都到达目的地时，发放护照和签证
+ * Created by jiapeng on 2018/1/7.
+ */
+public class TourGuideTask implements Runnable{
+
+    @Override
+    public void run() {
+        System.out.println(&quot;****导游分发护照签证****&quot;);
+        try {
+            //模拟发护照签证需要2秒
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+/**
+ * Created by jiapeng on 2018/1/7.
+ */
+public class Client {
+
+    public static void main(String[] args) throws Exception{
+
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(3, new TourGuideTask());
+        Executor executor = Executors.newFixedThreadPool(3);
+        //登哥最大牌，到的最晚
+        executor.execute(new TravelTask(cyclicBarrier,&quot;哈登&quot;,5));
+        executor.execute(new TravelTask(cyclicBarrier,&quot;保罗&quot;,3));
+        executor.execute(new TravelTask(cyclicBarrier,&quot;戈登&quot;,1));
+    }
+}
+</code></pre>
+<p>通过CyclicBarrier我们可以实现n个线程相互等待。我们可以通过参数指定达到公共屏障点之后的行为。</p>
+<p>我们先来看一下CyclicBarrier的成员变量：</p>
+<pre><code class="java">private final ReentrantLock lock = new ReentrantLock();
+private final Condition trip = lock.newCondition();
+private final int parties;
+private final Runnable barrierCommand;
+private Generation generation = new Generation();
+private int count;
+</code></pre>
+<p>CyclicBarrier是通过独占锁lock和Condition对象trip来实现的，成员parties表示必须有parties个线程到达barrier，成员barrierCommand表示当parties个线程到达之后要执行的代码，成员count表示离触发barrierCommand还差count个线程（还有count个线程未到达barrier），成员generation表示当前的“代数”，“cyclic”表示可循环使用，generation是对一次循环的标识。注意：Generation是CyclicBarrier的一个私有内部类，他只有一个成员变量来标识当前的barrier是否已“损坏”：</p>
+<pre><code class="java">private static class Generation {
+     boolean broken = false;
+}
+</code></pre>
+<p>构造函数</p>
+<pre><code class="java">public CyclicBarrier(int parties, Runnable barrierAction) {
+    if (parties &lt;= 0) throw new IllegalArgumentException();
+    this.parties = parties;
+    this.count = parties;
+    this.barrierCommand = barrierAction;
+}
+
+public CyclicBarrier(int parties) {
+    this(parties, null);
+}
+</code></pre>
+<p>CyclicBarrier提供了两种构造函数，没有指定barrierCommand的构造函数是调用第二个构造函数实现的。第二个构造函数有两个参数：parties和barrierAction，分别用来初始化成员parties和barrierCommand。注意，parties必须大于0，否则会抛出IllegalArgumentException。</p>
+<p>await（）方法</p>
+<pre><code class="java">public int await() throws InterruptedException, BrokenBarrierException {
+    try {
+        return dowait(false, 0L);
+    } catch (TimeoutException toe) {
+     throw new Error(toe); // cannot happen;
+    }
+}
+</code></pre>
+<p>await方法是由调用dowait方法实现的，两个参数分别代表是否定时等待和等待的时长。</p>
+<p>doawait（）方法</p>
+<pre><code class="java">private int dowait(boolean timed, long nanos)
+            throws InterruptedException, BrokenBarrierException, TimeoutException {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            final Generation g = generation;
+
+            //小概率事件：该线程在等待锁的过程中，barrier被破坏
+            if (g.broken)
+                throw new BrokenBarrierException();
+
+            //小概率事件：该线程在等待锁的过程中被中断
+            if (Thread.interrupted()) {
+                breakBarrier();
+                throw new InterruptedException();
+            }
+
+           int index = --count;
+           //当有parties个线程到达barrier
+           if (index == 0) {  // tripped
+                boolean ranAction = false;
+                try {
+                   final Runnable command = barrierCommand;
+                   //如果设置了barrierCommand，令最后到达的barrier的线程执行它
+                   if (command != null)
+                        command.run();
+                    ranAction = true;
+                    nextGeneration();
+                    return 0;
+               } finally {
+                    //注意：当执行barrierCommand出现异常时，ranAction派上用场
+                    if (!ranAction)
+                        breakBarrier();
+               }
+           }
+
+            // loop until tripped, broken, interrupted, or timed out
+            for (;;) {
+                try {
+                    if (!timed)
+                        trip.await();
+                    else if (nanos &gt; 0L)
+                        //注意：nanos值标识了是否超时，后续用这个nanos值判断是否breakBarrier
+                        nanos = trip.awaitNanos(nanos);
+                } catch (InterruptedException ie) {
+                    if (g == generation &amp;&amp; ! g.broken) {
+                        breakBarrier();
+                        throw ie;
+                    } else {
+                        //小概率事件：该线程被中断，进入锁等待队列
+                        //在等待过程中，另一个线程更新或破坏了generation
+                        //当该线程获取锁之后，应重置interrupt标志而不是抛出异常
+                        //原因在于：它中断的太晚了，generation已更新或破坏，它抛出InterruptedException的时机已经过去，
+                        //两种情况：
+                        //①g被破坏：已有一个线程抛出InterruptedException（只能由第一个抛），与它同时等待的都抛BrokenBarrierException（后续检查broken标志会抛）。
+                        //②g被更新：此时抛异常没意义（后续检查g更新后会return index），这里重置interrupt标志，让线程继续执行，让这个标志由上层处理
+                        Thread.currentThread().interrupt();
+                    }
+                }
+
+                //barrier被破坏，抛出异常
+                if (g.broken)
+                    throw new BrokenBarrierException();
+
+                //barrier正常进入下一循环，上一代await的线程继续执行
+                if (g != generation)
+                    return index;
+
+                //只要有一个超时，就breakBarrier，后续线程抛的就是barrier损坏异常
+                if (timed &amp;&amp; nanos &lt;= 0L) {
+                    breakBarrier();
+                    throw new TimeoutException();
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+</code></pre>
+<p>dowait方法是CyclicBarrier的精华。应该重点来理解。</p>
+<p>方法开头首先申请锁，然后做了两个判断：g.broken和Thread.interrupted()，这两个判断是分别处理两种小概率的事件：①该线程在等待锁的过程中，barrier被破坏②该线程在等待锁的过程中被中断。这两个事件应抛出相应的异常。接下来dowait方法修改了令count减1，如果此时count减为0，说明已经有parties个线程到达barrier，这时由最后到达barrier的线程去执行barrierCommand。注意，这里设置了一个布尔值ranAction，作用是来标识barrierCommand是否被正确执行完毕，如果执行失败，finally中会执行breakBarrier操作。如果count尚未减为0，则在Condition对象trip上执行await操作，注意：这里有一个InterruptedException的catch子句。当前线程在await中被中断时，会抛出InterruptedException，这时候如果g==generation&amp;&amp;!g.broken的话，我们执行breakBarrier操作，同时抛出这个异常；如果g!=generation或者g.broken==true的话，我们的操作是重置interrupt标志而不是抛出这个异常。这么做的原因我们分两种情况讨论：</p>
+<ul>
+<li><p>g被破坏，这也是一个小概率事件，当前线程被中断后进入锁等待队列，此时另一个线程由于某种原因（超时或者被中断）在他之前获取了锁并执行了breakBarrier方法，那么当前线程持有锁之后就不应再抛InterruptedException，逻辑上应该处理barrier被破坏事件，事实上在后续g.broken的检查中，他会抛出一个BrokenBarrierException。而当前的InterruptedException被我们捕获却没有做出处理，所以执行interrupt方法重置中断标志，交由上层程序处理。</p>
+</li>
+<li><p>g被更新：说明当前线程在即将完成等待之际被中断，此时抛异常没意义（后续检查g更新后会return index），这里重置interrupt标志，让线程继续执行，让这个标志由上层处理。</p>
+</li>
+</ul>
+<p>后续对g.broken和g!=generation的判断，分表代表了被唤醒线程（非最后一个到达barrier的线程，也不是被中断或第一个超时的线程）的两种退出方法的方式：第一种是以barrier被破坏告终（然后抛异常），第二个是barrier等到parties个线程，寿终正寝（返回该线程的到达次序index）。</p>
+<p>最后一个if是第一个超时线程执行breakBarrier操作并跑出异常。最后finally子句要释放锁。</p>
+<p>至此，整个doawait方法流程就分析完毕了，我们可以发现，在barrier上等待的线程，如果以抛异常结束的话，只有第一个线程会抛InterruptedException或TimeoutException并执行breakBarrier操作，其他等待线程只能抛BrokenBarrierException，逻辑上这也是合理的：一个barrier只能因超时或中断被破坏一次。</p>
+<pre><code class="java">private void nextGeneration() {
+    trip.signalAll();
+    count = parties;
+    generation = new Generation();
+}
+
+private void breakBarrier() {
+    generation.broken = true;
+    count = parties;
+    trip.signalAll();
+}
+</code></pre>
+<p>doawait方法中用到的nextGeneration方法将所有等待线程唤醒，更新generation对象，复位count，进入下一轮任务。breakBarrier方法将generation状态值为broken，复位count（这个复位看上去没有用，但实际上，在broken之后reset之前，如果调用getNumberWaiting方法查看等待线程数的话，复位count是合理的），并唤醒所有等待线程。在调用reset更新generation之前，barrier将处于不可用状态。</p>
+<p>reset（）方法</p>
+<pre><code class="java">public void reset() {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        breakBarrier();   // break the current generation
+        nextGeneration(); // start a new generation
+    } finally {
+        lock.unlock();
+    }
+}
+</code></pre>
+<p>reset方法先break当执行breakBarrier操作（如果有线程在barrier上等待，调用reset会导致BrokenBarrierException），再更新generation对象。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> juc </tag>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之CountDownLatch]]></title>
+      <url>/2020/11/22/juc-7/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<h2 id="CountDownLatch是什么"><a href="#CountDownLatch是什么" class="headerlink" title="CountDownLatch是什么"></a>CountDownLatch是什么</h2><p>闭锁，CountDownLatch能够使一个线程等待其他线程完成各自的工作后再执行。例如，应用程序的主线程希望在负责启动框架服务的线程已经启动所有的框架服务之后再执行。</p>
+<p>可见CountDownLatch跟之前我们所有的juc对象都有着本质性区别，之前的都是线程能拿到资源，也可以归还资源，CountDownLatch则是只能拿，不能还，而且在资源花完之前，父线程会一直阻塞。</p>
+<p>例子：每天起早贪黑的上班，父母每天也要上班，话说今天定了个饭店，一家人一起吃个饭，通知大家下班去饭店集合。假设：3个人在不同的地方上班，必须等到3个人到场才能吃饭，用程序如何实现呢？</p>
+<pre><code class="java">public static void main(String[] args) throws InterruptedException{
+
+        new Thread()
+        {
+            public void run()
+            {
+                fatherToRes();
+                latch.countDown();
+            };
+        }.start();
+        new Thread()
+        {
+            public void run()
+            {
+                motherToRes();
+                latch.countDown();
+            };
+        }.start();
+        new Thread()
+        {
+            public void run()
+            {
+                meToRes();
+                latch.countDown();
+            };
+        }.start();
+
+        latch.await();
+        togetherToEat();
+    }
+</code></pre>
+<p>CountDownLatch就是一个使用共享模式的自定义同步器实现的共享锁。</p>
+<h2 id="await方法"><a href="#await方法" class="headerlink" title="await方法"></a>await方法</h2><pre><code class="java">public void await() throws InterruptedException {
+    sync.acquireSharedInterruptibly(1);
+}
+
+public boolean await(long timeout, TimeUnit unit)
+    throws InterruptedException {
+    return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
+}
+</code></pre>
+<p>CountDownLatch提供了两种await方法：有等待时长限制和一直等待。两种均能响应中断（归根到底是UNSAFE.park可响应中断。但是如果是定时的park，则不能判断被唤醒的原因是超时还是被中断，因此需要isInterrupted判断下，而此方法会清除中断标志，因此如果是延迟处理要“补上”）。</p>
+<p>await（）方法调用了同步器的acquireSharedInterruptibly方法，这个方法由上层AQS提供，它调用了我们重写的tryAcquireShared方法而封装了排队等待、唤醒、响应中断的细节，我们只关注自定义同步器中的tryAcquireShared方法即可：</p>
+<pre><code class="java">protected int tryAcquireShared(int acquires) {
+            return (getState() == 0) ? 1 : -1;
+        }
+</code></pre>
+<p>注意，tryAcquireShared方法的返回值的意义在AQS是这样规定的：负值代表获取资源失败，非负值代表成功获取资源后剩余资源的数量。而这里当getState返回值为0的时候，我们却总是返回1，表示仍有剩余资源。这看上去并不合理，但这确实是正确的：因为可能有多个线程调用了await，同时在队列中等待资源，CountDownLatch的语义要求我们在倒计时结束有唤醒所有等待线程。因此我们在成功获取资源后，总是要告诉AQS“还有剩余”，这样AQS便会继续唤醒队列中的其他等待线程（由AQS中的setHeadAndPropagate方法调用doReleaseShared来唤醒）。一句话：成功获取总返回1是为了保证唤醒的“延续性”。</p>
+<p>有等待时长限制的await(long, TimeUnit)方法调用了同步器的tryAcquireSharedNanos方法：</p>
+<pre><code class="java">public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquireShared(arg) &gt;= 0 ||
+            doAcquireSharedNanos(arg, nanosTimeout);
+    }
+</code></pre>
+<p>这个方法首先检测中断，然后试图获取，失败后进入“自旋-等待”阶段，直到成功获取或被中断。这是AQS的内容，不再赘述。</p>
+<h2 id="countDown方法"><a href="#countDown方法" class="headerlink" title="countDown方法"></a>countDown方法</h2><pre><code class="java"> public void countDown() {
+        sync.releaseShared(1);
+    }
+</code></pre>
+<p>countDown方法调用releaseShared释放资源：</p>
+<pre><code class="java">public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+<p>releaseShared会调用tryReleaseShared方法：</p>
+<pre><code class="java">protected boolean tryReleaseShared(int releases) {
+            // Decrement count; signal when transition to zero
+            for (;;) {
+                int c = getState();
+                if (c == 0)
+                    return false;
+                int nextc = c-1;
+                if (compareAndSetState(c, nextc))
+                    return nextc == 0;
+            }
+        }
+</code></pre>
+<p>方法一直自旋，直到成功释放或倒计时完毕。因为可能有超过count的线程调用countDown，因此releaseShared是可能失败的。当然在释放过程中也可能发生竞争，CAS自旋保证竞争发生时的正确执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>CountDownLatch是一个共享锁，但有些特别：他在初始化的时候锁住了所有共享资源，任何线程都可以调用countDown方法释放一个资源，当所有资源都被释放后，所有等待线程被唤醒。从而实现了倒计时的效果。</p>
+<p>CountDownLatch是一次性的，计数值不可恢复。CountDownLatch唤醒线程总是非公平的。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> juc </tag>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之Semaphore]]></title>
+      <url>/2020/11/22/juc-6/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<h2 id="Semaphore-是什么"><a href="#Semaphore-是什么" class="headerlink" title="Semaphore 是什么"></a>Semaphore 是什么</h2><p>Semaphore是JUC包提供的一个共享锁，一般称之为信号量。可以用来控制同时访问特定资源的线程数量，通过协调各个线程，以保证合理的使用资源。</p>
+<p>Semaphore通过自定义的同步器维护了一个或多个共享资源，线程通过调用acquire获取共享资源，通过调用release释放。</p>
+<p>注意Semaphore并非lock的子类，所以加锁和解锁，用的是acquire，release，tryacquire，tryrelease</p>
+<p>可以把它简单的理解成我们停车场入口立着的那个显示屏，每有一辆车进入停车场显示屏就会显示剩余车位减1，每有一辆车从停车场出去，显示屏上显示的剩余车辆就会加1，当显示屏上的剩余车位为0时，停车场入口的栏杆就不会再打开，车辆就无法进入停车场了，直到有一辆车从停车场出去为止。</p>
+<h2 id="用semaphore-实现停车场提示牌功能"><a href="#用semaphore-实现停车场提示牌功能" class="headerlink" title="用semaphore 实现停车场提示牌功能"></a>用semaphore 实现停车场提示牌功能</h2><p>业务场景 ：</p>
+<ul>
+<li>停车场容纳总停车量10。</li>
+<li>当一辆车进入停车场后，显示牌的剩余车位数响应的减1.</li>
+<li>每有一辆车驶出停车场后，显示牌的剩余车位数响应的加1。</li>
+<li>停车场剩余车位不足时，车辆只能在外面等待。</li>
+</ul>
+<pre><code class="java">public class TestCar {
+​
+    //停车场同时容纳的车辆10
+    private  static  Semaphore semaphore=new Semaphore(10);
+​
+    public static void main(String[] args) {
+​
+        //模拟100辆车进入停车场
+        for(int i=0;i&lt;100;i++){
+​
+            Thread thread=new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println(&quot;====&quot;+Thread.currentThread().getName()+&quot;来到停车场&quot;);
+                        if(semaphore.availablePermits()==0){
+                            System.out.println(&quot;车位不足，请耐心等待&quot;);
+                        }
+                        semaphore.acquire();//获取令牌尝试进入停车场
+                        System.out.println(Thread.currentThread().getName()+&quot;成功进入停车场&quot;);
+                        Thread.sleep(new Random().nextInt(10000));//模拟车辆在停车场停留的时间
+                        System.out.println(Thread.currentThread().getName()+&quot;驶出停车场&quot;);
+                        semaphore.release();//释放令牌，腾出停车场车位
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            },i+&quot;号车&quot;);
+​
+            thread.start();
+​
+        }
+​
+    }
+}
+</code></pre>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre><code class="java">    public Semaphore(int permits) {
+        sync = new NonfairSync(permits);
+    }
+
+    public Semaphore(int permits, boolean fair) {
+        sync = fair ? new FairSync(permits) : new NonfairSync(permits);
+    }
+</code></pre>
+<p>初始化Semaphore时需要指定共享资源的个数。Semaphore提供了两种模式：公平模式&amp;非公平模式。如果不指定工作模式的话，默认工作在非公平模式下。后面我们将看到，两种模式的区别在于获取共享资源时的排序策略。Semaphore有三个内部类：Sync&amp;NonfairSync&amp;FairSync。后两个继承自Sync，Sync继承自AQS。除了序列化版本号之外，Semaphore只有一个成员变量sync，公平模式下sync初始化为FairSync，非公平模式下sync初始化为NonfairSync。</p>
+<h2 id="acquire-响应中断获取资源"><a href="#acquire-响应中断获取资源" class="headerlink" title="acquire 响应中断获取资源"></a>acquire 响应中断获取资源</h2><p>Semaphore提供了两种获取资源的方式：响应中断&amp;不响应中断。我们先来看一下响应中断的获取。</p>
+<pre><code class="java">public void acquire() throws InterruptedException {
+        sync.acquireSharedInterruptibly(1);
+    }
+</code></pre>
+<p>acquire方法由同步器sync调用上层AQS提供的acquireSharedInterruptibly方法获取：</p>
+<pre><code class="java">public final void acquireSharedInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (tryAcquireShared(arg) &lt; 0)
+            doAcquireSharedInterruptibly(arg);
+    }
+</code></pre>
+<p>acquireSharedInterruptibly方法先检测中断。然后调用tryAcquireShared方法试图获取共享资源。这时公平模式和非公平模式的代码执行路径发生分叉，FairSync和NonfairSync各自重写了tryAcquireShared方法。</p>
+<p>我们先来看下非公平模式下的tryAcquireShared方法：</p>
+<pre><code class="java">     protected int tryAcquireShared(int acquires) {
+            return nonfairTryAcquireShared(acquires);
+        }
+</code></pre>
+<p>它直接代用了父类Sync提供的nonfairTryAcquireShared方法：</p>
+<pre><code class="java">final int nonfairTryAcquireShared(int acquires) {
+            for (;;) {
+                int available = getState();
+                int remaining = available - acquires;
+                if (remaining &lt; 0 ||
+                    compareAndSetState(available, remaining))
+                    return remaining;
+            }
+        }
+</code></pre>
+<p>注意，这里是一个CAS自旋。因为Semaphore是一个共享锁，可能有多个线程同时申请共享资源，因此CAS操作可能失败。直到成功获取返回剩余资源数目，或者发现没有剩余资源返回负值代表申请失败。有一个问题，为什么我们不在CAS操作失败后就直接返回失败呢？因为这样做虽然不会导致错误，但会降低效率：在还有剩余资源的情况下，一个线程因为竞争导致CAS失败后被放入等待序列尾，一定在队列头部有一个线程被唤醒去试图获取资源，这比直接自旋继续获取多了操作等待队列的开销。(有剩余资源的时候就不断的自旋获取，没有剩的了再入队)</p>
+<p>这里“非公平”的语义体现在：如果一个线程通过nonfairTryAcquireShared成功获取了共享资源，对于此时正在等待队列中的线程来说，可能是不公平的：队列中线程先到，却没能先获取资源。</p>
+<p>如果tryAcquireShared没能成功获取，acquireSharedInterruptibly方法调用doAcquireSharedInterruptibly方法将当前线程放入等待队列并开始自旋检测获取资源：</p>
+<pre><code class="java">private void doAcquireSharedInterruptibly(int arg)
+        throws InterruptedException {
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>我们注意到，doAcquireSharedInterruptibly中，当一个线程从parkAndCheckInterrupt方法中被中断唤醒之后，直接抛出了中断异常。还记得我们分析AQS时的doAcquireShared方法吗，它在这里的处理方式是用一个局部变量interrupted记录下这个异常但不立即处理，而是等到成功获取资源之后返回这个中断标志，并在上层调用selfInterrupt方法补上中断。<br>这正是两个方法的关键区别：是否及时响应中断。</p>
+<p>我们再来看公平模式下的tryAcquireShared方法：</p>
+<pre><code class="java">protected int tryAcquireShared(int acquires) {
+            for (;;) {
+                if (hasQueuedPredecessors())
+                    return -1;
+                int available = getState();
+                int remaining = available - acquires;
+                if (remaining &lt; 0 ||
+                    compareAndSetState(available, remaining))
+                    return remaining;
+            }
+        }
+</code></pre>
+<p>相比较非公平模式的nonfairTryAcquireShared方法，公平模式下的tryAcquireShared方法在试图获取之前做了一个判断，如果发现等对队列中有线程在等待获取资源，就直接返回-1表示获取失败。当前线程会被上层的acquireSharedInterruptibly方法调用doAcquireShared方法放入等待队列中。这正是“公平”模式的语义：如果有线程先于我进入等待队列且正在等待，就直接进入等待队列，效果便是各个线程按照申请的顺序获得共享资源，具有公平性。</p>
+<h2 id="acquireUnInterruptibly-不响应中断获取资源"><a href="#acquireUnInterruptibly-不响应中断获取资源" class="headerlink" title="acquireUnInterruptibly 不响应中断获取资源"></a>acquireUnInterruptibly 不响应中断获取资源</h2><pre><code class="java">    public void acquireUninterruptibly() {
+        sync.acquireShared(1);
+    }
+</code></pre>
+<p>acquireUnInterruptibly方法调用AQS提供的acquireShared方法：</p>
+<pre><code class="java"> public final void acquireShared(int arg) {
+        if (tryAcquireShared(arg) &lt; 0)
+            doAcquireShared(arg);
+    }
+</code></pre>
+<p>acquireShared方法首先试图获取资源，这与acquireSharedInterruptibly方法相比，没有先检测中断的这一步。紧接着调用doAcquireShared方法，由于这个方法在AQS中已经详细分析过，这里我们只关注它与doAcquireSharedInterruptibly方法的区别：</p>
+<pre><code class="java"> private void doAcquireShared(int arg) {
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        if (interrupted)
+                            selfInterrupt();
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>正如刚刚说过的，区别只在线程从parkAndCheckInterrupt方法中因中断而返回时的处理：在这里它没有抛出异常，而是用一个局部变量interrupted记录下这个异常但不立即处理，而是等到成功获取资源之后返回这个中断标志，并在上层调用selfInterrupt方法补上中断。</p>
+<h2 id="acquire-int-amp-acquireUninterruptibly-int-指定申请的资源数目的获取"><a href="#acquire-int-amp-acquireUninterruptibly-int-指定申请的资源数目的获取" class="headerlink" title="acquire(int) &amp; acquireUninterruptibly(int) 指定申请的资源数目的获取"></a>acquire(int) &amp; acquireUninterruptibly(int) 指定申请的资源数目的获取</h2><pre><code class="java">public void acquire(int permits) throws InterruptedException {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.acquireSharedInterruptibly(permits);
+    }
+
+    public void acquireUninterruptibly(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.acquireShared(permits);
+    }
+</code></pre>
+<p>可以看到，与不指定数目时的获取的区别仅在参数值，不再赘述。</p>
+<h2 id="release-释放资源"><a href="#release-释放资源" class="headerlink" title="release 释放资源"></a>release 释放资源</h2><p>公平模式和非公平模式的释放资源操作是一样的：</p>
+<pre><code class="java">public void release() {
+        sync.releaseShared(1);
+    }
+
+    public void release(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.releaseShared(permits);
+    }
+</code></pre>
+<p>调用AQS提供的releaseShared方法：</p>
+<pre><code class="java">public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+<p>releaseShared方法首先调用我们重写的tryReleaseShared方法试图释放资源。然后调用doReleaseShared方法唤醒队列之后的等待线程。我们主要关注tryReleaseShared方法：</p>
+<pre><code class="java">protected final boolean tryReleaseShared(int releases) {
+            for (;;) {
+                int current = getState();
+                int next = current + releases;
+                if (next &lt; current) // overflow
+                    throw new Error(&quot;Maximum permit count exceeded&quot;);
+                if (compareAndSetState(current, next))
+                    return true;
+            }
+        }
+</code></pre>
+<p>这个方法也是一个CAS自旋，原因是应为Semaphore是一个共享锁，可能有多个线程同时释放资源，因此CAS操作可能失败。最后方法总会成功释放并返回true（如果不出错的话）。</p>
+<h2 id="tryAcquire-amp-tryAcquire-timeout-方法"><a href="#tryAcquire-amp-tryAcquire-timeout-方法" class="headerlink" title="tryAcquire &amp; tryAcquire(timeout) 方法"></a>tryAcquire &amp; tryAcquire(timeout) 方法</h2><pre><code class="java">public boolean tryAcquire() {
+        return sync.nonfairTryAcquireShared(1) &gt;= 0;
+    }
+
+    public boolean tryAcquire(long timeout, TimeUnit unit)
+        throws InterruptedException {
+        return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
+    }
+
+    public boolean tryAcquire(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        return sync.nonfairTryAcquireShared(permits) &gt;= 0;
+    }
+
+    public boolean tryAcquire(int permits, long timeout, TimeUnit unit)
+        throws InterruptedException {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        return sync.tryAcquireSharedNanos(permits, unit.toNanos(timeout));
+    }
+</code></pre>
+<p>没有指定等待时间的tryAcquire调用的是nonfairTryAcquireShared方法，我们已经分析过，不再赘述。我们重点关注指定等待时长的方法。限时等待是通过调用AQS提供的tryAcquireSharedNanos方法实现的：</p>
+<pre><code class="java">public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquireShared(arg) &gt;= 0 ||
+            doAcquireSharedNanos(arg, nanosTimeout);
+    }
+</code></pre>
+<p>注意：限时等待默认都是及时响应中断的。方法开始先检测中断，然后调用tryAcquireShared方法试图获取资源，如果成功的话直接返回true，不成功则调用doAcquireSharedNanos方法：</p>
+<pre><code class="java">private boolean doAcquireSharedNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (nanosTimeout &lt;= 0L)
+            return false;
+        final long deadline = System.nanoTime() + nanosTimeout;
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        failed = false;
+                        return true;
+                    }
+                }
+                nanosTimeout = deadline - System.nanoTime();
+                if (nanosTimeout &lt;= 0L)
+                    return false;
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    nanosTimeout &gt; spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if (Thread.interrupted())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>方法在自旋之前先计算了一个结束等待的时间节点deadline，然后便开始自旋，每次自旋都要计算一下剩余等待时间nanosTimeout，如果nanosTimeout小于等于0，说明已经到达deadline，直接返回false表示超时。</p>
+<p>有一点值得注意，spinForTimeoutThreshold这个值规定了一个阈值，当剩余等待时间小于这个值的时候，线程将不再被park，而是一直在自旋试图获取资源。关于这个值的作用Doug Lea是这样注释的：</p>
+<pre><code class="java">/**
+     * The number of nanoseconds for which it is faster to spin
+     * rather than to use timed park. A rough estimate suffices
+     * to improve responsiveness with very short timeouts.
+     */
+</code></pre>
+<p>park和unpark操作需要一定的开销，当nanosTimeout很小的时候，这个开销就相对很大了。这个阈值的设置可以让短时等待的线程一直保持自旋，可以提高短时等待的反应效率，而由于nanosTimeout很小，自旋又不会有过多的开销。</p>
+<p>除此之外，doAcquireSharedNanos方法与不限时等待的doAcquireShared方法还有两点重要区别：</p>
+<ul>
+<li>由于有等待时限，所以线程从park方法返回时我们不能确定返回的原因是中断还是超时，因此需要调用interrupted方法检测一下中断标志；</li>
+<li>doAcquireSharedNanos方法是及时响应中断的，而doAcquireShared方法延迟处理中断。</li>
+</ul>
+<h2 id="drainPermits-amp-reducePermits-修改剩余共享资源数量"><a href="#drainPermits-amp-reducePermits-修改剩余共享资源数量" class="headerlink" title="drainPermits &amp; reducePermits 修改剩余共享资源数量"></a>drainPermits &amp; reducePermits 修改剩余共享资源数量</h2><p>Semaphore提供了“耗尽”所有剩余共享资源的操作：</p>
+<pre><code class="java">public int drainPermits() {
+        return sync.drainPermits();
+    }
+</code></pre>
+<p>drainPermits调用了自定义同步器Sync的同名方法：</p>
+<pre><code class="java">        final int drainPermits() {
+            for (;;) {
+                int current = getState();
+                if (current == 0 || compareAndSetState(current, 0))
+                    return current;
+            }
+        }
+</code></pre>
+<p>用CAS自旋将剩余资源清空。</p>
+<p>我们再来看看“缩减”剩余共享资源的操作：</p>
+<pre><code class="java">protected void reducePermits(int reduction) {
+        if (reduction &lt; 0) throw new IllegalArgumentException();
+        sync.reducePermits(reduction);
+    }
+</code></pre>
+<p>首先，缩减必须是单向的，即只能减少不能增加，然后调用Sync的同名方法：</p>
+<pre><code class="java">final void reducePermits(int reductions) {
+            for (;;) {
+                int current = getState();
+                int next = current - reductions;
+                if (next &gt; current) // underflow
+                    throw new Error(&quot;Permit count underflow&quot;);
+                if (compareAndSetState(current, next))
+                    return;
+            }
+        }
+</code></pre>
+<p>用CAS自旋在剩余共享资源上做缩减。</p>
+<p>上述两个对共享资源数量的修改操作有两点需要注意：</p>
+<ul>
+<li>是不可逆的</li>
+<li>是对剩余资源的操作而不是全部资源，当剩余资源数目不足或已经为0时，方法就返回，正咋被占用的资源不参与。</li>
+</ul>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>Semaphore是JUC包提供的一个典型的共享锁，它通过自定义两种不同的同步器（FairSync&amp;NonfairSync）提供了公平&amp;非公平两种工作模式，两种模式下分别提供了限时/不限时、响应中断/不响应中断的获取资源的方法（限时获取总是及时响应中断的），而所有的释放资源的release操作是统一的。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> juc </tag>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[juc之ReentrantReadWriteLock]]></title>
       <url>/2020/11/22/juc-5/</url>
       <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
@@ -438,9 +1156,9 @@ private transient int firstReaderHoldCount;
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -817,9 +1535,401 @@ final ConditionObject newCondition() {
         
         <tags>
             
+            <tag> juc </tag>
+            
             <tag> 并发 </tag>
             
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之aqs]]></title>
+      <url>/2020/11/22/juc-2/</url>
+      <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>AbstractQueuedSynchronizer（AQS）是一个同步器框架，抽象类。在实现锁的时候，一般会实现一个继承自AQS的内部类sync，作为我们的自定义同步器。AQS内部维护了一个state成员和一个队列。其中state标识了共享资源的状态，队列则记录了等待资源的线程。</p>
+<p>以下这五个方法，在AQS中实现为直接抛出异常，这是我们自定义同步器需要重写的方法：</p>
+<ul>
+<li><p>isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。</p>
+</li>
+<li><p>tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败返回false。</p>
+</li>
+<li><p>tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败返回false。</p>
+</li>
+<li><p>tryAcquireShared(int)：共享方式。尝试获取资源。成功返回true，失败返回false。</p>
+</li>
+<li><p>tryReleaseShared(int)：共享方式。尝试释放资源，成功则返回true，失败返回false。</p>
+</li>
+</ul>
+<p>例如ReentrantLock就是一种独占锁，CountDownLatch和Semaphore是共享锁。与CountDownLatch有一定相似性的CyclicBarrier并没有自己的共享同步器，而是使用Lock和Condition来实现的。</p>
+<p>本质上aqs就是一个clh锁，AQS在CLH的基础上进行了变种：CLH是单向队列，其主要特点是自旋检查前驱节点的locked状态。而AQS同步队列是双向队列，每个节点也有状态waitStatus，而其并不是一直对前驱节点的状态自旋，在尝试自旋一次后会将线程阻塞让出CPU时间片，等到占有锁的线程主动唤醒后续节点的继续自旋。</p>
+<pre><code> * &lt;pre&gt;
+ *      +------+  prev +-----+       +-----+
+ * head |      | &lt;---- |     | &lt;---- |     |  tail
+ *      +------+       +-----+       +-----+
+ * &lt;/pre&gt;
+</code></pre><p><img src="https://s3.ax1x.com/2020/11/22/D8ZfXR.png" alt="D8ZfXR.png"></p>
+<p>每个线程都会包装成一个node，从队列尾部入队，头节点占有锁的线程（一个虚节点），当前线程会通知检查其前驱节点，看其是否是头节点，如果是就自旋去获取锁（线程可能休息，但自旋会一直进行），其他节点都可以安全阻塞等待被唤醒。</p>
+<h2 id="独占模式"><a href="#独占模式" class="headerlink" title="独占模式"></a>独占模式</h2><p>下面是一个简单的独占锁的实现，它是不可重入的。它重写了AQS的tryAcquire方法和tryRelease方法：</p>
+<pre><code class="java">class Mutex implements Lock, Serializable {
+    //自定义同步器，继承自AQS
+   private static class Sync extends AbstractQueuedSynchronizer {
+     //试图获取锁，当state为0时能成功获取，
+     public boolean tryAcquire(int acquires) {
+       assert acquires == 1; //这是一个对于state进行操作的量，含义自定义
+       if (compareAndSetState(0, 1)) {    //注意：这是一个原子操作
+         setExclusiveOwnerThread(Thread.currentThread());
+         return true;
+       }
+       return false;
+     }
+     //释放锁，此时state应为1，Mutex处于被独占状态
+     protected boolean tryRelease(int releases) {
+       assert releases == 1; // Otherwise unused
+       if (getState() == 0) throw new IllegalMonitorStateException();
+       setExclusiveOwnerThread(null);
+       setState(0);
+       return true;
+     }
+     //返回一个Condition
+     Condition newCondition() { return new ConditionObject(); }
+   }
+
+   private final Sync sync = new Sync();
+
+   public void lock()                { sync.acquire(1); }
+   public boolean tryLock()          { return sync.tryAcquire(1); }
+   public void unlock()              { sync.release(1); }
+   public Condition newCondition()   { return sync.newCondition(); }
+   public void lockInterruptibly() throws InterruptedException {
+     sync.acquireInterruptibly(1);
+   }
+   public boolean tryLock(long timeout, TimeUnit unit)
+       throws InterruptedException {
+     return sync.tryAcquireNanos(1, unit.toNanos(timeout));
+   }
+ }
+</code></pre>
+<h3 id="acquire-获取锁"><a href="#acquire-获取锁" class="headerlink" title="acquire 获取锁"></a>acquire 获取锁</h3><p>我们先来看一下Mutex重写的tryAcquire方法：</p>
+<pre><code class="java">//试图获取锁，当state为0时能成功获取，
+     public boolean tryAcquire(int acquires) {
+       assert acquires == 1; //这是一个对于state进行操作的量，含义自定义
+       if (compareAndSetState(0, 1)) {    //注意：这是一个原子操作
+         setExclusiveOwnerThread(Thread.currentThread());
+         return true;
+       }
+       return false;
+     }
+</code></pre>
+<p>注意：当我们初始化一个Sync的时候，如果没有指定state的初值（无参数），那么state的默认初值是0。可以看到，方法开头首先有一个断言acquires==1，参数acquires代表要在state上做的改变的量（减去或增加），在Mutex中，我们定义state只有两个状态：0或1，0代表共享资源可以被获取，1表示共享资源正在被占用，因此Mutex是不可重入的。实际上，自定义同步器通过重写tryAcquire和tryRelease来定义state代表的意义和资源的共享方式，这是同步器的主要任务。Mutex的tryAcquire使用一个原子操作compareAndSetState来试图获取资源，这个原子操作由上层的AQS提供，如果成功，将当前线程设置为独占线程并返回true。</p>
+<p>Mutex的lock方法调用了aqs的acquire方法，acquire方法实现为：</p>
+<pre><code class="java">    public final void acquire(int arg) {
+        if (!tryAcquire(arg) &amp;&amp;
+            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+            selfInterrupt();
+    }
+</code></pre>
+<p>它首先调用tryAquire去获取共享资源，如果失败，调用addWaiter将当前线程放入等待队列，返回持有当前线程的Node对象，然后调用acquireQueued方法来监视等待队列并获取资源。acquireQueued方法会阻塞线程，直到成功获取。注意，acquire方法不能及时响应中断，只能在成功获取锁之后，再来处理。中断当前线程的操作跑出的异常在acquireQueued方法中被捕获，外部调用者没能看到这个异常，因此调用selfInterrupt来重置中断标识。</p>
+<p>我们需要详细了解addWaiter方法和acquireQueued方法，之后再来回顾acquire的过程，才能对整个获取锁的流程有比较详细的了解。</p>
+<p>（ps：enqueue：入队，简称enq；dequeue：出队，简称dnq）</p>
+<pre><code class="java">private Node addWaiter(Node mode) {
+        Node node = new Node(Thread.currentThread(), mode);
+        // Try the fast path of enq; backup to full enq on failure
+        Node pred = tail;
+        if (pred != null) {
+            node.prev = pred;
+            if (compareAndSetTail(pred, node)) {
+                pred.next = node;
+                return node;
+            }
+        }
+        enq(node);
+        return node;
+    }
+</code></pre>
+<p>addWaiter首先将当前线程包装在一个Node对象node中，然后获取了一下队列的尾节点，如果队列不为空（tail不为null）的话，调用一个CAS函数试图将node放入等待队列的尾部，注意，此时可能发生竞争，如果有另外一个线程在两个if之间抢先更新的队列的尾节点，CAS操作将会失败，这时会调用enq方法，继续试图将node放入队列：</p>
+<pre><code class="java">private Node enq(final Node node) {
+        for (;;) {
+            Node t = tail;
+            if (t == null) { // Must initialize
+                if (compareAndSetHead(new Node()))
+                    tail = head;
+            } else {
+                node.prev = t;
+                if (compareAndSetTail(t, node)) {
+                    t.next = node;
+                    return t;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>enq方法会循环检测队列，如果队列为空，则调用CAS函数初始化队列（此时node==head==tail），否则调用CAS函数将node放入队列尾。</p>
+<p>请注意，初始化的头结点并不是当前线程节点，而是调用了无参构造函数的节点。如果经历了初始化或者并发导致队列中有元素，则与之前的方法相同。其实，addWaiter就是一个在双端链表添加尾节点的操作，需要注意的是，双端链表的头结点是一个无参构造函数的头结点。头节点虚节点。</p>
+<p>如果CAS失败，enq会继续循环检测，直到成功将node入列。这里便是入队操作中的CAS自旋，因为这里还没有涉及锁的竞争，所以不需要响应中断。这里有一个隐含的知识点，即tail是一个volatile成员，确保某个线程更新队列后对其他线程的可见性。</p>
+<p>注意：队列为空的时候，第一个线程进入队列的情况有点tricky：第一个发现队列为空并初始化队列（head节点）的线程不一定优先拿到资源。head节点被初始化后，当前线程需要下一次旋转才有机会进入队列，在这期间，完全有可能半路杀出程咬金，将当前线程与它初始化出的head节点无情分开。我们来总结一下，当队列只有一个节点时（head=tail），有两种情况：第一种是这个队列刚刚被初始化，head并没有持有任何线程对象。这个状态不会持续太久，初始化队列的线程有很大机会在下次自旋时把自己接到队尾。第二种情况是，所有等待线程都已经获得资源并继续执行下去了，队列仅有的节点是最后一个获取共享资源的线程，等到下一个线程到达等待队列并将它踢出队列之后，它才有机会被回收。</p>
+<p>enq执行完毕，我们已经成功把当前线程放入等待队列，接下来的任务就是监视队列，等待获取资源。这个过程由acquireQueued方法实现：</p>
+<pre><code class="java">final boolean acquireQueued(final Node node, int arg) {
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return interrupted;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>acquireQueued方法是一个很重要的方法，在分析这个方法之前，我们先来说一下AQS中的那个等待队列。这个队列实际上是一个CLH队列，它保证了竞争资源的线程按到达顺序来获取资源，避免了饥饿的发生。CLH队列的工作过程，就是acquireQueued方法的工作过程。很明显，这又是一个自旋。首先，我们调用predecessor方法获取当前线程的前驱节点，如果这个前驱是head节点，就紧接着调用tryAcquire去获取共享资源，当然这是有可能失败的，因为head节点可能刚刚“上位”，持有锁的线程还没有释放资源。如果很幸运，我们拿到了资源，就调用setHead将node设置为队列的头结点，setHead方法同时会将node的prev置为null，并把thread置为null（前驱节点出队，当前虚节点head占有锁），紧接着将原先head的next也置为null，显然这是为了让其后续被回收。注意：acquireQueued方法在自旋过程中是不可被中断的，当然它会检测到中断（在parkAndCheckInterrupt方法中检测中断标志），但并不会因此结束自旋，只能在获得资源退出方法后，反馈给上层的方法：我刚刚被中断了。还记得acquire方法中的selfInterrupt的调用吗，就是为了“补上”这里没有响应的中断。</p>
+<p>好，我们继续往下。获取资源失败后，调用shouldParkAfterFailedAcquire方法检测是否该去“休息”下，毕竟一直自旋很累嘛。如果可以休息就调用parkAndCheckInterrupt放心去休息。我们先来看一下shuldParkAfterFailedAcquire：</p>
+<pre><code class="java">private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+        int ws = pred.waitStatus;
+        if (ws == Node.SIGNAL)
+            /*
+             * This node has already set status asking a release
+             * to signal it, so it can safely park.
+             */
+            return true;
+        if (ws &gt; 0) {
+            /*
+             * Predecessor was cancelled. Skip over predecessors and
+             * indicate retry.
+             */
+            do {
+                node.prev = pred = pred.prev;
+            } while (pred.waitStatus &gt; 0);
+            pred.next = node;
+        } else {
+            /*
+             * waitStatus must be 0 or PROPAGATE.  Indicate that we
+             * need a signal, but don&#39;t park yet.  Caller will need to
+             * retry to make sure it cannot acquire before parking.
+             */
+            compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+        }
+        return false;
+    }
+</code></pre>
+<p>我们首先了解一下waitStatus。Node对象维护了一个int成员waitStatus，他的可能取值如下：</p>
+<pre><code class="java">// 因为超时或者中断，结点会被设置为取消状态，被取消状态的结点不应该去竞争锁，只能保持取消状态不变，不能转换为其他状态。
+// 处于这种状态的结点会被踢出队列，被GC回收；
+static final int CANCELLED =  1;
+// 表示这个结点的继任结点被阻塞了，到时需要通知它；
+static final int SIGNAL    = -1;
+// 表示这个结点在条件队列中，因为等待某个条件而被阻塞；
+static final int CONDITION = -2;
+// 使用在共享模式头结点有可能处于这种状态，表示锁的下一次获取可以无条件传播；
+static final int PROPAGATE = -3;
+// 0：None of the above，新结点会处于这种状态。
+</code></pre>
+<p>在我们的Mutex的例子中，节点的waitStatus只可能有CANCELLED、SIGNAL和0三中状态（事实上，独占模式下所有不使用Condition的同步器都是这样）。</p>
+<p>我们继续来分析shouldParkAfterFailedAcquire方法：</p>
+<p>首先检测下node的前驱节点pred，如果pred状态已经被置为SIGNAL，直接返回true。否则，从node的前驱继续往前找，直到找到一个waitStatus小于等于0的节点，设置该点为node的前驱（注意：此时node与这个节点之间的节点从等待队列中被“摘下”，等待被回收了）并返回false。</p>
+<p>返回之后，上层的acquireQueued方法继续自旋，再次进入shouldParkAfterFailedAcquire方法之后，如果发现node前驱不是取消状态且waitStatus不等于SIGNAL，调用CAS函数进行注册（从ws-&gt;SIGNAL，标注为可以休息，等待被唤醒）。注意：这个操作可能失败，因此不能直接返回true，而是返回false由上层的自旋再次调用shouldParkAfterFailedAcquire直到确认注册成功。</p>
+<p>历尽曲折，我们终于可以安心休息了：</p>
+<pre><code class="java">private final boolean parkAndCheckInterrupt() {
+        LockSupport.park(this);
+        return Thread.interrupted();
+    }
+</code></pre>
+<p>parkAndCheckInterrupt方法十分简单，他调用LockSupport的静态方法park阻塞当前线程，直到被中断，这次中断会被acquireQueued记录，但不会立即响应，直到自旋完成。注意：返回操作中的interrupted方法会将中断标志复位，因此我们在上层需要将这个中断“补上”，再一次：还记得大明湖边的selfInterrupt吗？</p>
+<p>注意aqs的线程中断：</p>
+<ul>
+<li><p>当中断线程被唤醒时，并不知道被唤醒的原因，可能是当前线程在等待中被中断，也可能是释放了锁以后被唤醒。因此我们通过Thread.interrupted()方法检查中断标记（该方法返回了当前线程的中断状态，并将当前线程的中断标识设置为False），并记录下来，如果发现该线程被中断过，就再中断一次。</p>
+</li>
+<li><p>线程在等待资源的过程中被唤醒，唤醒后还是会不断地去尝试获取锁，直到抢到锁为止。也就是说，在整个流程中，并不响应中断，只是记录中断记录。最后抢到锁返回了，那么如果被中断过的话，就需要补充一次中断。</p>
+</li>
+</ul>
+<h3 id="release-释放锁"><a href="#release-释放锁" class="headerlink" title="release 释放锁"></a>release 释放锁</h3><p>我们先来看一下Mutex中重写的tryRelease方法：</p>
+<pre><code class="java">//释放锁，此时state应为1，Mutex处于被独占状态
+     protected boolean tryRelease(int releases) {
+       assert releases == 1; // Otherwise unused
+       if (getState() == 0) throw new IllegalMonitorStateException();
+       setExclusiveOwnerThread(null);
+       setState(0);
+       return true;
+     }
+</code></pre>
+<p>逻辑比较简单，首先将独占线程置为null，紧接着将state设置为0，这里不会发生资源竞争，因此不需要用CAS去设置state值，直接置0即可。</p>
+<pre><code class="java">public final boolean release(int arg) {
+        if (tryRelease(arg)) {
+            Node h = head;
+            if (h != null &amp;&amp; h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+<p>好，我们开始分析release方法。首先调用tryRelease试图释放共享资源，紧接着检测head的waitStatus是否为SIGNAL，如果是的话，调用unparkSuccessor唤醒队列中的head。独占模式下，waitStatus！=0与waitStatus==-1等价（这里waitStatus不会为CANCELLED，因为已经获取资源了）。如果不为SIGNAL，说明如果有下个等待线程，它正在自旋。所以直接返回true即可。我们来看下unparkSuccessor方法：</p>
+<pre><code class="java">private void unparkSuccessor(Node node) {
+        /*
+         * If status is negative (i.e., possibly needing signal) try
+         * to clear in anticipation of signalling.  It is OK if this
+         * fails or if status is changed by waiting thread.
+         */
+        int ws = node.waitStatus;
+        if (ws &lt; 0)
+            compareAndSetWaitStatus(node, ws, 0);
+
+        /*
+         * Thread to unpark is held in successor, which is normally
+         * just the next node.  But if cancelled or apparently null,
+         * traverse backwards from tail to find the actual
+         * non-cancelled successor.
+         */
+        Node s = node.next;
+        if (s == null || s.waitStatus &gt; 0) {
+            s = null;
+            for (Node t = tail; t != null &amp;&amp; t != node; t = t.prev)
+                if (t.waitStatus &lt;= 0)
+                    s = t;
+        }
+        if (s != null)
+            LockSupport.unpark(s.thread);
+    }
+</code></pre>
+<p>unparkSuccessor方法也会在共享模式的工作流程中被调用，因此方法开始做的判断是有必要的。对于独占模式而言，ws应该都是0。然后找到下一个需要被唤醒的线程并调用LockSupport的静态方法unpark唤醒等待线程。</p>
+<p>至此，我们比较详细地了解了acquire&amp;release的工作流程。</p>
+<h2 id="共享模式"><a href="#共享模式" class="headerlink" title="共享模式"></a>共享模式</h2><h3 id="acquireShared-获取锁"><a href="#acquireShared-获取锁" class="headerlink" title="acquireShared 获取锁"></a>acquireShared 获取锁</h3><p>下面，我们来学习下共享模式下的获取&amp;释放锁的工作流程。</p>
+<pre><code class="java">    public final void acquireShared(int arg) {
+        if (tryAcquireShared(arg) &lt; 0)
+            doAcquireShared(arg);
+    }
+</code></pre>
+<p>acquireShared方法首先调用tryAcquireShared试图获取共享资源。tryAcquireShared的返回值表示剩余资源个数，负值表示获取失败，0表示获取成功但已无剩余资源。如果获取失败，调用doAcquireShared方法完成独占模式下类似的操作，后面我们会详细分析。注意，doAcquireShared方法在等待资源的过程中也是不响应中断的，它能觉察到中断，但在成功获取资源之前不会处理。</p>
+<pre><code class="java">private void doAcquireShared(int arg) {
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        if (interrupted)
+                            selfInterrupt();
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>doAcquireShared方法与acquireQueued方法相似，不同的地方在于，共享模式下成功获取资源并将head指向自己之后，要检查并试图唤醒之后的等待线程。因为共享资源可能剩余，可以被后面的等待线程获取。</p>
+<pre><code class="java">private void setHeadAndPropagate(Node node, int propagate) {
+        Node h = head; // Record old head for check below
+        setHead(node);
+        if (propagate &gt; 0 || h == null || h.waitStatus &lt; 0 ||
+            (h = head) == null || h.waitStatus &lt; 0) {
+            Node s = node.next;
+            if (s == null || s.isShared())
+                doReleaseShared();
+        }
+    }
+</code></pre>
+<p>setHeadAndPropagate中有一个长长的if，来判断是否应该去试图唤醒后面的线程。propagate大于0，表示尚有资源可被获取，显然应该继续判断；h == null, 说明没有节点；而当h.waitStatus小于0时，它有两种取值可能，SIGNAL和PROPAGATE，我们将在后面看到，这几种情况都是应该继续判断。后续是对node的后继进行的判断，注意，node此时可能已经不是head节点了，因为这是共享模式，所以可能有一个node的后继成功获取资源后，把自己设为head，将node踢出了队列。这种情况下node的后继s是可能为null的，但貌似这种情况doReleaseShared的调用没有意义。s.isShared的判断主要是考虑到读写锁的情况，在读写锁的使用过程中，申请写锁（独占模式）和申请读锁（共享模式）的线程可能同时存在，这个判断发现后即线程是共享模式的时候，调用doReleaseShared方法唤醒他。</p>
+<pre><code class="java">private void doReleaseShared() {
+        for (;;) {
+            Node h = head;
+            if (h != null &amp;&amp; h != tail) {
+                int ws = h.waitStatus;
+                if (ws == Node.SIGNAL) {
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+                    unparkSuccessor(h);
+                }
+                else if (ws == 0 &amp;&amp;
+                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }
+</code></pre>
+<p>又是一个自旋。我们首先获取head节点h，然后检查它的waitStatus是否为SIGNAL，如果是的话，调用CAS将h的waitStatus设置为0，并调用unparkSuccessor唤醒下一个等待线程。注意，这里调用CAS方法而不是直接赋值，是因为在共享模式下，这里可能发生竞争。doReleaseShared方法可能由head节点在使用完共享资源后主动调用（后续在releaseShared方法中可以看到），也可能由刚刚“上位”的等待线程调用，在上位之后，原来的head线程已被踢出队列。</p>
+<p>因此，doReleaseShared方法的执行情况变得比较复杂，需要细致分析。</p>
+<p>第一种情况，只有刚刚释放资源的head线程调用，这时候没有竞争，waitStatus是SIGNAL，就去唤醒下个线程，是0，就重置为PROPAGATE。</p>
+<p>第二种情况，刚刚释放完资源的旧head，和刚刚上位的新head同时调用doReleaseShared方法，这时候最新的head获取的都是自己，若干被踢出的旧head获取的可能是旧head，也可能是新head，这些被踢出的旧head线程也在根据自己获取的head（不管新旧）的状态进行CAS操作和unparkSuccessor操作，幸运的是，这些操作不会造成错误，只是多了一些唤醒而已（这些唤醒可能导致一个线程获得资源，也可能是一个“虚晃”）。</p>
+<p>我们可以发现，不管head引用怎样更迭，最终新head的waitStatus都会被顺利处理。注意，可能有多个旧head同时参与这个过程，都不影响正确性。</p>
+<p>我们注意到，一个新head，在他刚上位的时候有机会调用一次setHeadAndPropagate进而调用doReleaseShared，在他释放资源之后，又一次调用doReleaseShared（这次是必然的）。第一次调用时，不管新head的waitStatus是0还是SIGNAL，最终状态都被PROPAGATE（当然，被踢出队列的head可能还没来得及设置成PROPAGATE，但新上位的head最终会被设置），这也符合PROPAGATE的语义：使用在共享模式头结点有可能处于这种状态，表示锁的下一次获取可以无条件传播。</p>
+<p>还有一个问题，它是由SIGNAL–&gt;0–&gt;PROPAGATE变化而来的，为什么不是SIGNAL–&gt;PROPAGA这样直接变化呢？原因是unparkSuccessor方法会试图将当前node的waitStatus复位成0，如果我们直接SIGNAL–&gt;PROPAGA后，那么又被复位成0，还需要一次CAS操作置为PROPAGATE。</p>
+<h3 id="releaseShared-释放锁"><a href="#releaseShared-释放锁" class="headerlink" title="releaseShared 释放锁"></a>releaseShared 释放锁</h3><pre><code class="java">public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+<p>我们可以看到，调用tryReleaseShared成功释放共享资源之后，最终要再次调用doReleaseShared试图唤醒后面的等待线程。</p>
+<hr>
+<p>之前自己实现过一个分布式锁：<a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<p>redis实现的，具体怎么实现以后会单独开文章说。</p>
+<p>这里主要说下aqs：</p>
+<p>单实例的aqs，头节点永远是占有锁的节点，并永远在自旋。其他节点都可以放心休息。<br>而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，而也错误的进入了休息，这样这个队列就永远不会被唤醒。<br>因此，要解决问题，只需要保持每个实例的队列的头节点都永远在自旋即可。<br>简单改一下aqs中的一行就能实现：</p>
+<pre><code class="java">final boolean acquireQueued(final Node node, int arg) {
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null;
+                    failed = false;
+                    return interrupted;
+                }
+                // 就是这一行
+                if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                    interrupted = true;
+                }
+            }
+        } finally {
+            if (failed) {
+                cancelAcquire(node);
+            }
+        }
+    }
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -1033,401 +2143,9 @@ final ConditionObject newCondition() {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
             
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[juc之aqs]]></title>
-      <url>/2020/11/22/juc-2/</url>
-      <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
-<p>AbstractQueuedSynchronizer（AQS）是一个同步器框架，抽象类。在实现锁的时候，一般会实现一个继承自AQS的内部类sync，作为我们的自定义同步器。AQS内部维护了一个state成员和一个队列。其中state标识了共享资源的状态，队列则记录了等待资源的线程。</p>
-<p>以下这五个方法，在AQS中实现为直接抛出异常，这是我们自定义同步器需要重写的方法：</p>
-<ul>
-<li><p>isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。</p>
-</li>
-<li><p>tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败返回false。</p>
-</li>
-<li><p>tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败返回false。</p>
-</li>
-<li><p>tryAcquireShared(int)：共享方式。尝试获取资源。成功返回true，失败返回false。</p>
-</li>
-<li><p>tryReleaseShared(int)：共享方式。尝试释放资源，成功则返回true，失败返回false。</p>
-</li>
-</ul>
-<p>例如ReentrantLock就是一种独占锁，CountDownLatch和Semaphore是共享锁。与CountDownLatch有一定相似性的CyclicBarrier并没有自己的共享同步器，而是使用Lock和Condition来实现的。</p>
-<p>本质上aqs就是一个clh锁，AQS在CLH的基础上进行了变种：CLH是单向队列，其主要特点是自旋检查前驱节点的locked状态。而AQS同步队列是双向队列，每个节点也有状态waitStatus，而其并不是一直对前驱节点的状态自旋，在尝试自旋一次后会将线程阻塞让出CPU时间片，等到占有锁的线程主动唤醒后续节点的继续自旋。</p>
-<pre><code> * &lt;pre&gt;
- *      +------+  prev +-----+       +-----+
- * head |      | &lt;---- |     | &lt;---- |     |  tail
- *      +------+       +-----+       +-----+
- * &lt;/pre&gt;
-</code></pre><p><img src="https://s3.ax1x.com/2020/11/22/D8ZfXR.png" alt="D8ZfXR.png"></p>
-<p>每个线程都会包装成一个node，从队列尾部入队，头节点占有锁的线程（一个虚节点），当前线程会通知检查其前驱节点，看其是否是头节点，如果是就自旋去获取锁（线程可能休息，但自旋会一直进行），其他节点都可以安全阻塞等待被唤醒。</p>
-<h2 id="独占模式"><a href="#独占模式" class="headerlink" title="独占模式"></a>独占模式</h2><p>下面是一个简单的独占锁的实现，它是不可重入的。它重写了AQS的tryAcquire方法和tryRelease方法：</p>
-<pre><code class="java">class Mutex implements Lock, Serializable {
-    //自定义同步器，继承自AQS
-   private static class Sync extends AbstractQueuedSynchronizer {
-     //试图获取锁，当state为0时能成功获取，
-     public boolean tryAcquire(int acquires) {
-       assert acquires == 1; //这是一个对于state进行操作的量，含义自定义
-       if (compareAndSetState(0, 1)) {    //注意：这是一个原子操作
-         setExclusiveOwnerThread(Thread.currentThread());
-         return true;
-       }
-       return false;
-     }
-     //释放锁，此时state应为1，Mutex处于被独占状态
-     protected boolean tryRelease(int releases) {
-       assert releases == 1; // Otherwise unused
-       if (getState() == 0) throw new IllegalMonitorStateException();
-       setExclusiveOwnerThread(null);
-       setState(0);
-       return true;
-     }
-     //返回一个Condition
-     Condition newCondition() { return new ConditionObject(); }
-   }
-
-   private final Sync sync = new Sync();
-
-   public void lock()                { sync.acquire(1); }
-   public boolean tryLock()          { return sync.tryAcquire(1); }
-   public void unlock()              { sync.release(1); }
-   public Condition newCondition()   { return sync.newCondition(); }
-   public void lockInterruptibly() throws InterruptedException {
-     sync.acquireInterruptibly(1);
-   }
-   public boolean tryLock(long timeout, TimeUnit unit)
-       throws InterruptedException {
-     return sync.tryAcquireNanos(1, unit.toNanos(timeout));
-   }
- }
-</code></pre>
-<h3 id="acquire-获取锁"><a href="#acquire-获取锁" class="headerlink" title="acquire 获取锁"></a>acquire 获取锁</h3><p>我们先来看一下Mutex重写的tryAcquire方法：</p>
-<pre><code class="java">//试图获取锁，当state为0时能成功获取，
-     public boolean tryAcquire(int acquires) {
-       assert acquires == 1; //这是一个对于state进行操作的量，含义自定义
-       if (compareAndSetState(0, 1)) {    //注意：这是一个原子操作
-         setExclusiveOwnerThread(Thread.currentThread());
-         return true;
-       }
-       return false;
-     }
-</code></pre>
-<p>注意：当我们初始化一个Sync的时候，如果没有指定state的初值（无参数），那么state的默认初值是0。可以看到，方法开头首先有一个断言acquires==1，参数acquires代表要在state上做的改变的量（减去或增加），在Mutex中，我们定义state只有两个状态：0或1，0代表共享资源可以被获取，1表示共享资源正在被占用，因此Mutex是不可重入的。实际上，自定义同步器通过重写tryAcquire和tryRelease来定义state代表的意义和资源的共享方式，这是同步器的主要任务。Mutex的tryAcquire使用一个原子操作compareAndSetState来试图获取资源，这个原子操作由上层的AQS提供，如果成功，将当前线程设置为独占线程并返回true。</p>
-<p>Mutex的lock方法调用了aqs的acquire方法，acquire方法实现为：</p>
-<pre><code class="java">    public final void acquire(int arg) {
-        if (!tryAcquire(arg) &amp;&amp;
-            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-            selfInterrupt();
-    }
-</code></pre>
-<p>它首先调用tryAquire去获取共享资源，如果失败，调用addWaiter将当前线程放入等待队列，返回持有当前线程的Node对象，然后调用acquireQueued方法来监视等待队列并获取资源。acquireQueued方法会阻塞线程，直到成功获取。注意，acquire方法不能及时响应中断，只能在成功获取锁之后，再来处理。中断当前线程的操作跑出的异常在acquireQueued方法中被捕获，外部调用者没能看到这个异常，因此调用selfInterrupt来重置中断标识。</p>
-<p>我们需要详细了解addWaiter方法和acquireQueued方法，之后再来回顾acquire的过程，才能对整个获取锁的流程有比较详细的了解。</p>
-<p>（ps：enqueue：入队，简称enq；dequeue：出队，简称dnq）</p>
-<pre><code class="java">private Node addWaiter(Node mode) {
-        Node node = new Node(Thread.currentThread(), mode);
-        // Try the fast path of enq; backup to full enq on failure
-        Node pred = tail;
-        if (pred != null) {
-            node.prev = pred;
-            if (compareAndSetTail(pred, node)) {
-                pred.next = node;
-                return node;
-            }
-        }
-        enq(node);
-        return node;
-    }
-</code></pre>
-<p>addWaiter首先将当前线程包装在一个Node对象node中，然后获取了一下队列的尾节点，如果队列不为空（tail不为null）的话，调用一个CAS函数试图将node放入等待队列的尾部，注意，此时可能发生竞争，如果有另外一个线程在两个if之间抢先更新的队列的尾节点，CAS操作将会失败，这时会调用enq方法，继续试图将node放入队列：</p>
-<pre><code class="java">private Node enq(final Node node) {
-        for (;;) {
-            Node t = tail;
-            if (t == null) { // Must initialize
-                if (compareAndSetHead(new Node()))
-                    tail = head;
-            } else {
-                node.prev = t;
-                if (compareAndSetTail(t, node)) {
-                    t.next = node;
-                    return t;
-                }
-            }
-        }
-    }
-</code></pre>
-<p>enq方法会循环检测队列，如果队列为空，则调用CAS函数初始化队列（此时node==head==tail），否则调用CAS函数将node放入队列尾。</p>
-<p>请注意，初始化的头结点并不是当前线程节点，而是调用了无参构造函数的节点。如果经历了初始化或者并发导致队列中有元素，则与之前的方法相同。其实，addWaiter就是一个在双端链表添加尾节点的操作，需要注意的是，双端链表的头结点是一个无参构造函数的头结点。头节点虚节点。</p>
-<p>如果CAS失败，enq会继续循环检测，直到成功将node入列。这里便是入队操作中的CAS自旋，因为这里还没有涉及锁的竞争，所以不需要响应中断。这里有一个隐含的知识点，即tail是一个volatile成员，确保某个线程更新队列后对其他线程的可见性。</p>
-<p>注意：队列为空的时候，第一个线程进入队列的情况有点tricky：第一个发现队列为空并初始化队列（head节点）的线程不一定优先拿到资源。head节点被初始化后，当前线程需要下一次旋转才有机会进入队列，在这期间，完全有可能半路杀出程咬金，将当前线程与它初始化出的head节点无情分开。我们来总结一下，当队列只有一个节点时（head=tail），有两种情况：第一种是这个队列刚刚被初始化，head并没有持有任何线程对象。这个状态不会持续太久，初始化队列的线程有很大机会在下次自旋时把自己接到队尾。第二种情况是，所有等待线程都已经获得资源并继续执行下去了，队列仅有的节点是最后一个获取共享资源的线程，等到下一个线程到达等待队列并将它踢出队列之后，它才有机会被回收。</p>
-<p>enq执行完毕，我们已经成功把当前线程放入等待队列，接下来的任务就是监视队列，等待获取资源。这个过程由acquireQueued方法实现：</p>
-<pre><code class="java">final boolean acquireQueued(final Node node, int arg) {
-        boolean failed = true;
-        try {
-            boolean interrupted = false;
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head &amp;&amp; tryAcquire(arg)) {
-                    setHead(node);
-                    p.next = null; // help GC
-                    failed = false;
-                    return interrupted;
-                }
-                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
-                    parkAndCheckInterrupt())
-                    interrupted = true;
-            }
-        } finally {
-            if (failed)
-                cancelAcquire(node);
-        }
-    }
-</code></pre>
-<p>acquireQueued方法是一个很重要的方法，在分析这个方法之前，我们先来说一下AQS中的那个等待队列。这个队列实际上是一个CLH队列，它保证了竞争资源的线程按到达顺序来获取资源，避免了饥饿的发生。CLH队列的工作过程，就是acquireQueued方法的工作过程。很明显，这又是一个自旋。首先，我们调用predecessor方法获取当前线程的前驱节点，如果这个前驱是head节点，就紧接着调用tryAcquire去获取共享资源，当然这是有可能失败的，因为head节点可能刚刚“上位”，持有锁的线程还没有释放资源。如果很幸运，我们拿到了资源，就调用setHead将node设置为队列的头结点，setHead方法同时会将node的prev置为null，并把thread置为null（前驱节点出队，当前虚节点head占有锁），紧接着将原先head的next也置为null，显然这是为了让其后续被回收。注意：acquireQueued方法在自旋过程中是不可被中断的，当然它会检测到中断（在parkAndCheckInterrupt方法中检测中断标志），但并不会因此结束自旋，只能在获得资源退出方法后，反馈给上层的方法：我刚刚被中断了。还记得acquire方法中的selfInterrupt的调用吗，就是为了“补上”这里没有响应的中断。</p>
-<p>好，我们继续往下。获取资源失败后，调用shouldParkAfterFailedAcquire方法检测是否该去“休息”下，毕竟一直自旋很累嘛。如果可以休息就调用parkAndCheckInterrupt放心去休息。我们先来看一下shuldParkAfterFailedAcquire：</p>
-<pre><code class="java">private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
-        int ws = pred.waitStatus;
-        if (ws == Node.SIGNAL)
-            /*
-             * This node has already set status asking a release
-             * to signal it, so it can safely park.
-             */
-            return true;
-        if (ws &gt; 0) {
-            /*
-             * Predecessor was cancelled. Skip over predecessors and
-             * indicate retry.
-             */
-            do {
-                node.prev = pred = pred.prev;
-            } while (pred.waitStatus &gt; 0);
-            pred.next = node;
-        } else {
-            /*
-             * waitStatus must be 0 or PROPAGATE.  Indicate that we
-             * need a signal, but don&#39;t park yet.  Caller will need to
-             * retry to make sure it cannot acquire before parking.
-             */
-            compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
-        }
-        return false;
-    }
-</code></pre>
-<p>我们首先了解一下waitStatus。Node对象维护了一个int成员waitStatus，他的可能取值如下：</p>
-<pre><code class="java">// 因为超时或者中断，结点会被设置为取消状态，被取消状态的结点不应该去竞争锁，只能保持取消状态不变，不能转换为其他状态。
-// 处于这种状态的结点会被踢出队列，被GC回收；
-static final int CANCELLED =  1;
-// 表示这个结点的继任结点被阻塞了，到时需要通知它；
-static final int SIGNAL    = -1;
-// 表示这个结点在条件队列中，因为等待某个条件而被阻塞；
-static final int CONDITION = -2;
-// 使用在共享模式头结点有可能处于这种状态，表示锁的下一次获取可以无条件传播；
-static final int PROPAGATE = -3;
-// 0：None of the above，新结点会处于这种状态。
-</code></pre>
-<p>在我们的Mutex的例子中，节点的waitStatus只可能有CANCELLED、SIGNAL和0三中状态（事实上，独占模式下所有不使用Condition的同步器都是这样）。</p>
-<p>我们继续来分析shouldParkAfterFailedAcquire方法：</p>
-<p>首先检测下node的前驱节点pred，如果pred状态已经被置为SIGNAL，直接返回true。否则，从node的前驱继续往前找，直到找到一个waitStatus小于等于0的节点，设置该点为node的前驱（注意：此时node与这个节点之间的节点从等待队列中被“摘下”，等待被回收了）并返回false。</p>
-<p>返回之后，上层的acquireQueued方法继续自旋，再次进入shouldParkAfterFailedAcquire方法之后，如果发现node前驱不是取消状态且waitStatus不等于SIGNAL，调用CAS函数进行注册（从ws-》SIGNAL，标注为可以休息，等待被唤醒）。注意：这个操作可能失败，因此不能直接返回true，而是返回false由上层的自旋再次调用shouldParkAfterFailedAcquire直到确认注册成功。</p>
-<p>历尽曲折，我们终于可以安心休息了：</p>
-<pre><code class="java">private final boolean parkAndCheckInterrupt() {
-        LockSupport.park(this);
-        return Thread.interrupted();
-    }
-</code></pre>
-<p>parkAndCheckInterrupt方法十分简单，他调用LockSupport的静态方法park阻塞当前线程，直到被中断，这次中断会被acquireQueued记录，但不会立即响应，直到自旋完成。注意：返回操作中的interrupted方法会将中断标志复位，因此我们在上层需要将这个中断“补上”，再一次：还记得大明湖边的selfInterrupt吗？</p>
-<p>注意aqs的线程中断：</p>
-<ul>
-<li><p>当中断线程被唤醒时，并不知道被唤醒的原因，可能是当前线程在等待中被中断，也可能是释放了锁以后被唤醒。因此我们通过Thread.interrupted()方法检查中断标记（该方法返回了当前线程的中断状态，并将当前线程的中断标识设置为False），并记录下来，如果发现该线程被中断过，就再中断一次。</p>
-</li>
-<li><p>线程在等待资源的过程中被唤醒，唤醒后还是会不断地去尝试获取锁，直到抢到锁为止。也就是说，在整个流程中，并不响应中断，只是记录中断记录。最后抢到锁返回了，那么如果被中断过的话，就需要补充一次中断。</p>
-</li>
-</ul>
-<h3 id="release-释放锁"><a href="#release-释放锁" class="headerlink" title="release 释放锁"></a>release 释放锁</h3><p>我们先来看一下Mutex中重写的tryRelease方法：</p>
-<pre><code class="java">//释放锁，此时state应为1，Mutex处于被独占状态
-     protected boolean tryRelease(int releases) {
-       assert releases == 1; // Otherwise unused
-       if (getState() == 0) throw new IllegalMonitorStateException();
-       setExclusiveOwnerThread(null);
-       setState(0);
-       return true;
-     }
-</code></pre>
-<p>逻辑比较简单，首先将独占线程置为null，紧接着将state设置为0，这里不会发生资源竞争，因此不需要用CAS去设置state值，直接置0即可。</p>
-<pre><code class="java">public final boolean release(int arg) {
-        if (tryRelease(arg)) {
-            Node h = head;
-            if (h != null &amp;&amp; h.waitStatus != 0)
-                unparkSuccessor(h);
-            return true;
-        }
-        return false;
-    }
-</code></pre>
-<p>好，我们开始分析release方法。首先调用tryRelease试图释放共享资源，紧接着检测head的waitStatus是否为SIGNAL，如果是的话，调用unparkSuccessor唤醒队列中的head。独占模式下，waitStatus！=0与waitStatus==-1等价（这里waitStatus不会为CANCELLED，因为已经获取资源了）。如果不为SIGNAL，说明如果有下个等待线程，它正在自旋。所以直接返回true即可。我们来看下unparkSuccessor方法：</p>
-<pre><code class="java">private void unparkSuccessor(Node node) {
-        /*
-         * If status is negative (i.e., possibly needing signal) try
-         * to clear in anticipation of signalling.  It is OK if this
-         * fails or if status is changed by waiting thread.
-         */
-        int ws = node.waitStatus;
-        if (ws &lt; 0)
-            compareAndSetWaitStatus(node, ws, 0);
-
-        /*
-         * Thread to unpark is held in successor, which is normally
-         * just the next node.  But if cancelled or apparently null,
-         * traverse backwards from tail to find the actual
-         * non-cancelled successor.
-         */
-        Node s = node.next;
-        if (s == null || s.waitStatus &gt; 0) {
-            s = null;
-            for (Node t = tail; t != null &amp;&amp; t != node; t = t.prev)
-                if (t.waitStatus &lt;= 0)
-                    s = t;
-        }
-        if (s != null)
-            LockSupport.unpark(s.thread);
-    }
-</code></pre>
-<p>unparkSuccessor方法也会在共享模式的工作流程中被调用，因此方法开始做的判断是有必要的。对于独占模式而言，ws应该都是0。然后找到下一个需要被唤醒的线程并调用LockSupport的静态方法unpark唤醒等待线程。</p>
-<p>至此，我们比较详细地了解了acquire&amp;release的工作流程。</p>
-<h2 id="共享模式"><a href="#共享模式" class="headerlink" title="共享模式"></a>共享模式</h2><h3 id="acquireShared-获取锁"><a href="#acquireShared-获取锁" class="headerlink" title="acquireShared 获取锁"></a>acquireShared 获取锁</h3><p>下面，我们来学习下共享模式下的获取&amp;释放锁的工作流程。</p>
-<pre><code class="java">    public final void acquireShared(int arg) {
-        if (tryAcquireShared(arg) &lt; 0)
-            doAcquireShared(arg);
-    }
-</code></pre>
-<p>acquireShared方法首先调用tryAcquireShared试图获取共享资源。tryAcquireShared的返回值表示剩余资源个数，负值表示获取失败，0表示获取成功但已无剩余资源。如果获取失败，调用doAcquireShared方法完成独占模式下类似的操作，后面我们会详细分析。注意，doAcquireShared方法在等待资源的过程中也是不响应中断的，它能觉察到中断，但在成功获取资源之前不会处理。</p>
-<pre><code class="java">private void doAcquireShared(int arg) {
-        final Node node = addWaiter(Node.SHARED);
-        boolean failed = true;
-        try {
-            boolean interrupted = false;
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head) {
-                    int r = tryAcquireShared(arg);
-                    if (r &gt;= 0) {
-                        setHeadAndPropagate(node, r);
-                        p.next = null; // help GC
-                        if (interrupted)
-                            selfInterrupt();
-                        failed = false;
-                        return;
-                    }
-                }
-                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
-                    parkAndCheckInterrupt())
-                    interrupted = true;
-            }
-        } finally {
-            if (failed)
-                cancelAcquire(node);
-        }
-    }
-</code></pre>
-<p>doAcquireShared方法与acquireQueued方法相似，不同的地方在于，共享模式下成功获取资源并将head指向自己之后，要检查并试图唤醒之后的等待线程。因为共享资源可能剩余，可以被后面的等待线程获取。</p>
-<pre><code class="java">private void setHeadAndPropagate(Node node, int propagate) {
-        Node h = head; // Record old head for check below
-        setHead(node);
-        if (propagate &gt; 0 || h == null || h.waitStatus &lt; 0 ||
-            (h = head) == null || h.waitStatus &lt; 0) {
-            Node s = node.next;
-            if (s == null || s.isShared())
-                doReleaseShared();
-        }
-    }
-</code></pre>
-<p>setHeadAndPropagate中有一个长长的if，来判断是否应该去试图唤醒后面的线程。propagate大于0，表示尚有资源可被获取，显然应该继续判断；h == null, 说明没有节点；而当h.waitStatus小于0时，它有两种取值可能，SIGNAL和PROPAGATE，我们将在后面看到，这几种情况都是应该继续判断。后续是对node的后继进行的判断，注意，node此时可能已经不是head节点了，因为这是共享模式，所以可能有一个node的后继成功获取资源后，把自己设为head，将node踢出了队列。这种情况下node的后继s是可能为null的，但貌似这种情况doReleaseShared的调用没有意义。s.isShared的判断主要是考虑到读写锁的情况，在读写锁的使用过程中，申请写锁（独占模式）和申请读锁（共享模式）的线程可能同时存在，这个判断发现后即线程是共享模式的时候，调用doReleaseShared方法唤醒他。</p>
-<pre><code class="java">private void doReleaseShared() {
-        for (;;) {
-            Node h = head;
-            if (h != null &amp;&amp; h != tail) {
-                int ws = h.waitStatus;
-                if (ws == Node.SIGNAL) {
-                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
-                        continue;            // loop to recheck cases
-                    unparkSuccessor(h);
-                }
-                else if (ws == 0 &amp;&amp;
-                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
-                    continue;                // loop on failed CAS
-            }
-            if (h == head)                   // loop if head changed
-                break;
-        }
-    }
-</code></pre>
-<p>又是一个自旋。我们首先获取head节点h，然后检查它的waitStatus是否为SIGNAL，如果是的话，调用CAS将h的waitStatus设置为0，并调用unparkSuccessor唤醒下一个等待线程。注意，这里调用CAS方法而不是直接赋值，是因为在共享模式下，这里可能发生竞争。doReleaseShared方法可能由head节点在使用完共享资源后主动调用（后续在releaseShared方法中可以看到），也可能由刚刚“上位”的等待线程调用，在上位之后，原来的head线程已被踢出队列。</p>
-<p>因此，doReleaseShared方法的执行情况变得比较复杂，需要细致分析。</p>
-<p>第一种情况，只有刚刚释放资源的head线程调用，这时候没有竞争，waitStatus是SIGNAL，就去唤醒下个线程，是0，就重置为PROPAGATE。</p>
-<p>第二种情况，刚刚释放完资源的旧head，和刚刚上位的新head同时调用doReleaseShared方法，这时候最新的head获取的都是自己，若干被踢出的旧head获取的可能是旧head，也可能是新head，这些被踢出的旧head线程也在根据自己获取的head（不管新旧）的状态进行CAS操作和unparkSuccessor操作，幸运的是，这些操作不会造成错误，只是多了一些唤醒而已（这些唤醒可能导致一个线程获得资源，也可能是一个“虚晃”）。</p>
-<p>我们可以发现，不管head引用怎样更迭，最终新head的waitStatus都会被顺利处理。注意，可能有多个旧head同时参与这个过程，都不影响正确性。</p>
-<p>我们注意到，一个新head，在他刚上位的时候有机会调用一次setHeadAndPropagate进而调用doReleaseShared，在他释放资源之后，又一次调用doReleaseShared（这次是必然的）。第一次调用时，不管新head的waitStatus是0还是SIGNAL，最终状态都被PROPAGATE（当然，被踢出队列的head可能还没来得及设置成PROPAGATE，但新上位的head最终会被设置），这也符合PROPAGATE的语义：使用在共享模式头结点有可能处于这种状态，表示锁的下一次获取可以无条件传播。</p>
-<p>还有一个问题，它是由SIGNAL–&gt;0–&gt;PROPAGATE变化而来的，为什么不是SIGNAL–&gt;PROPAGA这样直接变化呢？原因是unparkSuccessor方法会试图将当前node的waitStatus复位成0，如果我们直接SIGNAL–&gt;PROPAGA后，那么又被复位成0，还需要一次CAS操作置为PROPAGATE。</p>
-<h3 id="releaseShared-释放锁"><a href="#releaseShared-释放锁" class="headerlink" title="releaseShared 释放锁"></a>releaseShared 释放锁</h3><pre><code class="java">public final boolean releaseShared(int arg) {
-        if (tryReleaseShared(arg)) {
-            doReleaseShared();
-            return true;
-        }
-        return false;
-    }
-</code></pre>
-<p>我们可以看到，调用tryReleaseShared成功释放共享资源之后，最终要再次调用doReleaseShared试图唤醒后面的等待线程。</p>
-<hr>
-<p>之前自己实现过一个分布式锁：<a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
-<p>redis实现的，具体怎么实现以后会单独开文章说。</p>
-<p>这里主要说下aqs：</p>
-<p>单实例的aqs，头节点永远是占有锁的节点，并永远在自旋。其他节点都可以放心休息。<br>而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，而也错误的进入了休息，这样这个队列就永远不会被唤醒。<br>因此，要解决问题，只需要保持每个实例的队列的头节点都永远在自旋即可。<br>简单改一下aqs中的一行就能实现：</p>
-<pre><code class="java">final boolean acquireQueued(final Node node, int arg) {
-        boolean failed = true;
-        try {
-            boolean interrupted = false;
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head &amp;&amp; tryAcquire(arg)) {
-                    setHead(node);
-                    p.next = null;
-                    failed = false;
-                    return interrupted;
-                }
-                // 就是这一行
-                if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
-                    interrupted = true;
-                }
-            }
-        } finally {
-            if (failed) {
-                cancelAcquire(node);
-            }
-        }
-    }
-</code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> juc </category>
-            
-            <category> 并发 </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
             <tag> 并发 </tag>
-            
-            <tag> juc </tag>
             
         </tags>
         
@@ -1505,9 +2223,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -2195,9 +2913,9 @@ public class TicketLock {
         
         <tags>
             
-            <tag> cas </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> cas </tag>
             
         </tags>
         
@@ -2305,6 +3023,27 @@ private void doSomething(){
 <li>结束(Terminated):已终止线程的线程状态，线程已经结束执行。</li>
 </ul>
 <p><img src="https://s3.ax1x.com/2020/11/20/DQg8wq.png" alt="DQg8wq.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/23/DJTGa6.png" alt="DJTGa6.png"></p>
+<h4 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h4><p>感觉必须要加一段线程中断和响应中断的详解，不然后续对aqs理解会有问题：</p>
+<p>Java没有提供任何机制来安全地终止线程，但提供了中断机制，即thread.interrupt()方法。线程中断是一种协作式的机制，并不是说调用了中断方法之后目标线程一定会立即中断，而是发送了一个中断请求给目标线程，目标线程会自行在某个取消点中断自己。这种设定很有必要，因为如果不论线程执行到何种情况都立即响应中断的话，很容易造成某些对象状态不一致的情况出现。</p>
+<p>每个线程对象里都有一个 boolean 类型的标识（不一定就要是 Thread 类的字段，实际上也的确不是，这几个方法最终都是通过 native 方法来完成的），代表着是否有中断请求（该请求可以来自所有线程，包括被中断的线程本身）。例如，当线程 t1 想中断线程 t2，只需要在线程 t1 中将线程 t2 对象的中断标识置为 true，然后线程 2 可以选择在合适的时候处理该中断请求，甚至可以不理会该请求，就像这个线程没有被中断一样。</p>
+<p>涉及到中断的线程基础方法有三个：interrupt()、isInterrupted()、interrupted()，它们都位于Thread类下。</p>
+<ul>
+<li><p>interrupt()方法：对目标线程发送中断请求，看其源码会发现最终是调用了一个本地方法实现的线程中断；</p>
+</li>
+<li><p>interrupted()方法：返回目标线程是否中断的布尔值（通过本地方法实现），且返回后会重置中断状态为未中断；换句话说，如果连续两次调用该方法，则第二次调用将返回 false（在第一次调用已清除了其中断状态之后，且第二次调用检验完中断状态前，当前线程再次中断的情况除外）。</p>
+</li>
+<li><p>isInterrupted()方法：该方法返回的是线程中断与否的布尔值（通过本地方法实现），不会重置中断状态；</p>
+</li>
+</ul>
+<p>其中，interrupt 方法是唯一能将中断状态设置为 true 的方法。静态方法 interrupted 会将当前线程的中断状态清除，但这个方法的命名极不直观，很容易造成误解，需要特别注意。</p>
+<p>Thread.interrupt()方法仅仅是在当前线程中打了一个停止的标识将中断标志修改为true，并没有真正的停止线程。如果在此基础上进入堵塞状态（sleep(),wait(),join()）,马上就会抛出一个InterruptedException，且中断标志被清除，重新设置为false。记住一点，当调用Thread.interrupt()，还没有进行中断时，此时的中断标志位是true，当发生中断之后（执行到sleep(),wait(),join()），这个时候的中断标志位就是false了。</p>
+<p>中断是通过调用Thread.interrupt()方法来做的. 这个方法通过修改了被调用线程的中断状态来告知那个线程, 说它被中断了. 对于非阻塞中的线程, 只是改变了中断状态, 即Thread.isInterrupted()将返回true; 对于可取消的阻塞状态中的线程, 比如等待在这些函数上的线程, Thread.sleep(), Object.wait(), Thread.join(), 这个线程收到中断信号后, 会抛出InterruptedException, 同时会把中断状态置回为false.但调用Thread.interrupted()会对中断状态进行复位。</p>
+<h4 id="响应中断的方法和不响应中断的方法"><a href="#响应中断的方法和不响应中断的方法" class="headerlink" title="响应中断的方法和不响应中断的方法"></a>响应中断的方法和不响应中断的方法</h4><p>响应中断的方法： 线程进入等待或是超时等待的状态后，调用interrupt方法都是会响应中断的，所以响应中断的方法：Object.wait()、Thread.join、Thread.sleep、LockSupport.park的有参和无参方法。</p>
+<p>不响应中断的方法：线程进入阻塞状态后，是不响应中断的，等待进入synchronized的方法或是代码块，都是会被阻塞的，此时不会响应中断，另外还有一个不响应中断的，那就是阻塞在ReentrantLock.lock方法里面的线程，也是不响应中断的，如果想要响应中断，可以使用ReentrantLock.lockInterruptibly方法。</p>
+<p>其ReentrantLock底层是使用LockSupport.park方法进行等待的，前面说了LockSupport.park是响应中断的。</p>
+<p>当调用interrupt方法时，会把中断状态设置为true，然后park方法会去判断中断状态，如果为true，就直接返回，然后往下继续执行，并不会抛出异常。注意，这里并不会清除中断标志。（Object.wait()、Thread.join、Thread.sleep方法则会清除中断状态）</p>
+<p>当线程进入ReentrantLock.lock方法里面进行阻塞后，此时调用Thread.interrupt()方法之后，该线程是会被中断被唤醒的，但是唤醒之后，会调用LockSupport.park再次进入等待状态，所以仅从宏观（表面）上面看ReentrantLock.lock是不支持响应中断的，从微观（原理）上面讲ReentrantLock.lock内部确实中断了响应，但是还是会被迫进行等待状态。（当然，如果这期间抢到锁了，会在aqs里调用selfInterrupt补一下中断状态）</p>
 <h2 id="java锁分类"><a href="#java锁分类" class="headerlink" title="java锁分类"></a>java锁分类</h2><p><img src="https://s3.ax1x.com/2020/11/20/DQg6k6.png" alt="DQg6k6.png"></p>
 <p>synchronized是一个重量级的，阻塞的，非公平的，可重入的，排他的，悲观锁。</p>
 <p>无锁即使cas。Java中的CAS操作，由sun.misc.Unsafe类里面的<code>compareAndSwapInt()</code>和<code>compareAndSwapLong()</code>等几个方法包装提供。HotSpot虚拟机在内部对这些方法做了特殊处理，即时编译出来的结果就是一条平台相关的处理器CAS指令，没有方法调用的过程，或者可以认为是无条件内联进去了。</p>
@@ -2336,9 +3075,9 @@ private void doSomething(){
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -3110,9 +3849,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> jvm </tag>
-            
             <tag> classLoader </tag>
+            
+            <tag> jvm </tag>
             
         </tags>
         
@@ -3258,9 +3997,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> jvm </tag>
-            
             <tag> classLoader </tag>
+            
+            <tag> jvm </tag>
             
         </tags>
         

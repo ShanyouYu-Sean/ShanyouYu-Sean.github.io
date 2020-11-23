@@ -63,7 +63,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,并发,jvm">
+    <meta name="keywords" content="小鱼肖恩,jvm,并发">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -248,11 +248,11 @@
     <meta property="og:title" content="jvm与并发 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="并发"> <meta property="og:article:tag" content="jvm"> 
+    <meta property="og:article:tag" content="jvm"> <meta property="og:article:tag" content="并发"> 
 
     
         <meta property="article:published_time" content="Wed Nov 18 2020 10:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Fri Nov 20 2020 18:32:26 GMT+0800">
+        <meta property="article:modified_time" content="Mon Nov 23 2020 16:29:52 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -275,7 +275,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2020/11/18/jvm-multithread/index.html",
     "headline": "jvm与并发",
     "datePublished": "Wed Nov 18 2020 10:00:00 GMT+0800",
-    "dateModified": "Fri Nov 20 2020 18:32:26 GMT+0800",
+    "dateModified": "Mon Nov 23 2020 16:29:52 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -293,7 +293,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": ",并发,jvm小鱼肖恩",
+    "keywords": ",jvm,并发小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -376,7 +376,7 @@
     </button>
 
     <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
-        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Java中的内存并发模型"><span class="post-toc-number">1.</span> <span class="post-toc-text">Java中的内存并发模型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#并发的三个特性"><span class="post-toc-number">2.</span> <span class="post-toc-text">并发的三个特性</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#volatile"><span class="post-toc-number">3.</span> <span class="post-toc-text">volatile</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保证可见性"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">保证可见性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#通过内存屏障避免指令重排"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">通过内存屏障避免指令重排</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#synchronized"><span class="post-toc-number">4.</span> <span class="post-toc-text">synchronized</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#happens-before"><span class="post-toc-number">5.</span> <span class="post-toc-text">happens-before</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java线程"><span class="post-toc-number">6.</span> <span class="post-toc-text">java线程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#状态转换"><span class="post-toc-number">6.0.1.</span> <span class="post-toc-text">状态转换</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java锁分类"><span class="post-toc-number">7.</span> <span class="post-toc-text">java锁分类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#轻量级锁"><span class="post-toc-number">7.0.1.</span> <span class="post-toc-text">轻量级锁</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#偏向锁"><span class="post-toc-number">7.0.2.</span> <span class="post-toc-text">偏向锁</span></a></li></ol></li></ol></li></ol>
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Java中的内存并发模型"><span class="post-toc-number">1.</span> <span class="post-toc-text">Java中的内存并发模型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#并发的三个特性"><span class="post-toc-number">2.</span> <span class="post-toc-text">并发的三个特性</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#volatile"><span class="post-toc-number">3.</span> <span class="post-toc-text">volatile</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保证可见性"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">保证可见性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#通过内存屏障避免指令重排"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">通过内存屏障避免指令重排</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#synchronized"><span class="post-toc-number">4.</span> <span class="post-toc-text">synchronized</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#happens-before"><span class="post-toc-number">5.</span> <span class="post-toc-text">happens-before</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java线程"><span class="post-toc-number">6.</span> <span class="post-toc-text">java线程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#状态转换"><span class="post-toc-number">6.0.1.</span> <span class="post-toc-text">状态转换</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#线程中断"><span class="post-toc-number">6.0.2.</span> <span class="post-toc-text">线程中断</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#响应中断的方法和不响应中断的方法"><span class="post-toc-number">6.0.3.</span> <span class="post-toc-text">响应中断的方法和不响应中断的方法</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java锁分类"><span class="post-toc-number">7.</span> <span class="post-toc-text">java锁分类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#轻量级锁"><span class="post-toc-number">7.0.1.</span> <span class="post-toc-text">轻量级锁</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#偏向锁"><span class="post-toc-number">7.0.2.</span> <span class="post-toc-text">偏向锁</span></a></li></ol></li></ol></li></ol>
     </ul>
     
 
@@ -625,6 +625,27 @@ private void doSomething(){
 <li>结束(Terminated):已终止线程的线程状态，线程已经结束执行。</li>
 </ul>
 <p><img src="https://s3.ax1x.com/2020/11/20/DQg8wq.png" alt="DQg8wq.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/23/DJTGa6.png" alt="DJTGa6.png"></p>
+<h4 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h4><p>感觉必须要加一段线程中断和响应中断的详解，不然后续对aqs理解会有问题：</p>
+<p>Java没有提供任何机制来安全地终止线程，但提供了中断机制，即thread.interrupt()方法。线程中断是一种协作式的机制，并不是说调用了中断方法之后目标线程一定会立即中断，而是发送了一个中断请求给目标线程，目标线程会自行在某个取消点中断自己。这种设定很有必要，因为如果不论线程执行到何种情况都立即响应中断的话，很容易造成某些对象状态不一致的情况出现。</p>
+<p>每个线程对象里都有一个 boolean 类型的标识（不一定就要是 Thread 类的字段，实际上也的确不是，这几个方法最终都是通过 native 方法来完成的），代表着是否有中断请求（该请求可以来自所有线程，包括被中断的线程本身）。例如，当线程 t1 想中断线程 t2，只需要在线程 t1 中将线程 t2 对象的中断标识置为 true，然后线程 2 可以选择在合适的时候处理该中断请求，甚至可以不理会该请求，就像这个线程没有被中断一样。</p>
+<p>涉及到中断的线程基础方法有三个：interrupt()、isInterrupted()、interrupted()，它们都位于Thread类下。</p>
+<ul>
+<li><p>interrupt()方法：对目标线程发送中断请求，看其源码会发现最终是调用了一个本地方法实现的线程中断；</p>
+</li>
+<li><p>interrupted()方法：返回目标线程是否中断的布尔值（通过本地方法实现），且返回后会重置中断状态为未中断；换句话说，如果连续两次调用该方法，则第二次调用将返回 false（在第一次调用已清除了其中断状态之后，且第二次调用检验完中断状态前，当前线程再次中断的情况除外）。</p>
+</li>
+<li><p>isInterrupted()方法：该方法返回的是线程中断与否的布尔值（通过本地方法实现），不会重置中断状态；</p>
+</li>
+</ul>
+<p>其中，interrupt 方法是唯一能将中断状态设置为 true 的方法。静态方法 interrupted 会将当前线程的中断状态清除，但这个方法的命名极不直观，很容易造成误解，需要特别注意。</p>
+<p>Thread.interrupt()方法仅仅是在当前线程中打了一个停止的标识将中断标志修改为true，并没有真正的停止线程。如果在此基础上进入堵塞状态（sleep(),wait(),join()）,马上就会抛出一个InterruptedException，且中断标志被清除，重新设置为false。记住一点，当调用Thread.interrupt()，还没有进行中断时，此时的中断标志位是true，当发生中断之后（执行到sleep(),wait(),join()），这个时候的中断标志位就是false了。</p>
+<p>中断是通过调用Thread.interrupt()方法来做的. 这个方法通过修改了被调用线程的中断状态来告知那个线程, 说它被中断了. 对于非阻塞中的线程, 只是改变了中断状态, 即Thread.isInterrupted()将返回true; 对于可取消的阻塞状态中的线程, 比如等待在这些函数上的线程, Thread.sleep(), Object.wait(), Thread.join(), 这个线程收到中断信号后, 会抛出InterruptedException, 同时会把中断状态置回为false.但调用Thread.interrupted()会对中断状态进行复位。</p>
+<h4 id="响应中断的方法和不响应中断的方法"><a href="#响应中断的方法和不响应中断的方法" class="headerlink" title="响应中断的方法和不响应中断的方法"></a>响应中断的方法和不响应中断的方法</h4><p>响应中断的方法： 线程进入等待或是超时等待的状态后，调用interrupt方法都是会响应中断的，所以响应中断的方法：Object.wait()、Thread.join、Thread.sleep、LockSupport.park的有参和无参方法。</p>
+<p>不响应中断的方法：线程进入阻塞状态后，是不响应中断的，等待进入synchronized的方法或是代码块，都是会被阻塞的，此时不会响应中断，另外还有一个不响应中断的，那就是阻塞在ReentrantLock.lock方法里面的线程，也是不响应中断的，如果想要响应中断，可以使用ReentrantLock.lockInterruptibly方法。</p>
+<p>其ReentrantLock底层是使用LockSupport.park方法进行等待的，前面说了LockSupport.park是响应中断的。</p>
+<p>当调用interrupt方法时，会把中断状态设置为true，然后park方法会去判断中断状态，如果为true，就直接返回，然后往下继续执行，并不会抛出异常。注意，这里并不会清除中断标志。（Object.wait()、Thread.join、Thread.sleep方法则会清除中断状态）</p>
+<p>当线程进入ReentrantLock.lock方法里面进行阻塞后，此时调用Thread.interrupt()方法之后，该线程是会被中断被唤醒的，但是唤醒之后，会调用LockSupport.park再次进入等待状态，所以仅从宏观（表面）上面看ReentrantLock.lock是不支持响应中断的，从微观（原理）上面讲ReentrantLock.lock内部确实中断了响应，但是还是会被迫进行等待状态。（当然，如果这期间抢到锁了，会在aqs里调用selfInterrupt补一下中断状态）</p>
 <h2 id="java锁分类"><a href="#java锁分类" class="headerlink" title="java锁分类"></a>java锁分类</h2><p><img src="https://s3.ax1x.com/2020/11/20/DQg6k6.png" alt="DQg6k6.png"></p>
 <p>synchronized是一个重量级的，阻塞的，非公平的，可重入的，排他的，悲观锁。</p>
 <p>无锁即使cas。Java中的CAS操作，由sun.misc.Unsafe类里面的<code>compareAndSwapInt()</code>和<code>compareAndSwapLong()</code>等几个方法包装提供。HotSpot虚拟机在内部对这些方法做了特殊处理，即时编译出来的结果就是一条平台相关的处理器CAS指令，没有方法调用的过程，或者可以认为是无条件内联进去了。</p>
@@ -853,7 +874,7 @@ private void doSomething(){
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
             </ul>
         </li>
         
@@ -871,7 +892,7 @@ private void doSomething(){
             </a>
             <ul class="dropdown-menu">
                 <li>
-                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a>
             </ul>
         </li>
         

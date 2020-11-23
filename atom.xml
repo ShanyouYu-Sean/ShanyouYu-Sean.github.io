@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-22T14:01:08.196Z</updated>
+  <updated>2020-11-23T09:14:59.301Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,96 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>juc之CyclicBarrier</title>
+    <link href="http://seanthefish.com/2020/11/22/juc-8/"/>
+    <id>http://seanthefish.com/2020/11/22/juc-8/</id>
+    <published>2020-11-22T07:00:00.000Z</published>
+    <updated>2020-11-23T09:14:59.301Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>juc之CountDownLatch</title>
+    <link href="http://seanthefish.com/2020/11/22/juc-7/"/>
+    <id>http://seanthefish.com/2020/11/22/juc-7/</id>
+    <published>2020-11-22T06:00:00.000Z</published>
+    <updated>2020-11-23T09:02:23.601Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>juc之Semaphore</title>
+    <link href="http://seanthefish.com/2020/11/22/juc-6/"/>
+    <id>http://seanthefish.com/2020/11/22/juc-6/</id>
+    <published>2020-11-22T05:00:00.000Z</published>
+    <updated>2020-11-23T08:30:38.563Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>juc之ReentrantReadWriteLock</title>
@@ -40,9 +130,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -70,9 +160,39 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
+  </entry>
+  
+  <entry>
+    <title>juc之aqs</title>
+    <link href="http://seanthefish.com/2020/11/22/juc-2/"/>
+    <id>http://seanthefish.com/2020/11/22/juc-2/</id>
+    <published>2020-11-22T02:00:00.000Z</published>
+    <updated>2020-11-23T08:13:17.037Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;今天说aqs，juc中的绝对核心。内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -100,39 +220,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
     
-  </entry>
-  
-  <entry>
-    <title>juc之aqs</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-2/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-2/</id>
-    <published>2020-11-22T02:00:00.000Z</published>
-    <updated>2020-11-22T13:51:02.840Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;今天说aqs，juc中的绝对核心。内容参考自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
     
   </entry>
   
@@ -162,9 +252,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -218,9 +308,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/cas/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
-    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
     
   </entry>
   
@@ -229,7 +319,7 @@
     <link href="http://seanthefish.com/2020/11/18/jvm-multithread/"/>
     <id>http://seanthefish.com/2020/11/18/jvm-multithread/</id>
     <published>2020-11-18T02:00:00.000Z</published>
-    <updated>2020-11-20T10:32:26.853Z</updated>
+    <updated>2020-11-23T08:29:52.636Z</updated>
     
     <summary type="html">
     
@@ -248,9 +338,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/jvm/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -336,9 +426,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
     
     
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
-    
       <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
     
   </entry>
   
@@ -366,9 +456,9 @@
       <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
     
     
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
-    
       <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
+    
+      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
     
   </entry>
   
@@ -520,88 +610,6 @@
       <category term="fe" scheme="http://seanthefish.com/tags/fe/"/>
     
       <category term="oauth" scheme="http://seanthefish.com/tags/oauth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一次艰难的troubleshooting</title>
-    <link href="http://seanthefish.com/2020/05/11/troubleshooting-ram-guards/"/>
-    <id>http://seanthefish.com/2020/05/11/troubleshooting-ram-guards/</id>
-    <published>2020-05-11T02:00:00.000Z</published>
-    <updated>2020-11-18T08:41:13.481Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h1 id=&quot;一次艰难的troubleshooting&quot;&gt;&lt;a href=&quot;#一次艰难的troubleshooting&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="fe" scheme="http://seanthefish.com/categories/fe/"/>
-    
-      <category term="oauth" scheme="http://seanthefish.com/categories/fe/oauth/"/>
-    
-    
-      <category term="fe" scheme="http://seanthefish.com/tags/fe/"/>
-    
-      <category term="oauth" scheme="http://seanthefish.com/tags/oauth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JPA在多表联查上的一些坑</title>
-    <link href="http://seanthefish.com/2020/04/11/jpa-improve/"/>
-    <id>http://seanthefish.com/2020/04/11/jpa-improve/</id>
-    <published>2020-04-11T02:00:00.000Z</published>
-    <updated>2020-11-18T08:49:41.831Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;JPA的使用场景-（仅针对查询）&quot;&gt;&lt;a href=&quot;#JPA的使用场景-（仅针对查询）&quot; class=&quot;headerlink&quot; title=&quot;JPA的使用场景 （仅针对查询）&quot;&gt;&lt;/a&gt;JPA的使用场景
-        
-      
-    
-    </summary>
-    
-      <category term="jpa" scheme="http://seanthefish.com/categories/jpa/"/>
-    
-    
-      <category term="jpa" scheme="http://seanthefish.com/tags/jpa/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在spring中使用cors</title>
-    <link href="http://seanthefish.com/2018/11/06/spring-cors/"/>
-    <id>http://seanthefish.com/2018/11/06/spring-cors/</id>
-    <published>2018-11-06T06:00:00.000Z</published>
-    <updated>2018-11-06T08:56:33.319Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;网上有很多教程，基本上都是清一色的&lt;code&gt;@CrossOrigin&lt;/code&gt;，&lt;code&gt;@CrossOrigin&lt;/code&gt;在和spring security一起用的时候不生效，因为filter chain
-        
-      
-    
-    </summary>
-    
-      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
-    
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
     
   </entry>
   

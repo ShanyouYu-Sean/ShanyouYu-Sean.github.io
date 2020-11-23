@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            juc之Semaphore | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,juc,并发">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/22/juc-6/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/22/juc-6/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="juc之Semaphore | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="juc"> <meta property="og:article:tag" content="并发"> 
+
+    
+        <meta property="article:published_time" content="Sun Nov 22 2020 13:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Mon Nov 23 2020 16:30:38 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/22/juc-6/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/22/juc-6/index.html",
+    "headline": "juc之Semaphore",
+    "datePublished": "Sun Nov 22 2020 13:00:00 GMT+0800",
+    "dateModified": "Mon Nov 23 2020 16:30:38 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",juc,并发小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Semaphore-是什么"><span class="post-toc-number">1.</span> <span class="post-toc-text">Semaphore 是什么</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#用semaphore-实现停车场提示牌功能"><span class="post-toc-number">2.</span> <span class="post-toc-text">用semaphore 实现停车场提示牌功能</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#源码"><span class="post-toc-number">3.</span> <span class="post-toc-text">源码</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#acquire-响应中断获取资源"><span class="post-toc-number">4.</span> <span class="post-toc-text">acquire 响应中断获取资源</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#acquireUnInterruptibly-不响应中断获取资源"><span class="post-toc-number">5.</span> <span class="post-toc-text">acquireUnInterruptibly 不响应中断获取资源</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#acquire-int-amp-acquireUninterruptibly-int-指定申请的资源数目的获取"><span class="post-toc-number">6.</span> <span class="post-toc-text">acquire(int) &amp; acquireUninterruptibly(int) 指定申请的资源数目的获取</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#release-释放资源"><span class="post-toc-number">7.</span> <span class="post-toc-text">release 释放资源</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#tryAcquire-amp-tryAcquire-timeout-方法"><span class="post-toc-number">8.</span> <span class="post-toc-text">tryAcquire &amp; tryAcquire(timeout) 方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#drainPermits-amp-reducePermits-修改剩余共享资源数量"><span class="post-toc-number">9.</span> <span class="post-toc-text">drainPermits &amp; reducePermits 修改剩余共享资源数量</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结："><span class="post-toc-number">10.</span> <span class="post-toc-text">总结：</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                juc之Semaphore
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 22, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACYklEQVR42u3aUXIqIRQEUPe/6WQBPrX7MjC+1OHLMspwSBVgcx8/f7o98PDw8PDw8PDwvoz3iNvzt55f/+NhwSffv1+PDQ8PD+8I78NS+zTEV+DnvyYTNJu4V5/Bw8PDO8l7P8SX3cXfWtlykqfg4eHhfTMvWfrbbSah4uHh4f2PvB0H8eQpeHh4eN/Jy3/wt1HstfHuxqwFDw8PL+bll0znXx+938PDw8MLeG1ro9g2nlhveHh4eLt5O0oH8omYBbsfesPDw8PbzPvww34UJeQFWCtlB/W+h4eHh7eNNyu6et/bLIBoY188PDy8u3grR+38WLwSfBSlA3h4eHhHeEkXSQ/5EIdH5/YCDA8PD+9SXh62tkX/+fbQvoOHh4d3F69dphP8ekH/yqEfDw8P7yRvvYygLRRowXUYgYeHh7eNt3JxlQ93dryuJwsPDw9vM68daD4F7fXYbJrw8PDwzvPy+KAd1izmyC+98PDw8O7l5YyNC3pccDAMI/Dw8PAu4s2Ozkk0sBJVtNEwHh4e3kle0ulscV+/ykr+AXh4eHh38VrSVUFDcv2WH9zx8PDw7uLNigDacqvZJnFB1oKHh4d3Ea89Ouffzacy2VqiLQQPDw9vM69tK0UDbWCRX4/h4eHhneQ94taGCFddfeVTgIeHh3eSl28G+eI+KzJYKUrAw8PDO89rC1LzsoP8cqstVK1Tajw8PLybeOsH6zbIKI77eHh4eF/Jm4HboQ+v2fDw8PAO8vIwYlaA1caybWCBh4eHd5LXRgDr4cJV0QYeHh7eed7fa3h4eHh4eHh4eF/QfgH6ZBEk0b3CjAAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/juc/">juc</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/并发/">并发</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=juc之Semaphore&url=http://seanthefish.com/2020/11/22/juc-6/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/22/juc-6/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=juc之Semaphore&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/22/juc-6/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<h2 id="Semaphore-是什么"><a href="#Semaphore-是什么" class="headerlink" title="Semaphore 是什么"></a>Semaphore 是什么</h2><p>Semaphore是JUC包提供的一个共享锁，一般称之为信号量。可以用来控制同时访问特定资源的线程数量，通过协调各个线程，以保证合理的使用资源。</p>
+<p>Semaphore通过自定义的同步器维护了一个或多个共享资源，线程通过调用acquire获取共享资源，通过调用release释放。</p>
+<p>注意Semaphore并非lock的子类，所以加锁和解锁，用的是acquire，release，tryacquire，tryrelease</p>
+<p>可以把它简单的理解成我们停车场入口立着的那个显示屏，每有一辆车进入停车场显示屏就会显示剩余车位减1，每有一辆车从停车场出去，显示屏上显示的剩余车辆就会加1，当显示屏上的剩余车位为0时，停车场入口的栏杆就不会再打开，车辆就无法进入停车场了，直到有一辆车从停车场出去为止。</p>
+<h2 id="用semaphore-实现停车场提示牌功能"><a href="#用semaphore-实现停车场提示牌功能" class="headerlink" title="用semaphore 实现停车场提示牌功能"></a>用semaphore 实现停车场提示牌功能</h2><p>业务场景 ：</p>
+<ul>
+<li>停车场容纳总停车量10。</li>
+<li>当一辆车进入停车场后，显示牌的剩余车位数响应的减1.</li>
+<li>每有一辆车驶出停车场后，显示牌的剩余车位数响应的加1。</li>
+<li>停车场剩余车位不足时，车辆只能在外面等待。</li>
+</ul>
+<pre><code class="java">public class TestCar {
+​
+    //停车场同时容纳的车辆10
+    private  static  Semaphore semaphore=new Semaphore(10);
+​
+    public static void main(String[] args) {
+​
+        //模拟100辆车进入停车场
+        for(int i=0;i&lt;100;i++){
+​
+            Thread thread=new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println(&quot;====&quot;+Thread.currentThread().getName()+&quot;来到停车场&quot;);
+                        if(semaphore.availablePermits()==0){
+                            System.out.println(&quot;车位不足，请耐心等待&quot;);
+                        }
+                        semaphore.acquire();//获取令牌尝试进入停车场
+                        System.out.println(Thread.currentThread().getName()+&quot;成功进入停车场&quot;);
+                        Thread.sleep(new Random().nextInt(10000));//模拟车辆在停车场停留的时间
+                        System.out.println(Thread.currentThread().getName()+&quot;驶出停车场&quot;);
+                        semaphore.release();//释放令牌，腾出停车场车位
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            },i+&quot;号车&quot;);
+​
+            thread.start();
+​
+        }
+​
+    }
+}
+</code></pre>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre><code class="java">    public Semaphore(int permits) {
+        sync = new NonfairSync(permits);
+    }
+
+    public Semaphore(int permits, boolean fair) {
+        sync = fair ? new FairSync(permits) : new NonfairSync(permits);
+    }
+</code></pre>
+<p>初始化Semaphore时需要指定共享资源的个数。Semaphore提供了两种模式：公平模式&amp;非公平模式。如果不指定工作模式的话，默认工作在非公平模式下。后面我们将看到，两种模式的区别在于获取共享资源时的排序策略。Semaphore有三个内部类：Sync&amp;NonfairSync&amp;FairSync。后两个继承自Sync，Sync继承自AQS。除了序列化版本号之外，Semaphore只有一个成员变量sync，公平模式下sync初始化为FairSync，非公平模式下sync初始化为NonfairSync。</p>
+<h2 id="acquire-响应中断获取资源"><a href="#acquire-响应中断获取资源" class="headerlink" title="acquire 响应中断获取资源"></a>acquire 响应中断获取资源</h2><p>Semaphore提供了两种获取资源的方式：响应中断&amp;不响应中断。我们先来看一下响应中断的获取。</p>
+<pre><code class="java">public void acquire() throws InterruptedException {
+        sync.acquireSharedInterruptibly(1);
+    }
+</code></pre>
+<p>acquire方法由同步器sync调用上层AQS提供的acquireSharedInterruptibly方法获取：</p>
+<pre><code class="java">public final void acquireSharedInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (tryAcquireShared(arg) &lt; 0)
+            doAcquireSharedInterruptibly(arg);
+    }
+</code></pre>
+<p>acquireSharedInterruptibly方法先检测中断。然后调用tryAcquireShared方法试图获取共享资源。这时公平模式和非公平模式的代码执行路径发生分叉，FairSync和NonfairSync各自重写了tryAcquireShared方法。</p>
+<p>我们先来看下非公平模式下的tryAcquireShared方法：</p>
+<pre><code class="java">     protected int tryAcquireShared(int acquires) {
+            return nonfairTryAcquireShared(acquires);
+        }
+</code></pre>
+<p>它直接代用了父类Sync提供的nonfairTryAcquireShared方法：</p>
+<pre><code class="java">final int nonfairTryAcquireShared(int acquires) {
+            for (;;) {
+                int available = getState();
+                int remaining = available - acquires;
+                if (remaining &lt; 0 ||
+                    compareAndSetState(available, remaining))
+                    return remaining;
+            }
+        }
+</code></pre>
+<p>注意，这里是一个CAS自旋。因为Semaphore是一个共享锁，可能有多个线程同时申请共享资源，因此CAS操作可能失败。直到成功获取返回剩余资源数目，或者发现没有剩余资源返回负值代表申请失败。有一个问题，为什么我们不在CAS操作失败后就直接返回失败呢？因为这样做虽然不会导致错误，但会降低效率：在还有剩余资源的情况下，一个线程因为竞争导致CAS失败后被放入等待序列尾，一定在队列头部有一个线程被唤醒去试图获取资源，这比直接自旋继续获取多了操作等待队列的开销。(有剩余资源的时候就不断的自旋获取，没有剩的了再入队)</p>
+<p>这里“非公平”的语义体现在：如果一个线程通过nonfairTryAcquireShared成功获取了共享资源，对于此时正在等待队列中的线程来说，可能是不公平的：队列中线程先到，却没能先获取资源。</p>
+<p>如果tryAcquireShared没能成功获取，acquireSharedInterruptibly方法调用doAcquireSharedInterruptibly方法将当前线程放入等待队列并开始自旋检测获取资源：</p>
+<pre><code class="java">private void doAcquireSharedInterruptibly(int arg)
+        throws InterruptedException {
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>我们注意到，doAcquireSharedInterruptibly中，当一个线程从parkAndCheckInterrupt方法中被中断唤醒之后，直接抛出了中断异常。还记得我们分析AQS时的doAcquireShared方法吗，它在这里的处理方式是用一个局部变量interrupted记录下这个异常但不立即处理，而是等到成功获取资源之后返回这个中断标志，并在上层调用selfInterrupt方法补上中断。<br>这正是两个方法的关键区别：是否及时响应中断。</p>
+<p>我们再来看公平模式下的tryAcquireShared方法：</p>
+<pre><code class="java">protected int tryAcquireShared(int acquires) {
+            for (;;) {
+                if (hasQueuedPredecessors())
+                    return -1;
+                int available = getState();
+                int remaining = available - acquires;
+                if (remaining &lt; 0 ||
+                    compareAndSetState(available, remaining))
+                    return remaining;
+            }
+        }
+</code></pre>
+<p>相比较非公平模式的nonfairTryAcquireShared方法，公平模式下的tryAcquireShared方法在试图获取之前做了一个判断，如果发现等对队列中有线程在等待获取资源，就直接返回-1表示获取失败。当前线程会被上层的acquireSharedInterruptibly方法调用doAcquireShared方法放入等待队列中。这正是“公平”模式的语义：如果有线程先于我进入等待队列且正在等待，就直接进入等待队列，效果便是各个线程按照申请的顺序获得共享资源，具有公平性。</p>
+<h2 id="acquireUnInterruptibly-不响应中断获取资源"><a href="#acquireUnInterruptibly-不响应中断获取资源" class="headerlink" title="acquireUnInterruptibly 不响应中断获取资源"></a>acquireUnInterruptibly 不响应中断获取资源</h2><pre><code class="java">    public void acquireUninterruptibly() {
+        sync.acquireShared(1);
+    }
+</code></pre>
+<p>acquireUnInterruptibly方法调用AQS提供的acquireShared方法：</p>
+<pre><code class="java"> public final void acquireShared(int arg) {
+        if (tryAcquireShared(arg) &lt; 0)
+            doAcquireShared(arg);
+    }
+</code></pre>
+<p>acquireShared方法首先试图获取资源，这与acquireSharedInterruptibly方法相比，没有先检测中断的这一步。紧接着调用doAcquireShared方法，由于这个方法在AQS中已经详细分析过，这里我们只关注它与doAcquireSharedInterruptibly方法的区别：</p>
+<pre><code class="java"> private void doAcquireShared(int arg) {
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        if (interrupted)
+                            selfInterrupt();
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>正如刚刚说过的，区别只在线程从parkAndCheckInterrupt方法中因中断而返回时的处理：在这里它没有抛出异常，而是用一个局部变量interrupted记录下这个异常但不立即处理，而是等到成功获取资源之后返回这个中断标志，并在上层调用selfInterrupt方法补上中断。</p>
+<h2 id="acquire-int-amp-acquireUninterruptibly-int-指定申请的资源数目的获取"><a href="#acquire-int-amp-acquireUninterruptibly-int-指定申请的资源数目的获取" class="headerlink" title="acquire(int) &amp; acquireUninterruptibly(int) 指定申请的资源数目的获取"></a>acquire(int) &amp; acquireUninterruptibly(int) 指定申请的资源数目的获取</h2><pre><code class="java">public void acquire(int permits) throws InterruptedException {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.acquireSharedInterruptibly(permits);
+    }
+
+    public void acquireUninterruptibly(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.acquireShared(permits);
+    }
+</code></pre>
+<p>可以看到，与不指定数目时的获取的区别仅在参数值，不再赘述。</p>
+<h2 id="release-释放资源"><a href="#release-释放资源" class="headerlink" title="release 释放资源"></a>release 释放资源</h2><p>公平模式和非公平模式的释放资源操作是一样的：</p>
+<pre><code class="java">public void release() {
+        sync.releaseShared(1);
+    }
+
+    public void release(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        sync.releaseShared(permits);
+    }
+</code></pre>
+<p>调用AQS提供的releaseShared方法：</p>
+<pre><code class="java">public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+</code></pre>
+<p>releaseShared方法首先调用我们重写的tryReleaseShared方法试图释放资源。然后调用doReleaseShared方法唤醒队列之后的等待线程。我们主要关注tryReleaseShared方法：</p>
+<pre><code class="java">protected final boolean tryReleaseShared(int releases) {
+            for (;;) {
+                int current = getState();
+                int next = current + releases;
+                if (next &lt; current) // overflow
+                    throw new Error(&quot;Maximum permit count exceeded&quot;);
+                if (compareAndSetState(current, next))
+                    return true;
+            }
+        }
+</code></pre>
+<p>这个方法也是一个CAS自旋，原因是应为Semaphore是一个共享锁，可能有多个线程同时释放资源，因此CAS操作可能失败。最后方法总会成功释放并返回true（如果不出错的话）。</p>
+<h2 id="tryAcquire-amp-tryAcquire-timeout-方法"><a href="#tryAcquire-amp-tryAcquire-timeout-方法" class="headerlink" title="tryAcquire &amp; tryAcquire(timeout) 方法"></a>tryAcquire &amp; tryAcquire(timeout) 方法</h2><pre><code class="java">public boolean tryAcquire() {
+        return sync.nonfairTryAcquireShared(1) &gt;= 0;
+    }
+
+    public boolean tryAcquire(long timeout, TimeUnit unit)
+        throws InterruptedException {
+        return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
+    }
+
+    public boolean tryAcquire(int permits) {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        return sync.nonfairTryAcquireShared(permits) &gt;= 0;
+    }
+
+    public boolean tryAcquire(int permits, long timeout, TimeUnit unit)
+        throws InterruptedException {
+        if (permits &lt; 0) throw new IllegalArgumentException();
+        return sync.tryAcquireSharedNanos(permits, unit.toNanos(timeout));
+    }
+</code></pre>
+<p>没有指定等待时间的tryAcquire调用的是nonfairTryAcquireShared方法，我们已经分析过，不再赘述。我们重点关注指定等待时长的方法。限时等待是通过调用AQS提供的tryAcquireSharedNanos方法实现的：</p>
+<pre><code class="java">public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquireShared(arg) &gt;= 0 ||
+            doAcquireSharedNanos(arg, nanosTimeout);
+    }
+</code></pre>
+<p>注意：限时等待默认都是及时响应中断的。方法开始先检测中断，然后调用tryAcquireShared方法试图获取资源，如果成功的话直接返回true，不成功则调用doAcquireSharedNanos方法：</p>
+<pre><code class="java">private boolean doAcquireSharedNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (nanosTimeout &lt;= 0L)
+            return false;
+        final long deadline = System.nanoTime() + nanosTimeout;
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r &gt;= 0) {
+                        setHeadAndPropagate(node, r);
+                        p.next = null; // help GC
+                        failed = false;
+                        return true;
+                    }
+                }
+                nanosTimeout = deadline - System.nanoTime();
+                if (nanosTimeout &lt;= 0L)
+                    return false;
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    nanosTimeout &gt; spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if (Thread.interrupted())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>方法在自旋之前先计算了一个结束等待的时间节点deadline，然后便开始自旋，每次自旋都要计算一下剩余等待时间nanosTimeout，如果nanosTimeout小于等于0，说明已经到达deadline，直接返回false表示超时。</p>
+<p>有一点值得注意，spinForTimeoutThreshold这个值规定了一个阈值，当剩余等待时间小于这个值的时候，线程将不再被park，而是一直在自旋试图获取资源。关于这个值的作用Doug Lea是这样注释的：</p>
+<pre><code class="java">/**
+     * The number of nanoseconds for which it is faster to spin
+     * rather than to use timed park. A rough estimate suffices
+     * to improve responsiveness with very short timeouts.
+     */
+</code></pre>
+<p>park和unpark操作需要一定的开销，当nanosTimeout很小的时候，这个开销就相对很大了。这个阈值的设置可以让短时等待的线程一直保持自旋，可以提高短时等待的反应效率，而由于nanosTimeout很小，自旋又不会有过多的开销。</p>
+<p>除此之外，doAcquireSharedNanos方法与不限时等待的doAcquireShared方法还有两点重要区别：</p>
+<ul>
+<li>由于有等待时限，所以线程从park方法返回时我们不能确定返回的原因是中断还是超时，因此需要调用interrupted方法检测一下中断标志；</li>
+<li>doAcquireSharedNanos方法是及时响应中断的，而doAcquireShared方法延迟处理中断。</li>
+</ul>
+<h2 id="drainPermits-amp-reducePermits-修改剩余共享资源数量"><a href="#drainPermits-amp-reducePermits-修改剩余共享资源数量" class="headerlink" title="drainPermits &amp; reducePermits 修改剩余共享资源数量"></a>drainPermits &amp; reducePermits 修改剩余共享资源数量</h2><p>Semaphore提供了“耗尽”所有剩余共享资源的操作：</p>
+<pre><code class="java">public int drainPermits() {
+        return sync.drainPermits();
+    }
+</code></pre>
+<p>drainPermits调用了自定义同步器Sync的同名方法：</p>
+<pre><code class="java">        final int drainPermits() {
+            for (;;) {
+                int current = getState();
+                if (current == 0 || compareAndSetState(current, 0))
+                    return current;
+            }
+        }
+</code></pre>
+<p>用CAS自旋将剩余资源清空。</p>
+<p>我们再来看看“缩减”剩余共享资源的操作：</p>
+<pre><code class="java">protected void reducePermits(int reduction) {
+        if (reduction &lt; 0) throw new IllegalArgumentException();
+        sync.reducePermits(reduction);
+    }
+</code></pre>
+<p>首先，缩减必须是单向的，即只能减少不能增加，然后调用Sync的同名方法：</p>
+<pre><code class="java">final void reducePermits(int reductions) {
+            for (;;) {
+                int current = getState();
+                int next = current - reductions;
+                if (next &gt; current) // underflow
+                    throw new Error(&quot;Permit count underflow&quot;);
+                if (compareAndSetState(current, next))
+                    return;
+            }
+        }
+</code></pre>
+<p>用CAS自旋在剩余共享资源上做缩减。</p>
+<p>上述两个对共享资源数量的修改操作有两点需要注意：</p>
+<ul>
+<li>是不可逆的</li>
+<li>是对剩余资源的操作而不是全部资源，当剩余资源数目不足或已经为0时，方法就返回，正咋被占用的资源不参与。</li>
+</ul>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>Semaphore是JUC包提供的一个典型的共享锁，它通过自定义两种不同的同步器（FairSync&amp;NonfairSync）提供了公平&amp;非公平两种工作模式，两种模式下分别提供了限时/不限时、响应中断/不响应中断的获取资源的方法（限时获取总是及时响应中断的），而所有的释放资源的release操作是统一的。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/22/juc-6/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/22/juc-6/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/11/22/juc-7/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/22/juc-5/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
