@@ -192,16 +192,26 @@ public CyclicBarrier(int parties) {
     }
 </code></pre>
 <p>dowait方法是CyclicBarrier的精华。应该重点来理解。</p>
-<p>方法开头首先申请锁，然后做了两个判断：g.broken和Thread.interrupted()，这两个判断是分别处理两种小概率的事件：①该线程在等待锁的过程中，barrier被破坏②该线程在等待锁的过程中被中断。这两个事件应抛出相应的异常。接下来dowait方法修改了令count减1，如果此时count减为0，说明已经有parties个线程到达barrier，这时由最后到达barrier的线程去执行barrierCommand。注意，这里设置了一个布尔值ranAction，作用是来标识barrierCommand是否被正确执行完毕，如果执行失败，finally中会执行breakBarrier操作。如果count尚未减为0，则在Condition对象trip上执行await操作，注意：这里有一个InterruptedException的catch子句。当前线程在await中被中断时，会抛出InterruptedException，这时候如果g==generation&amp;&amp;!g.broken的话，我们执行breakBarrier操作，同时抛出这个异常；如果g!=generation或者g.broken==true的话，我们的操作是重置interrupt标志而不是抛出这个异常。这么做的原因我们分两种情况讨论：</p>
+<p>方法开头首先申请锁，然后做了两个判断：g.broken和Thread.interrupted()，这两个判断是分别处理两种小概率的事件：</p>
+<ul>
+<li>该线程在等待锁的过程中，barrier被破坏</li>
+<li>该线程在等待锁的过程中被中断。这两个事件应抛出相应的异常。</li>
+</ul>
+<p>接下来dowait方法修改了令count减1，如果此时count减为0，说明已经有parties个线程到达barrier，这时由最后到达barrier的线程去执行barrierCommand。注意，这里设置了一个布尔值ranAction，作用是来标识barrierCommand是否被正确执行完毕，如果执行失败，finally中会执行breakBarrier操作。</p>
+<p>如果count尚未减为0，则在Condition对象trip上执行await操作，注意：这里有一个InterruptedException的catch子句。当前线程在await中被中断时，会抛出InterruptedException，这时候如果g==generation&amp;&amp;!g.broken的话，我们执行breakBarrier操作，同时抛出这个异常；如果g!=generation或者g.broken==true的话，我们的操作是重置interrupt标志而不是抛出这个异常。这么做的原因我们分两种情况讨论：</p>
 <ul>
 <li><p>g被破坏，这也是一个小概率事件，当前线程被中断后进入锁等待队列，此时另一个线程由于某种原因（超时或者被中断）在他之前获取了锁并执行了breakBarrier方法，那么当前线程持有锁之后就不应再抛InterruptedException，逻辑上应该处理barrier被破坏事件，事实上在后续g.broken的检查中，他会抛出一个BrokenBarrierException。而当前的InterruptedException被我们捕获却没有做出处理，所以执行interrupt方法重置中断标志，交由上层程序处理。</p>
 </li>
 <li><p>g被更新：说明当前线程在即将完成等待之际被中断，此时抛异常没意义（后续检查g更新后会return index），这里重置interrupt标志，让线程继续执行，让这个标志由上层处理。</p>
 </li>
 </ul>
-<p>后续对g.broken和g!=generation的判断，分表代表了被唤醒线程（非最后一个到达barrier的线程，也不是被中断或第一个超时的线程）的两种退出方法的方式：第一种是以barrier被破坏告终（然后抛异常），第二个是barrier等到parties个线程，寿终正寝（返回该线程的到达次序index）。</p>
+<p>后续对g.broken和g!=generation的判断，分表代表了被唤醒线程（非最后一个到达barrier的线程，也不是被中断或第一个超时的线程）的两种退出方法的方式：</p>
+<ul>
+<li>第一种是以barrier被破坏告终（然后抛异常）</li>
+<li>第二个是barrier等到parties个线程，寿终正寝（返回该线程的到达次序index）。</li>
+</ul>
 <p>最后一个if是第一个超时线程执行breakBarrier操作并跑出异常。最后finally子句要释放锁。</p>
-<p>至此，整个doawait方法流程就分析完毕了，我们可以发现，在barrier上等待的线程，如果以抛异常结束的话，只有第一个线程会抛InterruptedException或TimeoutException并执行breakBarrier操作，其他等待线程只能抛BrokenBarrierException，逻辑上这也是合理的：一个barrier只能因超时或中断被破坏一次。</p>
+<p>至此，整个doawait方法流程就分析完毕了，我们可以发现，<strong>在barrier上等待的线程，如果以抛异常结束的话，只有第一个线程会抛InterruptedException或TimeoutException并执行breakBarrier操作，其他等待线程只能抛BrokenBarrierException，逻辑上这也是合理的：一个barrier只能因超时或中断被破坏一次。</strong></p>
 <pre><code class="java">private void nextGeneration() {
     trip.signalAll();
     count = parties;
@@ -214,7 +224,8 @@ private void breakBarrier() {
     trip.signalAll();
 }
 </code></pre>
-<p>doawait方法中用到的nextGeneration方法将所有等待线程唤醒，更新generation对象，复位count，进入下一轮任务。breakBarrier方法将generation状态值为broken，复位count（这个复位看上去没有用，但实际上，在broken之后reset之前，如果调用getNumberWaiting方法查看等待线程数的话，复位count是合理的），并唤醒所有等待线程。在调用reset更新generation之前，barrier将处于不可用状态。</p>
+<p>doawait方法中用到的nextGeneration方法将所有等待线程唤醒，更新generation对象，复位count，进入下一轮任务。</p>
+<p>breakBarrier方法将generation状态值为broken，复位count（这个复位看上去没有用，但实际上，在broken之后reset之前，如果调用getNumberWaiting方法查看等待线程数的话，复位count是合理的），并唤醒所有等待线程。在调用reset更新generation之前，barrier将处于不可用状态。</p>
 <p>reset（）方法</p>
 <pre><code class="java">public void reset() {
     final ReentrantLock lock = this.lock;
@@ -241,9 +252,9 @@ private void breakBarrier() {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -342,7 +353,7 @@ public boolean await(long timeout, TimeUnit unit)
 </code></pre>
 <p>方法一直自旋，直到成功释放或倒计时完毕。因为可能有超过count的线程调用countDown，因此releaseShared是可能失败的。当然在释放过程中也可能发生竞争，CAS自旋保证竞争发生时的正确执行。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>CountDownLatch是一个共享锁，但有些特别：他在初始化的时候锁住了所有共享资源，任何线程都可以调用countDown方法释放一个资源，当所有资源都被释放后，所有等待线程被唤醒。从而实现了倒计时的效果。</p>
-<p>CountDownLatch是一次性的，计数值不可恢复。CountDownLatch唤醒线程总是非公平的。</p>
+<p>CountDownLatch是一次性的，计数值不可恢复。</p>
 ]]></content>
       
         <categories>
@@ -356,9 +367,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -712,9 +723,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -1156,9 +1167,9 @@ private transient int firstReaderHoldCount;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -1535,9 +1546,225 @@ final ConditionObject newCondition() {
         
         <tags>
             
+            <tag> 并发 </tag>
+            
             <tag> juc </tag>
             
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之ReentrantLock]]></title>
+      <url>/2020/11/22/juc-3/</url>
+      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+<p>ReentrantLock是JUC包提供的一种可重入独占锁，它实现了Lock接口。与Semaphore类似，ReentrantLock也提供了两种工作模式：公平模式&amp;非公平模式，也是通过自定义两种同步器FairSync&amp;NonfairSync来实现的。</p>
+<h2 id="lock-不响应中断获取锁"><a href="#lock-不响应中断获取锁" class="headerlink" title="lock 不响应中断获取锁"></a>lock 不响应中断获取锁</h2><pre><code class="java">public void lock() {
+        sync.lock();
+    }
+</code></pre>
+<p>lock方法通过调用自定义同步器的同名方法来获取锁。注意：ReentrantLock自定义了两种同步器：FairSync&amp;NonfairSync，分别对应公平模式&amp;非公平模式。</p>
+<p>我们先来看一下非公平模式下的lock方法：</p>
+<pre><code class="java">final void lock() {
+            if (compareAndSetState(0, 1))
+                setExclusiveOwnerThread(Thread.currentThread());
+            else
+                acquire(1);
+        }
+</code></pre>
+<p>lock方法并没有直接调用AQS提供的acquire方法，而是先试探地获取了一下锁，CAS操作失败再去调用acquire方法。我的理解是为了提升性能。因为可能很多时候我们能在第一次试探获取时成功，而不需要经过acquire-&gt;tryAcquire-&gt;nonfairAcquire的调用过程：</p>
+<pre><code class="java">public final void acquire(int arg) {
+        if (!tryAcquire(arg) &amp;&amp;
+            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+            selfInterrupt();
+    }
+</code></pre>
+<p>AQS提供的acquire方法首先调用了我们自定义同步器重写的tryAcquire方法试图获取锁，如果失败的话先调用addWaiter方法将当前线程加入等待队列，然后对掉用acquireQueued方法进行自旋、检测获取锁的操作，直到成功获取锁。在自旋、检测的过程中如果被中断（注意：acquireQueued延迟处理中断），要在成功获取锁之后调用selfInterrupt方法“补上”这次中断。这里我们主要关注ReentrantLock重写的tryAcquire方法：</p>
+<pre><code class="java"> protected final boolean tryAcquire(int acquires) {
+            return nonfairTryAcquire(acquires);
+        }
+</code></pre>
+<p>nonfairSync的tryAcquire方法通过调用其父类Sync的nonfairTryAcquire方法实现：</p>
+<pre><code class="java">final boolean nonfairTryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc &lt; 0) // overflow
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+</code></pre>
+<p>nonfairTryAcquire方法首先判断锁是否被占用，如果锁可用，通过调用CAS操作试图获取锁，如果失败直接返回false；但如果锁被占用（state==0），并不代表没有机会，因为有可能占用锁的正是当前线程。如果正是当前线程占用了锁，让state做+1操作，然后返回true：这正是可重入的概念，一个已经获取锁的线程可以重复获取锁。</p>
+<p>我们再来看一下公平模式下的lock方法：</p>
+<pre><code class="java">final void lock() {
+            acquire(1);
+        }
+</code></pre>
+<p>fairSync的lock方法直接调用acquire，而没有想NonfairSync一样先试图获取，因为这样可能导致违反“公平”的语义：在已等待在队列中的线程之前获取了锁。</p>
+<p>由上面的分析可知，AQS的acquire方法调用了fairSync重写的tryAcquire方法：</p>
+<pre><code class="java">protected final boolean tryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                if (!hasQueuedPredecessors() &amp;&amp;
+                    compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc &lt; 0)
+                    throw new Error(&quot;Maximum lock count exceeded&quot;);
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+</code></pre>
+<p>这与nonfairTryAcquire方法大同小异，主要区别在于，当发现锁未被占用的时候，还要判断一下等待队列中是否有先到的线程正在等待锁，如果有，直接返回false。这保证了公平性：线程按照申请锁的顺序获取锁。</p>
+<h2 id="lockInterruptibly-可响应中断获取锁"><a href="#lockInterruptibly-可响应中断获取锁" class="headerlink" title="lockInterruptibly 可响应中断获取锁"></a>lockInterruptibly 可响应中断获取锁</h2><pre><code class="java">public void lockInterruptibly() throws InterruptedException {
+        sync.acquireInterruptibly(1);
+    }
+</code></pre>
+<p>lockInterruptibly方法通过调用AQS提供的acquireInterruptibly方法实现：</p>
+<pre><code class="java">public final void acquireInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (!tryAcquire(arg))
+            doAcquireInterruptibly(arg);
+    }
+</code></pre>
+<p>acquireInterruptibly方法首先检测一下中断，然后调用重写的tryAcquire方法试图获取锁，如果失败，调用doAcquireInterruptibly方法进行自旋、检测获取锁操作：</p>
+<pre><code class="java">private void doAcquireInterruptibly(int arg)
+        throws InterruptedException {
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>doAcquireInterruptibly方法与acquireQueued方法的区别在于：</p>
+<ul>
+<li>doAcquireInterruptibly方法将addWaiter的调用写在了方法里，而acquireQueued方法没有；</li>
+<li>doAcquireInterruptibly在当前线程从park中被中断唤醒时，直接抛出中断异常，而acquireQueued方法则是用一个局部变量记录下这次中断，但不立即处理，等到成功获取锁/共享资源之后，反馈给上层，由上层调用selfInterrupt方法“补上”这次中断。</li>
+</ul>
+<p>这些区别与doAcquireSharedInterruptibly&amp;doAcquireShared方法之间的区别一致。</p>
+<h2 id="tryLock-amp-tryLock-Timeout-尝试获取锁"><a href="#tryLock-amp-tryLock-Timeout-尝试获取锁" class="headerlink" title="tryLock &amp; tryLock(Timeout) 尝试获取锁"></a>tryLock &amp; tryLock(Timeout) 尝试获取锁</h2><pre><code class="java">public boolean tryLock() {
+        return sync.nonfairTryAcquire(1);
+    }
+
+    public boolean tryLock(long timeout, TimeUnit unit)
+            throws InterruptedException {
+        return sync.tryAcquireNanos(1, unit.toNanos(timeout));
+    }
+</code></pre>
+<p>ReentrantLock提供了两种tryLock方法：限时&amp;不限时。我们注意到，不限时（立即返回）的tryLock方法，不管在公平还是非公平模式下，调用的都是Sync中的nonfairTryAcquire方法。因此，如果在公平模式下调用tryLock，即使队列中有等待线程，也可能获取成功。</p>
+<p>而限时（不立即返回）的tryLock(Timeout)方法则公国tryAcquireNanos提供了公平&amp;非公平两种模式的tryLock(Timeout)操作：</p>
+<pre><code class="java">public final boolean tryAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquire(arg) ||
+            doAcquireNanos(arg, nanosTimeout);
+    }
+</code></pre>
+<p>可以看到，tryAcquireNanos方法通过调用不同的重写的tryAcquire方法提供了两种模式下的不同操作。tryAcquire方法已经分析过，不再赘述。这里重点关注doAcquireNanos方法：</p>
+<pre><code class="java">private boolean doAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (nanosTimeout &lt;= 0L)
+            return false;
+        final long deadline = System.nanoTime() + nanosTimeout;
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head &amp;&amp; tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return true;
+                }
+                nanosTimeout = deadline - System.nanoTime();
+                if (nanosTimeout &lt;= 0L)
+                    return false;
+                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                    nanosTimeout &gt; spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if (Thread.interrupted())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+</code></pre>
+<p>可以看到，doAcquireNanos方法是立即响应中断的（事实上doAcquireSharedNanos方法也是立即响应中断的），即限时（不立即返回）的尝试获取的方法都是及时响应中断的，没有延迟处理中断的版本。</p>
+<p>还有一点需要注意，当线程从park中被唤醒时，我们无法确定唤醒原因是被中断还是超时，因此需要检测一下中断标志。</p>
+<h2 id="unlock-释放锁"><a href="#unlock-释放锁" class="headerlink" title="unlock 释放锁"></a>unlock 释放锁</h2><p>公平&amp;非公平模式的unlock操作是一致的：</p>
+<pre><code class="java">public void unlock() {
+        sync.release(1);
+    }
+</code></pre>
+<pre><code class="java">
+        protected final boolean tryRelease(int releases) {
+            int c = getState() - releases;
+            if (Thread.currentThread() != getExclusiveOwnerThread())
+                throw new IllegalMonitorStateException();
+            boolean free = false;
+            if (c == 0) {
+                free = true;
+                setExclusiveOwnerThread(null);
+            }
+            setState(c);
+            return free;
+        }
+</code></pre>
+<p>tryRelease是在FairSync和NonfairSync的父类Sync中定义的，因此公平&amp;非公平模式下的release操作是统一的。tryRelease方法首先检测当前线程是否持有锁，然后计算一下释放之后锁是否可用（计数值state是否等于0），如果可用，释放&amp;设置持有锁线程为null&amp;返回true，如果不可用，释放&amp;返回返回false。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -1545,7 +1772,7 @@ final ConditionObject newCondition() {
     
     <entry>
       <title><![CDATA[juc之aqs]]></title>
-      <url>/2020/11/22/juc-2/</url>
+      <url>/2020/11/21/juc-2/</url>
       <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
 <p>AbstractQueuedSynchronizer（AQS）是一个同步器框架，抽象类。在实现锁的时候，一般会实现一个继承自AQS的内部类sync，作为我们的自定义同步器。AQS内部维护了一个state成员和一个队列。其中state标识了共享资源的状态，队列则记录了等待资源的线程。</p>
 <p>以下这五个方法，在AQS中实现为直接抛出异常，这是我们自定义同步器需要重写的方法：</p>
@@ -1927,225 +2154,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
             
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[juc之ReentrantLock]]></title>
-      <url>/2020/11/22/juc-3/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
-<p>ReentrantLock是JUC包提供的一种可重入独占锁，它实现了Lock接口。与Semaphore类似，ReentrantLock也提供了两种工作模式：公平模式&amp;非公平模式，也是通过自定义两种同步器FairSync&amp;NonfairSync来实现的。</p>
-<h2 id="lock-不响应中断获取锁"><a href="#lock-不响应中断获取锁" class="headerlink" title="lock 不响应中断获取锁"></a>lock 不响应中断获取锁</h2><pre><code class="java">public void lock() {
-        sync.lock();
-    }
-</code></pre>
-<p>lock方法通过调用自定义同步器的同名方法来获取锁。注意：ReentrantLock自定义了两种同步器：FairSync&amp;NonfairSync，分别对应公平模式&amp;非公平模式。</p>
-<p>我们先来看一下非公平模式下的lock方法：</p>
-<pre><code class="java">final void lock() {
-            if (compareAndSetState(0, 1))
-                setExclusiveOwnerThread(Thread.currentThread());
-            else
-                acquire(1);
-        }
-</code></pre>
-<p>lock方法并没有直接调用AQS提供的acquire方法，而是先试探地获取了一下锁，CAS操作失败再去调用acquire方法。我的理解是为了提升性能。因为可能很多时候我们能在第一次试探获取时成功，而不需要经过acquire-&gt;tryAcquire-&gt;nonfairAcquire的调用过程：</p>
-<pre><code class="java">public final void acquire(int arg) {
-        if (!tryAcquire(arg) &amp;&amp;
-            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-            selfInterrupt();
-    }
-</code></pre>
-<p>AQS提供的acquire方法首先调用了我们自定义同步器重写的tryAcquire方法试图获取锁，如果失败的话先调用addWaiter方法将当前线程加入等待队列，然后对掉用acquireQueued方法进行自旋、检测获取锁的操作，直到成功获取锁。在自旋、检测的过程中如果被中断（注意：acquireQueued延迟处理中断），要在成功获取锁之后调用selfInterrupt方法“补上”这次中断。这里我们主要关注ReentrantLock重写的tryAcquire方法：</p>
-<pre><code class="java"> protected final boolean tryAcquire(int acquires) {
-            return nonfairTryAcquire(acquires);
-        }
-</code></pre>
-<p>nonfairSync的tryAcquire方法通过调用其父类Sync的nonfairTryAcquire方法实现：</p>
-<pre><code class="java">final boolean nonfairTryAcquire(int acquires) {
-            final Thread current = Thread.currentThread();
-            int c = getState();
-            if (c == 0) {
-                if (compareAndSetState(0, acquires)) {
-                    setExclusiveOwnerThread(current);
-                    return true;
-                }
-            }
-            else if (current == getExclusiveOwnerThread()) {
-                int nextc = c + acquires;
-                if (nextc &lt; 0) // overflow
-                    throw new Error(&quot;Maximum lock count exceeded&quot;);
-                setState(nextc);
-                return true;
-            }
-            return false;
-        }
-</code></pre>
-<p>nonfairTryAcquire方法首先判断锁是否被占用，如果锁可用，通过调用CAS操作试图获取锁，如果失败直接返回false；但如果锁被占用（state==0），并不代表没有机会，因为有可能占用锁的正是当前线程。如果正是当前线程占用了锁，让state做+1操作，然后返回true：这正是可重入的概念，一个已经获取锁的线程可以重复获取锁。</p>
-<p>我们再来看一下公平模式下的lock方法：</p>
-<pre><code class="java">final void lock() {
-            acquire(1);
-        }
-</code></pre>
-<p>fairSync的lock方法直接调用acquire，而没有想NonfairSync一样先试图获取，因为这样可能导致违反“公平”的语义：在已等待在队列中的线程之前获取了锁。</p>
-<p>由上面的分析可知，AQS的acquire方法调用了fairSync重写的tryAcquire方法：</p>
-<pre><code class="java">protected final boolean tryAcquire(int acquires) {
-            final Thread current = Thread.currentThread();
-            int c = getState();
-            if (c == 0) {
-                if (!hasQueuedPredecessors() &amp;&amp;
-                    compareAndSetState(0, acquires)) {
-                    setExclusiveOwnerThread(current);
-                    return true;
-                }
-            }
-            else if (current == getExclusiveOwnerThread()) {
-                int nextc = c + acquires;
-                if (nextc &lt; 0)
-                    throw new Error(&quot;Maximum lock count exceeded&quot;);
-                setState(nextc);
-                return true;
-            }
-            return false;
-        }
-</code></pre>
-<p>这与nonfairTryAcquire方法大同小异，主要区别在于，当发现锁未被占用的时候，还要判断一下等待队列中是否有先到的线程正在等待锁，如果有，直接返回false。这保证了公平性：线程按照申请锁的顺序获取锁。</p>
-<h2 id="lockInterruptibly-可响应中断获取锁"><a href="#lockInterruptibly-可响应中断获取锁" class="headerlink" title="lockInterruptibly 可响应中断获取锁"></a>lockInterruptibly 可响应中断获取锁</h2><pre><code class="java">public void lockInterruptibly() throws InterruptedException {
-        sync.acquireInterruptibly(1);
-    }
-</code></pre>
-<p>lockInterruptibly方法通过调用AQS提供的acquireInterruptibly方法实现：</p>
-<pre><code class="java">public final void acquireInterruptibly(int arg)
-            throws InterruptedException {
-        if (Thread.interrupted())
-            throw new InterruptedException();
-        if (!tryAcquire(arg))
-            doAcquireInterruptibly(arg);
-    }
-</code></pre>
-<p>acquireInterruptibly方法首先检测一下中断，然后调用重写的tryAcquire方法试图获取锁，如果失败，调用doAcquireInterruptibly方法进行自旋、检测获取锁操作：</p>
-<pre><code class="java">private void doAcquireInterruptibly(int arg)
-        throws InterruptedException {
-        final Node node = addWaiter(Node.EXCLUSIVE);
-        boolean failed = true;
-        try {
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head &amp;&amp; tryAcquire(arg)) {
-                    setHead(node);
-                    p.next = null; // help GC
-                    failed = false;
-                    return;
-                }
-                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
-                    parkAndCheckInterrupt())
-                    throw new InterruptedException();
-            }
-        } finally {
-            if (failed)
-                cancelAcquire(node);
-        }
-    }
-</code></pre>
-<p>doAcquireInterruptibly方法与acquireQueued方法的区别在于：</p>
-<ul>
-<li>doAcquireInterruptibly方法将addWaiter的调用写在了方法里，而acquireQueued方法没有；</li>
-<li>doAcquireInterruptibly在当前线程从park中被中断唤醒时，直接抛出中断异常，而acquireQueued方法则是用一个局部变量记录下这次中断，但不立即处理，等到成功获取锁/共享资源之后，反馈给上层，由上层调用selfInterrupt方法“补上”这次中断。</li>
-</ul>
-<p>这些区别与doAcquireSharedInterruptibly&amp;doAcquireShared方法之间的区别一致。</p>
-<h2 id="tryLock-amp-tryLock-Timeout-尝试获取锁"><a href="#tryLock-amp-tryLock-Timeout-尝试获取锁" class="headerlink" title="tryLock &amp; tryLock(Timeout) 尝试获取锁"></a>tryLock &amp; tryLock(Timeout) 尝试获取锁</h2><pre><code class="java">public boolean tryLock() {
-        return sync.nonfairTryAcquire(1);
-    }
-
-    public boolean tryLock(long timeout, TimeUnit unit)
-            throws InterruptedException {
-        return sync.tryAcquireNanos(1, unit.toNanos(timeout));
-    }
-</code></pre>
-<p>ReentrantLock提供了两种tryLock方法：限时&amp;不限时。我们注意到，不限时（立即返回）的tryLock方法，不管在公平还是非公平模式下，调用的都是Sync中的nonfairTryAcquire方法。因此，如果在公平模式下调用tryLock，即使队列中有等待线程，也可能获取成功。</p>
-<p>而限时（不立即返回）的tryLock(Timeout)方法则公国tryAcquireNanos提供了公平&amp;非公平两种模式的tryLock(Timeout)操作：</p>
-<pre><code class="java">public final boolean tryAcquireNanos(int arg, long nanosTimeout)
-            throws InterruptedException {
-        if (Thread.interrupted())
-            throw new InterruptedException();
-        return tryAcquire(arg) ||
-            doAcquireNanos(arg, nanosTimeout);
-    }
-</code></pre>
-<p>可以看到，tryAcquireNanos方法通过调用不同的重写的tryAcquire方法提供了两种模式下的不同操作。tryAcquire方法已经分析过，不再赘述。这里重点关注doAcquireNanos方法：</p>
-<pre><code class="java">private boolean doAcquireNanos(int arg, long nanosTimeout)
-            throws InterruptedException {
-        if (nanosTimeout &lt;= 0L)
-            return false;
-        final long deadline = System.nanoTime() + nanosTimeout;
-        final Node node = addWaiter(Node.EXCLUSIVE);
-        boolean failed = true;
-        try {
-            for (;;) {
-                final Node p = node.predecessor();
-                if (p == head &amp;&amp; tryAcquire(arg)) {
-                    setHead(node);
-                    p.next = null; // help GC
-                    failed = false;
-                    return true;
-                }
-                nanosTimeout = deadline - System.nanoTime();
-                if (nanosTimeout &lt;= 0L)
-                    return false;
-                if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
-                    nanosTimeout &gt; spinForTimeoutThreshold)
-                    LockSupport.parkNanos(this, nanosTimeout);
-                if (Thread.interrupted())
-                    throw new InterruptedException();
-            }
-        } finally {
-            if (failed)
-                cancelAcquire(node);
-        }
-    }
-</code></pre>
-<p>可以看到，doAcquireNanos方法是立即响应中断的（事实上doAcquireSharedNanos方法也是立即响应中断的），即限时（不立即返回）的尝试获取的方法都是及时响应中断的，没有延迟处理中断的版本。</p>
-<p>还有一点需要注意，当线程从park中被唤醒时，我们无法确定唤醒原因是被中断还是超时，因此需要检测一下中断标志。</p>
-<h2 id="unlock-释放锁"><a href="#unlock-释放锁" class="headerlink" title="unlock 释放锁"></a>unlock 释放锁</h2><p>公平&amp;非公平模式的unlock操作是一致的：</p>
-<pre><code class="java">public void unlock() {
-        sync.release(1);
-    }
-</code></pre>
-<pre><code class="java">
-        protected final boolean tryRelease(int releases) {
-            int c = getState() - releases;
-            if (Thread.currentThread() != getExclusiveOwnerThread())
-                throw new IllegalMonitorStateException();
-            boolean free = false;
-            if (c == 0) {
-                free = true;
-                setExclusiveOwnerThread(null);
-            }
-            setState(c);
-            return free;
-        }
-</code></pre>
-<p>tryRelease是在FairSync和NonfairSync的父类Sync中定义的，因此公平&amp;非公平模式下的release操作是统一的。tryRelease方法首先检测当前线程是否持有锁，然后计算一下释放之后锁是否可用（计数值state是否等于0），如果可用，释放&amp;设置持有锁线程为null&amp;返回true，如果不可用，释放&amp;返回返回false。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> juc </category>
-            
-            <category> 并发 </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
             <tag> juc </tag>
-            
-            <tag> 并发 </tag>
             
         </tags>
         
@@ -2223,9 +2234,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -2913,9 +2924,9 @@ public class TicketLock {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> cas </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
