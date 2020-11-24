@@ -3,9 +3,1709 @@
   
     
     <entry>
+      <title><![CDATA[juc之ConcurrentLinkedQueue]]></title>
+      <url>/2020/11/24/juc-13/</url>
+      <content type="html"><![CDATA[<p>内容转载自 <a href="https://www.beikejiedeliulangmao.top/java/concurrent/concurrent-linked-queue/" target="_blank" rel="noopener">https://www.beikejiedeliulangmao.top/java/concurrent/concurrent-linked-queue/</a> 稍有改动</p>
+<p>Java 提供的线程安全的 Queue 可以分为阻塞队列和非阻塞队列，其中阻塞队列的典型例子是 BlockingQueue，非阻塞队列的典型例子是 ConcurrentLinkedQueue，在实际应用中要根据实际需要选用阻塞队列或者非阻塞队列。 阻塞队列可以通过加锁来实现，非阻塞队列可以通过 CAS 操作实现。</p>
+<p>ConcurrentLinkedQueue 使用了链表作为其数据结构．内部使用 CAS 来进行链表的维护。ConcurrentLinkedQueue 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景，即如果对队列加锁的成本较高则适合使用无锁的 ConcurrentLinkedQueue 来替代。</p>
+<p>接下来我们简单地看一下 ConcurrentLinkedQueue 的实现，在 ConcurrentLinkedQueue 中所有数据通过单向链表存储，同时我们还会保存该链表的头指针和尾指针。</p>
+<pre><code class="java">// 链表中的节点
+private static class Node&lt;E&gt; {
+    volatile E item;
+    volatile Node&lt;E&gt; next;
+    //...
+}
+/**
+ * A node from which the first live (non-deleted) node (if any)
+ * can be reached in O(1) time.
+ * Invariants:
+ * - all live nodes are reachable from head via succ()
+ * - head != null
+ * - (tmp = head).next != tmp || tmp != head
+ * Non-invariants:
+ * - head.item may or may not be null.
+ * - it is permitted for tail to lag behind head, that is, for tail
+ *   to not be reachable from head!
+ */
+private transient volatile Node&lt;E&gt; head;
+
+/**
+ * A node from which the last node on list (that is, the unique
+ * node with node.next == null) can be reached in O(1) time.
+ * Invariants:
+ * - the last node is always reachable from tail via succ()
+ * - tail != null
+ * Non-invariants:
+ * - tail.item may or may not be null.
+ * - it is permitted for tail to lag behind head, that is, for tail
+ *   to not be reachable from head!
+ * - tail.next may or may not be self-pointing to tail.
+ */
+private transient volatile Node&lt;E&gt; tail;
+</code></pre>
+<p>在对象实例化时，会创建一个虚节点。看到后面你会发现，如果想通过 CAS 维护一个链表，一般都会使用到虚节点。</p>
+<pre><code class="java">public ConcurrentLinkedQueue() {
+    head = tail = new Node&lt;E&gt;(null);
+}
+</code></pre>
+<p>介绍完内部数据结构，我们看一下增删节点的实现方式。先来看一下增加数据的逻辑：</p>
+<ul>
+<li>入队操作是在一个循环中尝试 CAS 操作，首先判断，尾结点 p.next 是不是 null，是的话就通过 CAS 将 null-&gt; newNode，如果 CAS 成功，说明该节点就已经算是加入到队列中了<ul>
+<li>但是这里并没有直接修改尾结点，因为 ConcurrentLinkedQueue 中 tail 并不一定是实际上的尾结点，在并发很大时，如果所有线程都要去竞争修改尾结点的话，对性能会有影响，所以，当实际的尾结点（代码中的变量 p）不等于 tail 时，才会进行更新。</li>
+<li>在 ConcurrentLinkedQueue 中会出现 Node1 (head)-&gt;Node2 (tail)-&gt;null 以及 Node1 (head)-&gt;Node2 (tail)-&gt;Node3-&gt;null 这样的情况甚至 Node1 (head)-&gt;Node2 (tail)-&gt;Node3-&gt;Node4 这样的情况，虽然 tail 指针没有直接指向尾结点会导致将新节点加入链表时，需要从 tail 向后查找实际的尾结点，但是这个过程相较于对 tail 节点的竞争来说，影响较小，最终效率也更高</li>
+</ul>
+</li>
+<li>如果发现当前 p 节点不是实际上的尾结点，会先检查它的 next 指针是否指向自己，在出队函数 poll 中，将一个元素出队后会把它的 next 指针指向自己，所以这一步实际上是判断当前的 p 节点是否已经出队<ul>
+<li>如果满足上述情况，我们需要重新获取 tail 指针，如果发现在上述过程中 tail 指针发生了变化，这说明期间已经好有个并发插入过程完成了，我们直接从最新的 tail 对象开始上述流程即可，所以这里就将 p 赋为最新的 tail 指向的对象，</li>
+<li>如果整个过程中 tail 指针都没变，说明当前的情况类似于 Node1 (head，tail)-&gt; Node2-&gt;null, 但是在判断 p == q 之前，发生了出队操作，状态变成了 Node1 (tail, 已经出队的对象) Node2 (head)-&gt;null，这个时候我们要将 p 设置为 head 然后从 head 开始向后遍历</li>
+</ul>
+</li>
+<li>最后就是单纯的没有遍历到尾结点的情况了， Node1 (head)-&gt;Node2 (tail，当前 p 变量)-&gt;Node3（当前 q 变量）-&gt;null<ul>
+<li>如果发现已经进行过一次向后遍历的过程，即 p != t ，并且 tail 指针发生了变化，我们就直接使用 tail 指针，不再向后遍历了 p = t (最新的 tail 指针)</li>
+<li>如果不满足上述情况，比如还从来没遍历过，或者虽然遍历过但是 tail 指针没变，我们就继续遍历 p = q (p.next)</li>
+</ul>
+</li>
+</ul>
+<pre><code class="java">public boolean offer(E e) {
+    checkNotNull(e);
+    final Node&lt;E&gt; newNode = new Node&lt;E&gt;(e);
+
+    for (Node&lt;E&gt; t = tail, p = t;;) {
+        Node&lt;E&gt; q = p.next;
+        if (q == null) {
+            // p is last node
+            // 找到了最后一个节点，通过 CAS 将其 next 指向新节点
+            if (p.casNext(null, newNode)) {
+                // Successful CAS is the linearization point
+                // for e to become an element of this queue,
+                // and for newNode to become &quot;live&quot;.
+                // 如果 tail.next 为null就不修改tail，tail.next != null 时才会修改
+                // 这里会出现多个线程同时发现 tail.next != null 的情况，所以 tail 指针和实际的尾结点的距离不一定是1
+                if (p != t) // hop two nodes at a time
+                    casTail(t, newNode);  // Failure is OK. 因为没有要求 tail 指针和实际的尾结点的距离是1
+                return true;
+            }
+            // Lost CAS race to another thread; re-read next
+        }
+        else if (p == q)
+            // 如果发现当前p节点不是实际上的尾结点，会先检查它的next 指针是否指向自己，在出队函数poll中，将一个元素出队后会把它的next指针指向自己，所以这一步实际上是判断当前的 p 节点是否已经出队
+            // 如果 tail 指针发生了变化，就从最新的 tail 开始遍历
+            // 否则，从 head 开始遍历，因为这时候 tail 可能指向了一个死掉(next 指向自己，已经从队列中移除)的节点
+            // We have fallen off list.  If tail is unchanged, it
+            // will also be off-list, in which case we need to
+            // jump to head, from which all live nodes are always
+            // reachable.  Else the new tail is a better bet.
+            p = (t != (t = tail)) ? t : head;
+        else
+            // 最后就是单纯的没有遍历到尾结点的情况了
+            // 如果发现已经进行过一次向后遍历的过程，并且 tail 指针发生了变化，我们就直接使用 tail 指针
+            // 如果还从来没遍历过，或者虽然遍历过但是 tail 指针没变，我们就继续遍历
+            // Check for tail updates after two hops.
+            p = (p != t &amp;&amp; t != (t = tail)) ? t : q;
+    }
+}
+</code></pre>
+<p>最后，我们介绍一下出队的操作，整个出队过程也是在一个 CAS 循环中进行：</p>
+<ul>
+<li>首先我们检查头指针的 p (head).item 是不是 null，不是的话才说明该节点是一个有效节点，因为初始化是创建的虚节点 item 才等于 null，这里通过 item 是不是 null 来判断是不是虚节点也就是说 ConcurrentLinkedQueue 中不能添加值为 null 的节点<ul>
+<li>找到有效节点后，通过 cas 将 item 改为 null，后续的操作和添加元素时类似，因为 head 指针也是一个竞争点，所以这里并没有直接修改 head 指针，而是发现从 head 至少向后遍历过一次时，才会修改 head 指针，这和 offer 中的方式类似</li>
+<li>如果当前线程要负责修改 head 指针，会判断 刚删掉的节点 p 的 next 是不是 null，是的话就让 p 作为 head（此时 p 充当新的虚节点），如果不是的话，就让 p.next 作为 next（此时 head 就是实际上的头结点）</li>
+</ul>
+</li>
+<li>如果 p 的 item == null 或者 cas 失败（别的线程已经把 p.item 置为 null），我们要检查一下 p.next 是不是 null，如果是的话说明 p 已经是最后一个节点了，我们需要返回 null，但是在此之前，我们不妨把 p 设为新的 head 来减少其他线程的遍历开销</li>
+<li>检查当前 p 节点的 next 指针是不是指向自己，是的话说明当前检查的这个节点已经被别的线程从队列中移除了，那我们就重新开始执行 poll</li>
+<li>否则，让 p = q (p.next)，也就是说这是从 head 开始向后遍历的过程</li>
+</ul>
+<pre><code class="java">public E poll() {
+    restartFromHead:
+    for (;;) {
+        for (Node&lt;E&gt; h = head, p = h, q;;) {
+            E item = p.item;
+            // item != null 说明该节点是一个有效节点, 通过 CAS 将其item改为 null
+            if (item != null &amp;&amp; p.casItem(item, null)) {
+                // CAS 成功说明已经移除一个节点了，后续的操作和添加元素时类似，因为 head 指针也是一个竞争点
+                // 所以这里并没有直接修改 head 指针，而是发现从 head 至少向后遍历过一次时，才会修改 head 指针，这和 offer 中的方式类似
+                // Successful CAS is the linearization point
+                // for item to be removed from this queue.
+                if (p != h) // hop two nodes at a time
+                    // 判断刚删掉的节点 p 的 next 是不是null，是的话就让 p 作为 head（此时p充当新的虚节点），
+                    // 如果不是的话，就让 p.next 作为 next（此时head就是实际上的头结点）
+                    updateHead(h, ((q = p.next) != null) ? q : p);
+                return item;
+            }
+            else if ((q = p.next) == null) {
+                // 说明 p已经是最后一个节点了，我们需要返回 null
+                // 但是在此之前，我们不妨把p设为新的head来减少其他线程的遍历开销
+                updateHead(h, p);
+                return null;
+            }
+            else if (p == q)
+                // 说明当前检查的这个节点已经被别的线程从队列中移除了，那我们就重新开始执行 poll
+                continue restartFromHead;
+            else
+                // p = q(p.next)，也就是说这是从 head 开始向后遍历的过程
+                p = q;
+        }
+    }
+}
+</code></pre>
+<p>updateHead 的过程中先会检查是不是真的有必要重置 head 指针，有必要的话在通过 CAS 修改 head 指针，如果 CAS 失败了也无妨，毕竟我们不要求 head 一定指向实际的头结点，poll 中的遍历过程能 cover 这种情况。如果 CAS 成功，会将删掉的 head 指针指向自己。</p>
+<pre><code class="java">/**
+ * Tries to CAS head to p. If successful, repoint old head to itself
+ * as sentinel for succ(), below.
+ */
+final void updateHead(Node&lt;E&gt; h, Node&lt;E&gt; p) {
+    if (h != p &amp;&amp; casHead(h, p))
+        h.lazySetNext(h);
+}
+
+void lazySetNext(Node&lt;E&gt; val) {
+    UNSAFE.putOrderedObject(this, nextOffset, val);
+}
+</code></pre>
+<p>这里大家可能会有疑问，为什么要 lazySet next 指针呢？要想理解这个问题，我们需要先理解 putOrderedObject 和 putObjectVolatile 的区别。因为 Node 中的 next 属性是用 volatile 修饰的，而 volatile 有什么特点呢？一个是防止指令重拍，一个是将其他 CPU cache 中的相关数据无效化，迫使这些 CPU 重新从主存中拉取最新数据。这是通过 Fence (内存屏障) 实现的，在 linux x86 架构中一般是 lock; addl $0,0(%%esp). , 通过加锁来保证互斥。</p>
+<p>而 putObjectVolatile 函数等效于声明一个 volatile 变量，然后直接对该变量进行修改。也就是说，无论是 putObjectVolatile 还是对 volatile 变量的直接修改，都依赖与 StoreLoad barriers ，这里 StoreLoad barriers 就是说如果指令的顺序是 Store1; StoreLoad; Load2 ，就需要确保 Store1 保存的数据在 Load2 访问数据之前，一定要能够对所有线程可见。关于内存屏障的解释，可以参考这篇手册, 其中介绍了各个内存屏障的要求，以及在不同架构上的实现方式。</p>
+<p>而 putOrderedObject 函数呢，只需要保证当前 cpu 内指令是有序的，不会出现非法的内存访问即可，这也就是说，putOrderedObject 没有多处理期间的可见性保证，也就不会有多余的开销。在我们 ConcurrentLinkedQueue 的场景中，最终将 next 指针指向自己并不需要这么高的可见性需求，而且 next 是修饰为 volatile 的，所以，我们需要显式地调用 putOrderedObject 才能达到 “去 volatile 特性” 的效果，从而提升效率。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之PriorityBlockingQueue]]></title>
+      <url>/2020/11/24/juc-12/</url>
+      <content type="html"><![CDATA[<p>内容转载自  <a href="https://www.jianshu.com/p/bf6ef56646e5" target="_blank" rel="noopener"> https://www.jianshu.com/p/28c9d9e34b29</a>   稍有改动</p>
+<h2 id="PriorityBlockingQueue定义"><a href="#PriorityBlockingQueue定义" class="headerlink" title="PriorityBlockingQueue定义"></a>PriorityBlockingQueue定义</h2><p>PriorityBlockingQueue 是基于 二叉堆, ReentrantLock, Condition 实现的并发安全的优先级队列.<br>主要有以下特点:</p>
+<ul>
+<li>数据容量没有界限(最大值 Integer.MAX_VALUE - 8)</li>
+<li>居于ReentrantLock 实现并发安全, 基于 Condition 实现线程等待唤醒</li>
+<li>数据底层存放在居于数组实现的二叉堆上, 注意这里没有实现堆排序, 只是每次有数据变更时将最小/大放在了堆的最上面的节点上</li>
+</ul>
+<h2 id="初始化方法-堆化-heapify"><a href="#初始化方法-堆化-heapify" class="headerlink" title="初始化方法 堆化(heapify)"></a>初始化方法 堆化(heapify)</h2><p>实现思路: 从堆的最后一个 parent 开始, 将最小/大值放在 parent位置, 直到最顶层的parent为止；<br>直接看代码</p>
+<pre><code class="java">/**
+ * Establishes the heap invariant (described above) in the entire tree
+ * assuming nothing about the order of the elements prior to the call
+ */
+private void heapify(){
+    /**
+     * 将这个数组进行 堆化 (heapify)
+     *
+     */
+    Object[] array = queue;
+    int n = size;
+    int half = (n &gt;&gt;&gt; 1) -1;                // 1. 这里有个注意点 n 是数组的 length,
+    Comparator&lt;? super E&gt; cmp = comparator; // 2. 获取 比较器, 若这里的 comparator是空, 则用元素自己实现的比较接口进行比较
+    if(cmp == null){
+        for(int i = half; i &gt;= 0; i--){     // 3. 从整个数组的最后一颗树开始, 将二叉树的最小值放置在parent位置, 一直到最上面的那颗二叉树
+            siftDownComparable(i, (E)array[i], array, n);
+        }
+    }else{
+        for(int i = half; i &gt;= 0; i--){
+            siftDownUsingComparator(i, (E)array[i], array, n, cmp);
+        }
+    }
+                                            // 4. 经过这个 heapify 方法后, 整个二叉堆中的最小值已经放在的 index=0 的位置上(注意: 这时不保证 左子树一定小于右子树)
+                                            // 5. 若要进行二叉堆的排序, 则需要将 index=0的位置排查在外 从 index= 1的位置开始, 到最后一个位置, 再进行上面的操作
+                                            // 其实思路就是 每次将最小值放在数组的最上面, 然后排除这个节点在外, 将下面的数组作为一个整体, 然后重复上面的步骤, 直到最后一个元素
+}
+</code></pre>
+<p>这个方法其实从最后一个 parent 开始进行与子节点比较, 将最小/大值放在 parent 位置, 直到 顶层的 parent 为止<br>我们发现代码中有个 siftDownComparable 方法, 这是实现 堆化的重要步骤</p>
+<pre><code class="java">/**
+ * Inserts item x at position k, maintaining heap invariant by
+ * demoting x down the tree repeatedly until it is less than or
+ * equal to its children or is a leaf
+ *
+ * @param k     the position to fill
+ * @param x     the item to insert
+ * @param array the heap array
+ * @param n     the heap array
+ * @param &lt;T&gt;
+ */
+private static &lt;T&gt; void siftDownComparable(int k, T x, Object[] array, int n){
+    /**
+     * 从整个数组的 k 位置开始向下进行 比较更换操作
+     * 1. 获取这个数组的中间值(大于等于它其实就是说已经没有子节点)
+     *      举例: 数组 array 含有元素 : 1,2,3,4,5,6,7,8,9,10 共10个元素
+     *          其中的之间 half = n &gt;&gt;&gt; 1 = 10 &gt;&gt;&gt; 1 = 5; (就是下面代码中的 half, 堆中所有parent的 index 均小于 5)
+     *          而最大 parent 的index 是 : (9 - 1) &gt;&gt;&gt; 1 = 4;
+     *          再parent调整好后, 再下面的代码中获取的 k 就变成 9/10, 但是 9/10 &gt; 5 (就是下面代码的 while(k &lt; half))
+     * 2. 从k位子开始不断向下比较, 将最小值放到 parent位置, 直到 k &gt;= half
+     * 3. 经过这个方法比较后, 从k往下 都是最小值上parent上的一个棵二叉树
+     */
+    if(n &gt; 0){
+        Comparable&lt;? super T&gt; key = (Comparable&lt;? super T&gt;)x;
+        int half = n &gt;&gt;&gt; 1;                 // 1. 获取整个数组的中间坐标
+        while(k &lt; half){                    // 2. k这里其实表示 parent 在数组中的 index, k &gt;= half 其实就说明 k 在数组中已经没有子节点
+            int child = (k &lt;&lt; 1) + 1;       // 3. 获取 k 的左子节点的 index
+            Object c = array[child];        // 4. 获取左子节点的值
+            int right = child + 1;          // 5. 获取右子节点的 index
+            if(right &lt; n &amp;&amp;                 // 6. 这个 if 判断其实是 判断左右子节点的大小, 并且找到其中的最小值, 赋值给 c;
+                    ((Comparable&lt;? super T&gt;)c).compareTo((T)array[right]) &gt; 0
+                    ){
+                c = array[child = right];
+            }
+            if(key.compareTo((T)c) &lt;= 0){   // 7. key &lt;= c 则说明, 进行下面 sift 已经完成 (父节点k已经小于等于子节点), 直接 break 出
+                break;
+            }
+            array[k] = c;                   // 8. 代码运行到这里说明 k &gt; c， 则将子数据c赋值到k的位置
+            k = child;                      // 9. 将上次的子节点 child作为父节点, 再次下面进行比较, 直到 k &gt;= half
+        }
+        array[k] = key;                     // 10. 将key值赋值给最后一次进行 siftdown 比较的  父节点上
+    }
+}
+</code></pre>
+<p>操作思路:</p>
+<pre><code class="java"> 从整个数组的 k 位置开始向下进行 比较更换操作
+  1. 获取这个数组的中间值(大于等于它其实就是说已经没有子节点)
+       举例: 数组 array 含有元素 : 1,2,3,4,5,6,7,8,9,10 共10个元素
+           其中的之间 half = n &gt;&gt;&gt; 1 = 10 &gt;&gt;&gt; 1 = 5; (就是下面代码中的 half, 堆中所有parent的 index 均小于 5)
+           而最大 parent 的index 是 : (9 - 1) &gt;&gt;&gt; 1 = 4;
+           再parent调整好后, 再下面的代码中获取的 k 就变成 9/10, 但是 9/10 &gt; 5 (就是下面代码的 while(k &lt; half))
+  2. 从k位子开始不断向下比较, 将最小值放到 parent位置, 直到 k &gt;= half
+  3. 经过这个方法比较后, 从k往下 都是最小值上parent上的一个棵二叉树
+</code></pre>
+<h2 id="添加元素-offer-方法"><a href="#添加元素-offer-方法" class="headerlink" title="添加元素 offer 方法"></a>添加元素 offer 方法</h2><p>主要思路: 将添加的元素放置到数组的最尾端, 然后调用 siftUp 进行向上调整</p>
+<pre><code class="java">  /**
+ * Inserts the specified element into this priority queue
+ * As the queue is unbounded, his method will never return {@code false}
+ *
+ * @param e the lement to add
+ * @return {@code true} (as specified element cannot be compared
+ *          with elements currently in the priority queue according to the
+ *          priority queue&#39;s ordering)
+ * @throws NullPointerException if the specified element is null
+ */
+@Override
+public boolean offer(E e) {
+    if(e != null){
+        throw new NullPointerException();
+    }
+    final ReentrantLock lock = this.lock;       // 1. 获取全局共享的锁
+    lock.lock();
+    int n, cap;
+    Object[] array;                             // 2. 判断容器是否需要扩容
+    while((n = size) &gt;= (cap = (array = queue).length)){
+        tryGrow(array, cap);                    // 3. 进行扩容操作
+    }
+
+    try{
+        Comparator&lt;? super E&gt; cmp = comparator;
+        if(cmp == null){                        // 4. 进行 保持 heap 性质的 siftUp 操作
+            siftUpComparable(n, e, array);
+        }else{
+            siftUpUsingComparator(n, e, array, cmp);
+        }
+        size = n + 1;                           // 5. 数据插入后, 整个容量值 + 1;
+        notEmpty.signal();                      // 6. Condition 释放信号, 告知其他等待的线程: 容器中已经有元素
+    }finally {
+        lock.unlock();                          // 7. 释放锁
+    }
+    return true;
+}
+</code></pre>
+<p>在代码中我们看到了 tryGrow, 这个调整堆存储空间的方法<br>在里面运用了 先进行锁的释放 lock.unlock, 然后 根据 allocationSpinLock 这个指标判断是否其他线程在进行扩容, 基本上每次扩容都是 * 1.5</p>
+<pre><code class="java">/**
+ * Tries to grow array to accommodate at least one more element
+ * (but normally expend by about 50%), giving up (allowing retry)
+ * on contention (which we expect to be race). Call only this while
+ * holding lock
+ *
+ * @param array the heap array
+ * @param oldCap    the length of the array
+ */
+private void tryGrow(Object[] array, int oldCap){
+    /**
+     * tryGrow 数组容量扩容操作
+     * 整个方法的执行是在已经 ReentrantLock 获取锁的情况下进行的
+     */
+
+    lock.unlock(); // must release and then re-acquire main lock // 1. 释放全局的锁(为什么呢? 原因也非常简单, 这个 lock 是全局方法共享的, 为的是更好的并发性能, 而扩容操作的并发是通过简单的乐观锁 allocationSpinLock 来进行控制de)
+    Object[] newArray = null;
+    if(allocationSpinLock == 0 &amp;&amp;                                // 2. 居于CAS操作, 在 allocationSpinLock 实现乐观锁, 这个也是为了在扩容时不影响容器的其他并发操作
+            unsafe.compareAndSwapInt(this, allocationSpinLockOffset, 0, 1)){
+        try{
+            int newCap = oldCap + ((oldCap &lt; 64)?                // 3. 容量若小于 64则直接 double + 2; 大于的话, 直接 ＊ 1.5
+                    (oldCap + 2): // grow faster if small
+                    (oldCap &gt;&gt; 1)
+                                    );
+            if(newCap - MAX_ARRAY_SIZE &gt; 0){ // possible overflow
+                int minCap = oldCap + 1;                         // 4. 扩容后超过最大容量处理
+                if(minCap &lt; 0 || minCap &gt; MAX_ARRAY_SIZE){
+                    throw new OutOfMemoryError();
+                }
+                newCap = MAX_ARRAY_SIZE;
+            }
+            if(newCap &gt; oldCap &amp;&amp; queue == array){              // 5. queue == array 若数组没变化, 直接进行新建数组
+                newArray = new Object[newCap];
+            }
+        }finally {
+            allocationSpinLock = 0;
+        }
+    }
+                                                                // 6. newArray == null 说明上面的操作过程中, 有其他的线程进行了扩容的操作
+    if(newArray == null){ // back off if another thread is allocating
+        Thread.yield();                                         // 7. 让出 CPU 调度(因为其他线程扩容后必定有其他的操作)
+    }
+    lock.lock();                                                // 8. 重新获取锁
+    if(newArray != null &amp;&amp; queue == array){                     // 9. 判断数组 queue 有没有在其他线程中变化过
+        queue = newArray;                                       // 10. 未变化, 直接进行赋值操作
+        System.arraycopy(array, 0, newArray, 0, oldCap);
+    }
+}
+</code></pre>
+<p>在进行offer元素时主要还调用了 siftUpComparable 方法<br>思路: 将元素与上面的 parent 进行比较, 直到 parent &gt;= 这个元素</p>
+<pre><code class="java">    /**
+     * Insert item x at position k, maintaining heap invariant by
+     * promoting x up the tree until it is greater than or equal to
+     * its parent, or is the root
+     *
+     * To simplify and speed up coercions and comparisons. the
+     * Comparable and Comparator versions are separated into different
+     * method that are otherwise identical. (Similarly for siftDown)
+     * These methods are statics, with heap state as arguments, to
+     * simplify use in light og possible comparator exceptions
+     *
+     * @param k the position to fill
+     * @param x the item to insert
+     * @param array the heap array
+     * @param &lt;T&gt;
+     */
+    private static &lt;T&gt; void siftUpComparable(int k, T x, Object[] array){
+        /**
+         * 简单的 siftUp 操作: 大体操作就是将元素x放置到k位置, 然后对k的parent进行比较, 直到 k&gt;=parent为止
+         */
+        Comparable&lt;? super T&gt; key = (Comparable&lt;? super T&gt;)x;
+        while(k &gt; 0){                           // 1. k是否到达二叉树的顶端
+            int parent = (k - 1) &gt;&gt;&gt; 1;         // 2. 寻找 k 的parent位置
+            Object e = array[parent];           // 3. 获取parent的值
+            if(key.compareTo((T)e) &gt;= 0){       // 4. key &gt;= e说明 parent &gt;=子节点, 则不需要 siftUp 操作
+                break;
+            }
+            array[k] = e;                       // 5. 将上次比较中 parent节点的值放在子节点上
+            k = parent;                         // 6. 将这次比较中的 parent 当作下次比价的k(k是下次比较的子节点)
+        }
+        array[k] = key;                         // 7. 将值key放置合适的位置上
+    }
+</code></pre>
+<h2 id="删除元素-poll-方法"><a href="#删除元素-poll-方法" class="headerlink" title="删除元素 poll 方法"></a>删除元素 poll 方法</h2><p>思路: 将元素的首节点拿出, 作为返回, 末尾节点放置到 index=0位置, 开始 siftDown直到 满足 parent &gt;= child</p>
+<pre><code class="java">@Override
+public E poll() {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        return dequeue();
+    } finally {
+        lock.unlock();
+    }
+}
+
+private E dequeue(){
+    int n = size - 1;
+    if(n &lt; 0){                              // 1. 判断元素是否未空
+        return null;                        // 2. 容器中没有元素, 直接返回 null
+    }
+    else{
+        Object[] array = queue;
+        E result = (E)array[0];             // 3. 取出数组中的第一个元素, 作为返回值
+        E x = (E)array[n];                  // 4. 将数组的最后一个元素取出
+        array[n] = null;
+        Comparator&lt;? super E&gt; cmp = comparator;
+        if(cmp == null){                    // 5. 将刚才取出的数组中最后一个元素放到第一个index位置, 进行siftDown操作(就是向下堆化操作)
+            siftDownComparable(0, x, array, n);
+        }else{
+            siftDownUsingComparator(0, x, array, n, cmp);
+        }
+        size = n;                           // 6. 重新赋值 size值
+        return result;                      // 7. 返回取出的值
+    }
+}
+</code></pre>
+<p>PriorityBlockingQueue的注意要点</p>
+<p>PriorityBlockingQueue底层由数组维护，是基于PriorityQueue实现的阻塞队列。构造PriorityBlockingQueue最好传参数capacity(容量)，防止过度扩张，默认为11。</p>
+<p>但因为PriorityBlockingQueue可以扩容，可以被无限扩容到Integer.MAX_VALUE - 8，所以可以看做是一个”无界”阻塞队列。注意资源耗竭问题(会产生OOM)。</p>
+<p>PriorityBlockingQueue底层对于元素的入队列和出队列使用的是同一个lock对象。</p>
+<p>因为PriorityBlockingQueue是”无界”阻塞队列，所以put()不需要阻塞，直接调用offer()方法。因为，put方法在队列满时阻塞，take方法在队列空时阻塞，由于PriorityBlockingQueue是”无界”阻塞队列，所以不需要阻塞。</p>
+<p>PriorityBlockingQueue和ArrayBlockingQueue都是由数组维护。二者区别是，PriorityBlockingQueue支持扩容，ArrayBlockingQueue并不支持。由于LinkedBlockingQueue由链表维护，没有扩容的概念，只是会有容量限制。PriorityBlockingQueue的扩容使用CAS自旋锁。</p>
+<p>PriorityBlockingQueue的offer()方法(add()、put()方法相当于调用offer()方法)，poll()方法调用lock.lock()获取锁，不响应中断，因为这两个方法不是阻塞的；take()方法都调用lock.lockInterruptibly();方法获取锁，注意：该方法支持线程中断响应。</p>
+<p>PriorityBlockingQueue的插入移除参考二叉堆中的最小堆，因为数字越小优先级越高，数字越大优先级越低。所以数字最小的是在队头。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之LinkedBlockingQueue、SynchronousQueue]]></title>
+      <url>/2020/11/24/juc-11/</url>
+      <content type="html"><![CDATA[<p>内容转载自   <a href="https://www.jianshu.com/p/28c9d9e34b29" target="_blank" rel="noopener">https://www.jianshu.com/p/28c9d9e34b29</a>   稍有改动</p>
+<h2 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h2><p>LinkedBlockingQueue 底层基于单向链表实现的阻塞队列，可以当做无界队列也可以当做有界队列来使用，满足 FIFO 的特性，为了防止 LinkedBlockingQueue 容量迅速增，损耗大量内存。通常在创建 LinkedBlockingQueue 对象时，会指定其大小，如果未指定，容量等于 Integer.MAX_VALUE。因为Integer.MAX_VALUE数值很大，所以可以称为”无界”队列(这里的无界并不是真正意义上的无界)。</p>
+<p>LinkedBlockingQueue比ArrayBlockingQueue具有更高的吞吐量，但在大多数并发应用程序中的预测性能较差。</p>
+<p>队列中存在最久的元素存在于 head.next 节点上(PS: head 节点永远存在, 且是一个 dummy 节点), 存储时间最短的节点存储在tail上; 通常情况下 LinkedBlockingQueue 的吞吐量要好于 ArrayBlockingQueue.<br>主要特点:</p>
+<p>基于两个lock的 queue, putLock, takeLock; 并且两个锁都有相关联的 condition 用于相应的 await; 每次进行 put/offer 或 take/poll 之后会根据queue的容量进行判断是否需要进行对应的唤醒<br>队列中总是存在一个 dummy 节点, 每次 poll 节点时获取的是 head.next 节点中的值</p>
+<p>为了实现阻塞效果并保证线程安全，它的内部用到了两个锁和两个 Condition。（ArrayBlockingQueue只有一个锁，这导致了LinkedBlockingQueue可以一边取一边放，而ArrayBlockingQueue不行。为啥？因为固定长度的count是个int，不能保证原子性和可见性，至于为什么这么设计，我也不清楚）</p>
+<p>queue中的数据存储在 Node 对象中, 且 Node 具有以下的特点:</p>
+<ul>
+<li>head.item 永远是 null, head是一个 dummy 节点, 所以进行 poll 时获取的是 head.next 的值</li>
+<li>tail.next = null</li>
+</ul>
+<pre><code class="java">/** Linked list node class */
+/**
+ * Linked 的数据节点, 这里有个特点, LinkedBlockingQueue 开始构建时会创建一个dummy节点(类似于 ConcurrentLinkedQueue)
+ * 而整个队列里面的头节点都是 dummy 节点
+ * @param &lt;E&gt;
+ */
+static class Node&lt;E&gt;{
+    E item;
+
+    /**
+     * One of:
+     * - the real successor Node
+     * - this Node, meaning the successor is head.next
+     * - null, meaning there is no successor (this is the last node)
+     */
+    /**
+     * 在进行 poll 时 会将 node.next = node 来进行 help gc
+     * next == null 指的是要么是队列的 tail 节点
+     */
+    Node&lt;E&gt; next;
+    Node(E x){
+        item = x;
+    }
+}
+
+/** The capacity bound, or Integer.MAX_VALUE if none */
+private final int capacity;
+
+/** Current number of elements */
+private final AtomicInteger count = new AtomicInteger();
+
+/**
+ * Head of linked list
+ * Invariant: head.item == null
+ * Head 节点的不变性 head.item == null &lt;- 这是一个 dummy 节点(dummy 节点什么作用呢, 主要是方便代码, 不然的话需要处理一些 if 的判断, 加大代码的复杂度, 尤其是非阻塞的实现)
+ */
+transient Node&lt;E&gt; head;
+
+/**
+ * Tail of linked list
+ * Invariant: last.next == null
+ * Tail 节点的不变性 last.next == null &lt;- 尾节点的 next 是 null
+ */
+private transient Node&lt;E&gt; last;
+
+/** ReentrantLock Condition 的常见使用方式 */
+/** Lock held by take, poll, etc */
+private final ReentrantLock takeLock = new ReentrantLock();
+
+/** Wait queue for waiting takes */
+private final Condition notEmpty = takeLock.newCondition();
+
+/** Lock held by put, offer, etc */
+private final ReentrantLock putLock = new ReentrantLock();
+
+/** Wait queue for waiting puts */
+private final Condition notFull = putLock.newCondition();
+</code></pre>
+<p>LinkedBlockingQueue 构造函数<br>LinkedBlockingQueue的构造函数比较简单, 主要是初始化一下容量(默认 Integer.MAX_VALUE), 及 head, tail</p>
+<pre><code class="java">/**
+ * Creates a {@code KLinkedBlockingQueue} with the given (fixed) capacity
+ *
+ * @param capacity the capacity of this queue
+ * @throws IllegalArgumentException if {@code capacity} is not greater
+ *                                  than zero
+ */
+public KLinkedBlockingQueue(int capacity){
+    if(capacity &lt;= 0) throw new IllegalArgumentException();
+    this.capacity = capacity; // 指定 queue 的容量
+    last = head = new Node&lt;E&gt;(null); // 默认的在 queue 里面 创建 一个 dummy 节点
+}
+</code></pre>
+<p>添加元素 put方法<br>put 方法是将元素添加到队列尾部, queue满时进行await, 添加成功后容量还未满, 则进行 signal</p>
+<pre><code class="java">/**
+ * Inserts the specified element at the tail of this queue, waiting if
+ * necessary for space to become available
+ *
+ *  将元素加入到 queue 的尾部
+ * @param e
+ * @throws InterruptedException
+ */
+public void put(E e) throws InterruptedException{
+    if(e == null) throw new NullPointerException();
+    // Note: convention in all put/take/etc is to preset local var
+    // holding count negativeto indicate failure unless set.
+    // 有趣的 变量 c 下面会有对它的讲解
+    int c = -1;
+    Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+    final ReentrantLock putLocK = this.putLock;
+    final AtomicInteger count = this.count;  // 获取 queue 的数量 count 
+    putLocK.lockInterruptibly(); // 获取 put 的lock
+    try {
+        /**
+         * Note that count is used in wait guard even though it is
+         * not protected by lock. This works because count can
+         * only decrease at this point (all other puts are shut
+         * out by lock), and we (or some other waiting put) are
+         * signalled if it ever changes from capacity. Similarly
+         * for all other uses of count in other wait guards
+         */
+        /**
+         * 若 queue 的容量满了 则进行 await,直到有人进行通知
+         * 那何时进行通知呢?
+         * 有两种情况进行通知,
+         *      (1) 有线程进行 put/offer 成功后且 (c + 1) &lt; capacity 时
+         *      (2) 在线程进行 take/poll 成功 且 (c == capacity) (PS: 这里的 c 指的是 在进行 take/poll 之前的容量)
+         */
+
+        while(count.get() == capacity){     // 容量满了, 进行等待
+            notFull.await();
+        }
+        enqueue(node);                        // 进行节点的入队操作
+        c = count.getAndIncrement();          // 进行节点个数的增加1, 返回原来的值
+        if(c + 1 &lt; capacity){               // 说明 现在的 put 操作后 queue 还没满
+            notFull.signal();               // 唤醒其他在睡的线程
+        }
+
+    }finally {
+        putLock.unlock();                   // 释放锁
+    }
+    if(c == 0){                             // c == 0 说明 原来queue是空的, 所以这里 signalNotEmpty 一下, 唤醒正在 poll/take 等待中的线程
+        signalNotEmpty();
+    }
+}
+
+/**
+ * Links node at end of queue
+ * 节点 入队列 (PS: 这里因为有个 dummy 节点, 不需要判空 &lt;- 现在有点感觉 dummy 节点的作用了吧)
+ * @param node the node
+ */
+private void enqueue(Node&lt;E&gt; node){
+    // assert putLock.isHeldByCurrentThread()
+    // assert last.next == null
+    last = last.next = node;
+}
+
+/**
+ * Signals a waiting take. Called only from put/offer (which do not
+ * otherwise ordinarily lock takeLock.)
+ */
+private void signalNotEmpty(){
+    final ReentrantLock takeLock = this.takeLock;
+    takeLock.lock();
+    try {
+        notEmpty.signal();
+    }finally {
+        takeLock.unlock();
+    }
+}
+</code></pre>
+<p>代码的注释中基本把操作思想都说了, 有几个注意的地方</p>
+<ul>
+<li>当queue满时, 会调用 notFull.await() 进行等待, 而相应的唤醒的地方有两处, 一个是 “有线程进行 put/offer 成功后且 (c + 1) &lt; capacity 时”, 另一处是 “在线程进行 take/poll 成功 且 (c == capacity) (PS: 这里的 c 指的是 在进行 take/poll 之前的容量)”</li>
+<li>代码中的 “signalNotEmpty” 这时在原来queue的数量 c (getAndIncrement的返回值是原来的值) ==0 时对此时在调用 take/poll 方法的线程进行唤醒</li>
+</ul>
+<p>添加元素offer 方法</p>
+<p>offer与put都是添加元素到queue的尾部, 只不过 put 方法在队列满时会进行阻塞, 直到成功; 而 offer 操作在容量满时直接返回 false.</p>
+<pre><code class="java">/**
+ * Inserts the specified element at the tail of this queue, waiting if
+ * necessary up to the specified wait time for space to become available
+ *
+ *  支持中断和超时的 offer 节点
+ *
+ * @param e
+ * @param timeout
+ * @param unit
+ * @return {@code true} if successful, or {@code false} if
+ *          the specified waiting time elapses before space is available
+ * @throws InterruptedException
+ */
+public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException{
+    if(e == null) throw new NullPointerException();
+    long nanos = unit.toNanos(timeout);
+    int c = -1;
+    final ReentrantLock putLock = this.putLock;     // 获取 put lock
+    final AtomicInteger count = this.count;         // 获取 queue 的容量
+    putLock.lockInterruptibly();
+    try {
+        while(count.get() == capacity){             // queue的容量满了进行 带 timeout 的 await
+            if(nanos &lt;= 0){                           //  用光了 timeout 直接 return false
+                return false;
+            }
+            nanos = notFull.awaitNanos(nanos);      // 直接 await (PS: 返回值 nanos &lt;= 0 说明 等待是超时了, 正常 await 并且 被 signal nanos &gt; 0; 具体详情会在 Condition 那一篇中详细说明)
+        }
+        enqueue(new Node&lt;E&gt;(e));                    // 节点若队列
+        c = count.getAndIncrement();                // 获取入队列之前的容量
+        if(c + 1 &lt; capacity){                     // c + 1 &lt; capacity 说明 现在的 offer 成功后 queue 还没满
+            notFull.signal();                     // 唤醒其他正在 await 的线程
+        }
+    }finally {
+        putLock.unlock();                           // 释放锁
+    }
+    if(c == 0){
+        signalNotEmpty();                            // c == 0 说明 原来queue是空的, 所以这里 signalNotEmpty 一下, 唤醒正在 poll/take 等待中的线程
+    }
+    return true;
+}
+</code></pre>
+<p>offer 整个操作和 put 差不多, 唯一变化的是多了一个 notFull.awaitNanos(nanos), 这个函数的返回值若是负数, 则说明等待超时, 则直接 return false (关于 Condition.awaitNanos 方法会在后续再说)</p>
+<p>获取queue头元素 take 方法<br>此方法是获取 queue 中呆着时间最长的节点的值(head.next)</p>
+<pre><code class="java">/**
+ * 取走 queue 中呆着时间最长的节点的 item (其实就是 head.next.item 的值)
+ * @return
+ * @throws InterruptedException
+ */
+public E take() throws InterruptedException{
+    E x;
+    int c = -1;
+    final AtomicInteger count = this.count;          // 获取 queue 的容量
+    final ReentrantLock takeLock = this.takeLock;
+    takeLock.lockInterruptibly();                      // 获取 lock
+    try {
+        while(count.get() == 0){                      // queue 为空, 进行 await
+            notEmpty.await();
+        }
+        x = dequeue();                                 // 将 head.next.item 的值取出, head = head.next
+        c = count.getAndDecrement();                   // queue 的容量计数减一
+        if(c &gt; 1){
+            notEmpty.signal();                        // c &gt; 1 说明 进行 take 后 queue 还有值
+        }
+    }finally {
+        takeLock.unlock();                              // 释放 lock
+    }
+    if(c == capacity){                                // c == capacity 说明一开始 queue 是满的, 调用 signalNotFull 进行唤醒一下 put/offer 的线程
+        signalNotFull();
+    }
+    return x;
+}
+
+/**
+ * Removes a node from head of queue
+ * 节点出队列 这里有个注意点 head 永远是 dummy 节点, dequeue 的值是 head.next.item 的值
+ * 在 dequeue 后 将 原  head 的后继节点设置为 head(成为了 dummy 节点)
+ * @return the node
+ */
+private E dequeue(){
+    // assert takeLock.isHeldByCurrentThread();
+    // assert head.item == null;
+    Node&lt;E&gt; h = head;       // 这里的 head 是一个 dummy 节点
+    Node&lt;E&gt; first = h.next; // 获取真正的节点
+    h.next = h;             // help GC
+    head = first;           // 重行赋值 head
+    E x = first.item;       // 获取 dequeue 的值
+    first.item = null;      // 将 item 置 空
+    return x;
+}
+
+/** Signal a waiting put. Called only from take/poll */
+private void signalNotFull(){
+    final ReentrantLock putLock = this.putLock;
+    putLock.lock();
+    try {
+        notFull.signal();
+    }finally {
+        putLock.unlock();
+    }
+}
+</code></pre>
+<p>操作过程: 将 head.next 的值取出, 将 head.next 设置为新的head; 操作的步骤比较少, 只有两处 condition 的唤醒需要注意一下：</p>
+<p>当 take 结束时, 判断 queue 是否还有元素 (c &gt; 1) 来进行 notEmpty.signal()<br>当 take 结束时, 判断原先的容量是否已经满 (c == capacity) 来决定是否需要调用 signalNotFull 进行唤醒此刻还在等待 put/offer 的线程</p>
+<p>获取queue头元素 poll 方法<br>poll 与 take 都是获取头节点的元素, 唯一的区别是 take在queue为空时进行await, poll 则直接返回</p>
+<pre><code class="java">/**
+ * 带 timeout 的poll 操作, 获取 head.next.item 的值
+ * @param timeout
+ * @param unit
+ * @return
+ * @throws InterruptedException
+ */
+public E poll(long timeout, TimeUnit unit) throws InterruptedException{
+    E x = null;
+    int c = -1;
+    long nanos = unit.toNanos(timeout);             //  计算超时时间
+    final AtomicInteger count = this.count;       // 获取 queue 的容量
+    final ReentrantLock takeLock = this.takeLock;
+    takeLock.lockInterruptibly();                   // 获取 lock
+    try{
+        while(count.get() == 0){                   // queue 为空, 进行 await
+            if(nanos &lt;= 0){                        // timeout 用光了, 直接 return null
+                return null;
+            }
+            nanos = notEmpty.awaitNanos(nanos);   // 调用 condition 进行 await, 在 timeout之内进行 signal -&gt; nanos&gt; 0
+        }
+        x = dequeue();                             // 节点出queue
+        c = count.getAndDecrement();               // 计算器减一
+        if(c &gt; 1){                                 // c &gt; 1 说明 poll 后 容器内还有元素, 进行 换新 await 的线程
+            notEmpty.signal();
+        }
+    }finally {
+        takeLock.unlock();                         // 释放锁
+    }
+    if(c == capacity){                           // c == capacity 说明一开始 queue 是满的, 调用 signalNotFull 进行唤醒一下 put/offer 的线程
+        signalNotFull();
+    }
+    return x;
+}
+</code></pre>
+<p>LinkedBlockingQueue 是一个基于链表实现的阻塞queue, 它的性能好于 ArrayBlockingQueue, 但是差于 ConcurrentLinkeQueue; 并且它非常适于生产者消费者的环境中, 比如 Executors.newFixedThreadPool() 就是基于这个队列的。</p>
+<p>LinkedBlockingQueue的静态工厂方法<br>使用LinkedBlockingQueue的好处：</p>
+<p>因为线程大小固定的线程池，其线程的数量是不具备伸缩性的，当任务非常繁忙的时候，就势必会导致所有的线程都处于工作状态，导致队列满的情况发生，从而导致任务无法提交而抛出RejectedExecutionException；<br>而使用”无界”队列由于其良好的存储容量的伸缩性，可以很好的去缓冲任务繁忙情况下场景，即使任务非常多，也可以进行动态扩容，当任务被处理完成之后，队列中的节点也会被随之被GC回收，非常灵活。</p>
+<p>FixedThreadPool的execute()说明</p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNQXj0.png" alt="DNQXj0.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNQxBT.png" alt="DNQxBT.png"></p>
+<p>FixedThreadPool的execute()执行流程</p>
+<ul>
+<li><p>如果当前运行的线程数少于corePoolSize，则会创建新线程来执行任务；</p>
+</li>
+<li><p>在线程池完成预热之后(当前运行的线程数等于corePoolSize)，将任务加入LinkedBlockingQueue；</p>
+</li>
+<li><p>线程执行完步骤A中的任务后，会在循环中反复从LinkedBlockingQueue获取任务来执行。</p>
+</li>
+</ul>
+<p>使用Executors.newFixedThreadPool相关的方法，LinkedBlockingQueue的capacity为Integer.MAX_VALUE，所以会对线程池有以下影响：</p>
+<ul>
+<li><p>当线程池中的线程数达到corePoolSize后，新任务将在无界队列中等待，因此线程池中的线程数不会超过corePoolSize；</p>
+</li>
+<li><p>由于A影响，使用”无界”队列时maximumPoolSize将是一个无效参数；</p>
+</li>
+<li><p>由于A、B影响，使用”无界”队列时keepAliveTime将是一个无效参数；</p>
+</li>
+<li><p>由于使用”无界队列”，运行中的FixedThreadPool(未执行shutdown()或shutdownNow())不会拒绝任务(不会调用RejectedExecutionException.rejectedExecution方法)。</p>
+</li>
+</ul>
+<p>SingleThreadExecutor的execute()说明</p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNlDvq.png" alt="DNlDvq.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNl6bT.png" alt="DNl6bT.png"></p>
+<p>SingleThreadExecutor的execute()执行流程</p>
+<ul>
+<li><p>如果当前运行的线程数少于corePoolSize(即线程池中无运行的线程)，则会创建一个新线程来执行任务；</p>
+</li>
+<li><p>在线程池完成预热之后(当前线程池中有一个运行的线程)，将任务加入LinkedBlockingQueue；</p>
+</li>
+<li><p>线程执行完步骤A中的任务后，会在一个无线循环中反复从LinkedBlockingQueue获取任务来执行。</p>
+</li>
+</ul>
+<p>SingleThreadExecutor使用”无界”的工作队列对线程池带来的影响与使用Executors.newFixedThreadPool相同。</p>
+<p>ArrayBlockingQueue和LinkedBlockingQueue的比较</p>
+<ul>
+<li>ArrayBlockingQueue由于其底层基于数组，并且在创建时指定存储的大小，在完成后就会立即在内存分配固定大小容量的数组元素，因此其存储通常有限；</li>
+<li>而LinkedBlockingQueue可以由用户指定最大存储容量，也可以无需指定，如果不指定则最大存储容量将是Integer.MAX_VALUE，由于其节点的创建都是动态创建，并且在节点出队列后可以被GC所回收，因此其具有灵活的伸缩性。</li>
+<li>但是由于ArrayBlockingQueue的有界性，因此其能够更好的对于性能进行预测，</li>
+<li><p>而LinkedBlockingQueue由于没有限制大小，当任务非常多的时候，不停地向队列中存储，就有可能导致内存溢出的情况发生。</p>
+</li>
+<li><p>ArrayBlockingQueue中在入队列和出队列操作过程中，使用的是同一个lock，所以即使在多核CPU的情况下，其读取和操作的都无法做到并行，而LinkedBlockingQueue的读取和插入操作所使用的锁是两个不同的lock，它们之间的操作互相不受干扰，因此两种操作可以并行完成，故LinkedBlockingQueue的吞吐量要高于ArrayBlockingQueue。</p>
+</li>
+</ul>
+<h2 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h2><p>每个插入操作必须等待另一个线程的对应移除操作 ，反之亦然。同步队列没有任何内部容量，甚至连一个队列的容量都没有。<br>SynchronousQueue的支持公平策略和非公平策略，所以底层可能两种数据结构：队列（实现公平策略）和栈（实现非公平策略），队列与栈都是通过链表来实现的。</p>
+<p>SynchronousQueue的静态工厂方法</p>
+<p>SynchronousQueue的execute()说明</p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNG0oT.png" alt="DNG0oT.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/24/DNGrYF.png" alt="DNGrYF.png"></p>
+<p>可以看到CacheThreadPool的corePoolSize被设置为0，即corePool为空，maximumPoolSize被设置为Integer.MAX_VALUE，即maximumPool是”无界”的，这意味着，如果主线程提交任务的速度高于maximumPool中线程处理任务的速度，CacheThreadPool会不断创建新的线程，极端情况下，CacheThreadPool会因为创建过多线程而耗尽CPU和内存资源；keepAliveTime设置为60L，意味着CacheThreadPool中的空闲线程等待新任务的最长时间为60s，空闲线程超过60s将被终止。</p>
+<p>SynchronousQueue的execute()执行流程</p>
+<ul>
+<li><p>首先执行SynchronousQueue.offer(E o)。如果当前maximumPool中有空闲线程正在执行SynchronousQueue.poll(long timeout, TimeUnit unit)，那么主线程执行offer操作与空闲线程执行的poll操作配对成功，主线程把任务交给空闲线程执行，execute()方法执行完成；否则执行下面的步骤2；</p>
+</li>
+<li><p>当初始maximumPool为空，或者maximumPool中当前没有空闲线程，将没有线程执行SynchronousQueue.poll(long timeout, TimeUnit unit)。这种情况下步骤1将失败。此时CacheThreadPool会创建一个新线程执行任务，execute()方法执行完成；</p>
+</li>
+<li><p>在步骤2中创建的线程将任务执行完成后，会执行SynchronousQueue.poll(long timeout, TimeUnit unit)。这个poll操作会让线程最多在SynchronousQueue中等待60s。如果60s内主线程就提交了一个新任务(主线程执行步骤1)，那么这个空闲线程将执行主线程提交的新任务；否则，这个空闲线程将终止。由于60s的空闲线程会被终止，因此长时间保持空闲的CacheThreadPool不会使用任何资源。</p>
+</li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之ArrayBlockingQueue]]></title>
+      <url>/2020/11/24/juc-10/</url>
+      <content type="html"><![CDATA[<p>内容转载自 <a href="https://juejin.cn/post/6844903989788540941" target="_blank" rel="noopener">https://juejin.cn/post/6844903989788540941</a> 稍有改动</p>
+<h2 id="BlockingQueue-介绍"><a href="#BlockingQueue-介绍" class="headerlink" title="BlockingQueue 介绍"></a>BlockingQueue 介绍</h2><p>BlockingQueue 继承自 Queue 接口,下面看看阻塞队列提供的接口；</p>
+<pre><code class="java">public interface BlockingQueue&lt;E&gt; extends Queue&lt;E&gt; {
+    /**
+     * 插入数据到队列尾部（如果立即可行且不会超过该队列的容量）
+     * 在成功时返回 true，如果此队列已满，则抛IllegalStateException。(与offer方法的区别)
+     */
+    boolean add(E e);
+
+    /**
+     * 插入数据到队列尾部，如果没有空间，直接返回false;
+     * 有空间直接插入，返回true。
+     */
+    boolean offer(E e);
+
+    /**
+     * 插入数据到队列尾部，如果队列没有空间，一直阻塞；
+     * 有空间直接插入。
+     */
+    void put(E e) throws InterruptedException;
+
+    /**
+     * 插入数据到队列尾部，如果没有额外的空间，等待一定的时间，有空间即插入，返回true，
+     * 到时间了，还是没有额外空间，返回false。
+     */
+    boolean offer(E e, long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+    /**
+     * 取出和删除队列中的头元素，如果没有数据，会一直阻塞到有数据
+     */
+    E take() throws InterruptedException;
+
+    /**
+     * 取出和删除队列中的头元素，如果没有数据，需要会阻塞一定的时间，过期了还没有数据，返回null
+     */
+    E poll(long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+    //除了上述方法还有继承自Queue接口的方法 
+    /**
+     * 取出和删除队列头元素，如果是空队列直接返回null。
+     */
+    E poll();
+
+    /**
+     * 取出但不删除头元素，该方法与peek方法的区别是当队列为空时会抛出NoSuchElementException异常
+     */
+    E element();
+
+    /**
+     * 取出但不删除头元素，空队列直接返回null
+     */
+    E peek();
+
+    /**
+     * 返回队列总额外的空间
+     */
+    int remainingCapacity();
+
+    /**
+     * 删除队列中存在的元素
+     */
+    boolean remove(Object o);
+
+   /**
+    * 判断队列中是否存在当前元素
+    */
+    boolean contains(Object o);
+
+}
+</code></pre>
+<h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><p>ArrayBlockingQueue() 是一个用数组实现的有界阻塞队列，内部按先进先出的原则对元素进行排序；固定长度，不用扩容。<br>其中 put 方法和 take 方法为添加和删除元素的阻塞方法。<br>ArrayBlockingQueue 实现的生产者消费者的 Demo，代码只是一个简单的 ArrayBlockingQueue 的使用，Consumer 消费者和 Producer 生产者通过 ArrayBlockingQueue 来获取（take）和添加（put）数据。</p>
+<pre><code class="java">/**
+ * 使用 ArrayBlockingQueue 实现的生产者消费者简单模型
+ */
+public class ArrayBlockingQueueDemo {
+
+    private final static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(4);
+    private final static ArrayBlockingQueue&lt;Data&gt; QUEUE = new ArrayBlockingQueue&lt;&gt;(1);
+
+    public static void main(String[] args) {
+        THREAD_POOL.execute(new Producer(QUEUE));
+        THREAD_POOL.execute(new Consumer(QUEUE));
+        THREAD_POOL.execute(new Producer(QUEUE));
+        THREAD_POOL.execute(new Consumer(QUEUE));
+        THREAD_POOL.shutdown();
+    }
+}
+
+class Data {
+
+}
+
+class Producer implements Runnable {
+
+    private final ArrayBlockingQueue&lt;Data&gt; mAbq;
+
+    public Producer(ArrayBlockingQueue&lt;Data&gt; mAbq) {
+        this.mAbq = mAbq;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 10; i++) {
+            produce();
+        }
+
+    }
+
+    private void produce() {
+        try {
+            Data data = new Data();
+            this.mAbq.put(data);
+            System.out.println(&quot;生产了数据@&quot; + data);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Consumer implements Runnable {
+
+    private final ArrayBlockingQueue&lt;Data&gt; mAbq;
+
+    public Consumer(ArrayBlockingQueue&lt;Data&gt; mAbq) {
+        this.mAbq = mAbq;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 10; i++) {
+            consumer();
+        }
+    }
+
+    private void consumer() {
+        try {
+            Data data = this.mAbq.take();
+            System.out.println(&quot;消费数据-&quot; + data);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+</code></pre>
+<p>ArrayBlockingQueue 内部的阻塞队列是通过 ReentrantLock 和 Condition 条件队列实现的，<br>所以 ArrayBlockingQueue 中的元素存在公平和非公平访问的区别，这是因为 ReentrantLock 里面存在公平锁和非公平锁的原因，</p>
+<p>下面对 ArrayBlockingQueue 构造方法进行分析：</p>
+<pre><code class="java">/**
+ * 创建一个具体容量的队列，默认是非公平队列
+ */
+public ArrayBlockingQueue(int capacity) {
+    this(capacity, false);
+}
+
+/**
+ * 创建一个具体容量、是否公平的队列 
+ */
+public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity &lt;= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair);
+    notEmpty = lock.newCondition();
+    notFull =  lock.newCondition();
+}
+</code></pre>
+<p>ArrayBlockingQueue 除了实现上述 BlockingQueue 接口的方法，其他方法介绍如下：</p>
+<pre><code class="java">//返回队列剩余容量
+public int remainingCapacity()
+
+// 判断队列中是否存在当前元素o
+public boolean contains(Object o) 
+
+// 返回一个按正确顺序，包含队列中所有元素的数组
+public Object[] toArray()
+
+// 返回一个按正确顺序，包含队列中所有元素的数组；数组的运行时类型是指定数组的运行时类型
+@SuppressWarnings(&quot;unchecked&quot;)
+public &lt;T&gt; T[] toArray(T[] a)
+
+
+// 自动清空队列中的所有元素
+public void clear()
+
+// 移除队列中所有可用元素，并将他们加入到给定的 Collection 中    
+public int drainTo(Collection&lt;? super E&gt; c)
+
+// 从队列中最多移除指定数量的可用元素，并将他们加入到给定的 Collection 中    
+public int drainTo(Collection&lt;? super E&gt; c, int maxElements)
+
+// 返回此队列中按正确顺序进行迭代的，包含所有元素的迭代器
+public Iterator&lt;E&gt; iterator()
+</code></pre>
+<p>ArrayBlockingQueue 源码和实现原理分析</p>
+<pre><code class="java">public class ArrayBlockingQueue&lt;E&gt; extends AbstractQueue&lt;E&gt;
+        implements BlockingQueue&lt;E&gt;, java.io.Serializable {
+
+    /** 存储数据的数组 */
+    final Object[] items;
+
+    /** 获取数据的索引，用于下次 take, poll, peek or remove 等方法 */
+    int takeIndex;
+
+    /** 添加元素的索引， 用于下次 put, offer, or add 方法 */
+    int putIndex;
+
+    /** 队列元素的个数 */
+    int count;
+
+    /*
+     * 并发控制使用任何教科书中的经典双条件算法
+     */
+
+    /** 控制并发访问的锁 */
+    final ReentrantLock lock;
+
+    /** 非空条件对象，用于通知 take 方法中在等待获取数据的线程，队列中已有数据，可以执行获取操作 */
+    private final Condition notEmpty;
+
+    /** 未满条件对象，用于通知 put 方法中在等待添加数据的线程，队列未满，可以执行添加操作 */
+    private final Condition notFull;
+
+    /** 迭代器 */
+    transient Itrs itrs = null;
+}
+</code></pre>
+<p>添加(阻塞添加)的实现分析</p>
+<pre><code class="java">/**
+ * 在当前 put 位置插入数据，put 位置前进一位，
+ * 同时唤醒 notEmpty 条件对象等待队列(链表)中第一个可用线程去 take 数据。
+ * 当然这一系列动作只有该线程获取锁的时候才能进行，即只有获取锁的线程
+ * 才能执行 enqueue 操作。
+ */
+// 元素统一入队操作
+private void enqueue(E x) {
+    // assert lock.getHoldCount() == 1;
+    // assert items[putIndex] == null;
+    final Object[] items = this.items;
+    items[putIndex] = x; // putIndex 位置添加数据
+    //putIndex 进行自增，当达到数组长度的时候，putIndex 重头再来，即设置为0
+    //因为线程会阻塞，所以进到这个方法的线程肯定是OK的，有空间的，直接冲头再来就好了
+    if (++putIndex == items.length) 
+        putIndex = 0;
+    count++; //元素个数自增
+    notEmpty.signal(); //添加完数据后，说明数组中有数据了，所以可以唤醒 notEmpty 条件对象等待队列(链表)中第一个可用线程去 take 数据
+}
+
+// 添加数据，数组中元素已满时，直接返回 false。
+public boolean offer(E e) {
+    checkNotNull(e);
+    final ReentrantLock lock = this.lock;
+    // 获取锁，保证线程安全
+    lock.lock();
+    try {
+        // 当数组元素个数已满时，直接返回false
+        if (count == items.length)
+            return false;
+        else {
+            // 执行入队操作，enqueue 方法在上面分析了
+            enqueue(e);
+            return true;
+        }
+    } finally {
+        // 释放锁，保证其他等待锁的线程可以获取到锁
+        // 为什么放到 finally (避免死锁)
+        lock.unlock();
+    }
+}
+
+// add 方法其实就是调用了 offer 方法来实现，
+// 与 offer 方法的区别就是 offer 方法数组满，抛出 IllegalStateException 异常。
+public boolean add(E e) {
+    if (offer(e))
+        return true;
+    else
+        throw new IllegalStateException(&quot;Queue full&quot;);
+}
+
+/**
+ * 插入数据到队列尾部，如果队列已满，阻塞等待空间
+ */
+public void put(E e) throws InterruptedException {
+    checkNotNull(e);
+    final ReentrantLock lock = this.lock;
+    // 获取锁，期间线程可以打断，打断则不会添加
+    lock.lockInterruptibly();
+    try {
+        // 通过上述分析，我们通过 count 来判断数组中元素个数
+        while (count == items.length)
+            notFull.await(); // 元素已满，线程挂起，线程加入 notFull 条件对象等待队列(链表)中，等待被唤醒
+        enqueue(e); // 队列未满，直接执行入队操作
+    } finally {
+        lock.unlock();
+    }
+}
+</code></pre>
+<p>提取(阻塞提取)的实现分析</p>
+<pre><code class="java">/**
+ * 提取 takeIndex 位置上的元素， 然后 takeIndex 前进一位，
+ * 同时唤醒 notFull 等待队列(链表)中的第一个可用线程去 put 数据。
+ * 这些操作都是在当前线程获取到锁的前提下进行的，
+ * 同时也说明了 dequeue 方法线程安全的。
+ */
+private E dequeue() {
+    // assert lock.getHoldCount() == 1;
+    // assert items[takeIndex] != null;
+    final Object[] items = this.items; 
+    @SuppressWarnings(&quot;unchecked&quot;)
+    E x = (E) items[takeIndex]; // 提取 takeIndex位置上的数据
+    items[takeIndex] = null; // 同时清空数组在 takeIndex 位置上的数据
+    // takeIndex 向前前进一位，如果前进后位置超过了数组的长度，则将其设置为0；
+    // 为什么设置为0，理由在 putIndex 设置为0的时候介绍过了，原因是一样的。
+    if (++takeIndex == items.length) 
+        takeIndex = 0;
+    count--; // 同时数组的元素个数进行减1
+    if (itrs != null)
+        itrs.elementDequeued(); // 同时更新迭代器中的元素，迭代器的具体分析会在下面单独整理
+    notFull.signal(); // 提取完数据后，说明数组中有空位，所以可以唤醒 notFull 条件对象的等待队列(链表)中的第一个可用线程去 put 数据
+    return x;
+}
+
+// 提取数据，数组中数据为空时，直接返回 null
+public E poll() {
+    final ReentrantLock lock = this.lock;
+    lock.lock(); // 加锁，前面也分析过，要执行 dequeue操作时，当前线程必须获取锁，保证线程安全
+    try {
+        return (count == 0) ? null : dequeue(); // 元素个数为0时，直接返回 null，不为0时，元素出队
+    } finally {
+        // 释放锁，在 finally 中释放可以避免死锁
+        lock.unlock();
+    }
+}
+
+
+// 返回数组上第 i 个元素
+final E itemAt(int i) {
+    return (E) items[i];
+}
+
+/**
+ * 通过代码可以看到，peek 是获取元素，而不是提取， 不会删除 takeIndex 位置上的数据。
+ * 内部通过 itemAt 方法实现，而不是 dequeue 方法。
+ */
+public E peek() {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+     return itemAt(takeIndex); //当队列为空时，返回 null
+    } finally {
+     lock.unlock();
+    }
+}
+
+// 从队列头部提取数据，队列中没有元素则阻塞，阻塞期间线程可中断
+public E take() throws InterruptedException {
+    final ReentrantLock lock = this.lock;
+    lock.lockInterruptibly(); //获取锁，期间线程可以打断，打断则不会提取
+    try {
+        // 元素为0时，当有线程提取元素，则将该线程加入到 notEmpty 条件对象的等待队列中，
+        // 直到当队列中有数据之后，会唤醒该线程去提取数据。
+        while (count == 0)
+            notEmpty.await();
+        return dequeue(); // 若有数据，直接调用 dequeue 提取数据
+    } finally {
+        lock.unlock();
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之Exchanger]]></title>
+      <url>/2020/11/23/juc-9/</url>
+      <content type="html"><![CDATA[<p>内容转载自 <a href="https://blog.csdn.net/u014634338/article/details/78385521" target="_blank" rel="noopener">https://blog.csdn.net/u014634338/article/details/78385521</a>  稍有改动</p>
+<p>前面分别介绍了CyclicBarrier、CountDownLatch、Semaphore，现在介绍并发工具类中的最后一个Exchange。<br>Exchanger 是一个用于线程间协作的工具类，Exchanger用于进行线程间的数据交换，它提供一个同步点，在这个同步点，两个线程可以交换彼此的数据。这两个线程通过exchange 方法交换数据，如果第一个线程先执行exchange 方法，它会一直等待第二个线程也执行exchange 方法，当两个线程都到达同步点时，这两个线程就可以交换数据。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>Exchanger 使用是非常简单的，但是实现原理和前面几种工具比较确实最难的，前面几种工具都是通过同步器或者锁来实现，而Exchanger 是一种无锁算法，和前面SynchronousQueue一样，都是通过循环 cas 来实现线程安全，因此这种方式就会显得比较抽象和麻烦。</p>
+<pre><code class="java">public class ExchangerDemo {
+
+    static Exchanger&lt;String&gt;exchanger=new Exchanger&lt;String&gt;();
+    static class Task implements Runnable{
+        @Override
+        public void run() {
+            try {
+                String result=exchanger.exchange(Thread.currentThread().getName());
+                System.out.println(&quot;this is &quot;+Thread.currentThread().getName()+&quot; receive data:&quot;+result);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void main(String[] args)throws  Exception{
+
+        Thread t1=new Thread(new Task(),&quot;thread1&quot;);
+        Thread t2=new Thread(new Task(),&quot;thread2&quot;);
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+    }
+}
+</code></pre>
+<h2 id="单槽-Exchanger"><a href="#单槽-Exchanger" class="headerlink" title="单槽 Exchanger"></a>单槽 Exchanger</h2><p>Exchanger 有单槽位和多槽位之分，单个槽位在同一时刻只能用于两个线程交换数据，这样在竞争比较激烈的时候，会影响到性能，多个槽位就是多个线程可以同时进行两个的数据交换，彼此之间不受影响，这样可以很好的提高吞吐量。<br>单槽 Exchanger相对要简单许多，我们就先从这里开始分析吧。</p>
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>槽位定义：</p>
+<pre><code class="java">@sun.misc.Contended static final class Node {
+    int index;              // arena的下标，多个槽位的时候利用
+    int bound;              // 上一次记录的Exchanger.bound；
+    int collides;           // 在当前bound下CAS失败的次数；
+    int hash;               // 用于自旋；
+    Object item;            // 这个线程的当前项，也就是需要交换的数据；
+    volatile Object match;  // 交换的数据
+    volatile Thread parked; // 线程
+}
+/**
+ * Value representing null arguments/returns from public
+ * methods. Needed because the API originally didn&#39;t disallow null
+ * arguments, which it should have.
+ * 如果交换的数据为 null,则用NULL_ITEM  代替
+ */
+private static final Object NULL_ITEM = new Object();
+
+/**
+ * Elimination array; null until enabled (within slotExchange).
+ * Element accesses use emulation of volatile gets and CAS.
+ * 多槽位节点
+ */
+private volatile Node[] arena;
+
+/**
+ * Slot used until contention detected.
+ * 单槽位节点
+ */
+private volatile Node slot;
+
+/**
+ * The index of the largest valid arena position, OR&#39;ed with SEQ
+ * number in high bits, incremented on each update.  The initial
+ * update from 0 to SEQ is used to ensure that the arena array is
+ * constructed only once.
+ * 最大槽位
+ */
+private volatile int bound;
+</code></pre>
+<p>Node 定义中，index，bound，collides 这些都是用于多槽位的，这些可以暂时不用管，item 是本线程需要交换的数据，match 是和其它线程交换后的数据，开始是为null,交换数据成功后，就是我们需要的数据了，parked记录线程，用于阻塞和唤醒线程。</p>
+<pre><code class="java">/** The number of CPUs, for sizing and spin control */
+private static final int NCPU = Runtime.getRuntime().availableProcessors();
+/**
+ * The bound for spins while waiting for a match. The actual
+ * number of iterations will on average be about twice this value
+ * due to randomization. Note: Spinning is disabled when NCPU==1.
+ */
+private static final int SPINS = 1 &lt;&lt; 10; // 自旋次数
+/**
+ * Slot used until contention detected.
+ */
+private volatile Node slot; // 用于交换数据的槽位
+</code></pre>
+<p>Node是每个线程自身用于数据交换的节点，相当于每个Node就代表了每个线程，为了保证线程安全，把线程的Node 节点 放在哪里呢，当然是ThreadLocal咯。</p>
+<pre><code class="java">/**
+ * Per-thread state  每个线程的数据，ThreadLocal 子类
+ */
+private final Participant participant;
+
+/** The corresponding thread local class */
+ static final class Participant extends ThreadLocal&lt;Node&gt; {
+     // 初始值返回Node
+     public Node initialValue() { return new Node(); }
+ }
+</code></pre>
+<p>单个槽位需要准备的知识就这么多，具体部分字段的理解，在代码中再来细看。</p>
+<h2 id="exchange-方法"><a href="#exchange-方法" class="headerlink" title="exchange 方法"></a>exchange 方法</h2><p>1、没有设定超时时间的exchange 方法</p>
+<pre><code class="java">public V exchange(V x) throws InterruptedException {
+    Object v;
+    Object item = (x == null) ? NULL_ITEM : x; // translate null args
+    if ((arena != null ||
+         (v = slotExchange(item, false, 0L)) == null) &amp;&amp;
+        ((Thread.interrupted() || // disambiguates null return
+          (v = arenaExchange(item, false, 0L)) == null)))
+        throw new InterruptedException();
+    return (v == NULL_ITEM) ? null : (V)v;
+}
+</code></pre>
+<p>2、具有超时功能的exchange 方法</p>
+<pre><code class="java">public V exchange(V x, long timeout, TimeUnit unit)
+    throws InterruptedException, TimeoutException {
+    Object v;
+    Object item = (x == null) ? NULL_ITEM : x;
+    long ns = unit.toNanos(timeout);
+    if ((arena != null ||
+         (v = slotExchange(item, true, ns)) == null) &amp;&amp;
+        ((Thread.interrupted() ||
+          (v = arenaExchange(item, true, ns)) == null)))
+        throw new InterruptedException();
+    if (v == TIMED_OUT)
+        throw new TimeoutException();
+    return (v == NULL_ITEM) ? null : (V)v;
+}
+</code></pre>
+<p>exchange 把 执行 单槽位交换还是多槽位交换，同时如果发生中断，则返回前会重设中断标志位 这几个操作通过一个语句来实现，因此看的时候可能需要仔细一点。<br>两个方法，主要的不同还是在于是否有超时时间设置，如果有超时时间设置，那么如果在指定的时间内没有交换到数据，那么就会返回（抛出超时异常），不会一直等待。<br>接下来我们就来看单槽位交换的核心方法slotExchange。</p>
+<p>slotExchange 方法</p>
+<pre><code class="java">private final Object slotExchange(Object item, boolean timed, long ns) {
+    // 得到一个初试的Node
+    Node p = participant.get();
+    // 当前线程
+    Thread t = Thread.currentThread();
+    // 如果发生中断，返回null,会重设中断标志位，并没有直接抛异常
+    if (t.isInterrupted()) // preserve interrupt status so caller can recheck
+        return null;
+
+    for (Node q;;) {
+        // 槽位 solt不为null,则说明已经有线程在这里等待交换数据了
+        if ((q = slot) != null) {
+            // 重置槽位
+            if (U.compareAndSwapObject(this, SLOT, q, null)) {
+                //获取交换的数据
+                Object v = q.item;
+                //等待线程需要的数据
+                q.match = item;
+                //等待线程
+                Thread w = q.parked;
+                //唤醒等待的线程
+                if (w != null)
+                    U.unpark(w);
+                return v; // 返回拿到的数据，交换完成
+            }
+            // create arena on contention, but continue until slot null
+            //存在竞争，其它线程抢先了一步该线程，因此需要采用多槽位模式，这个后面再分析
+            if (NCPU &gt; 1 &amp;&amp; bound == 0 &amp;&amp;
+                U.compareAndSwapInt(this, BOUND, 0, SEQ))
+                arena = new Node[(FULL + 2) &lt;&lt; ASHIFT];
+        }
+        else if (arena != null) //多槽位不为空，需要执行多槽位交换
+            return null; // caller must reroute to arenaExchange
+        else { //还没有其他线程来占据槽位
+            p.item = item;
+            // 设置槽位为p(也就是槽位被当前线程占据)
+            if (U.compareAndSwapObject(this, SLOT, null, p))
+                break; // 退出无限循环
+            p.item = null; // 如果设置槽位失败，则有可能其他线程抢先了，重置item,重新循环
+        }
+    }
+
+    //当前线程占据槽位，等待其它线程来交换数据
+    int h = p.hash;
+    long end = timed ? System.nanoTime() + ns : 0L;
+    int spins = (NCPU &gt; 1) ? SPINS : 1;
+    Object v;
+    // 直到成功交换到数据
+    while ((v = p.match) == null) {
+        if (spins &gt; 0) { // 自旋
+            h ^= h &lt;&lt; 1; h ^= h &gt;&gt;&gt; 3; h ^= h &lt;&lt; 10;
+            if (h == 0)
+                h = SPINS | (int)t.getId();
+            else if (h &lt; 0 &amp;&amp; (--spins &amp; ((SPINS &gt;&gt;&gt; 1) - 1)) == 0)
+                // 主动让出cpu,这样可以提供cpu利用率（反正当前线程也自旋等待，还不如让其它任务占用cpu）
+                Thread.yield();
+        }
+        else if (slot != p) //其它线程来交换数据了，修改了solt,但是还没有设置match,再稍等一会
+            spins = SPINS;
+        //需要阻塞等待其它线程来交换数据
+        //没发生中断，并且是单槽交换，没有设置超时或者超时时间未到 则继续执行
+        else if (!t.isInterrupted() &amp;&amp; arena == null &amp;&amp;
+                 (!timed || (ns = end - System.nanoTime()) &gt; 0L)) {
+            // cas 设置BLOCKER，可以参考Thread 中的parkBlocker
+            U.putObject(t, BLOCKER, this);
+            // 需要挂起当前线程
+            p.parked = t;
+            if (slot == p)
+                U.park(false, ns); // 阻塞当前线程
+            // 被唤醒后    
+            p.parked = null;
+            // 清空 BLOCKER
+            U.putObject(t, BLOCKER, null);
+        }
+        // 不满足前面 else if 条件，交换失败，需要重置solt
+        else if (U.compareAndSwapObject(this, SLOT, p, null)) {
+            v = timed &amp;&amp; ns &lt;= 0L &amp;&amp; !t.isInterrupted() ? TIMED_OUT : null;
+            break;
+        }
+    }
+    //清空match
+    U.putOrderedObject(p, MATCH, null);
+    p.item = null;
+    p.hash = h;
+    // 返回交换得到的数据（失败则为null）
+    return v;
+}
+</code></pre>
+<p>理解slotExchange 应该不难吧，相比前面的SynchronousQueue 之类的应该要简单多了，还是再来简述一遍：<br>当一个线程来交换数据时，如果发现槽位（solt）有数据时，说明其它线程已经占据了槽位，等待交换数据，那么当前线程就和该槽位进行数据交换，设置相应字段，如果交换失败，则说明其它线程抢先了该线程一步和槽位交换了数据，那么这个时候就存在竞争了，这个时候就会生成多槽位（area）,后面就会进行多槽位交换了。<br>如果来交换的线程发现槽位没有被占据，啊哈，这个时候自己就把槽位占据了，如果占据失败，则有可能其他线程抢先了占据了槽位，重头开始循环。<br>当来交换的线程占据了槽位后，就需要等待其它线程来进行交换数据了，首先自己需要进行一定时间的自旋，因为自旋期间有可能其它线程就来了，那么这个时候就可以进行数据交换工作，而不用阻塞等待了，如果不幸，进行了一定自旋后，没有其他线程到来，那么还是避免不了需要阻塞（如果设置了超时等待，发生了超时或中断异常，则退出，不阻塞等待），当准备阻塞线程的时候，发现槽位值变了，那么说明其它线程来交换数据了，但是还没有完全准备好数据，这个时候就不阻塞了，再稍微等那么一会，如果始终没有等到其它线程来交换，那么就挂起当前线程。<br>当其它线程到来并成功交换数据后，会唤醒被阻塞的线程，阻塞的线程被唤醒后，拿到数据（如果是超时，或中断，则数据为null）返回，结束。</p>
+<p>单槽位的交换就结束了，整个过程应该不难，如果竞争激烈，那么一个槽位显然就成了性能瓶颈了，因此就衍生出了多槽位交换，各自交换各自的，互不影响。</p>
+<h2 id="多槽-Exchanger"><a href="#多槽-Exchanger" class="headerlink" title="多槽 Exchanger"></a>多槽 Exchanger</h2><p>多槽位呢，实际就是一个Node 数组，代表了很多的槽位，对于多槽位，我个人对代码的部分理解得不是完全透彻，有些地方有点不知其所以然，在前面分析SynchronousQueue 的时候也曾遇到，但是SynchronousQueue 调试方便，跟几遍就可以很好的理解了，但是这个多槽位有点不好调试，而且一两个线程观察不出来，因此有些地方可能会说不清楚，或者有误，因此如果朋友发现有问题的，欢迎指出来，共同学习。</p>
+<pre><code class="java">@sun.misc.Contended static final class Node {
+    int index;              //arena的下标，多个槽位的时候利用
+    int bound;              // 上一次记录的Exchanger.bound；
+    int collides;           // 在当前bound下CAS失败的次数；
+    int hash;               // 用于自旋；
+    Object item;            // 这个线程的当前项，也就是需要交换的数据；
+    volatile Object match;  // 交换的数据
+    volatile Thread parked; // 线程
+}
+
+/**
+ * The byte distance (as a shift value) between any two used slots
+ * in the arena.  1 &lt;&lt; ASHIFT should be at least cacheline size.
+ * CacheLine填充
+ */
+private static final int ASHIFT = 7;
+
+/**
+ * The maximum supported arena index. The maximum allocatable
+ * arena size is MMASK + 1. Must be a power of two minus one, less
+ * than (1&lt;&lt;(31-ASHIFT)). The cap of 255 (0xff) more than suffices
+ * for the expected scaling limits of the main algorithms.
+ */
+private static final int MMASK = 0xff;
+
+/**
+ * Unit for sequence/version bits of bound field. Each successful
+ * change to the bound also adds SEQ.
+ * bound的&quot;版本号&quot;
+ */
+private static final int SEQ = MMASK + 1;
+
+/**
+ * The maximum slot index of the arena: The number of slots that
+ * can in principle hold all threads without contention, or at
+ * most the maximum indexable value.
+ */
+static final int FULL = (NCPU &gt;= (MMASK &lt;&lt; 1)) ? MMASK : NCPU &gt;&gt;&gt; 1;
+
+/**
+ * Elimination array; null until enabled (within slotExchange).
+ * Element accesses use emulation of volatile gets and CAS.
+ */
+private volatile Node[] arena;
+
+/**
+ * The index of the largest valid arena position, OR&#39;ed with SEQ
+ * number in high bits, incremented on each update.  The initial
+ * update from 0 to SEQ is used to ensure that the arena array is
+ * constructed only once.
+ */
+private volatile int bound;
+</code></pre>
+<p>为了不误导大家，重要的属性保留了源码的注释，这样有助于理解。<br>在Node 前面有个@sun.misc.Contended 的注解，这个是什么呢，这个是用来避免伪共享的（当然不仅仅是加个注解就ok了），下面的伪共享说明</p>
+<p>伪共享说明：假设一个类的两个相互独立的属性a和b在内存地址上是连续的(比如FIFO队列的头尾指针)，那么它们通常会被加载到相同的cpu cache line里面。并发情况下，如果一个线程修改了a，会导致整个cache line失效(包括b)，这时另一个线程来读b，就需要从内存里再次加载了，这种多线程频繁修改ab的情况下，虽然a和b看似独立，但它们会互相干扰，非常影响性能。</p>
+<p>ASHIFT 这个字段就是用于避免伪共享的，1 &lt;&lt; ASHIFT 可以避免两个Node在同一个共享区，这个可以从后面代码再来具体分析。</p>
+<p>在slotExchange 当存在竞争时，会构建area,现在我们再来回顾这个代码：</p>
+<pre><code class="java">if (NCPU &gt; 1 &amp;&amp; bound == 0 &amp;&amp;U.compareAndSwapInt(this, BOUND, 0, SEQ))
+      arena = new Node[(FULL + 2) &lt;&lt; ASHIFT];
+</code></pre>
+<p>初始化arena 时会设置bound为SEQ(SEQ=MMASK + 1)。MMASK 值为255，二进制：8个1<br>arena的大小为(FULL + 2) &lt;&lt; ASHIFT，因为1 &lt;&lt; ASHIFT 是用于避免伪共享的，因此实际有效的Node 只有FULL + 2 个，这个我们从后面的代码也可以得出。</p>
+<p>arenaExchange 方法</p>
+<p>多槽的交换大致思想就是：当一个线程来交换的时候，如果”第一个”槽位是空的，那么自己就在那里等待，如果发现”第一个”槽位有等待线程，那么就直接交换，如果交换失败，说明其它线程在进行交换，那么就往后挪一个槽位，如果有数据就交换，没数据就等一会，但是不会阻塞在这里，在这里等了一会，发现还没有其它线程来交换数据，那么就往“第一个”槽位的方向挪，如果反复这样过后，挪到了第一个槽位，没有线程来交换数据了，那么自己就在”第一个”槽位阻塞等待。<br>简单来说，如果有竞争冲突，那么就寻找后面的槽位，在后面的槽位等待一定时间，没有线程来交换，那么就又往前挪。</p>
+<pre><code class="java">private final Object arenaExchange(Object item, boolean timed, long ns) {
+    // 槽位数组
+    Node[] a = arena;
+    // 代表当前线程的Node
+    Node p = participant.get(); // p.index 初始值为 0
+    for (int i = p.index;;) {                      // access slot at i
+        int b, m, c; long j;                       // j is raw array offset
+        //在槽位数组中根据&quot;索引&quot; i 取出数据 j相当于是 &quot;第一个&quot;槽位
+        Node q = (Node)U.getObjectVolatile(a, j = (i &lt;&lt; ASHIFT) + ABASE);
+        // 该位置上有数据(即有线程在这里等待交换数据)
+        if (q != null &amp;&amp; U.compareAndSwapObject(a, j, q, null)) {
+            // 进行数据交换，这里和单槽位的交换是一样的
+            Object v = q.item;                     // release
+            q.match = item;
+            Thread w = q.parked;
+            if (w != null)
+                U.unpark(w);
+            return v;
+        }
+        // bound 是最大的有效的 位置，和MMASK相与，得到真正的存储数据的索引最大值
+        else if (i &lt;= (m = (b = bound) &amp; MMASK) &amp;&amp; q == null) {
+            // i 在这个范围内，该槽位也为空
+
+            // 将需要交换的数据 设置给p
+            p.item = item;                         // offer
+            // 设置该槽位数据(在该槽位等待其它线程来交换数据)
+            if (U.compareAndSwapObject(a, j, null, p)) {
+                long end = (timed &amp;&amp; m == 0) ? System.nanoTime() + ns : 0L;
+                Thread t = Thread.currentThread(); // wait
+                // 进行一定时间的自旋
+                for (int h = p.hash, spins = SPINS;;) {
+                    Object v = p.match;
+                    //在自旋的过程中，有线程来和该线程交换数据
+                    if (v != null) {
+                        //交换数据后，清空部分设置，返回交换得到的数据，over
+                        U.putOrderedObject(p, MATCH, null);
+                        p.item = null;             // clear for next use
+                        p.hash = h;
+                        return v;
+                    }
+                    else if (spins &gt; 0) {
+                        h ^= h &lt;&lt; 1; h ^= h &gt;&gt;&gt; 3; h ^= h &lt;&lt; 10; // xorshift
+                        if (h == 0)                // initialize hash
+                            h = SPINS | (int)t.getId();
+                        else if (h &lt; 0 &amp;&amp;          // approx 50% true
+                                 (--spins &amp; ((SPINS &gt;&gt;&gt; 1) - 1)) == 0)
+                            Thread.yield();        // two yields per wait
+                    }
+                    // 交换数据的线程到来，但是还没有设置好match，再稍等一会
+                    else if (U.getObjectVolatile(a, j) != p)
+                        spins = SPINS; 
+                    // 符合条件，特别注意m==0 这个说明已经到达area 中最小的存储数据槽位了
+                    // 没有其他线程在槽位等待了，所有当前线程需要阻塞在这里     
+                    else if (!t.isInterrupted() &amp;&amp; m == 0 &amp;&amp;
+                             (!timed ||
+                              (ns = end - System.nanoTime()) &gt; 0L)) {
+                        U.putObject(t, BLOCKER, this); // emulate LockSupport
+                        p.parked = t;              // minimize window
+                        // 再次检查槽位，看看在阻塞前，有没有线程来交换数据
+                        if (U.getObjectVolatile(a, j) == p) 
+                            U.park(false, ns); // 挂起
+                        p.parked = null;
+                        U.putObject(t, BLOCKER, null);
+                    }
+                    // 当前这个槽位一直没有线程来交换数据，准备换个槽位试试
+                    else if (U.getObjectVolatile(a, j) == p &amp;&amp;
+                             U.compareAndSwapObject(a, j, p, null)) {
+                        //更新bound
+                        if (m != 0)                // try to shrink
+                            U.compareAndSwapInt(this, BOUND, b, b + SEQ - 1);
+                        p.item = null;
+                        p.hash = h;
+                        // 减小索引值 往&quot;第一个&quot;槽位的方向挪动
+                        i = p.index &gt;&gt;&gt;= 1;        // descend
+                        // 发送中断，返回null
+                        if (Thread.interrupted())
+                            return null;
+                        // 超时
+                        if (timed &amp;&amp; m == 0 &amp;&amp; ns &lt;= 0L)
+                            return TIMED_OUT;
+                        break;                     // expired; restart 继续主循环
+                    }
+                }
+            }
+            else
+                //占据槽位失败，先清空item,防止成功交换数据后，p.item还引用着item
+                p.item = null;                     // clear offer
+        }
+        else { // i 不在有效范围，或者被其它线程抢先了
+            //更新p.bound
+            if (p.bound != b) {                    // stale; reset
+                p.bound = b;
+                //新bound ，重置collides
+                p.collides = 0;
+                //i如果达到了最大，那么就递减
+                i = (i != m || m == 0) ? m : m - 1;
+            }
+            else if ((c = p.collides) &lt; m || m == FULL ||
+                     !U.compareAndSwapInt(this, BOUND, b, b + SEQ + 1)) {
+                p.collides = c + 1; // 更新冲突
+                // i=0 那么就从m开始，否则递减i
+                i = (i == 0) ? m : i - 1;          // cyclically traverse
+            }
+            else
+                //递增，往后挪动
+                i = m + 1;                         // grow
+            // 更新index
+            p.index = i;
+        }
+    }
+}
+</code></pre>
+<p>理解起来应该有点抽象，当然我分析的也不一定就正确，不要全相信我的描述，结合自己理解。</p>
+<pre><code class="java">Node q = (Node)U.getObjectVolatile(a, j = (i &lt;&lt; ASHIFT) + ABASE);
+</code></pre>
+<p>对于上面这个代码，开始理解可能有点难，i &lt;&lt; ASHIFT 是用于避免伪共享的，虽然arena数组很大，但是里面并不是每个位置都利用的，还有一些是没有利用的，其间隔就是1 &lt;&lt; ASHIFT。</p>
+<pre><code class="java">Class&lt;?&gt; ak = Node[].class;
+ABASE = U.arrayBaseOffset(ak) + (1 &lt;&lt; ASHIFT);
+</code></pre>
+<p>ABASE 就是arena的起始位置上加了(1 &lt;&lt; ASHIFT) 这个偏移，相当于ABASE作为了 arena数组的其实位置，其前(1 &lt;&lt; ASHIFT)的位置没有利用。</p>
+<p>当发现槽位q 有数据的时候就交换数据，如果cas 失败，说明存在竞争，那么就会执行后面的else,更新bound 还是递增或者递减索引i。<br>如果槽位q 没有数据，并且索引 i在有效范围内，如果是”第一个”槽位，那么会占据槽位，进行一定时间的自旋，然后阻塞等待，如果不是”第一个”槽位，那么就会换个槽位等待，清空当前槽位，然后索引值减半。（如果设置了超时，需要进行超时判断，如果发生超时就返回）。</p>
+<p>对于 i &lt;= (m = (b = bound) &amp; MMASK) , m 的值肯定在[0,MMASK]之间。</p>
+<pre><code class="java">U.compareAndSwapInt(this, BOUND, b, b + SEQ + 1
+</code></pre>
+<p>上面这行代码则是在递增BOUND,SEQ+1的二进制位位：100000001，当它和MMASK 相与的结果相比原来就增加了1，因此这个是递增BOUND。</p>
+<pre><code class="java">if (m != 0)                // try to shrink
+    U.compareAndSwapInt(this, BOUND, b, b + SEQ - 1);
+</code></pre>
+<p>对于上面这行代码，SEQ - 1 就是MMASK,这个新bound和MMASK 相与的结果应该变大了，（注意m！=0 ,则说明bound低8位存在1），那么索引i 就越有可能在这个范围内，如果还是没有其他线程来交换，则会再次减小i，也就是说增大了m,反而减小了i, jdk 源码上的注释（try to shrink）则是尝试缩小,不知是不是指的这个含义。</p>
+<p>估计我描述的晕咚咚的，这个部分，我也不是特别明白，因此就不好多阐述了，后面抽空还会进行研究研究，如果朋友有新的理解，可以指教一二。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Exchanger 还是很有意思的，用于线程之间两两交换数据，在多线程下，互相交换数据的两个线程是不确定的。<br>在竞争比较小的时候，采用单槽位进行交换数据，当线程来交换数据时，发现槽位为空，则自己在这里等待，否则就和槽位进行交换数据，同时会唤醒等待的线程。</p>
+<p>在竞争比较激烈的情况下，就会转到多槽位的交换，这个多槽位的交换，其实思想还是很好理解，但是局部有些细节确实还没有理解透，同时调试也困难，只有自己脑海里不挺的模拟，但是这个可能模拟出错（哈哈）。但是对多槽位的大致思想应该还是明白了，当一个线程来交换的时候，如果”第一个”槽位是空的，那么自己就在那里等待，如果发现”第一个”槽位有等待线程，那么就直接交换，如果交换失败，说明其它线程在进行交换，那么就往后挪一个槽位，如果有数据就交换，没数据就等一会，但是不会阻塞在这里，在这里等了一会，发现还没有其它线程来交换数据，那么就往“第一个”槽位的方向挪，如果反复这样过后，挪到了第一个槽位，没有线程来交换数据了，那么自己就在”第一个”槽位阻塞等待。</p>
+<p>第一个槽位并不是指的数组中的第一个，而是逻辑第一个，因为存在伪共享，多槽位中，部分空间没有被利用。</p>
+<p>最后用一个在网上看到的段子结束此篇博客（<a href="http://brokendreams.iteye.com/blog/2253956），博主对其做了一点点修改，以便更加符合在1.8环境下的Exchanger：" target="_blank" rel="noopener">http://brokendreams.iteye.com/blog/2253956），博主对其做了一点点修改，以便更加符合在1.8环境下的Exchanger：</a></p>
+<p>其实就是”我”和”你”(可能有多个”我”，多个”你”)在一个叫Slot的地方做交易(一手交钱，一手交货)，过程分以下步骤：</p>
+<ol>
+<li>我先到一个叫做Slot的交易场所交易，发现你已经到了，那我就尝试喊你交易，如果你回应了我，决定和我交易那么进入第2步；如果别人抢先一步把你喊走了，那我就进入第5步。</li>
+<li>我拿出钱交给你，你可能会接收我的钱，然后把货给我，交易结束；也可能嫌我掏钱太慢(超时)或者接个电话(中断)，TM的不卖了，走了，那我只能再找别人买货了(从头开始)。</li>
+<li>我到交易地点的时候，你不在，那我先尝试把这个交易点给占了(一屁股做凳子上…)，如果我成功抢占了单间(交易点)，那就坐这儿等着你拿货来交易，进入第4步；如果被别人抢座了，那我只能在找别的地方儿了，进入第5步。</li>
+<li>你拿着货来了，喊我交易，然后完成交易；也可能我等了好长时间你都没来，我不等了，继续找别人交易去，走的时候我看了一眼，一共没多少人，弄了这么多单间(交易地点Slot)，太TM浪费了，我喊来交易地点管理员：一共也没几个人，搞这么多单间儿干毛，给哥撤一个！。然后再找别人买货(从头开始)；或者我老大给我打了个电话，不让我买货了(中断)。</li>
+<li>我跑去喊管理员，尼玛，就一个坑交易个毛啊，然后管理在一个更加开阔的地方开辟了好多个单间，然后我就挨个来看每个单间是否有人。如果有人我就问他是否可以交易，如果回应了我，那我就进入第2步。如果我没有人，那我就占着这个单间等其他人来交易，进入第4步。</li>
+<li>如果我尝试了几次都没有成功，我就会认为，是不是我TM选的这个单间风水不好？不行，得换个地儿继续(从头开始)；如果我尝试了多次发现还没有成功，怒了，把管理员喊来：给哥再开一个单间(Slot)，加一个凳子，这么多人就这么几个破凳子够谁用！</li>
+</ol>
+<p>看起来在并发竞争多的时候，exchanger这种先到先得的模式，无法保证与某一个特定的线程交换值。这玩意真的有使用场景么？</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[juc之CyclicBarrier]]></title>
       <url>/2020/11/22/juc-8/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <h2 id="CyclicBarrier是什么？"><a href="#CyclicBarrier是什么？" class="headerlink" title="CyclicBarrier是什么？"></a>CyclicBarrier是什么？</h2><p>字面意思回环栅栏，通过它可以实现让一组线程等待至某个状态之后再全部同时执行。<br>叫做回环是因为当所有等待线程都被释放以后，CyclicBarrier可以被重用。<br>叫做栅栏，大概是描述所有线程被栅栏挡住了，当都达到时，一起跳过栅栏执行，也算形象。我们可以把这个状态就叫做barrier。</p>
 <p>举个报旅行团旅行的例子。<br>出发时，导游会在机场收了护照和签证，办理集体出境手续，所以，要等大家都到齐才能出发，出发前再把护照和签证发到大家手里。<br>对应CyclicBarrier使用。<br>每个人到达后进入barrier状态。<br>都到达后，唤起大家一起出发去旅行。<br>旅行出发前，导游还会有个发护照和签证的动作。</p>
 <pre><code class="java">/**
@@ -263,7 +1963,7 @@ private void breakBarrier() {
     <entry>
       <title><![CDATA[juc之CountDownLatch]]></title>
       <url>/2020/11/22/juc-7/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <h2 id="CountDownLatch是什么"><a href="#CountDownLatch是什么" class="headerlink" title="CountDownLatch是什么"></a>CountDownLatch是什么</h2><p>闭锁，CountDownLatch能够使一个线程等待其他线程完成各自的工作后再执行。例如，应用程序的主线程希望在负责启动框架服务的线程已经启动所有的框架服务之后再执行。</p>
 <p>可见CountDownLatch跟之前我们所有的juc对象都有着本质性区别，之前的都是线程能拿到资源，也可以归还资源，CountDownLatch则是只能拿，不能还，而且在资源花完之前，父线程会一直阻塞。</p>
 <p>例子：每天起早贪黑的上班，父母每天也要上班，话说今天定了个饭店，一家人一起吃个饭，通知大家下班去饭店集合。假设：3个人在不同的地方上班，必须等到3个人到场才能吃饭，用程序如何实现呢？</p>
@@ -378,7 +2078,7 @@ public boolean await(long timeout, TimeUnit unit)
     <entry>
       <title><![CDATA[juc之Semaphore]]></title>
       <url>/2020/11/22/juc-6/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <h2 id="Semaphore-是什么"><a href="#Semaphore-是什么" class="headerlink" title="Semaphore 是什么"></a>Semaphore 是什么</h2><p>Semaphore是JUC包提供的一个共享锁，一般称之为信号量。可以用来控制同时访问特定资源的线程数量，通过协调各个线程，以保证合理的使用资源。</p>
 <p>Semaphore通过自定义的同步器维护了一个或多个共享资源，线程通过调用acquire获取共享资源，通过调用release释放。</p>
 <p>注意Semaphore并非lock的子类，所以加锁和解锁，用的是acquire，release，tryacquire，tryrelease</p>
@@ -734,7 +2434,7 @@ public boolean await(long timeout, TimeUnit unit)
     <entry>
       <title><![CDATA[juc之ReentrantReadWriteLock]]></title>
       <url>/2020/11/22/juc-5/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <p>ReentrantLock提供了标准的互斥操作，但在应用中，我们对一个资源的访问有两种方式：读和写，读操作一般不会影响数据的一致性问题。但如果我们使用ReentrantLock，则在需要在读操作的时候也独占锁，这会导致并发效率大大降低。JUC包提供了读写锁ReentrantReadWriteLock，使得读写锁分离，在上述情境下，应用读写锁相对于使用独占锁，并发性能得到较大提高。</p>
 <p>我们先来大致了解一下ReentrantReadWriteLock的性质：</p>
 <ul>
@@ -1178,7 +2878,7 @@ private transient int firstReaderHoldCount;
     <entry>
       <title><![CDATA[juc之Condition]]></title>
       <url>/2020/11/22/juc-4/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <p>Condition在JUC框架下提供了传统Java监视器风格的wait、notify和notifyAll相似的功能。</p>
 <p><img src="https://s3.ax1x.com/2020/11/22/DGpqBD.png" alt="DGpqBD.png"></p>
 <p>Condition队列与Sync队列（锁等待队列）有几点不同：</p>
@@ -1557,7 +3257,7 @@ final ConditionObject newCondition() {
     <entry>
       <title><![CDATA[juc之ReentrantLock]]></title>
       <url>/2020/11/22/juc-3/</url>
-      <content type="html"><![CDATA[<p>内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <p>ReentrantLock是JUC包提供的一种可重入独占锁，它实现了Lock接口。与Semaphore类似，ReentrantLock也提供了两种工作模式：公平模式&amp;非公平模式，也是通过自定义两种同步器FairSync&amp;NonfairSync来实现的。</p>
 <h2 id="lock-不响应中断获取锁"><a href="#lock-不响应中断获取锁" class="headerlink" title="lock 不响应中断获取锁"></a>lock 不响应中断获取锁</h2><pre><code class="java">public void lock() {
         sync.lock();
@@ -1773,7 +3473,7 @@ final ConditionObject newCondition() {
     <entry>
       <title><![CDATA[juc之aqs]]></title>
       <url>/2020/11/21/juc-2/</url>
-      <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容参考自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a></p>
+      <content type="html"><![CDATA[<p>今天说aqs，juc中的绝对核心。内容转载自：<a href="https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/" target="_blank" rel="noopener">https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/</a>  稍有改动</p>
 <p>AbstractQueuedSynchronizer（AQS）是一个同步器框架，抽象类。在实现锁的时候，一般会实现一个继承自AQS的内部类sync，作为我们的自定义同步器。AQS内部维护了一个state成员和一个队列。其中state标识了共享资源的状态，队列则记录了等待资源的线程。</p>
 <p>以下这五个方法，在AQS中实现为直接抛出异常，这是我们自定义同步器需要重写的方法：</p>
 <ul>
@@ -2167,7 +3867,7 @@ static final int PROPAGATE = -3;
       <url>/2020/11/21/juc-1/</url>
       <content type="html"><![CDATA[<hr>
 <p>给自己立的flag：</p>
-<p>预计这个系列会包括，原子类，AQS，ReentrantLock，Condition，ReentrantReadWriteLock，Semaphore，CountDownLatch，CyclicBarrier，Exchanger，BlockingQueue，ThreadPoolExecutor，FockJoin，ConcurrentHashMap，ConcurrentSkipListMap，CopyOnWriteArrayList。</p>
+<p>预计这个系列会包括，原子类，AQS，ReentrantLock，Condition，ReentrantReadWriteLock，Semaphore，CountDownLatch，CyclicBarrier，Exchanger，BlockingQueue，ConcurrentHashMap，ConcurrentSkipListMap，CopyOnWriteArrayList,ThreadPoolExecutor，FockJoin。</p>
 <p>回头记得把阿里的transmittable-thread-local给补上</p>
 <p>最后总结些并发中的经典场景，案例以及面试题。</p>
 <p>撸一遍方鹏飞的Java并发编程艺术</p>
