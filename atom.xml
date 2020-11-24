@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-24T10:13:55.473Z</updated>
+  <updated>2020-11-24T11:13:05.694Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,67 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>juc之CoryOnWriteArrayList、CopyOnWriteArraySet</title>
+    <link href="http://seanthefish.com/2020/11/24/juc-14/"/>
+    <id>http://seanthefish.com/2020/11/24/juc-14/</id>
+    <published>2020-11-24T07:00:00.000Z</published>
+    <updated>2020-11-24T11:13:05.694Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;CopyOnWrite（简称：COW）：即复制再写入，就是在添加元素的时候，先把原 List 列表复制一份，再添加新的元素&lt;/p&gt;
+&lt;p&gt;CopyOnWriteArrayList
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>juc之ConcurrentHashMap</title>
+    <link href="http://seanthefish.com/2020/11/24/juc-15/"/>
+    <id>http://seanthefish.com/2020/11/24/juc-15/</id>
+    <published>2020-11-24T07:00:00.000Z</published>
+    <updated>2020-11-24T16:28:41.410Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;搬运自 &lt;a href=&quot;https://my.oschina.net/xiaolyuh/blog/3080609&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+  </entry>
   
   <entry>
     <title>juc之ConcurrentLinkedQueue</title>
@@ -111,7 +172,7 @@
     <link href="http://seanthefish.com/2020/11/24/juc-10/"/>
     <id>http://seanthefish.com/2020/11/24/juc-10/</id>
     <published>2020-11-24T03:00:00.000Z</published>
-    <updated>2020-11-24T09:35:07.408Z</updated>
+    <updated>2020-11-24T11:24:50.838Z</updated>
     
     <summary type="html">
     
@@ -547,68 +608,6 @@
       <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
     
       <category term="gc" scheme="http://seanthefish.com/tags/gc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>tomcat classloader源码详解</title>
-    <link href="http://seanthefish.com/2020/11/15/tomcat-classloader/"/>
-    <id>http://seanthefish.com/2020/11/15/tomcat-classloader/</id>
-    <published>2020-11-15T04:14:47.000Z</published>
-    <updated>2020-11-18T01:53:36.243Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;源码&quot;&gt;&lt;a href=&quot;#源码&quot; class=&quot;headerlink&quot; title=&quot;源码&quot;&gt;&lt;/a&gt;源码&lt;/h3&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;public void init() throws Exception {
-
-       
-        
-      
-    
-    </summary>
-    
-      <category term="classLoader" scheme="http://seanthefish.com/categories/classLoader/"/>
-    
-      <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
-    
-    
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
-    
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>classloader详解</title>
-    <link href="http://seanthefish.com/2020/11/14/classloader-classpath-hell/"/>
-    <id>http://seanthefish.com/2020/11/14/classloader-classpath-hell/</id>
-    <published>2020-11-14T04:14:47.000Z</published>
-    <updated>2020-11-18T01:52:32.210Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;类加载的顺序&quot;&gt;&lt;a href=&quot;#类加载的顺序&quot; class=&quot;headerlink&quot; title=&quot;类加载的顺序&quot;&gt;&lt;/a&gt;类加载的顺序&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://s3.ax1x.com/2020/11/17/DVLBkt.png&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="classLoader" scheme="http://seanthefish.com/categories/classLoader/"/>
-    
-      <category term="jvm" scheme="http://seanthefish.com/categories/classLoader/jvm/"/>
-    
-    
-      <category term="classLoader" scheme="http://seanthefish.com/tags/classLoader/"/>
-    
-      <category term="jvm" scheme="http://seanthefish.com/tags/jvm/"/>
     
   </entry>
   
