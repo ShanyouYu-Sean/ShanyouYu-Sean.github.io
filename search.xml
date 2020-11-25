@@ -92,6 +92,8 @@
                     }
 
             }else {
+                // 释放节点，使前驱节点有效自旋
+                node.t = null;
                 // 如果后驱节点不为空，unpark
                 if (node.next != null){
                     LockSupport.unpark(node.next.t);
@@ -120,9 +122,9 @@
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -614,9 +616,9 @@ public class Hosee {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -640,9 +642,9 @@ public class Hosee {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -1330,16 +1332,16 @@ public void run() {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
     </entry>
     
     <entry>
-      <title><![CDATA[juc之ConcurrentHashMap]]></title>
+      <title><![CDATA[juc之ConcurrentSkipListMap]]></title>
       <url>/2020/11/25/juc-16/</url>
       <content type="html"><![CDATA[<h2 id="跳表"><a href="#跳表" class="headerlink" title="跳表"></a>跳表</h2><p>对于一个单链表，即使链表是有序的，如果我们想要在其中查找某个数据，也只能从头到尾遍历链表，这样效率自然就会很低。而跳表是在这个单链表的基础上同时维护了多个链表，并且链表是分层的。</p>
 <p><img src="https://s3.ax1x.com/2020/11/25/DaiIzD.png" alt="DaiIzD.png"></p>
@@ -1631,9 +1633,9 @@ static final class HeadIndex&lt;K,V&gt; extends Index&lt;K,V&gt; {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -2748,9 +2750,9 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -2851,9 +2853,9 @@ public boolean addIfAbsent(E e) {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -3036,9 +3038,9 @@ void lazySetNext(Node&lt;E&gt; val) {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -3314,9 +3316,9 @@ private E dequeue(){
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -3709,9 +3711,9 @@ public E poll(long timeout, TimeUnit unit) throws InterruptedException{
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -4103,9 +4105,9 @@ public E take() throws InterruptedException {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -4551,9 +4553,9 @@ ABASE = U.arrayBaseOffset(ak) + (1 &lt;&lt; ASHIFT);
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -4809,9 +4811,9 @@ private void breakBarrier() {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -4924,9 +4926,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -5280,9 +5282,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -5724,9 +5726,9 @@ private transient int firstReaderHoldCount;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -6103,9 +6105,9 @@ final ConditionObject newCondition() {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -6319,9 +6321,9 @@ final ConditionObject newCondition() {
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -6711,9 +6713,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -6783,9 +6785,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> juc </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> juc </tag>
             
         </tags>
         
@@ -7473,9 +7475,9 @@ public class TicketLock {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> cas </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -8410,9 +8412,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -8558,9 +8560,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -10261,6 +10263,55 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
     </entry>
     
     <entry>
+      <title><![CDATA[在spring中使用cors]]></title>
+      <url>/2018/11/06/spring-cors/</url>
+      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
+<p>解决方案：</p>
+<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+@Configuration
+public class WebCorsConfig {
+
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        config.addAllowedMethod(&quot;*&quot;);
+        source.registerCorsConfiguration(&quot;/**&quot;, config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[使用oidc id token验证spring security resource server]]></title>
       <url>/2018/11/06/spring-security-jwt/</url>
       <content type="html"><![CDATA[<p>在前后端分离的项目中，前端因为不能保证密钥的安全，通常会使用oidc implicit grant type来获取access token和id token，后端会验证token的合法性并获得用户信息。</p>
@@ -10416,58 +10467,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             
             <tag> OAuth </tag>
             
+            <tag> spring </tag>
+            
             <tag> OIDC </tag>
-            
-            <tag> spring </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[在spring中使用cors]]></title>
-      <url>/2018/11/06/spring-cors/</url>
-      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
-<p>解决方案：</p>
-<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-
-@Configuration
-public class WebCorsConfig {
-
-    @Bean
-    public FilterRegistrationBean customCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        config.addAllowedMethod(&quot;*&quot;);
-        source.registerCorsConfiguration(&quot;/**&quot;, config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-}
-</code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> spring </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> spring </tag>
             
         </tags>
         
