@@ -3,87 +3,1000 @@
   
     
     <entry>
-      <title><![CDATA[juc之CoryOnWriteArrayList、CopyOnWriteArraySet]]></title>
-      <url>/2020/11/24/juc-14/</url>
-      <content type="html"><![CDATA[<p>CopyOnWrite（简称：COW）：即复制再写入，就是在添加元素的时候，先把原 List 列表复制一份，再添加新的元素</p>
-<p>CopyOnWriteArrayList 用于读场景远多于写场景的情况，它能够让读与读之间不互斥，读与写也不互斥，只有写与写之间才会互斥。它的思路也很简单，内部通过一个数组来维护数据，正常读数据时直接通过索引从数组中提取数据。</p>
-<pre><code class="java">/** The array, accessed only via getArray/setArray. */
-private transient volatile Object[] array;
-
-@SuppressWarnings(&quot;unchecked&quot;)
-private E get(Object[] a, int index) {
-    return (E) a[index];
-}
-
-/**
- * {@inheritDoc}
- *
- * @throws IndexOutOfBoundsException {@inheritDoc}
- */
-public E get(int index) {
-    return get(getArray(), index);
-}
-
-/**
- * Gets the array.  Non-private so as to also be accessible
- * from CopyOnWriteArraySet class.
- */
-final Object[] getArray() {
-    return array;
+      <title><![CDATA[juc之ForkJoinPool]]></title>
+      <url>/2020/11/25/juc-18/</url>
+      <content type="html"><![CDATA[<p>直接看这篇文章吧</p>
+<p><a href="http://blog.dyngr.com/blog/2016/09/15/java-forkjoinpool-internals/" target="_blank" rel="noopener">http://blog.dyngr.com/blog/2016/09/15/java-forkjoinpool-internals/</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之ThreadPoolExecutor]]></title>
+      <url>/2020/11/25/juc-17/</url>
+      <content type="html"><![CDATA[<h2 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h2><p><img src="https://i.loli.net/2020/11/25/2F5etwLdmrR9fTn.png" alt="image.png"></p>
+<h2 id="线程池的主要处理流程"><a href="#线程池的主要处理流程" class="headerlink" title="线程池的主要处理流程"></a>线程池的主要处理流程</h2><p><img src="https://i.loli.net/2020/11/25/i8es5gX9SJwD7GC.png" alt="image.png"></p>
+<p>根据返回的对象类型创建线程池可以分为三类：</p>
+<ul>
+<li><p>创建返回ThreadPoolExecutor对象</p>
+</li>
+<li><p>创建返回ScheduleThreadPoolExecutor对象</p>
+</li>
+<li><p>创建返回ForkJoinPool对象</p>
+</li>
+</ul>
+<h2 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h2><p>在介绍Executors创建线程池方法前先介绍一下ThreadPoolExecutor，因为这些创建线程池的静态方法都是返回ThreadPoolExecutor对象，和我们手动创建ThreadPoolExecutor对象的区别就是我们不需要自己传构造函数的参数。</p>
+<p>ThreadPoolExecutor的构造函数共有四个，但最终调用的都是同一个：</p>
+<pre><code class="java">public ThreadPoolExecutor(int corePoolSize, // 线程池核心线程数量
+                          int maximumPoolSize, // 线程池最大数量
+                          long keepAliveTime, // 空闲线程存活时间
+                          TimeUnit unit, // 时间单位
+                          BlockingQueue&lt;Runnable&gt; workQueue, // 线程池所使用的缓冲队列
+                          ThreadFactory threadFactory, // 线程池创建线程使用的工厂
+                          RejectedExecutionHandler handler // 线程池对拒绝任务的处理策略
+                          );
+</code></pre>
+<h3 id="Executors-newCachedThreadPool方法"><a href="#Executors-newCachedThreadPool方法" class="headerlink" title="Executors#newCachedThreadPool方法"></a>Executors#newCachedThreadPool方法</h3><pre><code class="java">public static ExecutorService newCachedThreadPool() {
+    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                  60L, TimeUnit.SECONDS,
+                                  new SynchronousQueue&lt;Runnable&gt;());
 }
 </code></pre>
-<p>而写数据时，需要将整个数组都复制一遍，然后在新数组的末尾添加最新的数据。最后替换掉原来的数组，这样原来的数组就会被回收。很显然，这种实现方式在减小竞争的同时，承担了数据空间 * 2 的压力。</p>
-<pre><code class="java">/** The lock protecting all mutators */
-final transient ReentrantLock lock = new ReentrantLock();
+<ul>
+<li>corePoolSize =&gt; 0，核心线程池的数量为0</li>
+<li>maximumPoolSize =&gt; Integer.MAX_VALUE，可以认为最大线程数是无限的</li>
+<li>keepAliveTime =&gt; 60L</li>
+<li>unit =&gt; 秒</li>
+<li>workQueue =&gt; SynchronousQueue</li>
+</ul>
+<p>当一个任务提交时，corePoolSize为0不创建核心线程，SynchronousQueue是一个不存储元素的队列，可以理解为队里永远是满的，因此最终会创建非核心线程来执行任务。<br>对于非核心线程空闲60s时将被回收。因为Integer.MAX_VALUE非常大，可以认为是可以无限创建线程的，在资源有限的情况下容易引起OOM异常</p>
+<h3 id="Executors-newSingleThreadExecutor方法"><a href="#Executors-newSingleThreadExecutor方法" class="headerlink" title="Executors#newSingleThreadExecutor方法"></a>Executors#newSingleThreadExecutor方法</h3><pre><code class="java">public static ExecutorService newSingleThreadExecutor() {
+    return new FinalizableDelegatedExecutorService
+        (new ThreadPoolExecutor(1, 1,
+                                0L, TimeUnit.MILLISECONDS,
+                                new LinkedBlockingQueue&lt;Runnable&gt;()));
+}
+</code></pre>
+<ul>
+<li>corePoolSize =&gt; 1，核心线程池的数量为1</li>
+<li>maximumPoolSize =&gt; 1，只可以创建一个非核心线程</li>
+<li>keepAliveTime =&gt; 0L</li>
+<li>unit =&gt; 秒</li>
+<li>workQueue =&gt; LinkedBlockingQueue</li>
+</ul>
+<p>当一个任务提交时，首先会创建一个核心线程来执行任务，如果超过核心线程的数量，将会放入队列中，因为LinkedBlockingQueue是长度为Integer.MAX_VALUE的队列，可以认为是无界队列，因此往队列中可以插入无限多的任务，在资源有限的时候容易引起OOM异常，同时因为无界队列，maximumPoolSize和keepAliveTime参数将无效，压根就不会创建非核心线程</p>
+<h2 id="Executors-newFixedThreadPool方法"><a href="#Executors-newFixedThreadPool方法" class="headerlink" title="Executors#newFixedThreadPool方法"></a>Executors#newFixedThreadPool方法</h2><pre><code class="java">public static ExecutorService newFixedThreadPool(int nThreads) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                  0L, TimeUnit.MILLISECONDS,
+                                  new LinkedBlockingQueue&lt;Runnable&gt;());
+}
+</code></pre>
+<ul>
+<li>corePoolSize =&gt; 1，核心线程池的数量为1</li>
+<li>maximumPoolSize =&gt; 1，只可以创建一个非核心线程</li>
+<li>keepAliveTime =&gt; 0L</li>
+<li>unit =&gt; 秒</li>
+<li>workQueue =&gt; LinkedBlockingQueue</li>
+</ul>
+<p>它和SingleThreadExecutor类似，唯一的区别就是核心线程数不同，并且由于使用的是LinkedBlockingQueue，在资源有限的时候容易引起OOM异常</p>
+<p>总结：<br>FixedThreadPool和SingleThreadExecutor =&gt; 允许的请求队列长度为Integer.MAX_VALUE，可能会堆积大量的请求，从而引起OOM异常<br>CachedThreadPool =&gt; 允许创建的线程数为Integer.MAX_VALUE，可能会创建大量的线程，从而引起OOM异常<br>这就是为什么禁止使用Executors去创建线程池，而是推荐自己去创建ThreadPoolExecutor的原因</p>
+<p>顺便说一下ScheduledThreadPoolExecutor，就不分析源码了：</p>
+<p>ScheduledThreadPoolExecutor继承ThreadPoolExecutor来重用线程池的功能，它的实现方式如下：</p>
+<ul>
+<li>将任务封装成ScheduledFutureTask对象，ScheduledFutureTask基于相对时间，不受系统时间的改变所影响；</li>
+<li>ScheduledFutureTask实现了java.lang.Comparable接口和java.util.concurrent.Delayed接口，所以有两个重要的方法：compareTo和getDelay。compareTo方法用于比较任务之间的优先级关系，如果距离下次执行的时间间隔较短，则优先级高；getDelay方法用于返回距离下次任务执行时间的时间间隔；</li>
+<li>ScheduledThreadPoolExecutor定义了一个DelayedWorkQueue，它是一个有序队列，会通过每个任务按照距离下次执行时间间隔的大小来排序；</li>
+<li>ScheduledFutureTask继承自FutureTask，可以通过返回Future对象来获取执行的结果。</li>
+</ul>
+<p>如何定义线程池参数:</p>
+<ul>
+<li>CPU密集型 =&gt; 线程池的大小推荐为CPU数量 + 1，CPU数量可以根据Runtime.availableProcessors方法获取</li>
+<li>IO密集型 =&gt; CPU数量 <em> CPU利用率 </em> (1 + 线程等待时间/线程CPU时间)</li>
+<li>混合型 =&gt; 将任务分为CPU密集型和IO密集型，然后分别使用不同的线程池去处理，从而使每个线程池可以根据各自的工作负载来调整</li>
+<li>阻塞队列 =&gt; 推荐使用有界队列，有界队列有助于避免资源耗尽的情况发生</li>
+<li>拒绝策略 =&gt; <ul>
+<li>直接丢弃（DiscardPolicy）</li>
+<li>丢弃队列中最老的任务(DiscardOldestPolicy)。</li>
+<li>抛异常(AbortPolicy)</li>
+<li>将任务分给调用线程来执行(CallerRunsPolicy)。<br>默认采用的是AbortPolicy拒绝策略，直接在程序中抛出RejectedExecutionException异常【因为是运行时异常，不强制catch】，这种处理方式不够优雅。处理拒绝策略有以下几种比较推荐：</li>
+<li>在程序中捕获RejectedExecutionException异常，在捕获异常中对任务进行处理。针对默认拒绝策略</li>
+<li>使用CallerRunsPolicy拒绝策略，该策略会将任务交给调用execute的线程执行【一般为主线程】，此时主线程将在一段时间内不能提交任何任务，从而使工作线程处理正在执行的任务。此时提交的线程将被保存在TCP队列中，TCP队列满将会影响客户端，这是一种平缓的性能降低</li>
+<li>自定义拒绝策略，只需要实现RejectedExecutionHandler接口即可</li>
+<li>如果任务不是特别重要，使用DiscardPolicy和DiscardOldestPolicy拒绝策略将任务丢弃也是可以的</li>
+</ul>
+</li>
+<li>如果使用Executors的静态方法创建ThreadPoolExecutor对象，可以通过使用Semaphore对任务的执行进行限流也可以避免出现OOM异常</li>
+</ul>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><h3 id="核心属性"><a href="#核心属性" class="headerlink" title="核心属性"></a>核心属性</h3><pre><code class="java">// 状态控制属性：高3位表示线程池的运行状态，剩下的29位表示当前有效的线程数量
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 
-/**
- * Appends the specified element to the end of this list.
- *
- * @param e element to be appended to this list
- * @return {@code true} (as specified by {@link Collection#add})
- */
-public boolean add(E e) {
-    // 加锁
-    final ReentrantLock lock = this.lock;
-    lock.lock();
-    try {
-        // 获取原始集合
-        Object[] elements = getArray();
-        int len = elements.length;
+// 线程池的基本大小，当提交一个任务到线程池时，线程池会创建一个线程来执行任务，
+// 即使其他空闲的基本线程能够执行新任务也会创建线程，等到需要执行的任务数大于
+// 线程池基本大小时就不再创建。如果调用了线程池的prestartAllCoreThreads()方法，
+// 线程池会提前创建并启动所有基本线程。
+private volatile int corePoolSize;
 
-        // 复制一个新集合
-        Object[] newElements = Arrays.copyOf(elements, len + 1);
-        newElements[len] = e;
+// 线程池线程最大数量，如果队列满了，并且已创建的线程数小于最大线程数，
+// 则线程池会再创建新的线程执行任务。如果使用了无界的任务队列这个参数就没什么效果。
+private volatile int maximumPoolSize;
 
-        // 替换原始集合为新集合
-        setArray(newElements);
+// 用于设置创建线程的工厂，可以通过线程工厂给每个创建出来的线程设 置更有意义的名字。
+private volatile ThreadFactory threadFactory;
+
+// 饱和策略，默认情况下是AbortPolicy。
+private volatile RejectedExecutionHandler handler;
+
+// 线程池的工作线程空闲后，保持存活的时间。如果任务很多，并且每个任务执行的时间比较短，
+// 可以调大时间，提高线程的利用率。
+private volatile long keepAliveTime;
+
+// 用于保存等待执行的任务的阻塞队列，具体可以参考[JAVA并发容器-阻塞队列](https://www.jianshu.com/p/5646fb5faee1)
+private final BlockingQueue&lt;Runnable&gt; workQueue;
+
+// 存放工作线程的容器，必须获取到锁才能访问
+private final HashSet&lt;Worker&gt; workers = new HashSet&lt;Worker&gt;();
+
+// ctl的拆包和包装
+private static int runStateOf(int c)     { return c &amp; ~CAPACITY; }
+private static int workerCountOf(int c)  { return c &amp; CAPACITY; }
+private static int ctlOf(int rs, int wc) { return rs | wc; }
+
+// 阻塞队列参考之前的文章
+// ctl状态控制属性，高3位表示线程池的运行状态（runState），剩下的29位表示当前有效的线程数量（workerCount）
+// 线程池最大线程数是(1 &lt;&lt; COUNT_BITS) - 1 = 536 870 911
+</code></pre>
+<h3 id="线程池的运行状态runState"><a href="#线程池的运行状态runState" class="headerlink" title="线程池的运行状态runState"></a>线程池的运行状态runState</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RUNNING</td>
+<td>运行态，可处理新任务并执行队列中的任务</td>
+</tr>
+<tr>
+<td>SHUTDOW</td>
+<td>关闭态，不接受新任务，但处理队列中的任务</td>
+</tr>
+<tr>
+<td>STOP</td>
+<td>停止态，不接受新任务，不处理队列中任务，且打断运行中任务</td>
+</tr>
+<tr>
+<td>TIDYING</td>
+<td>整理态，所有任务已经结束，workerCount = 0 ，将执行terminated()方法</td>
+</tr>
+<tr>
+<td>TERMINATED</td>
+<td>结束态，terminated() 方法已完成</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://i.loli.net/2020/11/25/kdPgAxHU8evOSsn.png" alt="image.png"></p>
+<h3 id="核心内部类-Worker"><a href="#核心内部类-Worker" class="headerlink" title="核心内部类 Worker"></a>核心内部类 Worker</h3><pre><code class="JAVA">
+```private final class Worker  extends AbstractQueuedSynchronizer  implements Runnable {
+    // 正在执行任务的线程
+    final Thread thread;
+    // 线程创建时初始化的任务
+    Runnable firstTask;
+    // 完成任务计数器
+    volatile long completedTasks;
+
+    Worker(Runnable firstTask) {
+        // 在runWorker方法运行之前禁止中断，要中断线程必须先获取worker内部的互斥锁
+        setState(-1); // inhibit interrupts until runWorker
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);
+    }
+
+    /** delegates main run loop to outer runworker  */
+    // 直接委托给外部runworker方法
+    public void run() {
+        runWorker(this);
+    }
+    // Lock methods
+    //
+    // The value 0 represents the unlocked state.
+    // The value 1 represents the locked state.
+
+    protected boolean isHeldExclusively() {
+        return getState() != 0;
+    }
+
+    // 重写的aqs方法，直接cas
+    protected boolean tryAcquire(int unused) {
+        if (compareAndSetState(0, 1)) {
+            setExclusiveOwnerThread(Thread.currentThread());
+            return true;
+        }
+        return false;
+    }
+
+    // 重写方法，直接release
+    protected boolean tryRelease(int unused) {
+        setExclusiveOwnerThread(null);
+        setState(0);
         return true;
-    } finally {
-        // 释放锁
-        lock.unlock();
     }
 }
+</code></pre>
+<p>Worker 类将执行任务的线程封装到了内部，在初始化Worker 的时候，会调用ThreadFactory初始化新线程；Worker 继承了AbstractQueuedSynchronizer，在内部实现了一个互斥锁，主要目的是控制工作线程的中断状态。</p>
+<p>线程的中断一般是由其他线程发起的，比如<code>ThreadPoolExecutor#interruptIdleWorkers(boolean)</code>方法，它在调用过程中会去中断worker内部的工作线程，Work的互斥锁可以保证正在执行的任务不被打断。它是怎么保证的呢？在线程真正执行任务的时候，也就是runWorker方法被调用时，它会先获取到Work的锁，当我们在其他线程需要中断当前线程时也需要获取到work的互斥锁，否则不能中断。</p>
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><p>前文说过了</p>
+<pre><code class="java">    public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue&lt;Runnable&gt; workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler) {
+        if (corePoolSize &lt; 0 ||
+            maximumPoolSize &lt;= 0 ||
+            maximumPoolSize &lt; corePoolSize ||
+            keepAliveTime &lt; 0)
+            throw new IllegalArgumentException();
+        if (workQueue == null || threadFactory == null || handler == null)
+            throw new NullPointerException();
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.workQueue = workQueue;
+        this.keepAliveTime = unit.toNanos(keepAliveTime);
+        this.threadFactory = threadFactory;
+        this.handler = handler;
+    }
+</code></pre>
+<h3 id="execute-提交线程"><a href="#execute-提交线程" class="headerlink" title="execute() 提交线程"></a>execute() 提交线程</h3><pre><code class="java">public void execute(Runnable command) {
+    if (command == null)
+        throw new NullPointerException();
+    // 获取控制的值
+    int c = ctl.get();
+    // 判断工作线程数是否小于corePoolSize
+    if (workerCountOf(c) &lt; corePoolSize) {
+        // 新创建核心线程
+        if (addWorker(command, true))
+            return;
+        c = ctl.get();
+    }
+    // 工作线程数大于或等于corePoolSize
+    // 判断线程池是否处于运行状态，如果是将任务command入队
+    if (isRunning(c) &amp;&amp; workQueue.offer(command)) {
+        int recheck = ctl.get();
+        // 再次检查线程池的运行状态，如果不在运行中，那么将任务从队列里面删除，并尝试结束线程池
+        if (!isRunning(recheck) &amp;&amp; remove(command))
+            // 调用驱逐策略
+            reject(command);
+        // 检查活跃线程总数是否为0
+        else if (workerCountOf(recheck) == 0)
+            // 新创建非核心线程
+            addWorker(null, false);
+    }
+    // 队列满了，新创建非核心线程
+    else if (!addWorker(command, false))
+        // 调用驱逐策略
+        reject(command);
+}
+</code></pre>
+<p>excute()方法中添加任务的方式是使用addWorker（）方法。</p>
+<h3 id="addWorker-新创建线程"><a href="#addWorker-新创建线程" class="headerlink" title="addWorker() 新创建线程"></a>addWorker() 新创建线程</h3><pre><code class="java">private boolean addWorker(Runnable firstTask, boolean core) {
+    retry:
+    // 外层循环，用于判断线程池状态
+    for (;;) {
+        int c = ctl.get();
+        int rs = runStateOf(c);
 
-/**
- * Sets the array.
- */
-final void setArray(Object[] a) {
-    array = a;
+        // 仅在必要的时候检查队列是否为NULL
+        // 检查队列是否处于非运行状态
+        if (rs &gt;= SHUTDOWN &amp;&amp;
+            ! (rs == SHUTDOWN &amp;&amp;
+               firstTask == null &amp;&amp;
+               ! workQueue.isEmpty()))
+            return false;
+
+        for (;;) {
+            // 内层的循环，任务是将worker数量加1
+            // 获取活跃线程数
+            int wc = workerCountOf(c);
+            // 判断线程是否超过最大值，当队列满了则验证线程数是否大于maximumPoolSize，
+            // 没有满则验证corePoolSize
+            if (wc &gt;= CAPACITY ||
+                wc &gt;= (core ? corePoolSize : maximumPoolSize))
+                return false;
+            // 增加活跃线程总数，否则重试
+            if (compareAndIncrementWorkerCount(c))
+                // 如果成功跳出外层循环
+                break retry;
+            c = ctl.get();  // Re-read ctl
+            // 再次校验一下线程池运行状态
+            if (runStateOf(c) != rs)
+                continue retry;
+            // else CAS failed due to workerCount change; retry inner loop
+        }
+    }
+// worker加1后，接下来将woker添加到HashSet&lt;Worker&gt; workers中，并启动worker
+    // 工作线程是否启动
+    boolean workerStarted = false;
+    // 工作线程是否创建
+    boolean workerAdded = false;
+    Worker w = null;
+    try {
+        // 新创建线程
+        w = new Worker(firstTask);
+        // 获取新创建的线程
+        final Thread t = w.thread;
+        if (t != null) {
+            // 创建线程要获得全局锁
+            final ReentrantLock mainLock = this.mainLock;
+            mainLock.lock();
+            try {
+                // Recheck while holding lock.
+                // Back out on ThreadFactory failure or if
+                // shut down before lock acquired.
+                int rs = runStateOf(ctl.get());
+                // 检查线程池的运行状态
+                if (rs &lt; SHUTDOWN ||
+                    (rs == SHUTDOWN &amp;&amp; firstTask == null)) {
+                    // 检查线程的状态
+                    if (t.isAlive()) // precheck that t is startable
+                        throw new IllegalThreadStateException();
+                    // 将新建工作线程存放到容器
+                    workers.add(w);
+                    int s = workers.size();
+                    if (s &gt; largestPoolSize) {
+                        // 跟踪线程池最大的工作线程总数
+                        largestPoolSize = s;
+                    }
+                    workerAdded = true;
+                }
+            } finally {
+                mainLock.unlock();
+            }
+            // 启动工作线程
+            if (workerAdded) {
+                t.start();
+                workerStarted = true;
+            }
+        }
+    } finally {
+        if (! workerStarted)
+            // 启动新的工作线程失败，
+            // 1. 将工作线程移除workers容器
+            // 2. 还原工作线程总数（workerCount）
+            // 3. 尝试结束线程
+            addWorkerFailed(w);
+    }
+    return workerStarted;
 }
 </code></pre>
-<p>CopyOnWriteArraySet<br>CopyOnWriteArraySet逻辑就更简单了，就是使用 CopyOnWriteArrayList 的 addIfAbsent 方法来去重的，添加元素的时候判断对象是否已经存在，不存在才添加进集合。</p>
+<p>如果启动新线程失败那么addWorkerFailed()这个方法将做一下三件事：</p>
+<ul>
+<li>将工作线程移除workers容器</li>
+<li>还原工作线程总数（workerCount）</li>
+<li>尝试结束线程</li>
+</ul>
+<h3 id="execute-执行过程"><a href="#execute-执行过程" class="headerlink" title="execute() 执行过程"></a>execute() 执行过程</h3><p><img src="https://i.loli.net/2020/11/25/ATZyz3X4kJv9wR1.png" alt="image.png"></p>
+<ul>
+<li>如果当前运行的线程少于corePoolSize，即使有空闲线程也会创建新线程来执行任务，（注意，执行这一步骤 需要获取全局锁）。如果调用了线程池的restartAllCoreThreads()方法， 线程池会提前创建并启动所有基本线程。</li>
+<li>如果运行的线程等于或多于corePoolSize，则将任务加入BlockingQueue。</li>
+<li>如果无法将任务加入BlockingQueue（队列已满），则创建新的线程来处理任务（注意，执<br>行这一步骤需要获取全局锁）。</li>
+<li>如果创建新线程将使当前运行的线程超出maximumPoolSize，任务将被拒绝，并调用 RejectedExecutionHandler.rejectedExecution()方法。</li>
+</ul>
+<h3 id="线程任务的执行"><a href="#线程任务的执行" class="headerlink" title="线程任务的执行"></a>线程任务的执行</h3><p>线程的正在执行是<code>ThreadPoolExecutor.Worker#run()</code>方法，但是这个方法直接委托给了外部的runWorker()方法，源码如下：</p>
+<pre><code class="java">// 直接委托给外部runworker方法
+public void run() {
+    runWorker(this);
+}
+</code></pre>
+<h3 id="runWorker-执行任务"><a href="#runWorker-执行任务" class="headerlink" title="runWorker() 执行任务"></a>runWorker() 执行任务</h3><pre><code class="java">final void runWorker(Worker w) {
+    // 当前Work中的工作线程
+    Thread wt = Thread.currentThread();
+    // 获取初始任务
+    Runnable task = w.firstTask;
+    // 初始任务置NULL(表示不是建线程)
+    w.firstTask = null;
+    // 修改锁的状态，使需发起中断的线程可以获取到锁（使工作线程可以响应中断）
+    // 因为worker初始化的时候setState(-1); 
+    // 根据注释, 这样做的原因是为了抑制工作线程的 interrupt 信号, 直到此工作线程正是开始执行 task. 
+    // 那么在 addWorker 中的 w.unlock(); 就是允许 Worker 的 interrupt 信号.
+    w.unlock(); // allow interrupts
+    // 工作线程是否是异常结束
+    boolean completedAbruptly = true;
+    try {
+        // 循环的从队列里面获取任务
+        while (task != null || (task = getTask()) != null) {
+            // 每次执行任务时需要获取到内置的互斥锁
+            w.lock();
+            // 1. 当前工作线程不是中断状态，且线程池是STOP,TIDYING,TERMINATED状态，我们需要中断当前工作线程
+            // 2. 当前工作线程是中断状态，且线程池是STOP,TIDYING,TERMINATED状态，我们需要中断当前工作线程
+            if ((runStateAtLeast(ctl.get(), STOP) || (Thread.interrupted() &amp;&amp; runStateAtLeast(ctl.get(), STOP)))
+                    &amp;&amp; !wt.isInterrupted())
+                // 中断线程，中断标志位设置成true
+                wt.interrupt();
+            try {
+                // 执行任务前置方法,扩展用
+                beforeExecute(wt, task);
+                Throwable thrown = null;
+                try {
+                    // 执行任务
+                    task.run();
+                } catch (RuntimeException x) {
+                    thrown = x; throw x;
+                } catch (Error x) {
+                    thrown = x; throw x;
+                } catch (Throwable x) {
+                    thrown = x; throw new Error(x);
+                } finally {
+                    // 执行任务后置方法,扩展用
+                    afterExecute(task, thrown);
+                }
+            } finally {
+                // 任务NULL表示已经处理了
+                task = null;
+                w.completedTasks++;
+                w.unlock();
+            }
+        }
+        completedAbruptly = false;
+    } finally {
+        // 将工作线程从容器中剔除
+        processWorkerExit(w, completedAbruptly);
+    }
+}
+</code></pre>
+<p>正在执行线程的方法，执行流程：</p>
+<ul>
+<li>获取到当前的工作线程</li>
+<li>获取初始化的线程任务</li>
+<li>修改锁的状态，使工作线程可以响应中断</li>
+<li>获取工作线程的锁（保证在任务执行过程中工作线程不被外部线程中断），如果获取到的任务是NULL，则结束当前工作线程</li>
+<li>判断先测试状态，看是否需要中断当前工作线程</li>
+<li>执行任务前置方法beforeExecute(wt, task);</li>
+<li>执行任务(执行提交到线程池的线程)task.run();</li>
+<li>执行任务后置方法afterExecute(task, thrown);，处理异常信息</li>
+<li>修改完成任务的总数</li>
+<li>解除当前工作线程的锁</li>
+<li>获取队列里面的任务，循环第4步</li>
+<li>将工作线程从容器中剔除</li>
+</ul>
+<pre><code>- `wt.isInterrupted()`：获取中断状态，无副作用
+- `Thread.interrupted()`：获取中断状态，并将中断状态恢重置成false(不中断)
+- `beforeExecute(wt, task)`：执行任务前置方法，扩展用。如果这个方法在执行过程中抛出异常，那么会导致当前工作线程直接死亡而被回收，工作线程异常结束标记位completedAbruptly被设置成true，任务线程不能被执行
+- `task.run()`： 执行任务
+- `afterExecute(task, thrown)`：执行任务后置方法，扩展用。这个方法可以收集到任务运行的异常信息，这个方法如果有异常抛出，也会导致当前工作线程直接死亡而被回收，工作线程异常结束标记位completedAbruptly被设置成true
+- 任务运行过程中的异常信息除了RuntimeException以外，其他全部封装成Error，然后被afterExecute方法收集
+- `terminated()`这也是一个扩展方法，在线程池结束的时候调用
+</code></pre><h3 id="getTask-获取任务"><a href="#getTask-获取任务" class="headerlink" title="getTask() 获取任务"></a>getTask() 获取任务</h3><p>主要从q里拿任务</p>
+<pre><code class="java">private Runnable getTask() {
+    // 记录最后一次获取任务是不是超时了
+    boolean timedOut = false; // Did the last poll() time out?
+
+    for (;;) {
+        int c = ctl.get();
+        // 获取线程池状态
+        int rs = runStateOf(c);
+
+        // 线程池是停止状态或者状态是关闭并且队列为空
+        if (rs &gt;= SHUTDOWN &amp;&amp; (rs &gt;= STOP || workQueue.isEmpty())) {
+            // 扣减工作线程总数
+            decrementWorkerCount();
+            return null;
+        }
+        // 获取工作线程总数
+        int wc = workerCountOf(c);
+
+        // 工作线程是否需要剔除
+        boolean timed = allowCoreThreadTimeOut || wc &gt; corePoolSize;
+
+        if ((wc &gt; maximumPoolSize || (timed &amp;&amp; timedOut))
+            &amp;&amp; (wc &gt; 1 || workQueue.isEmpty())) {
+            // 扣减工作线程总数
+            if (compareAndDecrementWorkerCount(c))
+                // 剔除工作线程，当返回为NULL的时候，runWorker方法的while循环会结束
+                return null;
+            continue;
+        }
+
+        try {
+            Runnable r = timed ?
+                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                workQueue.take();
+            if (r != null)
+                return r;
+            timedOut = true;
+        } catch (InterruptedException retry) {
+            timedOut = false;
+        }
+    }
+}
+</code></pre>
+<p>getTask() 阻塞或定时获取任务。当该方法返回NULL时，当前工作线程会结束，最后被回收，下面是返回NULL的几种情况：</p>
+<ul>
+<li>当前工作线程总数wc大于maximumPoolSize最大工作线程总数。maximumPoolSize可能被setMaximumPoolSize方法改变。</li>
+<li>当线程池处于停止状态时。</li>
+<li>当线程池处于关闭状态且阻塞队列为空。</li>
+<li>当前工作线程超时等待任务，并且当前工作线程总数wc大于corePoolSize或者allowCoreThreadTimeOut=true允许核心线程超时被回收，默认是false。</li>
+<li>线程池在运行过程中可以调用setMaximumPoolSize()方法来修改maximumPoolSize值，新的值必须大于corePoolSize，如果新的maximumPoolSize小于原来的值，那么在该方法会去中断当前的空闲线程(工作线程内置锁的是解锁状态的线程为空闲线程)。</li>
+</ul>
+<h3 id="processWorkerExit-工作线程结束"><a href="#processWorkerExit-工作线程结束" class="headerlink" title="processWorkerExit() 工作线程结束"></a>processWorkerExit() 工作线程结束</h3><pre><code class="java">private void processWorkerExit(Worker w, boolean completedAbruptly) {
+    // 判断是否是异常情况导致工作线程被回收
+    if (completedAbruptly) // If abrupt, then workerCount wasn&#39;t adjusted
+        // 如果是扣减工作线程总数，如果不是在getTask()方法就已经扣减了
+        decrementWorkerCount();
+
+    final ReentrantLock mainLock = this.mainLock;
+    mainLock.lock();
+    try {
+        // 将当前工作线程完成任务的总数加到completedTaskCount标志位上
+        completedTaskCount += w.completedTasks;
+        // 剔除当前工作线程
+        workers.remove(w);
+    } finally {
+        mainLock.unlock();
+    }
+    // 尝试结束线程池
+    tryTerminate();
+
+    // 判刑是否需要新实例化工程线程
+    int c = ctl.get();
+    if (runStateLessThan(c, STOP)) {
+        if (!completedAbruptly) {
+            int min = allowCoreThreadTimeOut ? 0 : corePoolSize;
+            if (min == 0 &amp;&amp; ! workQueue.isEmpty())
+                min = 1;
+            if (workerCountOf(c) &gt;= min)
+                return; // replacement not needed
+        }
+        addWorker(null, false);
+    }
+}
+</code></pre>
+<p>剔除线程流程：</p>
+<ul>
+<li>判断是否是异常情况导致工作线程被回收，如果是workerCount–</li>
+<li>获取到全局锁</li>
+<li>将当前工作线程完成任务的总数加到completedTaskCount标志位上</li>
+<li>剔除工作线程</li>
+<li>解锁</li>
+<li>尝试结束线程池tryTerminate()</li>
+<li>判刑是否需要重新实例化工程线程放到workers容器</li>
+</ul>
+<h3 id="shutdown-关闭线程池"><a href="#shutdown-关闭线程池" class="headerlink" title="shutdown() 关闭线程池"></a>shutdown() 关闭线程池</h3><pre><code class="java">public void shutdown() {
+    final ReentrantLock mainLock = this.mainLock;
+    mainLock.lock();
+    try {
+        // 检查权限
+        checkShutdownAccess();
+        // 设置线程池状态为关闭
+        advanceRunState(SHUTDOWN);
+        // 中断线程
+        interruptIdleWorkers();
+        // 扩展方法
+        onShutdown(); // hook for ScheduledThreadPoolExecutor
+    } finally {
+        mainLock.unlock();
+    }
+    // 尝试结束线池
+    tryTerminate();
+}
+</code></pre>
+<ul>
+<li>通过遍历工作线程容器workers，然后逐个中断工作线程，如果无法响应中断的任务可能永远无法终止</li>
+<li>shutdown只是将线程池的状态设置成SHUTDOWN状态，然后中断所有没有正在执行任务的线程。</li>
+<li>正在执行的任务依旧会执行</li>
+</ul>
+<h3 id="shutdownNow-关闭线程池"><a href="#shutdownNow-关闭线程池" class="headerlink" title="shutdownNow() 关闭线程池"></a>shutdownNow() 关闭线程池</h3><pre><code class="java">public List&lt;Runnable&gt; shutdownNow() {
+    List&lt;Runnable&gt; tasks;
+    final ReentrantLock mainLock = this.mainLock;
+    mainLock.lock();
+    try {
+        // 检查权限
+        checkShutdownAccess();
+        // 设置线程池状态为停止状态
+        advanceRunState(STOP);
+        // 中断线程
+        interruptIdleWorkers();
+        // 将所有任务移动到list容器
+        tasks = drainQueue();
+    } finally {
+        mainLock.unlock();
+    }
+    // 尝试结束线池
+    tryTerminate();
+    // 返回所有未执行的任务
+    return tasks;
+}
+</code></pre>
+<ul>
+<li>通过遍历工作线程容器workers，然后逐个中断工作线程，如果无法响应中断的任务可能永远无法终止</li>
+<li>shutdownNow首先将线程池的状态设置成 STOP，然后尝试停止所有的正在执行或暂停任务的线程，并返回等待执行任务的列表</li>
+</ul>
+<h3 id="tryTerminate-尝试结束线程池"><a href="#tryTerminate-尝试结束线程池" class="headerlink" title="tryTerminate() 尝试结束线程池"></a>tryTerminate() 尝试结束线程池</h3><pre><code class="java">final void tryTerminate() {
+    for (;;) {
+        int c = ctl.get();
+        //  判断是否在运行中,如果是直接返回
+        if (isRunning(c) ||
+            // 判断是否进入整理状态，如果进入了直接返回
+            runStateAtLeast(c, TIDYING) ||
+            // 如果是状态是关闭并且队列非空，也直接返回（关闭状态需要等到队列里面的线程处理完）
+            (runStateOf(c) == SHUTDOWN &amp;&amp; ! workQueue.isEmpty()))
+            return;
+        // 判断工作线程是否都关闭了
+        if (workerCountOf(c) != 0) { // Eligible to terminate
+            // 中断空闲线程
+            interruptIdleWorkers(ONLY_ONE);
+            return;
+        }
+
+        final ReentrantLock mainLock = this.mainLock;
+        mainLock.lock();
+        try {
+            // 将状态替换成整理状态
+            if (ctl.compareAndSet(c, ctlOf(TIDYING, 0))) {
+                try {
+                    // 整理发放执行
+                    terminated();
+                } finally {
+                    // 状态替换成结束状态
+                    ctl.set(ctlOf(TERMINATED, 0));
+                    termination.signalAll();
+                }
+                return;
+            }
+        } finally {
+            mainLock.unlock();
+        }
+        // else retry on failed CAS
+    }
+}
+</code></pre>
+<p>结束线程池大致流程为：</p>
+<ul>
+<li>判断是否在运行中，如果是则不结束线程</li>
+<li>判断是否进入整理状态，如果是也不用执行后面内容了</li>
+<li>判断如果线程池是关闭状态并且队列非空，则不结束线程池（关闭状态需要等到队列里面的线程处理完）</li>
+<li>判断工作线程是否都关闭了，如果没有就发起中断工作线程的请求</li>
+<li>获取全局锁将线程池状态替换成整理状态</li>
+<li>调用terminated();扩展方法（这也是一个扩展方法，在线程池结束的时候调用）</li>
+<li>将线程池状态替换成结束状态</li>
+<li>解除全局锁</li>
+</ul>
+<p>注意：</p>
+<ul>
+<li>我们可以通过的shutdown或shutdownNow方法来结束线程池。他们都是通过遍历工作线程容器，然后逐个中断工作线程，所以无法响应中断的任务 可能永远无法终止。</li>
+<li>shutdown和shutdownNow的区别在于：shutdownNow首先将线程池的状态设置成 STOP，然后尝试停止所有的正在执行或暂停任务的线程，并返回等待执行任务的列表；而 shutdown只是将线程池的状态设置成SHUTDOWN状态，然后中断所有没有正在执行任务的线程。</li>
+<li>只要调用了shutdown和shutdownNow那么isShutdown方法就会返回true<br>当所有的任务都已关闭后，才表示线程池关闭成功，这时调用isTerminaed方法会返回true<br>。</li>
+</ul>
+<p>总结下，worker里面包着thread，thread执行task，线程池初始化是没有worker（可以通过prestartAllCoreThreads预处理），直到真正提交task的时候才开始初始化worker，task执行结束后，thread并没有死，而是去执行其他的task了。</p>
+<p>线程池需要关闭么？</p>
+<p>局部线程池在确定不会使用的情况下需要关闭。</p>
+<p>如何优雅的让线程池自动关闭？</p>
+<ul>
+<li>核心线程数为 0 并指定线程存活时间</li>
+<li>通过 allowCoreThreadTimeOut 控制核心线程存活时间</li>
+</ul>
+<p>最后上张图</p>
+<p><img src="https://i.loli.net/2020/11/25/1XPFJerVGqEv7ni.png" alt="image.png"></p>
+<p>最最后，线程池是可以执行runnable callable future的，三着区别详见：<a href="https://zhuanlan.zhihu.com/p/88933756" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/88933756</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之ConcurrentHashMap]]></title>
+      <url>/2020/11/25/juc-16/</url>
+      <content type="html"><![CDATA[<h2 id="跳表"><a href="#跳表" class="headerlink" title="跳表"></a>跳表</h2><p>对于一个单链表，即使链表是有序的，如果我们想要在其中查找某个数据，也只能从头到尾遍历链表，这样效率自然就会很低。而跳表是在这个单链表的基础上同时维护了多个链表，并且链表是分层的。</p>
+<p><img src="https://s3.ax1x.com/2020/11/25/DaiIzD.png" alt="DaiIzD.png"></p>
+<p>最低层的链表维护了跳表内所有的元素，每上面一层链表都是下面一层的子集。</p>
+<p>跳表内的所有链表的元素都是排序的。查找时，可以从顶级链表开始找。一旦发现被查找的元素大于当前链表中的取值，就会转入下一层链表继续找。这也就是说在查找过程中，搜索是跳跃式的。如上图所示，在跳表中查找元素 18。</p>
+<p><img src="https://i.loli.net/2020/11/25/G3FKLseBHM6Jt7l.png" alt="image.png"></p>
+<p>查找 18 的时候原来需要遍历 12 次，现在只需要 7 次即可。针对链表长度比较大的时候，构建索引查找效率的提升就会非常明显。</p>
+<p>使用跳表实现 Map 和使用哈希算法实现 Map 的另外一个不同之处是：哈希并不会保存元素的顺序，而跳表内所有的元素都是排序的。因此在对跳表进行遍历时，你会得到一个有序的结果。</p>
+<p>在 JDK 的 ConcurrentSkipListMap 实现中，没有使用到锁，而是通过 CAS 来进行数据的修改，当插入数据时，通过 CAS 修改最下层列表的内容，然后再逐层向上维护各级列表（各层列表的修改都是通过 CAS 完成），这两个过程是独立的，因为上层列表维护的数据少也只会影响查找数据的速度，而不会影响到数据的准确性，因为添加与查找数据都以最下层列表内容为准。</p>
+<h2 id="ConcurrentSkipListMap的跳表内部实现"><a href="#ConcurrentSkipListMap的跳表内部实现" class="headerlink" title="ConcurrentSkipListMap的跳表内部实现"></a>ConcurrentSkipListMap的跳表内部实现</h2><p>内部节点类 Node</p>
+<pre><code class="java">static final class Node&lt;K, V&gt;{
+    final K key;  // key 是 final 的, 说明节点一旦定下来, 除了删除, 不然不会改动 key 了
+    volatile Object value; // 对应的 value
+    volatile Node&lt;K, V&gt; next; // 下一个节点
+
+    // 构造函数
+    public Node(K key, Object value, Node&lt;K, V&gt; next) {
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
+
+    /**
+     * 创建一个标记节点(通过 this.value = this 来标记)
+     * 这个标记节点非常重要: 有了它, 就能对链表中间节点进行同时删除了插入
+     * ps: ConcurrentLinkedQueue 只能在头上, 尾端进行插入, 中间进行删除 
+     */
+    public Node(Node&lt;K, V&gt; next) {
+        this.key = null;
+        this.value = this;
+        this.next = next;
+    }
+
+    /**
+     * CAS 操作设置 Value
+     */
+    boolean casValue(Object cmp, Object val){
+        return unsafe.compareAndSwapObject(this, valueOffset, cmp, val);
+    }
+
+    /**
+     * CAS 操作设置 next
+     */
+    boolean casNext(Node&lt;K, V&gt; cmp, Node&lt;K, V&gt; val){
+        return unsafe.compareAndSwapObject(this, nextOffset, cmp, val);
+    }
+
+    /**
+     * 检测是否为标记节点
+     */
+    boolean isMarker(){
+        return value == this;
+    }
+
+    /**
+     * 检测是否为 链表最左下角的 BASE_HEADER 节点
+     */
+    boolean isBaseHeader(){
+        return value == BASE_HEADER;
+    }
+
+    /**
+     * 对节点追加一个标记节点, 为最终的删除做准备
+     */
+    boolean appendMarker(Node&lt;K, V&gt; f){
+        return casNext(f, new Node&lt;K, V&gt;(f));
+    }
+
+    /**
+     * Help out a deletion by appending marker or unlinking from
+     * predecessor. This called during traversals when value
+     * field seen to be null
+     * 
+     * helpDelete 方法, 这个方法要么追加一个标记节点, 要么进行删除操作
+     */
+    void helpDelete(Node&lt;K, V&gt; b, Node&lt;K, V&gt; f){
+        /**
+         * Rechecking links and then doing only one of the
+         * help-out stages per call tends to minimize CAS
+         * interference among helping threads
+         */
+        if(f == next &amp;&amp; this == b.next){
+            if(f == null || f.value != f){ // 还没有对删除的节点进行节点 marker
+                casNext(f, new Node&lt;K, V&gt;(f));
+            }else{
+                b.casNext(this, f.next); // 删除 节点 b 与 f.next 之间的节点
+            }
+        }
+    }
+
+    /**
+     * 校验数据
+     */
+    V getValidValue(){
+        Object v = value;
+        if(v == this || v == BASE_HEADER){
+            return null;
+        }
+        V vv = (V)v;
+        return vv;
+    }
+
+    /**
+     * Creates and returns a new SimpleImmutableEntry holding current
+     * mapping if this node holds a valid value, else null.
+     *
+     * @return new entry or null
+     */
+    AbstractMap.SimpleImmutableEntry&lt;K, V&gt; createSnapshot(){
+        Object v = value;
+        if(v == null || v == this || v == BASE_HEADER){
+            return null;
+        }
+        V vv = (V) v;
+        return new AbstractMap.SimpleImmutableEntry&lt;K, V&gt;(key, vv);
+    }
+
+    // UNSAFE mechanics
+    private static final Unsafe unsafe;
+    private static final long valueOffset;
+    private static final long nextOffset;
+
+    static {
+        try {
+            unsafe = UnSafeClass.getInstance();
+            Class&lt;?&gt; k = Node.class;
+            valueOffset = unsafe.objectFieldOffset(k.getDeclaredField(&quot;value&quot;));
+            nextOffset = unsafe.objectFieldOffset(k.getDeclaredField(&quot;next&quot;));
+        }catch (Exception e){
+            throw new Error(e);
+        }
+    }
+
+}
+</code></pre>
+<p>索引节点 Index</p>
+<pre><code class="java">static class Index&lt;K, V&gt;{
+
+    final Node&lt;K, V&gt; node; // 索引指向的节点, 纵向上所有索引指向链表最下面的节点
+    final Index&lt;K, V&gt; down; // 下边level层的 Index
+    volatile Index&lt;K, V&gt; right; // 右边的  Index
+
+    /**
+     * Creates index node with given values
+     * @param node
+     * @param down
+     * @param right
+     */
+    public Index(Node&lt;K, V&gt; node, Index&lt;K, V&gt; down, Index&lt;K, V&gt; right) {
+        this.node = node;
+        this.down = down;
+        this.right = right;
+    }
+
+    /**
+     * compareAndSet right field
+     * @param cmp
+     * @param val
+     * @return
+     */
+    final boolean casRight(Index&lt;K, V&gt; cmp, Index&lt;K, V&gt; val){
+        return unsafe.compareAndSwapObject(this, rightOffset, cmp, val);
+    }
+
+    /**
+     * Returns true if the node this indexes has been deleted.
+     * @return true if indexed node is known to be deleted
+     */
+    final boolean indexesDeletedNode(){
+        return node.value == null;
+    }
+
+    /**
+     * Tries to CAS newSucc as successor. To minimize races with
+     * unlink that may lose this index node, if the node being
+     * indexed is known to be deleted, it doesn&#39;t try to link in
+     *
+     * @param succ the expecteccurrent successor
+     * @param newSucc the new successor
+     * @return true if successful
+     */
+    /**
+     * 在 index 本身 和 succ 之间插入一个新的节点 newSucc
+     * @param succ
+     * @param newSucc
+     * @return
+     */
+    final boolean link(Index&lt;K, V&gt; succ, Index&lt;K, V&gt; newSucc){
+        Node&lt;K, V&gt; n = node;
+        newSucc.right = succ;
+        return n.value != null  &amp;&amp; casRight(succ, newSucc);
+    }
+
+    /**
+     * Tries to CAS field to skip over apparent successor
+     * succ. Fails (forcing a retravesal by caller) if this node
+     * is known to be deleted
+     * @param succ the expected current successor
+     * @return true if successful
+     */
+    /**
+     * 将当前的节点 index 设置其的 right 为 succ.right 等于删除 succ 节点
+     * @param succ
+     * @return
+     */
+    final boolean unlink(Index&lt;K, V&gt; succ){
+        return node.value != null &amp;&amp; casRight(succ, succ.right);
+    }
+
+    // Unsafe mechanics
+    private static final Unsafe unsafe;
+    private static final long rightOffset;
+
+    static {
+        try{
+            unsafe = UnSafeClass.getInstance();
+            Class&lt;?&gt; k = Index.class;
+            rightOffset = unsafe.objectFieldOffset(k.getDeclaredField(&quot;right&quot;));
+        }catch (Exception e){
+            throw new Error(e);
+        }
+</code></pre>
+<p>头索引节点 HeadIndex</p>
 <pre><code class="java">/**
- * Appends the element, if not present.
- *
- * @param e element to be added to this list, if absent
- * @return {@code true} if the element was added
+ * Nodes heading each level keep track of their level.
  */
-public boolean addIfAbsent(E e) {
-    Object[] snapshot = getArray();
-    return indexOf(e, snapshot, 0, snapshot.length) &gt;= 0 ? false :
-        addIfAbsent(e, snapshot);
+//  level 属性用来标示索引层级; 注意所有的 HeadIndex 都指向同一个 Base_header 节点;
+static final class HeadIndex&lt;K,V&gt; extends Index&lt;K,V&gt; {
+    final int level;
+    HeadIndex(Node&lt;K,V&gt; node, Index&lt;K,V&gt; down, Index&lt;K,V&gt; right, int level) {
+        super(node, down, right);
+        this.level = level;
+    }
 }
 </code></pre>
+<p>ConcurrentSkipListMap的put方法过去冗长和复杂，这里只上一个图解便于理解，就不上代码了，参考 <a href="https://www.jianshu.com/p/edc2fd149255" target="_blank" rel="noopener">https://www.jianshu.com/p/edc2fd149255</a><br>doPut步骤:<br>整个doPut方法看起来有点吓人, 但没事,我们将这个方法进行分割:</p>
+<p>Part I：找到目标节点的位置并插入</p>
+<ul>
+<li>这里的目标节点是数据节点，也就是最底层的那条链；</li>
+<li>寻找目标节点之前最近的一个索引对应的数据节点（数据节点都是在最底层的链表上）；</li>
+<li>从这个数据节点开始往后遍历，直到找到目标节点应该插入的位置；</li>
+<li>如果这个位置有元素，就更新其值（onlyIfAbsent=false）；</li>
+<li>如果这个位置没有元素，就把目标节点插入；</li>
+<li>至此，目标节点已经插入到最底层的数据节点链表中了；</li>
+</ul>
+<p>Part II：随机决定是否需要建立索引及其层次，如果需要则建立自上而下的索引</p>
+<ul>
+<li>取个随机数rnd，计算(rnd &amp; 0x80000001)；</li>
+<li>如果不等于0，结束插入过程，也就是不需要创建索引，返回；</li>
+<li>如果等于0，才进入创建索引的过程（只要正偶数才会等于0）；</li>
+<li>计算while (((rnd &gt;&gt;&gt;= 1) &amp; 1) != 0)，决定层级数，level从1开始；</li>
+<li>如果算出来的层级不高于现有最高层级，则直接建立一条竖直的索引链表（只有down有值），并结束Part II；</li>
+<li>如果算出来的层级高于现有最高层级，则新的层级只能比现有最高层级多1；</li>
+<li>同样建立一条竖直的索引链表（只有down有值）；</li>
+<li>将头索引也向上增加到相应的高度，结束Part II；</li>
+<li>也就是说，如果层级不超过现有高度，只建立一条索引链，否则还要额外增加头索引链的高度（脑补一下，后面举例说明）；</li>
+</ul>
+<p>Part III：将新建的索引节点（包含头索引节点）与其它索引节点通过右指针连接在一起（补上right指针）</p>
+<ul>
+<li>从最高层级的头索引节点开始，向右遍历，找到目标索引节点的位置；</li>
+<li>如果当前层有目标索引，则把目标索引插入到这个位置，并把目标索引前一个索引向下移一个层级；</li>
+<li>如果当前层没有目标索引，则把目标索引位置前一个索引向下移一个层级；</li>
+<li>同样地，再向右遍历，寻找新的层级中目标索引的位置，回到第（2）步；</li>
+<li>依次循环找到所有层级目标索引的位置并把它们插入到横向的索引链表中；</li>
+</ul>
+<p>总结起来，一共就是三大步：</p>
+<ul>
+<li>插入目标节点到数据节点链表中；</li>
+<li>建立竖直的down链表；</li>
+<li>建立横向的right链表；</li>
+</ul>
+<p>图解：</p>
+<p>初始时, 只存在 HeadIndex 和 Base_Header 节点<br><img src="https://i.loli.net/2020/11/25/5o7LuKrHONkSCRq.png" alt="image.png"></p>
+<p>添加 key=1, value = A 节点, 结果如图:<br><img src="https://i.loli.net/2020/11/25/RSJzn8pPLsG4qoZ.png" alt="image.png"></p>
+<p>再添加一个节点2<br><img src="https://i.loli.net/2020/11/25/BgQ3ADuToWtVZp7.png" alt="image.png"></p>
+<p>再次添加 key=3, value = C 节点<br><img src="https://i.loli.net/2020/11/25/OlwUhmug5QF29EB.png" alt="image.png"></p>
+<p>这时再put节点 key=4 value = D (情形和 Node1, Node2 一样), 最终结果:<br><img src="https://i.loli.net/2020/11/25/GPqkx2Z4lXbVMot.png" alt="image.png"></p>
+<p>再次添加 key=5, value = E 节点, 结果如图:<br><img src="https://i.loli.net/2020/11/25/JAEesmL5Zvluwcf.png" alt="image.png"></p>
 ]]></content>
       
         <categories>
@@ -1200,7 +2113,110 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 <p>4、resize（）<br>1.7：跟HashMap步骤一样，只不过是搬到单线程中执行，避免了HashMap在1.7中扩容时死循环的问题，保证线程安全。</p>
 <p>1.8：支持并发扩容，HashMap扩容在1.8中由头插改为尾插（为了避免死循环问题），ConcurrentHashmap也是，迁移也是从尾部开始，扩容前在桶的头部放置一个hash值为-1的节点，这样别的线程访问时就能判断是否该桶已经被其他线程处理过了。</p>
 <p>5、size（）<br>1.7：很经典的思路：计算两次，如果不变则返回计算结果，若不一致，则锁住所有的Segment求和。</p>
-<p>1.8：用baseCount来存储当前的节点个数，这就设计到baseCount并发环境下修改的问题（说实话我没看懂-_-!）。</p>
+<p>1.8：用baseCount来存储当前的节点个数，这就设计到baseCount并发环境下修改的问题</p>
+]]></content>
+      
+        <categories>
+            
+            <category> juc </category>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+            <tag> juc </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[juc之CoryOnWriteArrayList、CopyOnWriteArraySet]]></title>
+      <url>/2020/11/24/juc-14/</url>
+      <content type="html"><![CDATA[<p>CopyOnWrite（简称：COW）：即复制再写入，就是在添加元素的时候，先把原 List 列表复制一份，再添加新的元素</p>
+<p>CopyOnWriteArrayList 用于读场景远多于写场景的情况，它能够让读与读之间不互斥，读与写也不互斥，只有写与写之间才会互斥。它的思路也很简单，内部通过一个数组来维护数据，正常读数据时直接通过索引从数组中提取数据。</p>
+<pre><code class="java">/** The array, accessed only via getArray/setArray. */
+private transient volatile Object[] array;
+
+@SuppressWarnings(&quot;unchecked&quot;)
+private E get(Object[] a, int index) {
+    return (E) a[index];
+}
+
+/**
+ * {@inheritDoc}
+ *
+ * @throws IndexOutOfBoundsException {@inheritDoc}
+ */
+public E get(int index) {
+    return get(getArray(), index);
+}
+
+/**
+ * Gets the array.  Non-private so as to also be accessible
+ * from CopyOnWriteArraySet class.
+ */
+final Object[] getArray() {
+    return array;
+}
+</code></pre>
+<p>而写数据时，需要将整个数组都复制一遍，然后在新数组的末尾添加最新的数据。最后替换掉原来的数组，这样原来的数组就会被回收。很显然，这种实现方式在减小竞争的同时，承担了数据空间 * 2 的压力。</p>
+<pre><code class="java">/** The lock protecting all mutators */
+final transient ReentrantLock lock = new ReentrantLock();
+
+/**
+ * Appends the specified element to the end of this list.
+ *
+ * @param e element to be appended to this list
+ * @return {@code true} (as specified by {@link Collection#add})
+ */
+public boolean add(E e) {
+    // 加锁
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        // 获取原始集合
+        Object[] elements = getArray();
+        int len = elements.length;
+
+        // 复制一个新集合
+        Object[] newElements = Arrays.copyOf(elements, len + 1);
+        newElements[len] = e;
+
+        // 替换原始集合为新集合
+        setArray(newElements);
+        return true;
+    } finally {
+        // 释放锁
+        lock.unlock();
+    }
+}
+
+/**
+ * Sets the array.
+ */
+final void setArray(Object[] a) {
+    array = a;
+}
+</code></pre>
+<p>CopyOnWriteArraySet<br>CopyOnWriteArraySet逻辑就更简单了，就是使用 CopyOnWriteArrayList 的 addIfAbsent 方法来去重的，添加元素的时候判断对象是否已经存在，不存在才添加进集合。</p>
+<pre><code class="java">/**
+ * Appends the element, if not present.
+ *
+ * @param e element to be added to this list, if absent
+ * @return {@code true} if the element was added
+ */
+public boolean addIfAbsent(E e) {
+    Object[] snapshot = getArray();
+    return indexOf(e, snapshot, 0, snapshot.length) &gt;= 0 ? false :
+        addIfAbsent(e, snapshot);
+}
+</code></pre>
 ]]></content>
       
         <categories>
@@ -5085,15 +6101,7 @@ static final int PROPAGATE = -3;
     <entry>
       <title><![CDATA[juc之原子类]]></title>
       <url>/2020/11/21/juc-1/</url>
-      <content type="html"><![CDATA[<hr>
-<p>给自己立的flag：</p>
-<p>预计这个系列会包括，原子类，AQS，ReentrantLock，Condition，ReentrantReadWriteLock，Semaphore，CountDownLatch，CyclicBarrier，Exchanger，BlockingQueue，ConcurrentHashMap，ConcurrentSkipListMap，CopyOnWriteArrayList,ThreadPoolExecutor，FockJoin。</p>
-<p>回头记得把阿里的transmittable-thread-local给补上</p>
-<p>最后总结些并发中的经典场景，案例以及面试题。</p>
-<p>撸一遍方鹏飞的Java并发编程艺术</p>
-<p>一周内搞定。</p>
-<hr>
-<p>原子类是对Java中不能保证原子类型的指令的扩展。</p>
+      <content type="html"><![CDATA[<p>原子类是对Java中不能保证原子类型的指令的扩展。</p>
 <p>原子类是典型的cas无锁的应用，并在一些累加方法中加入了自旋锁。原子类相比于锁，有一定优势：<br>粒度更细：原子类把竞争范围缩小到了变量级别<br>效率较高：通常情况下更高，但是高度竞争的情况下效率更低</p>
 <p>看了一下源码都差不太多，放在一起说吧</p>
 <p>以AtomicInteger为例：</p>
@@ -8631,55 +9639,6 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
     </entry>
     
     <entry>
-      <title><![CDATA[在spring中使用cors]]></title>
-      <url>/2018/11/06/spring-cors/</url>
-      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
-<p>解决方案：</p>
-<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-
-@Configuration
-public class WebCorsConfig {
-
-    @Bean
-    public FilterRegistrationBean customCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        config.addAllowedMethod(&quot;*&quot;);
-        source.registerCorsConfiguration(&quot;/**&quot;, config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-}
-</code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> spring </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> spring </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[使用oidc id token验证spring security resource server]]></title>
       <url>/2018/11/06/spring-security-jwt/</url>
       <content type="html"><![CDATA[<p>在前后端分离的项目中，前端因为不能保证密钥的安全，通常会使用oidc implicit grant type来获取access token和id token，后端会验证token的合法性并获得用户信息。</p>
@@ -8835,9 +9794,58 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             
             <tag> OAuth </tag>
             
+            <tag> OIDC </tag>
+            
             <tag> spring </tag>
             
-            <tag> OIDC </tag>
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在spring中使用cors]]></title>
+      <url>/2018/11/06/spring-cors/</url>
+      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
+<p>解决方案：</p>
+<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+@Configuration
+public class WebCorsConfig {
+
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        config.addAllowedMethod(&quot;*&quot;);
+        source.registerCorsConfiguration(&quot;/**&quot;, config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
             
         </tags>
         
