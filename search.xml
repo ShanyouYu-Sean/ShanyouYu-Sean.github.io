@@ -5,7 +5,7 @@
     <entry>
       <title><![CDATA[juc之ForkJoinPool]]></title>
       <url>/2020/11/25/juc-18/</url>
-      <content type="html"><![CDATA[<p>直接看这篇文章吧</p>
+      <content type="html"><![CDATA[<p>直接看这篇文章吧，我觉得了解就好了，实际似乎用的场景很少？</p>
 <p><a href="http://blog.dyngr.com/blog/2016/09/15/java-forkjoinpool-internals/" target="_blank" rel="noopener">http://blog.dyngr.com/blog/2016/09/15/java-forkjoinpool-internals/</a></p>
 ]]></content>
       
@@ -457,6 +457,7 @@ public void run() {
         }
         completedAbruptly = false;
     } finally {
+        // 队列里没任务的时候
         // 将工作线程从容器中剔除
         processWorkerExit(w, completedAbruptly);
     }
@@ -685,7 +686,7 @@ public void run() {
 <li>shutdown和shutdownNow的区别在于：shutdownNow首先将线程池的状态设置成 STOP，然后尝试停止所有的正在执行或暂停任务的线程，并返回等待执行任务的列表；而 shutdown只是将线程池的状态设置成SHUTDOWN状态，然后中断所有没有正在执行任务的线程。</li>
 <li>只要调用了shutdown和shutdownNow那么isShutdown方法就会返回true<br>当所有的任务都已关闭后，才表示线程池关闭成功，这时调用isTerminaed方法会返回true<br>。</li>
 </ul>
-<p>总结下，worker里面包着thread，thread执行task，线程池初始化是没有worker（可以通过prestartAllCoreThreads预处理），直到真正提交task的时候才开始初始化worker，task执行结束后，thread并没有死，而是去执行其他的task了。</p>
+<p>总结下，worker里面包着thread，thread执行task，线程池初始化是没有worker（可以通过prestartAllCoreThreads预处理），直到真正提交task的时候才开始初始化worker，task执行结束后，worker会被回收，但如果回收后的线程数量少于核心线程时，就又会建立一个新的没有task的worker，这样就保持了核心线程的活跃。</p>
 <p>线程池需要关闭么？</p>
 <p>局部线程池在确定不会使用的情况下需要关闭。</p>
 <p>如何优雅的让线程池自动关闭？</p>
@@ -6983,6 +6984,7 @@ private void doSomething(){
 <p>其ReentrantLock底层是使用LockSupport.park方法进行等待的，前面说了LockSupport.park是响应中断的。</p>
 <p>当调用interrupt方法时，会把中断状态设置为true，然后park方法会去判断中断状态，如果为true，就直接返回，然后往下继续执行，并不会抛出异常。注意，这里并不会清除中断标志。（Object.wait()、Thread.join、Thread.sleep方法则会清除中断状态）</p>
 <p>当线程进入ReentrantLock.lock方法里面进行阻塞后，此时调用Thread.interrupt()方法之后，该线程是会被中断被唤醒的，但是唤醒之后，会调用LockSupport.park再次进入等待状态，所以仅从宏观（表面）上面看ReentrantLock.lock是不支持响应中断的，从微观（原理）上面讲ReentrantLock.lock内部确实中断了响应，但是还是会被迫进行等待状态。（当然，如果这期间抢到锁了，会在aqs里调用selfInterrupt补一下中断状态）</p>
+<p><img src="https://i.loli.net/2020/11/25/osDpLKSBgYuPt4C.png" alt="image.png"></p>
 <h2 id="java锁分类"><a href="#java锁分类" class="headerlink" title="java锁分类"></a>java锁分类</h2><p><img src="https://s3.ax1x.com/2020/11/20/DQg6k6.png" alt="DQg6k6.png"></p>
 <p>synchronized是一个重量级的，阻塞的，非公平的，可重入的，排他的，悲观锁。</p>
 <p>无锁即使cas。Java中的CAS操作，由sun.misc.Unsafe类里面的<code>compareAndSwapInt()</code>和<code>compareAndSwapLong()</code>等几个方法包装提供。HotSpot虚拟机在内部对这些方法做了特殊处理，即时编译出来的结果就是一条平台相关的处理器CAS指令，没有方法调用的过程，或者可以认为是无条件内联进去了。</p>
@@ -7788,9 +7790,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -7936,9 +7938,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -9639,6 +9641,55 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
     </entry>
     
     <entry>
+      <title><![CDATA[在spring中使用cors]]></title>
+      <url>/2018/11/06/spring-cors/</url>
+      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
+<p>解决方案：</p>
+<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+@Configuration
+public class WebCorsConfig {
+
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        config.addAllowedMethod(&quot;*&quot;);
+        source.registerCorsConfiguration(&quot;/**&quot;, config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[使用oidc id token验证spring security resource server]]></title>
       <url>/2018/11/06/spring-security-jwt/</url>
       <content type="html"><![CDATA[<p>在前后端分离的项目中，前端因为不能保证密钥的安全，通常会使用oidc implicit grant type来获取access token和id token，后端会验证token的合法性并获得用户信息。</p>
@@ -9794,58 +9845,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             
             <tag> OAuth </tag>
             
+            <tag> spring </tag>
+            
             <tag> OIDC </tag>
-            
-            <tag> spring </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[在spring中使用cors]]></title>
-      <url>/2018/11/06/spring-cors/</url>
-      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
-<p>解决方案：</p>
-<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-
-@Configuration
-public class WebCorsConfig {
-
-    @Bean
-    public FilterRegistrationBean customCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        config.addAllowedMethod(&quot;*&quot;);
-        source.registerCorsConfiguration(&quot;/**&quot;, config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-}
-</code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> spring </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> spring </tag>
             
         </tags>
         
