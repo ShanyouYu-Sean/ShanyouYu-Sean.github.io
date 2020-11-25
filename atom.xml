@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-25T09:56:29.447Z</updated>
+  <updated>2020-11-25T14:12:25.784Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,69 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>用LockSupport实现一个先进先出的不可重入锁</title>
+    <link href="http://seanthefish.com/2020/11/25/juc-action-2/"/>
+    <id>http://seanthefish.com/2020/11/25/juc-action-2/</id>
+    <published>2020-11-25T06:00:00.000Z</published>
+    <updated>2020-11-25T14:12:25.784Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;这是网上的解法，感觉不太好，还用了ConcurrentLinkedQueue&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;public class FIFOMutex {
+
+    private final AtomicBoolean locked =
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发案例之生产者消费者</title>
+    <link href="http://seanthefish.com/2020/11/25/juc-action-1/"/>
+    <id>http://seanthefish.com/2020/11/25/juc-action-1/</id>
+    <published>2020-11-25T05:00:00.000Z</published>
+    <updated>2020-11-25T10:53:02.406Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;转自 &lt;a href=&quot;https://my.oschina.net/hosee/blog/485121#OSC_h4_4&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
+    
+    
+      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>juc之ForkJoinPool</title>
@@ -41,9 +104,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -71,9 +134,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -101,9 +164,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -131,9 +194,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -162,9 +225,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -192,9 +255,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -222,9 +285,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -252,9 +315,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -282,9 +345,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -312,9 +375,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -342,9 +405,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -372,9 +435,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -402,9 +465,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -432,9 +495,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -462,9 +525,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -492,9 +555,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -522,9 +585,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -553,63 +616,7 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>thread，threadlocal，InheritableThreadLocal源码详解</title>
-    <link href="http://seanthefish.com/2020/11/20/thread-source-code/"/>
-    <id>http://seanthefish.com/2020/11/20/thread-source-code/</id>
-    <published>2020-11-20T04:14:47.000Z</published>
-    <updated>2020-11-20T16:58:01.987Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;Thread-源码解析&quot;&gt;&lt;a href=&quot;#Thread-源码解析&quot; class=&quot;headerlink&quot; title=&quot;Thread 源码解析&quot;&gt;&lt;/a&gt;Thread
-        
-      
-    
-    </summary>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>自旋锁</title>
-    <link href="http://seanthefish.com/2020/11/19/cas-spin/"/>
-    <id>http://seanthefish.com/2020/11/19/cas-spin/</id>
-    <published>2020-11-19T04:14:47.000Z</published>
-    <updated>2020-11-20T12:44:59.790Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;自旋锁&quot;&gt;&lt;a href=&quot;#自旋锁&quot; class=&quot;headerlink&quot; title=&quot;自旋锁&quot;&gt;&lt;/a&gt;自旋锁&lt;/h2&gt;&lt;p&gt;自旋锁是采用让当前线程不停地的在循环体内执行实现的，当循环的条件被其他线程改变时
-        
-      
-    
-    </summary>
-    
-      <category term="cas" scheme="http://seanthefish.com/categories/cas/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/cas/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="cas" scheme="http://seanthefish.com/tags/cas/"/>
     
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     

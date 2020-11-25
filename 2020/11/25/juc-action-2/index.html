@@ -52,7 +52,7 @@
     
     <title>
         
-            归档: 2020/11 | 
+            用LockSupport实现一个先进先出的不可重入锁 | 
         
         小鱼肖恩
     </title>
@@ -63,7 +63,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩">
+    <meta name="keywords" content="小鱼肖恩,juc,并发">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -90,6 +90,9 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -221,7 +224,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/archives/2020/11/page/2/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/25/juc-action-2/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -240,13 +243,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/archives/2020/11/page/2/">
+    <meta property="og:url" content="http://seanthefish.com/2020/11/25/juc-action-2/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="归档: 2020/11 | 小鱼肖恩">
+    <meta property="og:title" content="用LockSupport实现一个先进先出的不可重入锁 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    
+    <meta property="og:article:tag" content="juc"> <meta property="og:article:tag" content="并发"> 
 
+    
+        <meta property="article:published_time" content="Wed Nov 25 2020 14:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Nov 25 2020 22:12:25 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -254,13 +260,43 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/archives/2020/11/page/2/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2020/11/25/juc-action-2/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/25/juc-action-2/index.html",
+    "headline": "用LockSupport实现一个先进先出的不可重入锁",
+    "datePublished": "Wed Nov 25 2020 14:00:00 GMT+0800",
+    "dateModified": "Wed Nov 25 2020 22:12:25 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",juc,并发小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
 
 
     
@@ -311,655 +347,401 @@
                         </button>
                     
 
-                    <!-- Index Module -->
-<div class="material-index mdl-grid">
-    
-    <div class="locate-thumbnail-symbol"></div>
+                    <!-- Post TOC -->
 
-    <!-- Pin on top -->
     
-        
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
     
 
-    <!-- Normal Post -->
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
     
         
             <!-- Random Thumbnail -->
             <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
 
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/24/juc-10/">juc之ArrayBlockingQueue</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自 
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/24/juc-10/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 24, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/23/juc-9/">juc之Exchanger</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自 
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/23/juc-9/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 23, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-8/">juc之CyclicBarrier</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-8/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-7/">juc之CountDownLatch</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-7/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-6/">juc之Semaphore</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-6/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-5/">juc之ReentrantReadWriteLock</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-5/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-4/">juc之Condition</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-4/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/22/juc-3/">juc之ReentrantLock</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/22/juc-3/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 22, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/21/juc-2/">juc之aqs</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            今天说aqs，juc中的绝对核心。内容转载自：
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/21/juc-2/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 21, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--9dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2020/11/21/juc-1/">juc之原子类</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            原子类是对Java中不能保证原子类型的指令的扩展。
-原子类是典型的cas无锁的应用，并在一些累加方法中加入了自旋锁。原子类相比于锁，有...
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2020/11/21/juc-1/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.png" width="44px" height="44px" alt="Sean Yu's avatar">
-            </div>
-            <div>
-                <strong>Sean Yu</strong>
-                <span>11月 21, 2020</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-              <!-- Category -->
-              <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/juc/">juc</a>, <a class="post_category-link" href="/categories/juc/并发/">并发</a>
-              </span>
-            
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-
-    
-    <!-- Index nav -->
-        <nav class="material-nav mdl-cell mdl-cell--12-col">
-            <a class="extend prev" rel="prev" href="/archives/2020/11/"><button aria-label="Last page" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"><i class="material-icons" role="presentation">arrow_back</i></button></a><a class="page-number" href="/archives/2020/11/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2020/11/page/3/">3</a><a class="extend next" rel="next" href="/archives/2020/11/page/3/"><button aria-label="Next page" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"><i class="material-icons" role="presentation">arrow_forward</i></button></a>
-        </nav>
-    
-
-    
-        <script type="text/ls-javascript" id="thumbnail-script">
-    var randomNum;
-
-    var locatePost = $('.locate-thumbnail-symbol').next();
-    for(var i = 0; i < 10; i++) {
-        randomNum = Math.floor(Math.random() * 23 + 1);
-
-        locatePost.children('.post_thumbnail-random').attr('id', 'random_thumbnail-'+randomNum);
-        locatePost.children('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
     $('.post_thumbnail-random').addClass('lazy');
-
-        locatePost = locatePost.next();
-    }
 </script>
 
+        
+    
+            <p class="article-headline-p">
+                用LockSupport实现一个先进先出的不可重入锁
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 25, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACYElEQVR42u3aQW7DMAwEwPz/0+21QBB3SVqyY4xPQSFbGh1EltTr59HPCw8PDw8PDw8P72a8V/z8HX/87vv3339/GjNZGx4eHt5O3j9HbTx9PmbCPh6Dh4eHt5M3X8o8bORBCA8PD+9beNXAMNk4PDw8vCfxPv2lt9ykeIGHh4d3T17yD38yZb4pt6u14OHh4cW8SQNs9e+L+3t4eHh4b7zmxaYgdV5R1IjWhoeHh7eYN2lu9b5TTaOrc+Hh4eHt5OXH9DzhTuZtFpTx8PDwFvN6aXHv+J7Ajkfi4eHh7eQlASBPr3sbkXy/UNrAw8PDW8zLA0MSKprN/mIQWpJS4+Hh4RV5vXJtrxCcpMt5kMDDw8O7lpcUESbJdLU91myY4eHh4S3mJUdtdYJ846pJfJSy4+Hh4S3m5cuqJrhnlS2SUISHh4d3FS95OUmmq0d/rxTSrLXg4eHhjXnVRn5+xPeubS25dIWHh4e3+LpqnvJWyxnVtlYOxsPDw7uW17tS0Asbk41uBgY8PDy8U3nVy6ZJibZ3OTXfGjw8PLz9vHyyaqki2YJyulxNqfHw8PAW8KoXCKqw5uHeegsPDw9vD2/esK8urto2y8MGHh4e3h7eJDz0CrLVzUqKGnh4eHg7edWG/WRkUq7tFTLw8PDw9vN6wSBf3FmpdjMw4OHh4S3j9dr/K5ZbvQKLh4eH9y28hDq/cHBctlgYGPDw8PBO4p1VPqiWJ/ILYXh4eHg7eecWI6pHfBI2otXi4eHhbeFVD/HkQE8uEySFjPL24eHh4S3mPe/Bw8PDw8PDw8O7wfMLQvDoTB+wZb8AAAAASUVORK5CYII=">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/juc/">juc</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/并发/">并发</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=用LockSupport实现一个先进先出的不可重入锁&url=http://seanthefish.com/2020/11/25/juc-action-2/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/25/juc-action-2/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=用LockSupport实现一个先进先出的不可重入锁&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/25/juc-action-2/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
     
 </div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>这是网上的解法，感觉不太好，还用了ConcurrentLinkedQueue</p>
+<pre><code class="java">public class FIFOMutex {
+
+    private final AtomicBoolean locked = new AtomicBoolean(false);
+    private final Queue&lt;Thread&gt; waiters = new ConcurrentLinkedQueue&lt;Thread&gt;();
+
+    public void lock() {
+        boolean wasInterrupted = false;
+        Thread current = Thread.currentThread();
+        waiters.add(current);
+
+        // 只有自己在队首才可以获得锁，否则阻塞自己
+        // cas 操作失败的话说明这里有并发，别人已经捷足先登了，那么也要阻塞自己的
+        // 有了waiters.peek() != current判断如果自己队首了，为什么不直接获取到锁还要cas 操作呢？
+        // 主要是因为接下来那个remove 操作把自己移除掉了额，但是他还没有真正释放锁，锁的释放在unlock方法中释放的
+        while (waiters.peek() != current ||
+            !locked.compareAndSet(false, true)) {
+            // 这里就是使用LockSupport 来阻塞当前线程
+            LockSupport.park(this);
+            // 这里的意思就是忽略线程中断，只是记录下曾经被中断过
+            // 大家注意这里的java 中的中断仅仅是一个状态，要不要退出程序或者抛异常需要程序员来控制的
+            if (Thread.interrupted()) {
+                wasInterrupted = true;
+            }
+        }
+        // 移出队列，注意这里移出后，后面的线程就处于队首了，但是还是不能获取到锁的，locked 的值还是true,
+        // 上面while 循环的中的cas 操作还是会失败进入阻塞的
+        waiters.remove();
+        // 如果被中断过，那么设置中断状态
+        if (wasInterrupted) {
+            current.interrupt();
+        }
+
+    }
+
+    public void unlock() {
+        locked.set(false);
+        // 唤醒位于队首的线程
+        LockSupport.unpark(waiters.peek());
+    }
+
+}
+</code></pre>
+<p>然后我自己又写了个不用ConcurrentLinkedQueue的版本，只用cas, 没有head，只有tail的尾插clh队列，前驱节点自旋，</p>
+<pre><code class="java">public class FIFOMutex {
+
+    private final AtomicBoolean locked = new AtomicBoolean(false);
+
+    private AtomicReference&lt;Node&gt; tail = new AtomicReference&lt;&gt;(new Node());
+
+    public FIFOMutex(){
+    }
+
+    static class Node {
+        Thread t;
+        Node prev;
+        Node next;
+        public Node(Thread t){
+            this.t = t;
+        }
+        public Node(){
+        }
+    }
+
+    public void lock(){
+        // 初始化节点
+        Node node = new Node(Thread.currentThread());
+        for (;;){
+            // 拿锁
+            if (!locked.compareAndSet(false, true)){
+                    // 设置尾节点
+                    if (node.prev == null){
+                        for(;;){
+                            Node oldTail = tail.get();
+                            if (tail.compareAndSet(oldTail, node)){
+                                node.prev = oldTail;
+                                oldTail.next = node;
+                                break;
+                            }
+                        }
+                    }
+                    // 如果前驱节点有线程，park
+                    if (node.prev.t != null){
+                        LockSupport.park(Thread.currentThread());
+                    }
+
+            }else {
+                // 如果后驱节点不为空，unpark
+                if (node.next != null){
+                    LockSupport.unpark(node.next.t);
+                }
+                break;
+            }
+        }
+    }
+
+    public void unlock(){
+        locked.set(false);
+    }
+
+}
+</code></pre>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/25/juc-action-2/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/25/juc-action-2/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/25/juc-action-1/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
 
 
                     
@@ -1284,6 +1066,10 @@ It will not impact the appearance and can give developers a lot of support :)
 <!-- Import prettify js  -->
 
     
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
 
 
 
@@ -1296,6 +1082,11 @@ It will not impact the appearance and can give developers a lot of support :)
     });
 
     
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
         
     
     
