@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            设计模式 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,设计模式">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/25/design-patterns/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/25/design-patterns/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="设计模式 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="设计模式"> 
+
+    
+        <meta property="article:published_time" content="Wed Nov 25 2020 15:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Thu Nov 26 2020 20:24:33 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/25/design-patterns/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/25/design-patterns/index.html",
+    "headline": "设计模式",
+    "datePublished": "Wed Nov 25 2020 15:00:00 GMT+0800",
+    "dateModified": "Thu Nov 26 2020 20:24:33 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",设计模式小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#单例模式"><span class="post-toc-number">1.</span> <span class="post-toc-text">单例模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#简单的"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">简单的</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#双重检查"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">双重检查</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#静态内部类"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">静态内部类</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#枚举"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">枚举</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#工厂模式"><span class="post-toc-number">2.</span> <span class="post-toc-text">工厂模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#简单工厂"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">简单工厂</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#工厂方法"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">工厂方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#抽象工厂"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">抽象工厂</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#建造者模式（Bulider模式）"><span class="post-toc-number">3.</span> <span class="post-toc-text">建造者模式（Bulider模式）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#代理模式"><span class="post-toc-number">4.</span> <span class="post-toc-text">代理模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#适配器模式（Adapter模式）"><span class="post-toc-number">5.</span> <span class="post-toc-text">适配器模式（Adapter模式）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#桥接模式（Bridge模式）"><span class="post-toc-number">6.</span> <span class="post-toc-text">桥接模式（Bridge模式）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#装饰（Decorator）模式"><span class="post-toc-number">7.</span> <span class="post-toc-text">装饰（Decorator）模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#组合模式"><span class="post-toc-number">8.</span> <span class="post-toc-text">组合模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#模板方法（Template-Method）模式"><span class="post-toc-number">9.</span> <span class="post-toc-text">模板方法（Template Method）模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#责任链（Chain-of-Responsibility）模式"><span class="post-toc-number">10.</span> <span class="post-toc-text">责任链（Chain of Responsibility）模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#观察者模式（Observer模式）"><span class="post-toc-number">11.</span> <span class="post-toc-text">观察者模式（Observer模式）</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                设计模式
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 25, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACXUlEQVR42u3aQXLDIAwF0Nz/0u0B0rhfksFM5nmVGduYxwIRSa+fr75eeHh4eHh4eHh4h/Fe8fXHQG938+c/vTufGx4eHt4e3j9b7eWHc8D1k+/fas4NDw8PbyOv98n5Rn89n/JX8PDw8A7mJeGhukCTueHh4eGdzLueSjJyHkjw8PDwTuYlf/jz1G0+8kG5Fjw8PLyYlxeZ9v/eWt/Dw8PDC3jllqY4FTsvkj3QU4aHh4cX8Kopg15K4q6iV7IceHh4eKt58wTuXUFlXlrDw8PD28PLy04TTHVB8+BRiHt4eHh4N/Fyav6ZXkNAEgCSgzUeHh7eHl6yTU/K/NW7vXYrPDw8vJ28/IicJxqqW/ykBRYPDw/vKV7eBFBtC5gkF8oHejw8PLwtvLxRNZlKocxfXKDbWgfw8PDwbm26ylMAhdTqgqPzx3fx8PDwFvOqR9hqUnWSlu2VwfDw8PD28JINff7k5Dg+arrCw8PDW8DrpVaroaL3fDmc4OHh4T3EuyuJkI/Tu7ukvoeHh4cXV4iqh+y7Nvf8CF4ODHh4eHhbeL0JVYtYSRholsTw8PDwNvKqRfreJl5t7ao2fuHh4eE9xYuK9MV35+NEIQQPDw9vMa96JWFjfvhOxsfDw8N7itfbynsFsLwFYTQaHh4e3hZeHgwmbamj5OwkMODh4eEt40026CSh0Cu55QlfPDw8vPN585J/lRGld/Hw8PAO5uXBYJ6uXdI6gIeHhzfmVRuqem/lC1pNK+Ph4eHt5M1TAL2Ua568SJIaeHh4eHt433fh4eHh4eHh4eEdcP0CaAalgdCRolUAAAAASUVORK5CYII=">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/设计模式/">设计模式</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=设计模式&url=http://seanthefish.com/2020/11/25/design-patterns/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/25/design-patterns/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=设计模式&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/25/design-patterns/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p><a href="http://c.biancheng.net/view/8385.html" target="_blank" rel="noopener">http://c.biancheng.net/view/8385.html</a>  这篇文章对Java设计模式有十分全面的介绍。本文结合网上资料和自己经验总结一些设计模式的案例。</p>
+<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><h3 id="简单的"><a href="#简单的" class="headerlink" title="简单的"></a>简单的</h3><pre><code class="java">private static Singleton instance;
+
+    private Singleton() {
+    }
+
+    public static Singleton getInstance() {
+        if (instance == null)
+            instance = new Singleton();
+
+        return instance;
+    }
+</code></pre>
+<h3 id="双重检查"><a href="#双重检查" class="headerlink" title="双重检查"></a>双重检查</h3><p>为什么要双重检查<br>如果不加内层检查，两个线程可以同时进入if创建实例<br>如果不加外层检查，会重复上锁影响性能</p>
+<pre><code class="java">
+// 注意一定要用volatile来避免指令重排
+private volatile static Singleton instance;
+
+public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null)
+                    instance = new Singleton();
+            }
+        }
+
+        return instance;
+    }
+</code></pre>
+<h3 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h3><pre><code class="java">class Singleton {
+    public static Singleton instance;
+
+    private static class SingletonWrapper {
+        static Singleton instance = new Singleton();
+    }
+
+    private Singleton() {
+
+    }
+
+    public static Singleton getInstance() {
+        return SingletonWrapper.instance;
+    }
+}
+</code></pre>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><pre><code class="java">public class Main {
+    public static void main(String[] args) {
+        Singleton.INSTANCE.sayHello();
+    }
+}
+
+enum Singleton {
+    INSTANCE;
+
+    public void sayHello() {
+        System.out.println(&quot;hello&quot;);
+    }
+}
+</code></pre>
+<h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><p><img src="https://i.loli.net/2020/11/26/4LXkhJd2n7lCerH.png" alt="image.png"></p>
+<pre><code class="java">public class Client {
+    public static void main(String[] args) {
+    }
+
+    //抽象产品
+    public interface Product {
+        void show();
+    }
+
+    //具体产品：ProductA
+    static class ConcreteProduct1 implements Product {
+        public void show() {
+            System.out.println(&quot;具体产品1显示...&quot;);
+        }
+    }
+
+    //具体产品：ProductB
+    static class ConcreteProduct2 implements Product {
+        public void show() {
+            System.out.println(&quot;具体产品2显示...&quot;);
+        }
+    }
+
+    final class Const {
+        static final int PRODUCT_A = 0;
+        static final int PRODUCT_B = 1;
+        static final int PRODUCT_C = 2;
+    }
+
+    static class SimpleFactory {
+        public static Product makeProduct(int kind) {
+            switch (kind) {
+                case Const.PRODUCT_A:
+                    return new ConcreteProduct1();
+                case Const.PRODUCT_B:
+                    return new ConcreteProduct2();
+            }
+            return null;
+        }
+    }
+}
+</code></pre>
+<p>简单工厂模式没啥好说的，因为它太简单了。代码直接略过。唯一要说的是提供一种spring下的工厂模式实现思路，可以把一个接口的所有实现类都注册成bean，然后通过不同bean的名字来实现一个简单工厂，我在做分布式锁的时候用过这种方式，代码更简洁优雅。<a href="https://github.com/IBM/distributed-lock-spring-boot-starter/blob/master/src/main/java/com/ibm/distributedlock/provider/factory/LockProviderFactory.java" target="_blank" rel="noopener">详见这里</a></p>
+<h3 id="工厂方法"><a href="#工厂方法" class="headerlink" title="工厂方法"></a>工厂方法</h3><p><img src="https://i.loli.net/2020/11/26/jyYDLfAWOs1altw.png" alt="image.png"></p>
+<pre><code class="java">package FactoryMethod;
+
+public class AbstractFactoryTest {
+    public static void main(String[] args) {
+        try {
+            Product a;
+            AbstractFactory af;
+            af = (AbstractFactory) ReadXML1.getObject();
+            a = af.newProduct();
+            a.show();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+//抽象产品：提供了产品的接口
+interface Product {
+    public void show();
+}
+
+//具体产品1：实现抽象产品中的抽象方法
+class ConcreteProduct1 implements Product {
+    public void show() {
+        System.out.println(&quot;具体产品1显示...&quot;);
+    }
+}
+
+//具体产品2：实现抽象产品中的抽象方法
+class ConcreteProduct2 implements Product {
+    public void show() {
+        System.out.println(&quot;具体产品2显示...&quot;);
+    }
+}
+
+//抽象工厂：提供了厂品的生成方法
+interface AbstractFactory {
+    public Product newProduct();
+}
+
+//具体工厂1：实现了厂品的生成方法
+class ConcreteFactory1 implements AbstractFactory {
+    public Product newProduct() {
+        System.out.println(&quot;具体工厂1生成--&gt;具体产品1...&quot;);
+        return new ConcreteProduct1();
+    }
+}
+
+//具体工厂2：实现了厂品的生成方法
+class ConcreteFactory2 implements AbstractFactory {
+    public Product newProduct() {
+        System.out.println(&quot;具体工厂2生成--&gt;具体产品2...&quot;);
+        return new ConcreteProduct2();
+    }
+}
+</code></pre>
+<h3 id="抽象工厂"><a href="#抽象工厂" class="headerlink" title="抽象工厂"></a>抽象工厂</h3><p><img src="https://i.loli.net/2020/11/26/58I6cRCzoAsJ3bU.png" alt="image.png"></p>
+<pre><code class="java">package AbstractFactory;
+
+import java.awt.*;
+import javax.swing.*;
+
+public class FarmTest {
+    public static void main(String[] args) {
+        try {
+            Farm f;
+            Animal a;
+            Plant p;
+            f = (Farm) ReadXML.getObject();
+            a = f.newAnimal();
+            p = f.newPlant();
+            a.show();
+            p.show();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+//抽象产品：动物类
+interface Animal {
+    public void show();
+}
+
+//具体产品：马类
+class Horse implements Animal {
+    JScrollPane sp;
+    JFrame jf = new JFrame(&quot;抽象工厂模式测试&quot;);
+
+    public Horse() {
+        Container contentPane = jf.getContentPane();
+        JPanel p1 = new JPanel();
+        p1.setLayout(new GridLayout(1, 1));
+        p1.setBorder(BorderFactory.createTitledBorder(&quot;动物：马&quot;));
+        sp = new JScrollPane(p1);
+        contentPane.add(sp, BorderLayout.CENTER);
+        JLabel l1 = new JLabel(new ImageIcon(&quot;src/A_Horse.jpg&quot;));
+        p1.add(l1);
+        jf.pack();
+        jf.setVisible(false);
+        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//用户点击窗口关闭
+    }
+
+    public void show() {
+        jf.setVisible(true);
+    }
+}
+
+//具体产品：牛类
+class Cattle implements Animal {
+    JScrollPane sp;
+    JFrame jf = new JFrame(&quot;抽象工厂模式测试&quot;);
+
+    public Cattle() {
+        Container contentPane = jf.getContentPane();
+        JPanel p1 = new JPanel();
+        p1.setLayout(new GridLayout(1, 1));
+        p1.setBorder(BorderFactory.createTitledBorder(&quot;动物：牛&quot;));
+        sp = new JScrollPane(p1);
+        contentPane.add(sp, BorderLayout.CENTER);
+        JLabel l1 = new JLabel(new ImageIcon(&quot;src/A_Cattle.jpg&quot;));
+        p1.add(l1);
+        jf.pack();
+        jf.setVisible(false);
+        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//用户点击窗口关闭
+    }
+
+    public void show() {
+        jf.setVisible(true);
+    }
+}
+
+//抽象产品：植物类
+interface Plant {
+    public void show();
+}
+
+//具体产品：水果类
+class Fruitage implements Plant {
+    JScrollPane sp;
+    JFrame jf = new JFrame(&quot;抽象工厂模式测试&quot;);
+
+    public Fruitage() {
+        Container contentPane = jf.getContentPane();
+        JPanel p1 = new JPanel();
+        p1.setLayout(new GridLayout(1, 1));
+        p1.setBorder(BorderFactory.createTitledBorder(&quot;植物：水果&quot;));
+        sp = new JScrollPane(p1);
+        contentPane.add(sp, BorderLayout.CENTER);
+        JLabel l1 = new JLabel(new ImageIcon(&quot;src/P_Fruitage.jpg&quot;));
+        p1.add(l1);
+        jf.pack();
+        jf.setVisible(false);
+        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//用户点击窗口关闭
+    }
+
+    public void show() {
+        jf.setVisible(true);
+    }
+}
+
+//具体产品：蔬菜类
+class Vegetables implements Plant {
+    JScrollPane sp;
+    JFrame jf = new JFrame(&quot;抽象工厂模式测试&quot;);
+
+    public Vegetables() {
+        Container contentPane = jf.getContentPane();
+        JPanel p1 = new JPanel();
+        p1.setLayout(new GridLayout(1, 1));
+        p1.setBorder(BorderFactory.createTitledBorder(&quot;植物：蔬菜&quot;));
+        sp = new JScrollPane(p1);
+        contentPane.add(sp, BorderLayout.CENTER);
+        JLabel l1 = new JLabel(new ImageIcon(&quot;src/P_Vegetables.jpg&quot;));
+        p1.add(l1);
+        jf.pack();
+        jf.setVisible(false);
+        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//用户点击窗口关闭
+    }
+
+    public void show() {
+        jf.setVisible(true);
+    }
+}
+
+//抽象工厂：农场类
+interface Farm {
+    public Animal newAnimal();
+
+    public Plant newPlant();
+}
+
+//具体工厂：韶关农场类
+class SGfarm implements Farm {
+    public Animal newAnimal() {
+        System.out.println(&quot;新牛出生！&quot;);
+        return new Cattle();
+    }
+
+    public Plant newPlant() {
+        System.out.println(&quot;蔬菜长成！&quot;);
+        return new Vegetables();
+    }
+}
+
+//具体工厂：上饶农场类
+class SRfarm implements Farm {
+    public Animal newAnimal() {
+        System.out.println(&quot;新马出生！&quot;);
+        return new Horse();
+    }
+
+    public Plant newPlant() {
+        System.out.println(&quot;水果长成！&quot;);
+        return new Fruitage();
+    }
+}
+</code></pre>
+<h2 id="建造者模式（Bulider模式）"><a href="#建造者模式（Bulider模式）" class="headerlink" title="建造者模式（Bulider模式）"></a>建造者模式（Bulider模式）</h2><p><img src="https://i.loli.net/2020/11/26/tGfYeFNySTjC74s.png" alt="image.png"></p>
+<pre><code class="java">class Product
+{
+    private String partA;
+    private String partB;
+    private String partC;
+    public void setPartA(String partA)
+    {
+        this.partA=partA;
+    }
+    public void setPartB(String partB)
+    {
+        this.partB=partB;
+    }
+    public void setPartC(String partC)
+    {
+        this.partC=partC;
+    }
+    public void show()
+    {
+        //显示产品的特性
+    }
+}
+
+abstract class Builder
+{
+    //创建产品对象
+    protected Product product=new Product();
+    public abstract void buildPartA();
+    public abstract void buildPartB();
+    public abstract void buildPartC();
+    //返回产品对象
+    public Product getResult()
+    {
+        return product;
+    }
+}
+
+public class ConcreteBuilder extends Builder
+{
+    public void buildPartA()
+    {
+        product.setPartA(&quot;建造 PartA&quot;);
+    }
+    public void buildPartB()
+    {
+        product.setPartB(&quot;建造 PartB&quot;);
+    }
+    public void buildPartC()
+    {
+        product.setPartC(&quot;建造 PartC&quot;);
+    }
+}
+
+class Director
+{
+    private Builder builder;
+    public Director(Builder builder)
+    {
+        this.builder=builder;
+    }
+    //产品构建与组装方法
+    public Product construct()
+    {
+        builder.buildPartA();
+        builder.buildPartB();
+        builder.buildPartC();
+        return builder.getResult();
+    }
+}
+
+public class Client
+{
+    public static void main(String[] args)
+    {
+        Builder builder=new ConcreteBuilder();
+        Director director=new Director(builder);
+        Product product=director.construct();
+        product.show();
+    }
+}
+</code></pre>
+<h2 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h2><p><img src="https://i.loli.net/2020/11/26/Rrjncpv1TX3KCPG.png" alt="image.png"></p>
+<pre><code class="java">package proxy;
+public class ProxyTest {
+    public static void main(String[] args) {
+        Proxy proxy = new Proxy();
+        proxy.Request();
+    }
+}
+//抽象主题
+interface Subject {
+    void Request();
+}
+//真实主题
+class RealSubject implements Subject {
+    public void Request() {
+        System.out.println(&quot;访问真实主题方法...&quot;);
+    }
+}
+//代理
+class Proxy implements Subject {
+    private RealSubject realSubject;
+    public void Request() {
+        if (realSubject == null) {
+            realSubject = new RealSubject();
+        }
+        preRequest();
+        realSubject.Request();
+        postRequest();
+    }
+    public void preRequest() {
+        System.out.println(&quot;访问真实主题之前的预处理。&quot;);
+    }
+    public void postRequest() {
+        System.out.println(&quot;访问真实主题之后的后续处理。&quot;);
+    }
+}
+</code></pre>
+<h2 id="适配器模式（Adapter模式）"><a href="#适配器模式（Adapter模式）" class="headerlink" title="适配器模式（Adapter模式）"></a>适配器模式（Adapter模式）</h2><p>类适配器模式</p>
+<p>接口实现类调用另一个子类的方法<br><img src="https://i.loli.net/2020/11/26/8zxAJljOfcSukTV.png" alt="image.png"></p>
+<pre><code class="java">package adapter;
+//目标接口
+interface Target
+{
+    public void request();
+}
+//适配者接口
+class Adaptee
+{
+    public void specificRequest()
+    {       
+        System.out.println(&quot;适配者中的业务代码被调用！&quot;);
+    }
+}
+//类适配器类
+class ClassAdapter extends Adaptee implements Target
+{
+    public void request()
+    {
+        specificRequest();
+    }
+}
+//客户端代码
+public class ClassAdapterTest
+{
+    public static void main(String[] args)
+    {
+        System.out.println(&quot;类适配器模式测试：&quot;);
+        Target target = new ClassAdapter();
+        target.request();
+    }
+}
+</code></pre>
+<p>对象适配器模式</p>
+<p>用适配对象去实现接口，调用适配器方法<br><img src="https://i.loli.net/2020/11/26/mUu9nSiBM5qwFRP.png" alt="image.png"></p>
+<pre><code class="java">package adapter;
+//对象适配器类
+class ObjectAdapter implements Target
+{
+    private Adaptee adaptee;
+    public ObjectAdapter(Adaptee adaptee)
+    {
+        this.adaptee=adaptee;
+    }
+    public void request()
+    {
+        adaptee.specificRequest();
+    }
+}
+//客户端代码
+public class ObjectAdapterTest
+{
+    public static void main(String[] args)
+    {
+        System.out.println(&quot;对象适配器模式测试：&quot;);
+        Adaptee adaptee = new Adaptee();
+        Target target = new ObjectAdapter(adaptee);
+        target.request();
+    }
+}
+</code></pre>
+<h2 id="桥接模式（Bridge模式）"><a href="#桥接模式（Bridge模式）" class="headerlink" title="桥接模式（Bridge模式）"></a>桥接模式（Bridge模式）</h2><p>通过一个抽象类对一个接口的引用实现桥接</p>
+<p><img src="https://i.loli.net/2020/11/26/nJZfzRM9tI4galG.png" alt="image.png"></p>
+<pre><code class="java">package bridge;
+public class BridgeTest
+{
+    public static void main(String[] args)
+    {
+        Implementor imple=new ConcreteImplementorA();
+        Abstraction abs=new RefinedAbstraction(imple);
+        abs.Operation();
+    }
+}
+//实现化角色
+interface Implementor
+{
+    public void OperationImpl();
+}
+//具体实现化角色
+class ConcreteImplementorA implements Implementor
+{
+    public void OperationImpl()
+    {
+        System.out.println(&quot;具体实现化(Concrete Implementor)角色被访问&quot; );
+    }
+}
+//抽象化角色
+abstract class Abstraction
+{
+   protected Implementor imple;
+   protected Abstraction(Implementor imple)
+   {
+       this.imple=imple;
+   }
+   public abstract void Operation();   
+}
+//扩展抽象化角色
+class RefinedAbstraction extends Abstraction
+{
+   protected RefinedAbstraction(Implementor imple)
+   {
+       super(imple);
+   }
+   public void Operation()
+   {
+       System.out.println(&quot;扩展抽象化(Refined Abstraction)角色被访问&quot; );
+       imple.OperationImpl();
+   }
+}
+</code></pre>
+<h2 id="装饰（Decorator）模式"><a href="#装饰（Decorator）模式" class="headerlink" title="装饰（Decorator）模式"></a>装饰（Decorator）模式</h2><p>装饰者和具体实现，实现同一个接口，装饰者为借口方法提供额外功能</p>
+<p><img src="https://i.loli.net/2020/11/26/Ay9Iev1C67BNpxJ.png" alt="image.png"></p>
+<pre><code class="java">package decorator;
+public class DecoratorPattern
+{
+    public static void main(String[] args)
+    {
+        Component p=new ConcreteComponent();
+        p.operation();
+        System.out.println(&quot;---------------------------------&quot;);
+        Component d=new ConcreteDecorator(p);
+        d.operation();
+    }
+}
+//抽象构件角色
+interface  Component
+{
+    public void operation();
+}
+//具体构件角色
+class ConcreteComponent implements Component
+{
+    public ConcreteComponent()
+    {
+        System.out.println(&quot;创建具体构件角色&quot;);       
+    }   
+    public void operation()
+    {
+        System.out.println(&quot;调用具体构件角色的方法operation()&quot;);           
+    }
+}
+//抽象装饰角色
+class Decorator implements Component
+{
+    private Component component;   
+    public Decorator(Component component)
+    {
+        this.component=component;
+    }   
+    public void operation()
+    {
+        component.operation();
+    }
+}
+//具体装饰角色
+class ConcreteDecorator extends Decorator
+{
+    public ConcreteDecorator(Component component)
+    {
+        super(component);
+    }   
+    public void operation()
+    {
+        super.operation();
+        addedFunction();
+    }
+    public void addedFunction()
+    {
+        System.out.println(&quot;为具体构件角色增加额外的功能addedFunction()&quot;);           
+    }
+}
+</code></pre>
+<h2 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h2><p><img src="https://i.loli.net/2020/11/26/eIOKTmESi8kA6n7.png" alt="image.png"></p>
+<pre><code class="java">package composite;
+import java.util.ArrayList;
+public class ShoppingTest {
+    public static void main(String[] args) {
+        float s = 0;
+        Bags BigBag, mediumBag, smallRedBag, smallWhiteBag;
+        Goods sp;
+        BigBag = new Bags(&quot;大袋子&quot;);
+        mediumBag = new Bags(&quot;中袋子&quot;);
+        smallRedBag = new Bags(&quot;红色小袋子&quot;);
+        smallWhiteBag = new Bags(&quot;白色小袋子&quot;);
+        sp = new Goods(&quot;婺源特产&quot;, 2, 7.9f);
+        smallRedBag.add(sp);
+        sp = new Goods(&quot;婺源地图&quot;, 1, 9.9f);
+        smallRedBag.add(sp);
+        sp = new Goods(&quot;韶关香菇&quot;, 2, 68);
+        smallWhiteBag.add(sp);
+        sp = new Goods(&quot;韶关红茶&quot;, 3, 180);
+        smallWhiteBag.add(sp);
+        sp = new Goods(&quot;景德镇瓷器&quot;, 1, 380);
+        mediumBag.add(sp);
+        mediumBag.add(smallRedBag);
+        sp = new Goods(&quot;李宁牌运动鞋&quot;, 1, 198);
+        BigBag.add(sp);
+        BigBag.add(smallWhiteBag);
+        BigBag.add(mediumBag);
+        System.out.println(&quot;您选购的商品有：&quot;);
+        BigBag.show();
+        s = BigBag.calculation();
+        System.out.println(&quot;要支付的总价是：&quot; + s + &quot;元&quot;);
+    }
+}
+//抽象构件：物品
+interface Articles {
+    public float calculation(); //计算
+    public void show();
+}
+//树叶构件：商品
+class Goods implements Articles {
+    private String name;     //名字
+    private int quantity;    //数量
+    private float unitPrice; //单价
+    public Goods(String name, int quantity, float unitPrice) {
+        this.name = name;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+    }
+    public float calculation() {
+        return quantity * unitPrice;
+    }
+    public void show() {
+        System.out.println(name + &quot;(数量：&quot; + quantity + &quot;，单价：&quot; + unitPrice + &quot;元)&quot;);
+    }
+}
+//树枝构件：袋子
+class Bags implements Articles {
+    private String name;     //名字  
+    private ArrayList&lt;Articles&gt; bags = new ArrayList&lt;Articles&gt;();
+    public Bags(String name) {
+        this.name = name;
+    }
+    public void add(Articles c) {
+        bags.add(c);
+    }
+    public void remove(Articles c) {
+        bags.remove(c);
+    }
+    public Articles getChild(int i) {
+        return bags.get(i);
+    }
+    public float calculation() {
+        float s = 0;
+        for (Object obj : bags) {
+            s += ((Articles) obj).calculation();
+        }
+        return s;
+    }
+    public void show() {
+        for (Object obj : bags) {
+            ((Articles) obj).show();
+        }
+    }
+}
+</code></pre>
+<h2 id="模板方法（Template-Method）模式"><a href="#模板方法（Template-Method）模式" class="headerlink" title="模板方法（Template Method）模式"></a>模板方法（Template Method）模式</h2><p><img src="https://i.loli.net/2020/11/26/fhAeZQog5TBPEWY.png" alt="image.png"></p>
+<pre><code class="java">public class TemplateMethodPattern {
+    public static void main(String[] args) {
+        AbstractClass tm = new ConcreteClass();
+        tm.TemplateMethod();
+    }
+}
+//抽象类
+abstract class AbstractClass {
+    //模板方法
+    public void TemplateMethod() {
+        SpecificMethod();
+        abstractMethod1();
+        abstractMethod2();
+    }
+    //具体方法
+    public void SpecificMethod() {
+        System.out.println(&quot;抽象类中的具体方法被调用...&quot;);
+    }
+    //抽象方法1
+    public abstract void abstractMethod1();
+    //抽象方法2
+    public abstract void abstractMethod2();
+}
+//具体子类
+class ConcreteClass extends AbstractClass {
+    public void abstractMethod1() {
+        System.out.println(&quot;抽象方法1的实现被调用...&quot;);
+    }
+    public void abstractMethod2() {
+        System.out.println(&quot;抽象方法2的实现被调用...&quot;);
+    }
+}
+</code></pre>
+<h2 id="责任链（Chain-of-Responsibility）模式"><a href="#责任链（Chain-of-Responsibility）模式" class="headerlink" title="责任链（Chain of Responsibility）模式"></a>责任链（Chain of Responsibility）模式</h2><p><img src="https://i.loli.net/2020/11/26/iHjhBoMSt7DpIq4.png" alt="image.png"></p>
+<pre><code class="java">package chainOfResponsibility;
+public class ChainOfResponsibilityPattern {
+    public static void main(String[] args) {
+        //组装责任链
+        Handler handler1 = new ConcreteHandler1();
+        Handler handler2 = new ConcreteHandler2();
+        handler1.setNext(handler2);
+        //提交请求
+        handler1.handleRequest(&quot;two&quot;);
+    }
+}
+//抽象处理者角色
+abstract class Handler {
+    private Handler next;
+    public void setNext(Handler next) {
+        this.next = next;
+    }
+    public Handler getNext() {
+        return next;
+    }
+    //处理请求的方法
+    public abstract void handleRequest(String request);
+}
+//具体处理者角色1
+class ConcreteHandler1 extends Handler {
+    public void handleRequest(String request) {
+        if (request.equals(&quot;one&quot;)) {
+            System.out.println(&quot;具体处理者1负责处理该请求！&quot;);
+        } else {
+            if (getNext() != null) {
+                getNext().handleRequest(request);
+            } else {
+                System.out.println(&quot;没有人处理该请求！&quot;);
+            }
+        }
+    }
+}
+//具体处理者角色2
+class ConcreteHandler2 extends Handler {
+    public void handleRequest(String request) {
+        if (request.equals(&quot;two&quot;)) {
+            System.out.println(&quot;具体处理者2负责处理该请求！&quot;);
+        } else {
+            if (getNext() != null) {
+                getNext().handleRequest(request);
+            } else {
+                System.out.println(&quot;没有人处理该请求！&quot;);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="观察者模式（Observer模式）"><a href="#观察者模式（Observer模式）" class="headerlink" title="观察者模式（Observer模式）"></a>观察者模式（Observer模式）</h2><p><img src="https://i.loli.net/2020/11/26/IqKrnykPt2hObdQ.png" alt="image.png"></p>
+<pre><code class="java">package net.biancheng.c.observer;
+import java.util.*;
+public class ObserverPattern {
+    public static void main(String[] args) {
+        Subject subject = new ConcreteSubject();
+        Observer obs1 = new ConcreteObserver1();
+        Observer obs2 = new ConcreteObserver2();
+        subject.add(obs1);
+        subject.add(obs2);
+        subject.notifyObserver();
+    }
+}
+//抽象目标
+abstract class Subject {
+    protected List&lt;Observer&gt; observers = new ArrayList&lt;Observer&gt;();
+    //增加观察者方法
+    public void add(Observer observer) {
+        observers.add(observer);
+    }
+    //删除观察者方法
+    public void remove(Observer observer) {
+        observers.remove(observer);
+    }
+    public abstract void notifyObserver(); //通知观察者方法
+}
+//具体目标
+class ConcreteSubject extends Subject {
+    public void notifyObserver() {
+        System.out.println(&quot;具体目标发生改变...&quot;);
+        System.out.println(&quot;--------------&quot;);
+        for (Object obs : observers) {
+            ((Observer) obs).response();
+        }
+    }
+}
+//抽象观察者
+interface Observer {
+    void response(); //反应
+}
+//具体观察者1
+class ConcreteObserver1 implements Observer {
+    public void response() {
+        System.out.println(&quot;具体观察者1作出反应！&quot;);
+    }
+}
+//具体观察者1
+class ConcreteObserver2 implements Observer {
+    public void response() {
+        System.out.println(&quot;具体观察者2作出反应！&quot;);
+    }
+}
+</code></pre>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/25/design-patterns/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/25/design-patterns/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/25/spring-1/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">32</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">20</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">20</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
