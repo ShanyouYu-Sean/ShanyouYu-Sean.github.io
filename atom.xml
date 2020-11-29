@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-28T14:31:51.318Z</updated>
+  <updated>2020-11-29T12:47:09.572Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,85 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>redis进阶之优化</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-3/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-3/</id>
+    <published>2020-11-28T09:00:00.000Z</published>
+    <updated>2020-11-29T12:47:09.572Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;阻塞&quot;&gt;&lt;a href=&quot;#阻塞&quot; class=&quot;headerlink&quot; title=&quot;阻塞&quot;&gt;&lt;/a&gt;阻塞&lt;/h2&gt;&lt;p&gt;Redis是典型的单线程架构，所有的读写操作都是在一条主线程中完成 的。当Redis用于高并发场景时，这条线程就变成了它的生命线。如果出现
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis进阶之主从复制</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-2/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-2/</id>
+    <published>2020-11-28T08:00:00.000Z</published>
+    <updated>2020-11-29T11:13:05.115Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h3 id=&quot;建立复制&quot;&gt;&lt;a href=&quot;#建立复制&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis基础</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-1/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-1/</id>
+    <published>2020-11-28T07:00:00.000Z</published>
+    <updated>2020-11-29T11:08:37.222Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;为啥快&quot;&gt;&lt;a href=&quot;#为啥快&quot; class=&quot;headerlink&quot; title=&quot;为啥快&quot;&gt;&lt;/a&gt;为啥快&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;纯内存访问，Redis将所有数据放在内存中，内存的响应时长大
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
   
   <entry>
     <title>spring aop源码解析</title>
@@ -496,96 +575,6 @@
     <id>http://seanthefish.com/2020/11/22/juc-7/</id>
     <published>2020-11-22T06:00:00.000Z</published>
     <updated>2020-11-24T03:56:51.472Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之Semaphore</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-6/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-6/</id>
-    <published>2020-11-22T05:00:00.000Z</published>
-    <updated>2020-11-24T03:56:45.503Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之ReentrantReadWriteLock</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-5/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-5/</id>
-    <published>2020-11-22T04:00:00.000Z</published>
-    <updated>2020-11-24T03:56:40.089Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之Condition</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-4/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-4/</id>
-    <published>2020-11-22T03:00:00.000Z</published>
-    <updated>2020-11-24T03:56:36.688Z</updated>
     
     <summary type="html">
     
