@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-29T12:47:09.572Z</updated>
+  <updated>2020-11-30T07:07:07.843Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,85 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>raft算法</title>
+    <link href="http://seanthefish.com/2020/11/29/raft/"/>
+    <id>http://seanthefish.com/2020/11/29/raft/</id>
+    <published>2020-11-29T02:00:00.000Z</published>
+    <updated>2020-11-30T07:07:07.843Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;本来想在k8s章节里在说raft算法的，但看redis选主的时候发现用的也是raft算法，故提前把raft算法拿出来说一下。&lt;/p&gt;
+&lt;p&gt;raft算法的动画演示：&lt;a href=&quot;http://thesecretlivesofdata.com/raft/&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="raft" scheme="http://seanthefish.com/categories/raft/"/>
+    
+    
+      <category term="raft" scheme="http://seanthefish.com/tags/raft/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis进阶之集群</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-5/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-5/</id>
+    <published>2020-11-28T11:00:00.000Z</published>
+    <updated>2020-11-30T11:02:42.623Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;集群&quot;&gt;&lt;a href=&quot;#集群&quot; class=&quot;headerlink&quot; title=&quot;集群&quot;&gt;&lt;/a&gt;集群&lt;/h2&gt;&lt;p&gt;Redis
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis进阶之哨兵</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-4/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-4/</id>
+    <published>2020-11-28T10:00:00.000Z</published>
+    <updated>2020-11-30T09:06:51.967Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;哨兵&quot;&gt;&lt;a href=&quot;#哨兵&quot; class=&quot;headerlink&quot; title=&quot;哨兵&quot;&gt;&lt;/a&gt;哨兵&lt;/h2&gt;&lt;p&gt;Redis的主从复制模式下，一旦主节点由于故障不能提供服务，需要人 工将从节点晋升为主节点，同时还要通知应用方更新主节点地址，对于很多
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
   
   <entry>
     <title>redis进阶之优化</title>
@@ -493,96 +572,6 @@
         
         
           &lt;p&gt;内容转载自 &lt;a href=&quot;https://juejin.cn/post/6844903989788540941&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://juejin.cn/post/6844903989788540941&lt;/a&gt;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之Exchanger</title>
-    <link href="http://seanthefish.com/2020/11/23/juc-9/"/>
-    <id>http://seanthefish.com/2020/11/23/juc-9/</id>
-    <published>2020-11-23T02:00:00.000Z</published>
-    <updated>2020-11-24T07:03:49.281Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自 &lt;a href=&quot;https://blog.csdn.net/u014634338/article/details/78385521&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之CyclicBarrier</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-8/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-8/</id>
-    <published>2020-11-22T07:00:00.000Z</published>
-    <updated>2020-11-24T03:56:55.275Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之CountDownLatch</title>
-    <link href="http://seanthefish.com/2020/11/22/juc-7/"/>
-    <id>http://seanthefish.com/2020/11/22/juc-7/</id>
-    <published>2020-11-22T06:00:00.000Z</published>
-    <updated>2020-11-24T03:56:51.472Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自：&lt;a href=&quot;https://www.cnblogs.com/go2sea/tag/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E2%80%94%E2%80%94JUC%E5%8C%85/&quot; target=&quot;_blank&quot;
         
       
     

@@ -3,6 +3,553 @@
   
     
     <entry>
+      <title><![CDATA[raft算法]]></title>
+      <url>/2020/11/29/raft/</url>
+      <content type="html"><![CDATA[<p>本来想在k8s章节里在说raft算法的，但看redis选主的时候发现用的也是raft算法，故提前把raft算法拿出来说一下。</p>
+<p>raft算法的动画演示：<a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="noopener">http://thesecretlivesofdata.com/raft/</a></p>
+<p>不上图了，图都在动画中。</p>
+<p>raft是一个共识算法（consensus algorithm），所谓共识，就是多个节点对某个事情达成一致的看法。</p>
+<h2 id="什么是分布式共识？"><a href="#什么是分布式共识？" class="headerlink" title="什么是分布式共识？"></a>什么是分布式共识？</h2><p>假设我们有一个单节点服务器和一个客户端，客户端可以很轻松的向单个节点发送存储数据的请求，从而达成一致。</p>
+<p>但如果我们的服务器是多节点的呢？客户端没办法发送一个储存请求，使多节点达成一致，这就是分布式架构中的共识问题。</p>
+<h2 id="raft是如何解决问题的"><a href="#raft是如何解决问题的" class="headerlink" title="raft是如何解决问题的"></a>raft是如何解决问题的</h2><p>首先，一个节点可以存在三种状态：</p>
+<ul>
+<li>follower state（跟随者状态）</li>
+<li>candidate state（候选人状态）</li>
+<li>leader state（领导者状态）</li>
+</ul>
+<p>初始化状态时，节点都是Follower状态</p>
+<h3 id="leader选举（选主）"><a href="#leader选举（选主）" class="headerlink" title="leader选举（选主）"></a>leader选举（选主）</h3><p>所有的节点在最开始，都始于 follower state。</p>
+<ul>
+<li>如果一个follower得不到leader的响应，它就会成为一个candidate</li>
+<li>candidate会向其他的节点发送申请投票成为leader的请求，其他节点会响应此次投票</li>
+<li>如果candidate得到了大多数节点的票数，他就会成为leader。</li>
+</ul>
+<h3 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h3><p>当leader选出后，所有针对集群的改动，都会先经过leader节点。</p>
+<ul>
+<li>leader节点收到的每个改变的请求时，都会在节点的log中加入该请求的条目，但此时，这个请求并未被提交，所以并不会对节点上的值做实质性的改变。</li>
+<li>要想提交这次请求，leader节点必须首先复制log中的条目，并发送给它的follower，然后leader会等待，直到大多数的follower响应并写入log。此时，leader节点方可提交这次请求，并把leader的值进行改变。</li>
+<li>然后leader会通知它的follower这次请求已被提交，follower方可作出值的改变。至此，集群中的所有节点就都达成了共识。</li>
+</ul>
+<h2 id="leader选举-详解"><a href="#leader选举-详解" class="headerlink" title="leader选举 详解"></a>leader选举 详解</h2><p>在raft算法中，用两个超时设置来控制选举：</p>
+<ul>
+<li>选举超时（election timeout）（其实是不是叫等待选举更好？）<br>选举超时是指节点从Follower状态成为Candidate状态需要等待的时间。在这个时间内，节点必须等待，不能成为Candidate状态。（通常选举超时会被随机设为150ms到300ms之间）<ul>
+<li>当选举超时时间过去后，节点会从Follower成为Candidate，并发起一次新的选举任期，并为自己投票</li>
+<li>然后会发送投票请求到其他的节点，收到请求的节点如果没有在此次任期中投过票，就会投给当前这个Candidate，并重置自己的选举超时时间。</li>
+<li>当Candidate获得大多数节点的投票后，他就会成为leader。</li>
+</ul>
+</li>
+<li>心跳超时（heartbeat timeout）<br>leader会根据固定间隔时间向Follower发送消息，这个固定间隔时间被称为心跳超时<ul>
+<li>当节点成为leader后，会向它的Follower发送添加log条目（心跳）的请求，这个请求会根据心跳超时的时间来循环发送。</li>
+<li>Follower节点收到每一条添加log条目（心跳）的请求，都需要向Leader节点响应这条日志复制的结果，并重置其选举超时时间。</li>
+<li>这一个选举任期不会有节点状态改变，除非，一个Follower节点，因为没有在它的选举超时时间内，得到复制日志的请求（心跳），而变成Candidate，并重新发起一个选举任期。</li>
+</ul>
+</li>
+</ul>
+<p>要求会的大多数其票数，意味着，在一个任期内，只会有一个leader被选出。</p>
+<p>如果两个节点在同时变成了Candidate，那么分票的情况便可能发生，因为一个Follower在一选举任期内只能响应一个Candidate的投票请求，那么这时有可能两个Candidate都得不到大多数的票数，此时，在超过选举超时事件后，Candidate会重置选举超时时间，并进行重新开始一个选举任期，直到有一方胜出。</p>
+<p>如何判断选举任期？ 选举任期只有Candidate才能发起，当发起一个选举任期后，Candidate在申请投票的请求中包含任期信息，而follower会在响应投票请求记录当前选举任期信息，这样就能保证follower不能在一个选举任期内响应多个投票请求。</p>
+<h2 id="日志复制-详解"><a href="#日志复制-详解" class="headerlink" title="日志复制 详解"></a>日志复制 详解</h2><p>当我们的集群中有了leader后，我们便需要向其他follower同步日志。</p>
+<ul>
+<li>首先，客户端会向leader发送改变值的请求，这次请求会添加到leader的log中</li>
+<li>然后leader会带着这次log的改动，向follower发送下一次心跳</li>
+<li>但大多数follower响应了这次log改动（心跳）请求后，leader上这次log改动的条目就会被提交</li>
+<li>最后值会被改变，leader会返回给客户端response</li>
+</ul>
+<h2 id="raft算法在网络分区中保持一致"><a href="#raft算法在网络分区中保持一致" class="headerlink" title="raft算法在网络分区中保持一致"></a>raft算法在网络分区中保持一致</h2><p>当出现网络故障，节点可能会出现网络分区，假设我们有两个节点在一个网络中，三个节点在另一个网络中。</p>
+<p>此时便会出现多个leader，但两个节点的所在的分区，由于无法得到大多数节点的响应，因此不能将作出改变的日志进行提交。</p>
+<p>而当网络分区修复时，为提交日志记录的节点在收到新的同步日志请求时，就会回滚之前的未提交记录，而去同步新主的日志，从而修复节点的不一致性。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> raft </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> raft </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[redis进阶之集群]]></title>
+      <url>/2020/11/28/redis-5/</url>
+      <content type="html"><![CDATA[<h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><p>Redis Cluster是Redis的分布式解决方案，在3.0版本正式推出，有效地解决了Redis分布式方面的需求。当遇到单机内存、并发、流量等瓶颈时，可以采用Cluster架构方案达到负载均衡的目的。</p>
+<h3 id="数据分布"><a href="#数据分布" class="headerlink" title="数据分布"></a>数据分布</h3><h4 id="数据分布理论"><a href="#数据分布理论" class="headerlink" title="数据分布理论"></a>数据分布理论</h4><p>分布式数据库首先要解决把整个数据集按照分区规则映射到多个节点的问题，即把数据集划分到多个节点上，每个节点负责整体数据的一个子集。需要重点关注的是数据分区规则。常见的分区规则有哈希分区和顺序分区两种</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRFpzF.png" alt="DRFpzF.png"></p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRFkZR.png" alt="DRFkZR.png"></p>
+<p>由于Redis Cluster采用哈希分区规则，这里我们重点讨论哈希分区，常见的哈希分区规则有几种</p>
+<p><strong>扩展知识：</strong> <a href="https://segmentfault.com/a/1190000021199728" target="_blank" rel="noopener">https://segmentfault.com/a/1190000021199728</a></p>
+<h5 id="节点取余分区"><a href="#节点取余分区" class="headerlink" title="节点取余分区"></a>节点取余分区</h5><p>使用特定的数据，如Redis的键或用户ID，再根据节点数量N使用公式: <code>hash(key)%N</code>计算出哈希值，用来决定数据映射到哪一个节点上。这种方案存在一个问题:<br>当节点数量变化时，如扩容或收缩节点，数据节点映射关 系需要重新计算，会导致数据的重新迁移。<br>这种方式的突出优点是简单性，常用于数据库的分库分表规则，一般采用预分区的方式，提前根据数据量规划好分区数，比如划分为512或1024张表，保证可支撑未来一段时间的数据量，再根据负载情况将表迁移到其他数据库中。扩容时通常采用翻倍扩容，避免数据映射全部被打乱导致全量迁移的情况</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRF6YV.png" alt="DRF6YV.png"></p>
+<h5 id="一致性哈希分区"><a href="#一致性哈希分区" class="headerlink" title="一致性哈希分区"></a>一致性哈希分区</h5><p>一致性哈希分区(Distributed Hash Table)实现思路是为系统中每个节点分配一个token，范围一般在0~232，这些token构成一个哈希环。数据读写执行节点查找操作时，先根据key计算hash值，然后顺时针找到第一个大于等于该哈希值的token节点</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRFTFx.png" alt="DRFTFx.png"></p>
+<p>这种方式相比节点取余最大的好处在于加入和删除节点只影响哈希环中相邻的节点，对其他节点无影响。但一致性哈希分区存在几个问题:</p>
+<ul>
+<li>加减节点会造成哈希环中部分数据无法命中，需要手动处理或者忽略这部分数据，因此一致性哈希常用于缓存场景。</li>
+<li>当使用少量节点时，节点变化将大范围影响哈希环中数据映射，因此 这种方式不适合少量数据节点的分布式方案。</li>
+<li>普通的一致性哈希分区在增减节点时需要增加一倍或减去一半节点才能保证数据和负载的均衡。</li>
+</ul>
+<h5 id="虚拟槽分区"><a href="#虚拟槽分区" class="headerlink" title="虚拟槽分区"></a>虚拟槽分区</h5><p>虚拟槽分区巧妙地使用了哈希空间，使用分散度良好的哈希函数, 把所有数据映射到一个固定范围的整数集合中，整数定义为槽(slot)。这个范围一般远远大于节点数，比如Redis Cluster槽范围是0~16383。槽是集群内数据管理和迁移的基本单位。采用大范围槽的主要目的是为了方便数据拆分和集群扩展。每个节点会负责一定数量的槽，如图10-4所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRAjII.png" alt="DRAjII.png"></p>
+<p>当前集群有5个节点，每个节点平均大约负责3276个槽。由于采用高质量的哈希算法，每个槽所映射的数据通常比较均匀，将数据平均划分到5个节点进行数据分区。Redis Cluster就是采用虚拟槽分区，下面就介绍Redis数据分区方法。</p>
+<h4 id="Redis数据分区"><a href="#Redis数据分区" class="headerlink" title="Redis数据分区"></a>Redis数据分区</h4><p>Redis Cluser采用虚拟槽分区，所有的键根据哈希函数映射到0~16383整数槽内，计算公式:<code>slot=CRC16(key)&amp;16383</code>。每一个节点负责维护一部分槽以及槽所映射的键值数据。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRZqLF.png" alt="DRZqLF.png"></p>
+<p>Redis虚拟槽分区的特点:</p>
+<ul>
+<li>解耦数据和节点之间的关系，简化了节点扩容和收缩难度。 </li>
+<li>节点自身维护槽的映射关系，不需要客户端或者代理服务维护槽分区元数据。</li>
+<li>支持节点、槽、键之间的映射查询，用于数据路由、在线伸缩等场景。</li>
+</ul>
+<h4 id="集群功能限制"><a href="#集群功能限制" class="headerlink" title="集群功能限制"></a>集群功能限制</h4><p>Redis集群相对单机在功能上存在一些限制，需要开发人员提前了解，<br>在使用时做好规避。限制如下:</p>
+<ul>
+<li>1) key批量操作支持有限。如mset、mget，目前只支持具有相同slot值的key执行批量操作。对于映射为不同slot值的key由于执行mget、mget等操作可能存在于多个节点上因此不被支持。</li>
+<li>2) key事务操作支持有限。同理只支持多key在同一节点上的事务操作，当多个key分布在不同的节点上时无法使用事务功能。</li>
+<li>3) key作为数据分区的最小粒度，因此不能将一个大的键值对象如 hash、list等映射到不同的节点。</li>
+<li>4) 不支持多数据库空间。单机下的Redis可以支持16个数据库，集群模式下只能使用一个数据库空间，即db0。</li>
+<li>5) 复制结构只支持一层，从节点只能复制主节点，不支持嵌套树状复制结构。</li>
+</ul>
+<h3 id="搭建集群"><a href="#搭建集群" class="headerlink" title="搭建集群"></a>搭建集群</h3><h4 id="准备节点"><a href="#准备节点" class="headerlink" title="准备节点"></a>准备节点</h4><p>Redis集群一般由多个节点组成，节点数量至少为6个才能保证组成完整 高可用的集群。每个节点需要开启配置cluster-enabled yes，让Redis运行在集 群模式下。建议为集群内所有节点统一目录，一般划分三个目录:conf、 data、log，分别存放配置、数据和日志相关文件。把6个节点配置统一放在conf目录下，集群相关配置如下:</p>
+<pre><code class="java">#节点端口
+port 6379
+# 开启集群模式
+cluster-enabled yes
+# 节点超时时间，单位毫秒
+cluster-node-timeout 15000
+# 集群内部配置文件
+cluster-config-file &quot;nodes-6379.conf&quot;
+</code></pre>
+<p>启动过程如图10-6所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRmkcV.png" alt="DRmkcV.png"></p>
+<h4 id="节点握手"><a href="#节点握手" class="headerlink" title="节点握手"></a>节点握手</h4><p>节点握手是指一批运行在集群模式下的节点通过Gossip协议彼此通信， 达到感知对方的过程。节点握手是集群彼此通信的第一步，由客户端发起命令:<code>cluster meet{ip}{port}</code></p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRncM6.png" alt="DRncM6.png"></p>
+<ul>
+<li>节点6379本地创建6380节点信息对象，并发送meet消息。</li>
+<li>节点6380接受到meet消息后，保存6379节点信息并回复pong消息。</li>
+<li>之后节点6379和6380彼此定期通过ping/pong消息进行正常的节点通信。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRnoRI.png" alt="DRnoRI.png"></p>
+<h4 id="分配槽"><a href="#分配槽" class="headerlink" title="分配槽"></a>分配槽</h4><p>Redis集群把所有的数据映射到16384个槽中。每个key会映射为一个固 定的槽，只有当节点分配了槽，才能响应和这些槽关联的键命令。通过 cluster addslots命令为节点分配槽。</p>
+<p>假如我们有六个节点，三个节点加入集群进行槽分配，还有三个节点没有使用，作为一个完整的集群，每个负责处理槽的 节点应该具有从节点，保证当它出现故障时可以自动进行故障转移。</p>
+<p>集群模 式下，Reids节点角色分为主节点和从节点。首次启动的节点和被分配槽的节点都是主节点，从节点负责复制主节点槽信息和相关的数据。使用cluster replicate{nodeId}命令让一个节点成为从节点。其中命令执行必须在对应的 从节点上执行，nodeId是要复制主节点的节点ID。</p>
+<p>Redis集群模式下的主从复制使用了之前介绍的Redis复制流程，依然支 持全量和部分复制。复制(replication)完成后，整个集群的结构如图10-11 所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRQ2pd.png" alt="DRQ2pd.png"></p>
+<h3 id="节点通信"><a href="#节点通信" class="headerlink" title="节点通信"></a>节点通信</h3><h4 id="通信流程"><a href="#通信流程" class="headerlink" title="通信流程"></a>通信流程</h4><p>在分布式存储中需要提供维护节点元数据信息的机制，所谓元数据是指: 节点负责哪些数据，是否出现故障等状态信息。</p>
+<p>常见的元数据维护方式分为: 集中式和P2P方式。Redis集群采用P2P的Gossip(流言)协议， Gossip协议工作原理就是节点彼此不断通信交换信息，一段时间后所有的节点都会知道集群完整的信息，这种方式类似流言传播，如图10-12所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRQvn0.png" alt="DRQvn0.png"></p>
+<p>通信过程说明: </p>
+<ul>
+<li>1) 集群中的每个节点都会单独开辟一个TCP通道，用于节点之间彼此通信，通信端口号在基础端口上加10000。</li>
+<li>2) 每个节点在固定周期内通过特定规则选择几个节点发送ping消息。</li>
+<li>3) 接收到ping消息的节点用pong消息作为响应。</li>
+</ul>
+<p>集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全 部节点，也可能仅知道部分节点，只要这些节点彼此可以正常通信，最终它 们会达到一致的状态。当节点出故障、新节点加入、主从角色变化、槽信息 变更等事件发生时，通过不断的ping/pong消息通信，经过一段时间后所有的 节点都会知道整个集群全部节点的最新状态，从而达到集群状态同步的目的。</p>
+<h4 id="Gossip消息"><a href="#Gossip消息" class="headerlink" title="Gossip消息"></a>Gossip消息</h4><p>常用的Gossip消息可分为:</p>
+<ul>
+<li>meet消息: 用于通知新节点加入。消息发送者通知接收者加入到当前集群，meet消息通信正常完成后，接收节点会加入到集群中并进行周期性的 ping、pong消息交换。</li>
+<li>ping消息: 集群内交换最频繁的消息，集群内每个节点每秒向多个其他节点发送ping消息，用于检测节点是否在线和交换彼此状态信息。ping消息发送封装了自身节点和部分其他节点的状态数据。</li>
+<li>pong消息: 当接收到ping、meet消息时，作为响应消息回复给发送方确认消息正常通信。 <strong>pong消息内部封装了自身状态数据。</strong> 节点也可以向集群内广播自身的pong消息来通知整个集群对自身状态进行更新。</li>
+<li>fail消息:当节点判定集群内另一个节点下线时，会向集群内广播一个 fail消息，其他节点接收到fail消息之后把对应节点更新为下线状态。</li>
+</ul>
+<h4 id="节点选择"><a href="#节点选择" class="headerlink" title="节点选择"></a>节点选择</h4><p>虽然Gossip协议的信息交换机制具有天然的分布式特性，但它是有成本 的。由于内部需要频繁地进行节点信息交换，而ping/pong消息会携带当前节 点和部分其他节点的状态数据，势必会加重带宽和计算的负担。Redis集群 内节点通信采用固定频率(定时任务每秒执行10次)。</p>
+<p>因此节点每次选择需 要通信的节点列表变得非常重要。通信节点选择过多虽然可以做到信息及时 交换但成本过高。节点选择过少会降低集群内所有节点彼此信息交换频率， 从而影响故障判定、新节点发现等需求的速度。</p>
+<p>因此Redis集群的Gossip协议需要兼顾信息交换实时性和成本开销。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DR38Tf.png" alt="DR38Tf.png"></p>
+<h5 id="选择发送消息的节点数量"><a href="#选择发送消息的节点数量" class="headerlink" title="选择发送消息的节点数量"></a>选择发送消息的节点数量</h5><p>集群内每个节点维护定时任务默认每秒执行10次，每秒会随机选取5个节点找出最久没有通信的节点发送ping消息，用于保证Gossip信息交换的随机性。</p>
+<p>每100毫秒都会扫描本地节点列表，如果发现节点最近一次接受pong 消息的时间大于cluster_node_timeout/2，则立刻发送ping消息，防止该节点信 息太长时间未更新。</p>
+<p>根据以上规则得出每个节点每秒需要发送ping消息的数量=<code>1+10*num(node.pong_received&gt;cluster_node_timeout/2)</code>，因此 cluster_node_timeout参数对消息发送的节点数量影响非常大。当我们的带宽 资源紧张时，可以适当调大这个参数.</p>
+<h5 id="消息数据量"><a href="#消息数据量" class="headerlink" title="消息数据量"></a>消息数据量</h5><p>每个ping消息的数据量体现在消息头和消息体中，其中消息头主要占用空间的字段是<code>myslots[CLUSTER_SLOTS/8]</code>，占用2KB，这块空间占用相对固定, 是节点自身信息。消息体会携带一定数量的其他节点信息用于信息交换。</p>
+<h3 id="集群伸缩"><a href="#集群伸缩" class="headerlink" title="集群伸缩"></a>集群伸缩</h3><p>Redis集群提供了灵活的节点扩容和收缩方案。在不影响集群对外服务 的情况下，可以为集群添加节点进行扩容也可以下线部分节点进行缩容</p>
+<p>其中原 理可抽象为槽和对应数据在不同节点之间灵活移动。首先来看我们之前搭建的集群槽和数据与节点的对应关系</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRJxBR.png" alt="DRJxBR.png"></p>
+<p>三个主节点分别维护自己负责的槽和对应的数据，如果希望加入1个节 点实现集群扩容时，需要通过相关命令把一部分槽和数据迁移给新节点，如 图10-18所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRYVud.png" alt="DRYVud.png"></p>
+<p>图中每个节点把一部分槽和数据迁移到新的节点6385，每个节点负责的 槽和数据相比之前变少了从而达到了集群扩容的目的。这里我们故意忽略了 槽和数据在节点之间迁移的细节，目的是想让读者重点关注在上层槽和节点 分配上来，理解集群的水平伸缩的上层原理: <code>集群伸缩=槽和数据在节点之间的移动</code>，下面将介绍集群扩容和收缩的细节。</p>
+<h4 id="扩容集群"><a href="#扩容集群" class="headerlink" title="扩容集群"></a>扩容集群</h4><p>准备两个新节点6385和6386，新节点依然采用cluster meet命令加入到现有集群中。在集群内任意节点<br>执行cluster meet命令让6385和6386节点加入进来。集群内新旧节点经过一段时间的ping/pong消息通信之后，所有节点会发现新节点并将它们的状态保存到本地。</p>
+<p>新节点刚开始都是主节点状态，但是由于没有负责的槽，所以不能接受 任何读写操作。对于新节点的后续操作我们一般有两种选择:</p>
+<ul>
+<li>为它迁移槽和数据实现扩容。</li>
+<li>作为其他主节点的从节点负责故障转移。</li>
+</ul>
+<h5 id="迁移槽和数据"><a href="#迁移槽和数据" class="headerlink" title="迁移槽和数据"></a>迁移槽和数据</h5><p>槽迁移计划</p>
+<p>槽是Redis集群管理数据的基本单位，首先需要为新节点制定槽的迁移 计划，确定原有节点的哪些槽需要迁移到新节点。迁移计划需要确保每个节 点负责相似数量的槽，从而保证各节点的数据均匀。例如，在集群中加入 6385节点，如图10-21所示。加入6385节点后，原有节点负责的槽数量从 6380变为4096个。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRtNsH.png" alt="DRtNsH.png"></p>
+<p>迁移数据</p>
+<p>数据迁移过程是逐个槽进行的，每个槽数据迁移的流程如图10-23所示。</p>
+<ul>
+<li>对目标节点发送<code>cluster setslot{slot}importing{sourceNodeId}</code>命令，让目标节点准备导入槽的数据。</li>
+<li>对源节点发送<code>cluster setslot{slot}migrating{targetNodeId}</code>命令，让源节点准备迁出槽的数据。</li>
+<li>源节点循环执行<code>cluster getkeysinslot{slot}{count}</code>命令，获取count个属于槽{slot}的键。</li>
+<li>在源节点上执行<code>migrate{targetIp}{targetPort}&quot;&quot;0{timeout}keys{keys...}</code>命令，把获取的键通过流水线(pipeline)机制批量迁移到目标节点，批量 迁移版本的migrate命令在Redis3.0.6以上版本提供，之前的migrate命令只能 单个键迁移。对于大量key的场景，批量键迁移将极大降低节点之间网络IO 次数。</li>
+<li>重复执行步骤3)和步骤4)直到槽下所有的键值数据迁移到目标节点。</li>
+<li>向集群内所有主节点发送<code>cluster setslot{slot}node{targetNodeId}</code>命令，通知槽分配给目标节点。为了保证槽节点映射变更及时传播，需要遍历发送给所有主节点更新被迁移的槽指向新节点。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRtIYV.png" alt="DRtIYV.png"></p>
+<p>这里有个问题，redis每个节点的槽都是连续的么？</p>
+<p>在集群初始建立的时候，同一节点上的槽是连续的，但扩容时，新节点会取所有其他节点上连续的槽为其分配，因此就不是连续的了。如下图：</p>
+<p>初始状态：<br><img src="https://s3.ax1x.com/2020/11/30/DRaUL4.png" alt="DRaUL4.png"></p>
+<p>扩容后：<br><img src="https://s3.ax1x.com/2020/11/30/DRarJx.png" alt="DRarJx.png"></p>
+<p>这也印证了槽分区与一致性哈希的不同，一致性哈希因为是连续的环，所以可以只迁移相邻的节点上的数据，但会造成分配不均。槽分区不会分配不均，但迁移时还是要动所有的旧节点的，只不过旧节点之间不用彼此迁移了（传统的哈希就需要）。</p>
+<h5 id="添加从节点"><a href="#添加从节点" class="headerlink" title="添加从节点"></a>添加从节点</h5><p>使用<code>cluster replicate{masterNodeId}</code>命令为主节点添加对应从节点，注意在集群模式下slaveof添加从节点操作不再支持。</p>
+<p>从节点内部除了对主节点发起全量复制之外，还需要更新本地节点的集群相关状态.</p>
+<h4 id="收缩集群"><a href="#收缩集群" class="headerlink" title="收缩集群"></a>收缩集群</h4><h5 id="下线迁移槽"><a href="#下线迁移槽" class="headerlink" title="下线迁移槽"></a>下线迁移槽</h5><p>收缩集群意味着缩减规模，需要从现有集群中安全下线部分节点</p>
+<ul>
+<li>1) 首先需要确定下线节点是否有负责的槽，如果是，需要把槽迁移到其他节点，保证节点下线后整个集群槽节点映射的完整性。</li>
+<li>2) 当下线节点不再负责槽或者本身是从节点时，就可以通知集群内其 他节点忘记下线节点，当所有的节点忘记该节点后可以正常关闭。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRaofP.png" alt="DRaofP.png"></p>
+<p>下线节点需要把自己负责的槽迁移到其他节点，原理与之前节点扩容的迁移槽过程一致。源节点需要把自身负责的槽均匀地迁移到其他主节点上。</p>
+<p>节点下限后</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRdet1.png" alt="DRdet1.png"></p>
+<h5 id="忘记节点"><a href="#忘记节点" class="headerlink" title="忘记节点"></a>忘记节点</h5><p>由于集群内的节点不停地通过Gossip消息彼此交换节点状态，因此需要 通过一种健壮的机制让集群内所有节点忘记下线的节点。也就是说让其他节 点不再与要下线节点进行Gossip消息交换。</p>
+<p>Redis提供了<code>cluster forget{downNodeId}</code>命令实现该功能</p>
+<p>当节点接收到cluster forget{down NodeId}命令后，会把nodeId指定的节 点加入到禁用列表中，在禁用列表内的节点不再发送Gossip消息。禁用列表 有效期是60秒，超过60秒节点会再次参与消息交换。也就是说当第一次 forget命令发出后，我们有60秒的时间让集群内的所有节点忘记下线节点。</p>
+<p>线上操作不建议直接使用cluster forget命令下线节点，需要跟大量节点 命令交互，实际操作起来过于繁琐并且容易遗漏forget节点。建议使用<code>redis- trib.rb del-node{host:port}{downNodeId}</code>命令.</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRwQCq.png" alt="DRwQCq.png"></p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p>Redis集群对客户端通信协议做了比较大的修改， 为了追求性能最大化，并没有采用代理的方式而是采用客户端直连节点的方式。因此对于希望从单机切换到集群环境的应用需要修改客户端代码。本节 我们关注集群请求路由的细节，以及客户端如何高效地操作集群。</p>
+<h4 id="请求重定向"><a href="#请求重定向" class="headerlink" title="请求重定向"></a>请求重定向</h4><p>在集群模式下，Redis接收任何键相关命令时首先计算键对应的槽，再 根据槽找出所对应的节点，如果节点是自身，则处理键命令;否则回复 MOVED重定向错误，通知客户端请求正确的节点。这个过程称为MOVED重 定向，通知客户端请求正确的节点。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRwgVH.png" alt="DRwgVH.png"></p>
+<p>重定向信息包含了键所对应的槽以及负责该槽的节点地址，根据这些信 息客户端就可以向正确的节点发起请求。节点对于不属于它的键命令只回复重定向响应，并不负责转发。</p>
+<h5 id="键命令"><a href="#键命令" class="headerlink" title="键命令"></a>键命令</h5><p>计算槽</p>
+<p>Redis首先需要计算键所对应的槽。根据键的有效部分使用CRC16函数 计算出散列值，再取对16383的余数，使每个键都可以映射到0~16383槽范围内。</p>
+<p>槽节点查找</p>
+<p>Redis计算得到键对应的槽后，需要查找槽所对应的节点。集群内通过消息交换每个节点都会知道所有节点的槽信息，内部保存在clusterState结构中.</p>
+<p>根据MOVED重定向机制，客户端可 以随机连接集群内任一Redis获取键所在节点，这种客户端又叫Dummy(傀儡)客户端，它优点是代码实现简单，对客户端协议影响较小，只需要根据 重定向信息再次发送请求即可。但是它的弊端很明显，每次执行键命令前都 要到Redis上进行重定向才能找到要执行命令的节点，额外增加了IO开销， 这不是Redis集群高效的使用方式。正因为如此通常集群客户端都采用另一 种实现:Smart(智能)客户端。</p>
+<h4 id="Smart客户端"><a href="#Smart客户端" class="headerlink" title="Smart客户端"></a>Smart客户端</h4><p>大多数开发语言的Redis客户端都采用Smart客户端支持集群协议，Smart客户端通过在内部维护slot→node的映射关系，本地就可实现键到 节点的查找，从而保证IO效率的最大化，而MOVED重定向负责协助Smart客 户端更新slot→node映射。</p>
+<ul>
+<li>客户端初始化时会选择一个运行节点，初始化槽和节点映射关系</li>
+<li>客户端解析cluster slots结果缓存在本地，并为每个节点创建唯一的连接池</li>
+<li>执行命令<ul>
+<li>计算slot并根据slots缓存获取目标节点连接，发送命令。</li>
+<li>如果出现连接错误，使用随机连接重新执行键命令。</li>
+<li>捕获到MOVED重定向错误，使用cluster slots命令更新slots缓存</li>
+<li>重复执行1)~3)步，直到命令执行成功</li>
+</ul>
+</li>
+</ul>
+<h4 id="ASK重定向"><a href="#ASK重定向" class="headerlink" title="ASK重定向"></a>ASK重定向</h4><p>Redis集群支持在线迁移槽(slot)和数据来完成水平伸缩，当slot对应 的数据从源节点到目标节点迁移过程中，客户端需要做到智能识别，保证键命令可正常执行。</p>
+<p>例如当一个slot数据从源节点迁移到目标节点时，期间可 能出现一部分数据在源节点，而另一部分在目标节点</p>
+<p>当出现上述情况时，客户端键命令执行流程将发生变化，如下所示:</p>
+<ul>
+<li>客户端根据本地slots缓存发送命令到源节点，如果存在键对象则直 接执行并返回结果给客户端。</li>
+<li>如果键对象不存在，则可能存在于目标节点，这时源节点会回复 ASK重定向异常。格式如下:<code>(error)ASK{slot}{targetIP}:{targetPort}</code>。</li>
+<li>客户端从ASK重定向异常提取出目标节点信息，发送asking命令到目标节点打开客户端连接标识，再执行键命令。如果存在则执行，不存在则返 回不存在信息。</li>
+</ul>
+<p>ASK与MOVED虽然都是对客户端的重定向控制，但是有着本质区别。 ASK重定向说明集群正在进行slot数据迁移，客户端无法知道什么时候迁移 完成，因此只能是临时性的重定向，客户端不会更新slots缓存。但是 MOVED重定向说明键对应的槽已经明确指定到新的节点，因此需要更新 slots缓存。</p>
+<p>为了支持ASK重定向，源节点和目标节点在内部的clusterState结构中维护当前正在迁移的槽信息，用于识别槽迁移情况,节点每次接收到键命令时，都会根据clusterState内的迁移属性进行命令处理.</p>
+<h3 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h3><h4 id="故障发现"><a href="#故障发现" class="headerlink" title="故障发现"></a>故障发现</h4><h5 id="主观下线"><a href="#主观下线" class="headerlink" title="主观下线"></a>主观下线</h5><p>指某个节点认为另一个节点不可用，即下线状态，这个状 态并不是最终的故障判定，只能代表一个节点的意见，可能存在误判情况。</p>
+<ul>
+<li>节点a发送ping消息给节点b，如果通信正常将接收到pong消息，节点a更新最近一次与节点b的通信时间。 </li>
+<li>如果节点a与节点b通信出现问题则断开连接，下次会进行重连。如果一直通信失败，则节点a记录的与节点b最后通信时间将无法更新。 </li>
+<li>节点a内的定时任务检测到与节点b最后通信时间超高cluster-node-timeout时，更新本地对节点b的状态为主观下线(pfail)。<br><img src="https://s3.ax1x.com/2020/11/30/DRDLIH.png" alt="DRDLIH.png"></li>
+</ul>
+<h5 id="客观下线"><a href="#客观下线" class="headerlink" title="客观下线"></a>客观下线</h5><p>指标记一个节点真正的下线，集群内多个节点都认为该节 点不可用，从而达成共识的结果。如果是持有槽的主节点故障，需要为该节 点进行故障转移。</p>
+<p>当某个节点判断另一个节点主观下线后，相应的节点状态会跟随消息在 集群内传播。ping/pong消息的消息体会携带集群1/10的其他节点状态数据， 当接受节点发现消息体中含有主观下线的节点状态时，会在本地找到故障节 点的ClusterNode结构，保存到下线报告链表中。</p>
+<p>通过Gossip消息传播，集群内节点不断收集到故障节点的下线报告。当半数以上持有槽的主节点都标记某个节点是主观下线时。触发客观下线流程。</p>
+<p>这里有两个问题:</p>
+<ul>
+<li>为什么必须是负责槽的主节点参与故障发现决策?因为集群模式下 只有处理槽的主节点才负责读写请求和集群槽等关键信息维护，而从节点只 进行主节点数据和状态信息的复制。</li>
+<li>为什么半数以上处理槽的主节点?必须半数以上是为了应对网络分 区等原因造成的集群分割情况，被分割的小集群因为无法完成从主观下线到 客观下线这一关键过程，从而防止小集群完成故障转移之后继续对外提供服务(类似raft算法)</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRrUOK.png" alt="DRrUOK.png"></p>
+<ul>
+<li>首先统计有效的下线报告数量，如果小于集群内持有槽的主节点总数的一半则退出。</li>
+<li>当下线报告大于槽主节点数量一半时，标记对应故障节点为客观下线状态。 </li>
+<li>向集群广播一条fail消息，通知所有的节点将故障节点标记为客观下线，fail消息的消息体只包含故障节点的ID。</li>
+</ul>
+<h4 id="故障恢复"><a href="#故障恢复" class="headerlink" title="故障恢复"></a>故障恢复</h4><p>故障节点变为客观下线后，如果下线节点是持有槽的主节点则需要在它 的从节点中选出一个替换它，从而保证集群的高可用。下线主节点的所有从 节点承担故障恢复的义务，当从节点通过内部定时任务发现自身复制的主节 点进入客观下线时，将会触发故障恢复流程。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRsC11.png" alt="DRsC11.png"></p>
+<h5 id="资格检查"><a href="#资格检查" class="headerlink" title="资格检查"></a>资格检查</h5><p>每个从节点都要检查最后与主节点断线时间，判断是否有资格替换故障<br>的主节点。如果从节点与主节点断线时间超过<code>cluster-node-time*cluster-slave-validity-factor</code>，则当前从节点不具备故障转移资格。参数cluster-slave-validity-factor用于从节点的有效因子，默认为10。</p>
+<h5 id="准备选举时间"><a href="#准备选举时间" class="headerlink" title="准备选举时间"></a>准备选举时间</h5><p>当从节点符合故障转移资格后，更新触发故障选举的时间，只有到达该时间后才能执行后续流程。这里之所以采用延迟触发机制，主要是通过对多个从节点使用不同的延迟选举时间来支持优先级问题。复制偏移量越大说明从节点延迟越低，那么它应该具有更高的优先级来替换故障主节点</p>
+<h5 id="发起选举"><a href="#发起选举" class="headerlink" title="发起选举"></a>发起选举</h5><p>当从节点定时任务检测到达故障选举时间(failover_auth_time)到达后，发起选举流程如下:</p>
+<ul>
+<li>更新配置纪元： 配置纪元是一个只增不减的整数，每个主节点自身维护一个配置纪元 (clusterNode.configEpoch)标示当前主节点的版本，所有主节点的配置纪元 都不相等，从节点会复制主节点的配置纪元。整个集群又维护一个全局的配 置纪元(clusterState.current Epoch)（<strong>类似raft算法中的任期</strong>）。配置纪元的应用场景有: ·新节点加入。 ·槽节点映射冲突检测。 ·从节点投票选举冲突检测。</li>
+<li>广播选举消息： 在集群内广播选举消息(FAILOVER_AUTH_REQUEST)，并记录已发 送过消息的状态，保证该从节点在一个配置纪元内只能发起一次选举。</li>
+</ul>
+<h5 id="选举投票"><a href="#选举投票" class="headerlink" title="选举投票"></a>选举投票</h5><p>跟raft差不多。</p>
+<p>如集群内有N个持有槽的主节 点代表有N张选票。由于在每个配置纪元内持有槽的主节点只能投票给一个 从节点，因此只能有一个从节点获得N/2+1的选票，保证能够找出唯一的从节点。下线的主节点不计入投票。</p>
+<p>Redis集群没有直接使用从节点进行领导者选举，主要因为从节点数必 须大于等于3个才能保证凑够N/2+1个节点，将导致从节点资源浪费。使用 集群内所有持有槽的主节点进行领导者选举，即使只有一个从节点也可以完成选举过程。</p>
+<h5 id="替换主节点"><a href="#替换主节点" class="headerlink" title="替换主节点"></a>替换主节点</h5><p>当从节点收集到足够的选票之后，触发替换主节点操作:</p>
+<ul>
+<li>1) 当前从节点取消复制变为主节点。</li>
+<li>2) 执行clusterDelSlot操作撤销故障主节点负责的槽，并执行 clusterAddSlot把这些槽委派给自己。</li>
+<li>3) 向集群广播自己的pong消息，通知集群内所有的节点当前从节点变为主节点并接管了故障主节点的槽信息</li>
+</ul>
+<h3 id="集群中的问题调优"><a href="#集群中的问题调优" class="headerlink" title="集群中的问题调优"></a>集群中的问题调优</h3><h4 id="集群完整性"><a href="#集群完整性" class="headerlink" title="集群完整性"></a>集群完整性</h4><p>为了保证集群完整性，默认情况下当集群16384个槽任何一个没有指派 到节点时整个集群不可用。这是对集群完整性的一种保护措施，保证所有的 槽都指派给在线的节点。但是当持有槽的主节点下线时，从故障发现到自动 完成转移期间整个集群是不可用状态，对于大多数业务无法容忍这种情况， 因此建议将参数cluster-require-full-coverage配置为no，当主节点故障时只影 响它负责槽的相关命令执行，不会影响其他主节点的可用性。</p>
+<h4 id="带宽消耗"><a href="#带宽消耗" class="headerlink" title="带宽消耗"></a>带宽消耗</h4><p>集群内Gossip消息通信本身会消耗带宽，官方建议集群最大规模在1000 以内，也是出于对消息通信成本的考虑，因此单集群不适合部署超大规模的节点。集群内所有节点通过ping/pong消息彼此 交换信息，节点间消息通信对带宽的消耗体现在以下几个方面:</p>
+<ul>
+<li>消息发送频率: 跟cluster-node-timeout密切相关，当节点发现与其他节 点最后通信时间超过cluster-node-timeout/2时会直接发送ping消息。</li>
+<li>消息数据量: 每个消息主要的数据占用包含:slots槽数组(2KB空 间)和整个集群1/10的状态数据(10个节点状态数据约1KB)。</li>
+<li>节点部署的机器规模:机器带宽的上线是固定的，因此相同规模的集 群分布的机器越多每台机器划分的节点越均匀，则集群内整体的可用带宽越 高。</li>
+</ul>
+<p>优化：</p>
+<ul>
+<li>在满足业务需要的情况下尽量避免大集群。</li>
+<li>适度提高cluster-node-timeout降低消息发送频率，同时cluster-node- timeout还影响故障转移的速度，因此需要根据自身业务场景兼顾二者的平 衡。</li>
+<li>如果条件允许集群尽量均匀部署在更多机器上。避免集中部署</li>
+</ul>
+<h4 id="Pub-Sub广播问题"><a href="#Pub-Sub广播问题" class="headerlink" title="Pub/Sub广播问题"></a>Pub/Sub广播问题</h4><p>集群模式下内部实现对所有的publish命令都会向 所有的节点进行广播，造成每条publish数据都会在集群内所有节点传播一 次，加重带宽负担</p>
+<p><img src="https://i.loli.net/2020/11/30/GrnoR9DSHvaLCbE.png" alt="image.png"></p>
+<p>当频繁应用 Pub/Sub功能时应该避免在大量节点的集群内使用，否则会严重消耗集群内 网络带宽。针对这种情况建议使用sentinel结构专门用于Pub/Sub功能，从而 规避这一问题。</p>
+<h4 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h4><p>不建议集群模式下做读写分离</p>
+<h4 id="集群倾斜"><a href="#集群倾斜" class="headerlink" title="集群倾斜"></a>集群倾斜</h4><p>合理设计键，热点大集合对象做拆分或使用hmget替代hgetall避免整体读取。避免映射到同一槽。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[redis进阶之哨兵]]></title>
+      <url>/2020/11/28/redis-4/</url>
+      <content type="html"><![CDATA[<h2 id="哨兵"><a href="#哨兵" class="headerlink" title="哨兵"></a>哨兵</h2><p>Redis的主从复制模式下，一旦主节点由于故障不能提供服务，需要人 工将从节点晋升为主节点，同时还要通知应用方更新主节点地址，对于很多 应用场景这种故障处理的方式是无法接受的。可喜的是Redis从2.8开始正式 提供了Redis Sentinel(哨兵)架构来解决这个问题。</p>
+<p><img src="https://s3.ax1x.com/2020/11/29/DguZod.png" alt="DguZod.png"></p>
+<h3 id="主从复制的问题"><a href="#主从复制的问题" class="headerlink" title="主从复制的问题"></a>主从复制的问题</h3><p>Redis的主从复制模式可以将主节点的数据改变同步给从节点，这样从节点就可以起到两个作用: </p>
+<ul>
+<li>作为主节点的一个备份，一旦主节点出了故障不可达的情况，从节点可以作为后备“顶”上来，并且保证数据尽量不丢失(主从复制是最终一致性)。</li>
+<li>从节点可以扩展主节点的读能力，一旦主节点不能支撑住大并发量的读操作，从节点可以在一定程度上帮助主节点分担读压力。</li>
+</ul>
+<p>但是主从复制也带来了以下问题:</p>
+<ul>
+<li>一旦主节点出现故障，需要手动将一个从节点晋升为主节点，同时需要修改应用方的主节点地址，还需要命令其他从节点去复制新的主节点，整个过程都需要人工干预。</li>
+<li>主节点的写能力受到单机的限制。</li>
+<li>主节点的存储能力受到单机的限制。</li>
+</ul>
+<p>其中第一个问题就是Redis的高可用问题，就是哨兵解决的。 第二、三个问题属于Redis的分布式问题，是集群解决的。</p>
+<h3 id="高可用"><a href="#高可用" class="headerlink" title="高可用"></a>高可用</h3><p>当主节点出现故障时，Redis Sentinel能自动完成故障发现和故障转移，并通知应用方，从而实现真正的高可用。</p>
+<p>Redis Sentinel是一个分布式架构，其中包含若干个Sentinel节点和Redis 数据节点，每个Sentinel节点会对数据节点和其余Sentinel节点进行监控，当 它发现节点不可达时，会对节点做下线标识。如果被标识的是主节点，它还 会和其他Sentinel节点进行“协商”，当大多数Sentinel节点都认为主节点不可 达时，它们会选举出一个Sentinel节点来完成自动故障转移的工作，同时会 将这个变化实时通知给Redis应用方。整个过程完全是自动的，不需要人工 来介入，所以这套方案很有效地解决了Redis的高可用问题。</p>
+<p>Redis Sentinel与Redis主从复制模式只是多了若干Sentinel 节点，所以Redis Sentinel并没有针对Redis节点做了特殊处理。</p>
+<p><img src="https://s3.ax1x.com/2020/11/29/DgKkpq.png" alt="DgKkpq.png"></p>
+<p>从逻辑架构上看，Sentinel节点集合会定期对所有节点进行监控，特别是对主节点的故障实现自动转移。</p>
+<p>下面以1个主节点、2个从节点、3个Sentinel节点组成的Redis Sentinel为例子进行说明，拓扑结构如图9-7所示。</p>
+<p><img src="https://s3.ax1x.com/2020/11/29/DgKMN9.png" alt="DgKMN9.png"></p>
+<p>整个故障转移的处理逻辑有下面4个步骤:</p>
+<ul>
+<li>1) 如图9-8所示，主节点出现故障，此时两个从节点与主节点失去连接，主从复制失败。<br><img src="https://s3.ax1x.com/2020/11/29/DgK8c6.png" alt="DgK8c6.png"></li>
+<li>2) 如图9-9所示，每个Sentinel节点通过定期监控发现主节点出现了故障。<br><img src="https://s3.ax1x.com/2020/11/29/DgKw4A.png" alt="DgKw4A.png"></li>
+<li>3) 如图9-10所示，多个Sentinel节点对主节点的故障达成一致，选举出 sentinel-3节点作为领导者负责故障转移。<br><img src="https://s3.ax1x.com/2020/11/29/DgKsjf.png" alt="DgKsjf.png"></li>
+<li>4) 如图9-11所示，Sentinel领导者节点执行了故障转移，整个过程和主从复制手动处理是完全一致的，只不过是自动化完成的。<br><img src="https://s3.ax1x.com/2020/11/29/DgKWNj.png" alt="DgKWNj.png"></li>
+<li>5) 故障转移后整个Redis Sentinel的拓扑结构图9-12所示。<br><img src="https://s3.ax1x.com/2020/11/29/DgKovV.png" alt="DgKovV.png"></li>
+</ul>
+<p>通过上面介绍的Redis Sentinel逻辑架构以及故障转移的处理，可以看出Redis Sentinel具有以下几个功能:</p>
+<ul>
+<li>监控:Sentinel节点会定期检测Redis数据节点、其余Sentinel节点是否可达。</li>
+<li>通知:Sentinel节点会将故障转移的结果通知给应用方。</li>
+<li>主节点故障转移: 实现从节点晋升为主节点并维护后续正确的主从关系。</li>
+<li>配置提供者: 在Redis Sentinel结构中，客户端在初始化的时候连接的是Sentinel节点集合，从中获取主节点信息。</li>
+</ul>
+<p>同时看到，Redis Sentinel包含了若个Sentinel节点，这样做也带来了两个好处:</p>
+<ul>
+<li>对于节点的故障判断是由多个Sentinel节点共同完成，这样可以有效地 防止误判。</li>
+<li>Sentinel节点集合是由若干个Sentinel节点组成的，这样即使个别Sentinel节点不可用，整个Sentinel节点集合依然是健壮的。</li>
+</ul>
+<p>但是Sentinel节点本身就是独立的Redis节点，只不过它们有一些特殊， 它们不存储数据，只支持部分命令。</p>
+<h3 id="sentinel配置"><a href="#sentinel配置" class="headerlink" title="sentinel配置"></a>sentinel配置</h3><h4 id="sentinel-monitor-lt-master-name-gt-lt-ip-gt-lt-port-gt-lt-quorum-gt"><a href="#sentinel-monitor-lt-master-name-gt-lt-ip-gt-lt-port-gt-lt-quorum-gt" class="headerlink" title="sentinel monitor &lt;master-name&gt; &lt;ip&gt; &lt;port&gt; &lt;quorum&gt;"></a><code>sentinel monitor &lt;master-name&gt; &lt;ip&gt; &lt;port&gt; &lt;quorum&gt;</code></h4><p>Sentinel节点会定期监控主节点，所以从配置上必然也会有所体现，本 配置说明Sentinel节点要监控的是一个名字叫做<code>&lt;master-name&gt;</code>，ip地址和端口为<code>&lt;ip&gt;</code> <code>&lt;port&gt;</code>的主节点。<code>&lt;quorum&gt;</code>代表要判定主节点最终不可达所需要的 票数。但实际上Sentinel节点会对所有节点进行监控，但是在Sentinel节点的配置中没有看到有关从节点和其余Sentinel节点的配置，那是因为Sentinel节 点会从主节点中获取有关从节点以及其余Sentinel节点的相关信息.</p>
+<p>例如某个Sentinel初始节点配置如下:</p>
+<pre><code class="java">port 26379
+daemonize yes
+logfile &quot;26379.log&quot;
+dir /opt/soft/redis/data
+sentinel monitor mymaster 127.0.0.1 6379 2 
+sentinel down-after-milliseconds mymaster 30000 
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 180000
+</code></pre>
+<p>当所有节点启动后，配置文件中的内容发生了变化，体现在三个方面: </p>
+<ul>
+<li>Sentinel节点自动发现了从节点、其余Sentinel节点。 </li>
+<li>去掉了默认配置，例如parallel-syncs、failover-timeout参数。 </li>
+<li>添加了配置纪元相关参数。</li>
+</ul>
+<p>启动后变化为:</p>
+<pre><code class="java">port 26379
+daemonize yes
+logfile &quot;26379.log&quot;
+dir &quot;/opt/soft/redis/data&quot;
+sentinel monitor mymaster 127.0.0.1 6379 2
+sentinel config-epoch mymaster 0
+sentinel leader-epoch mymaster 0
+#发现两个slave节点
+sentinel known-slave mymaster 127.0.0.1 6380
+sentinel known-slave mymaster 127.0.0.1 6381
+#发现两个sentinel节点
+sentinel known-sentinel mymaster 127.0.0.1 26380 282a70ff56c36ed56e8f7ee6ada741
+24140d6f53
+sentinel known-sentinel mymaster 127.0.0.1 26381 f714470d30a61a8e39ae031192f1fe
+ae7eb5b2be
+sentinel current-epoch 0
+</code></pre>
+<p><code>&lt;quorum&gt;</code>参数用于故障发现和判定，例如将quorum配置为2，代表至少 有2个Sentinel节点认为主节点不可达，那么这个不可达的判定才是客观的。 对于<code>&lt;quorum&gt;</code>设置的越小，那么达到下线的条件越宽松，反之越严格。一 般建议将其设置为Sentinel节点的一半加1。</p>
+<p>同时<code>&lt;quorum&gt;</code>还与Sentinel节点的领导者选举有关，至少要有<code>max(quorum，num(sentinels)/2+1)</code>个Sentinel节点参与选举，才能选出领导者Sentinel，从而完成故障转移。例如有5个Sentinel节点，quorum=4，那么 至少要有<code>max(4，5/2+1)=4</code>个在线Sentinel节点才可以进行领导者选举。</p>
+<h4 id="sentinel-down-after-milliseconds-lt-master-name-gt-lt-times-gt"><a href="#sentinel-down-after-milliseconds-lt-master-name-gt-lt-times-gt" class="headerlink" title="sentinel down-after-milliseconds &lt;master-name&gt; &lt;times&gt;"></a><code>sentinel down-after-milliseconds &lt;master-name&gt; &lt;times&gt;</code></h4><p>每个Sentinel节点都要通过定期发送ping命令来判断Redis数据节点和其 余Sentinel节点是否可达，如果超过了down-after-milliseconds配置的时间且没 有有效的回复，则判定节点不可达，<code>&lt;times&gt;</code>(单位为毫秒)就是超时时 间。这个配置是对节点失败判定的重要依据。</p>
+<p>优化说明: down-after-milliseconds越大，代表Sentinel节点对于节点不可达的条件越宽松，反之越严格。条件宽松有可能带来的问题是节点确实不可达了，那么应用方需要等待故障转移的时间越长，也就意味着应用方故障时间可能越长。条件严格虽然可以及时发现故障完成故障转移，但是也存在一定的误判率。</p>
+<h4 id="sentinel-parallel-syncs-lt-master-name-gt-lt-nums-gt"><a href="#sentinel-parallel-syncs-lt-master-name-gt-lt-nums-gt" class="headerlink" title="sentinel parallel-syncs &lt;master-name&gt; &lt;nums&gt;"></a><code>sentinel parallel-syncs &lt;master-name&gt; &lt;nums&gt;</code></h4><p>当Sentinel节点集合对主节点故障判定达成一致时，Sentinel领导者节点会做故障转移操作，选出新的主节点，原来的从节点会向新的主节点发起复制操作，parallel-syncs就是用来限制在一次故障转移之后，每次向新的主节点发起复制操作的从节点个数。</p>
+<p>如果这个参数配置的比较大，那么多个从节点会向新的主节点同时发起复制操作，尽管复制操作通常不会阻塞主节点， 但是同时向主节点发起复制，必然会对主节点所在的机器造成一定的网络和磁盘IO开销。</p>
+<h4 id="sentinel-failover-timeout-lt-master-name-gt-lt-times-gt"><a href="#sentinel-failover-timeout-lt-master-name-gt-lt-times-gt" class="headerlink" title="sentinel failover-timeout &lt;master-name&gt; &lt;times&gt;"></a><code>sentinel failover-timeout &lt;master-name&gt; &lt;times&gt;</code></h4><p>failover-timeout通常被解释成故障转移超时时间，但实际上它作用于故障转移的各个阶段:</p>
+<ul>
+<li>a) 选出合适从节点。</li>
+<li>b) 晋升选出的从节点为主节点。</li>
+<li>c) 命令其余从节点复制新的主节点。</li>
+<li>d) 等待原主节点恢复后命令它去复制新的主节点。</li>
+</ul>
+<p>failover-timeout的作用具体体现在四个方面:</p>
+<ul>
+<li>1) 如果Redis Sentinel对一个主节点故障转移失败，那么下次再对该主节点做故障转移的起始时间是failover-timeout的2倍。</li>
+<li>2) 在 b) 阶段时，如果Sentinel节点向 a) 阶段选出来的从节点执行slaveof no one一直失败(例如该从节点此时出现故障)，当此过程超过 failover-timeout时，则故障转移失败。</li>
+<li>3) 在 b) 阶段如果执行成功，Sentinel节点还会执行info命令来确认 a) 阶段选出来的节点确实晋升为主节点，如果此过程执行时间超过failover- timeout时，则故障转移失败。</li>
+<li>4) 如果 c) 阶段执行时间超过了failover-timeout(不包含复制时间)， 则故障转移失败。注意即使超过了这个时间，Sentinel节点也会最终配置从节点去同步最新的主节点。</li>
+</ul>
+<h4 id="sentinel-auth-pass-lt-master-name-gt-lt-password-gt"><a href="#sentinel-auth-pass-lt-master-name-gt-lt-password-gt" class="headerlink" title="sentinel auth-pass &lt;master-name&gt; &lt;password&gt;"></a><code>sentinel auth-pass &lt;master-name&gt; &lt;password&gt;</code></h4><p>如果Sentinel监控的主节点配置了密码，sentinel auth-pass配置通过添加主节点的密码，防止Sentinel节点对主节点无法监控。</p>
+<h4 id="sentinel-notification-script-lt-master-name-gt-lt-script-path-gt"><a href="#sentinel-notification-script-lt-master-name-gt-lt-script-path-gt" class="headerlink" title="sentinel notification-script &lt;master-name&gt; &lt;script-path&gt;"></a><code>sentinel notification-script &lt;master-name&gt; &lt;script-path&gt;</code></h4><p>sentinel notification-script的作用是在故障转移期间，当一些警告级别的 Sentinel事件发生(指重要事件，例如-sdown:客观下线、-odown:主观下线)时，会触发对应路径的脚本，并向脚本发送相应的事件参数。</p>
+<h4 id="sentinel-client-reconfig-script-lt-master-name-gt-lt-script-path-gt"><a href="#sentinel-client-reconfig-script-lt-master-name-gt-lt-script-path-gt" class="headerlink" title="sentinel client-reconfig-script &lt;master-name&gt; &lt;script-path&gt;"></a><code>sentinel client-reconfig-script &lt;master-name&gt; &lt;script-path&gt;</code></h4><p>sentinel client-reconfig-script的作用是在故障转移结束后，会触发对应路 径的脚本，并向脚本发送故障转移结果的相关参数。</p>
+<h3 id="如何监控多个主节点"><a href="#如何监控多个主节点" class="headerlink" title="如何监控多个主节点"></a>如何监控多个主节点</h3><p>Redis Sentinel可以同时监控多个主节点，具体拓扑图类似于图9-18。<br>配置方法也比较简单，只需要指定多个masterName来区分不同的主节点 即可，例如下面的配置监控monitor master-business-1(10.10.xx.1:6379)和 monitor master-business-2(10.10.xx.2:6379)两个主节点:</p>
+<pre><code class="java">sentinel monitor master-business-1 10.10.xx.1 6379 2 
+sentinel down-after-milliseconds master-business-1 60000 
+sentinel failover-timeout master-business-1 180000 
+sentinel parallel-syncs master-business-1 1
+
+sentinel monitor master-business-2 10.16.xx.2 6380 2 
+sentinel down-after-milliseconds master-business-2 10000 
+sentinel failover-timeout master-business-2 180000 
+sentinel parallel-syncs master-business-2 1
+</code></pre>
+<p><img src="https://i.bmp.ovh/imgs/2020/11/0de94e8cde09823f.png" alt="xx"></p>
+<h3 id="调整配置"><a href="#调整配置" class="headerlink" title="调整配置"></a>调整配置</h3><p><img src="https://i.bmp.ovh/imgs/2020/11/d1f68a21f86d8620.png" alt="aa"></p>
+<ul>
+<li>1) sentinel set命令只对当前Sentinel节点有效。</li>
+<li>2) sentinel set命令如果执行成功会立即刷新配置文件，这点和Redis普 通数据节点设置配置需要执行config rewrite刷新到配置文件不同。</li>
+<li>3) 建议所有Sentinel节点的配置尽可能一致，这样在故障发现和转移时 比较容易达成一致。</li>
+</ul>
+<h3 id="部署技巧"><a href="#部署技巧" class="headerlink" title="部署技巧"></a>部署技巧</h3><ul>
+<li><p>Sentinel节点不应该部署在一台物理“机器”上。</p>
+</li>
+<li><p>部署至少三个且奇数个的Sentinel节点。</p>
+</li>
+<li><p>只有一套Sentinel，还是每个主节点配置一套Sentinel?</p>
+<ul>
+<li>方案一: 一套Sentinel，很明显这种方案在一定程度上降低了维护成 本，因为只需要维护固定个数的Sentinel节点，集中对多个Redis数据节点进 行管理就可以了。但是这同时也是它的缺点，如果这套Sentinel节点集合出 现异常，可能会对多个Redis数据节点造成影响。还有如果监控的Redis数据 节点较多，会造成Sentinel节点产生过多的网络连接，也会有一定的影响。</li>
+<li>方案二: 多套Sentinel，显然这种方案的优点和缺点和上面是相反的， 每个Redis主节点都有自己的Sentinel节点集合，会造成资源浪费。但是优点 也很明显，每套Redis Sentinel都是彼此隔离的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><ul>
+<li>1) 遍历Sentinel节点集合获取一个可用的Sentinel节点，后面会介绍 Sentinel节点之间可以共享数据，所以从任意一个Sentinel节点获取主节点信息都是可以的，如图9-22所示。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/11/30/SLxJpyUd2Cz8hoK.png" alt="image.png"></p>
+<ul>
+<li>2) 通过sentinel get-master-addr-by-name master-name这个API来获取对应 主节点的相关信息，如图9-23所示。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/11/30/uD4XcxQ5mrhpW1i.png" alt="image.png"></p>
+<ul>
+<li>3) 验证当前获取的“主节点”是真正的主节点，这样做的目的是为了防 止故障转移期间主节点的变化，如图9-24所示。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/11/30/sKqfVJQznahX4OZ.png" alt="image.png"></p>
+<ul>
+<li>4) 保持和Sentinel节点集合的“联系”，时刻获取关于主节点的相关“信 息”，如图9-25所示。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/11/30/F91RMJyTsKQ7f6A.png" alt="image.png"></p>
+<p>从上面的模型可以看出，Redis Sentinel客户端只有在初始化和切换主节点时需要和Sentinel节点集合进行交互来获取主节点信息，所以在设计客户端时需要将Sentinel节点集合考虑成配置(相关节点信息和变化)发现服务。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><h4 id="三个定时监控任务"><a href="#三个定时监控任务" class="headerlink" title="三个定时监控任务"></a>三个定时监控任务</h4><p>一套合理的监控机制是Sentinel节点判定节点不可达的重要保证，Redis<br>Sentinel通过三个定时监控任务完成对各个节点发现和监控: </p>
+<ul>
+<li><p>1) 每隔10秒，每个Sentinel节点会向主节点和从节点发送info命令获取最新的拓扑结构，如图9-26所示。这个定时任务的作用具体可以表现在三个方面:</p>
+<ul>
+<li>通过向主节点执行info命令，获取从节点的信息，这也是为什么 Sentinel节点不需要显式配置监控从节点。</li>
+<li>当有新的从节点加入时都可以立刻感知出来。 </li>
+<li>节点不可达或者故障转移后，可以通过info命令实时更新节点拓扑信息。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/D2eJUA.png" alt="D2eJUA.png"></p>
+<ul>
+<li>2) 每隔2秒，每个Sentinel节点会向Redis数据节点 <code>__sentinel__:hello</code> 频道上发送该Sentinel节点对于主节点的判断以及当前Sentiel节点的信息 (如图9-27所示)，同时每个Sentinel节点也会订阅该频道，来了解其他 Sentinel节点以及它们对主节点的判断，所以这个定时任务可以完成以下两个工作:<ul>
+<li>发现新的Sentinel节点: 通过订阅主节点的<code>__sentinel__:hello</code>了解其他 的Sentinel节点信息，如果是新加入的Sentinel节点，将该Sentinel节点信息保 存起来，并与该Sentinel节点创建连接。</li>
+<li>Sentinel节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/11/30/WIqNTC5uosA7DEb.png" alt="image.png"></p>
+<ul>
+<li>3) 每隔1秒，每个Sentinel节点会向主节点、从节点、其余Sentinel节点 发送一条ping命令做一次心跳检测，来确认这些节点当前是否可达。如图9- 28所示。通过上面的定时任务，Sentinel节点对主节点、从节点、其余 Sentinel节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/D2wiJx.png" alt="D2wiJx.png"></p>
+<h4 id="主观下线和客观下线"><a href="#主观下线和客观下线" class="headerlink" title="主观下线和客观下线"></a>主观下线和客观下线</h4><h5 id="主观下线"><a href="#主观下线" class="headerlink" title="主观下线"></a>主观下线</h5><p>上一小节介绍的第三个定时任务，每个Sentinel节点会每隔1秒对主节点、从节点、其他Sentinel节点发送ping命令做心跳检测，当这些节点超过 down-after-milliseconds没有进行有效回复，Sentinel节点就会对该节点做失败判定，这个行为叫做主观下线。从字面意思也可以很容易看出主观下线是当前Sentinel节点的一家之言，存在误判的可能。</p>
+<h5 id="客观下线"><a href="#客观下线" class="headerlink" title="客观下线"></a>客观下线</h5><p>当Sentinel主观下线的节点是主节点时，该Sentinel节点会通过sentinel is- master-down-by-addr命令向其他Sentinel节点询问对主节点的判断，当超过 <code>&lt;quorum&gt;</code>个数，Sentinel节点认为主节点确实有问题，这时该Sentinel节点会 做出客观下线的决定，这样客观下线的含义是比较明显了，也就是大部分 Sentinel节点都对主节点的下线做了同意的判定，那么这个判定就是客观的.</p>
+<p>注意: 从节点、Sentinel节点在主观下线后，没有后续的故障转移操作。</p>
+<h4 id="领导者Sentinel节点选举"><a href="#领导者Sentinel节点选举" class="headerlink" title="领导者Sentinel节点选举"></a>领导者Sentinel节点选举</h4><p>假如Sentinel节点对于主节点已经做了客观下线，那么是不是就可以立 即进行故障转移了?当然不是，实际上故障转移的工作只需要一个Sentinel 节点来完成即可，所以Sentinel节点之间会做一个领导者选举的工作，选出 一个Sentinel节点作为领导者进行故障转移的工作。Redis使用了Raft算法实现领导者选举:</p>
+<ul>
+<li>每个在线的Sentinel节点都有资格成为领导者，当它确认主节点客观下线时候，会向其他Sentinel节点发送sentinel is-master-down-by-addr命令， 要求将自己设置为领导者。</li>
+<li>收到命令的Sentinel节点，如果没有同意过其他Sentinel节点的sentinel is-master-down-by-addr命令，将同意该请求，否则拒绝。</li>
+<li>如果该Sentinel节点发现自己的票数已经大于等于max(quorum， num(sentinels)/2+1)，那么它将成为领导者。</li>
+<li>如果此过程没有选举出领导者，将进入下一次选举。</li>
+</ul>
+<h4 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h4><p>领导者选举出的Sentinel节点负责故障转移，具体步骤如下:</p>
+<ul>
+<li>1) 在从节点列表中选出一个节点作为新的主节点，选择方法如下:<ul>
+<li>a) 过滤: “不健康”(主观下线、断线)、5秒内没有回复过Sentinel节点ping响应、与主节点失联超过down-after-milliseconds*10秒。</li>
+<li>b) 选择slave-priority(从节点优先级)最高的从节点列表，如果存在则 返回，不存在则继续。</li>
+<li>c) 选择复制偏移量最大的从节点(复制的最完整)，如果存在则返回，不存在则继续。</li>
+<li>d) 选择runid最小的从节点。</li>
+</ul>
+</li>
+<li>2) Sentinel领导者节点会对第一步选出来的从节点执行slaveof no one命令让其成为主节点。</li>
+<li>3) Sentinel领导者节点会向剩余的从节点发送命令，让它们成为新主节点的从节点，复制规则和parallel-syncs参数有关。</li>
+<li>4) Sentinel节点集合会将原来的主节点更新为从节点，并保持着对其关注，当其恢复后命令它去复制新的主节点。</li>
+</ul>
+<h3 id="高可用读写分离"><a href="#高可用读写分离" class="headerlink" title="高可用读写分离"></a>高可用读写分离</h3><p>从节点的作用<br>从节点一般可以起到两个作用:</p>
+<ul>
+<li>当主节点出现故障时，作为主节点的后备“顶”上来实现故障转移，Redis Sentinel已经实现了该功能的自动化，实现了真正的高可用。</li>
+<li>扩展主节点的读能力，尤其是在读多写少的场景非常适用。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRSLl9.png" alt="DRSLl9.png"></p>
+<p>但上述模型中，从节点不是高可用的，如果slave-1节点出现故障，首先<br>客户端client-1将与其失联，其次Sentinel节点只会对该节点做主观下线，因为Redis Sentinel的故障转移是针对主节点的。所以很多时候，Redis Sentinel 中的从节点仅仅是作为主节点一个热备，不让它参与客户端的读操作，就是 为了保证整体高可用性，但实际上这种使用方法还是有一些浪费，尤其是在有很多从节点或者确实需要读写分离的场景，所以如何实现从节点的高可用 是非常有必要的。</p>
+<p>Redis Sentinel读写分离设计思路</p>
+<p>Redis Sentinel在对各个节点的监控中，如果有对应事件的发生，都会发<br>出相应的事件消息。在设计Redis Sentinel的从节点高可用时，只要能够实时掌握所有从节点的状态，把所有从节点看做一个资源池，无论是上线 还是下线从节点，客户端都能及时感知到(将其从资源池中添加或者删 除)，这样从节点的高可用目标就达到了。</p>
+<p><img src="https://s3.ax1x.com/2020/11/30/DRpY7V.png" alt="DRpY7V.png"></p>
+<h3 id="sentinel重点回顾"><a href="#sentinel重点回顾" class="headerlink" title="sentinel重点回顾"></a>sentinel重点回顾</h3><ul>
+<li>1) Redis Sentinel是Redis的高可用实现方案:故障发现、故障自动转<br>移、配置中心、客户端通知。</li>
+<li>2) Redis Sentinel从Redis2.8版本开始才正式生产可用，之前版本生产不 可用。</li>
+<li>3) 尽可能在不同物理机上部署Redis Sentinel所有节点。</li>
+<li>4) Redis Sentinel中的Sentinel节点个数应该为大于等于3且最好为奇数。</li>
+<li>5) Redis Sentinel中的数据节点与普通数据节点没有区别。</li>
+<li>6) 客户端初始化时连接的是Sentinel节点集合，不再是具体的Redis节 点，但Sentinel只是配置中心不是代理。</li>
+<li>7) Redis Sentinel通过三个定时任务实现了Sentinel节点对于主节点、从 节点、其余Sentinel节点的监控。</li>
+<li>8) Redis Sentinel在对节点做失败判定时分为主观下线和客观下线。 </li>
+<li>9) 看懂Redis Sentinel故障转移日志对于Redis Sentnel以及问题排查非常<br>有帮助。</li>
+<li>10) Redis Sentinel实现读写分离高可用可以依赖Sentinel节点的消息通<br>知，获取Redis数据节点的状态变化。</li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[redis进阶之优化]]></title>
       <url>/2020/11/28/redis-3/</url>
       <content type="html"><![CDATA[<h2 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h2><p>Redis是典型的单线程架构，所有的读写操作都是在一条主线程中完成 的。当Redis用于高并发场景时，这条线程就变成了它的生命线。如果出现 阻塞，哪怕是很短时间，对于我们的应用来说都是噩梦。导致阻塞问题的场 景大致分为内在原因和外在原因:</p>
@@ -12148,9 +12695,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -12296,9 +12843,9 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
         
         <tags>
             
-            <tag> classLoader </tag>
-            
             <tag> jvm </tag>
+            
+            <tag> classLoader </tag>
             
         </tags>
         
@@ -13999,55 +14546,6 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
     </entry>
     
     <entry>
-      <title><![CDATA[在spring中使用cors]]></title>
-      <url>/2018/11/06/spring-cors/</url>
-      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
-<p>解决方案：</p>
-<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-
-@Configuration
-public class WebCorsConfig {
-
-    @Bean
-    public FilterRegistrationBean customCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        config.addAllowedMethod(&quot;*&quot;);
-        source.registerCorsConfiguration(&quot;/**&quot;, config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-}
-</code></pre>
-]]></content>
-      
-        <categories>
-            
-            <category> spring </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> spring </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[使用oidc id token验证spring security resource server]]></title>
       <url>/2018/11/06/spring-security-jwt/</url>
       <content type="html"><![CDATA[<p>在前后端分离的项目中，前端因为不能保证密钥的安全，通常会使用oidc implicit grant type来获取access token和id token，后端会验证token的合法性并获得用户信息。</p>
@@ -14203,9 +14701,58 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             
             <tag> OAuth </tag>
             
+            <tag> OIDC </tag>
+            
             <tag> spring </tag>
             
-            <tag> OIDC </tag>
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在spring中使用cors]]></title>
+      <url>/2018/11/06/spring-cors/</url>
+      <content type="html"><![CDATA[<p>网上有很多教程，基本上都是清一色的<code>@CrossOrigin</code>，<code>@CrossOrigin</code>在和spring security一起用的时候不生效，因为filter chain order的原因。</p>
+<p>解决方案：</p>
+<pre><code class="java">import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+@Configuration
+public class WebCorsConfig {
+
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        config.addAllowedMethod(&quot;*&quot;);
+        source.registerCorsConfiguration(&quot;/**&quot;, config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+}
+</code></pre>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
             
         </tags>
         
