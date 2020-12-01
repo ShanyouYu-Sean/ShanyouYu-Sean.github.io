@@ -44,6 +44,87 @@
   </entry>
   
   <entry>
+    <title>redis进阶之消息队列</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-8/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-8/</id>
+    <published>2020-11-28T13:00:00.000Z</published>
+    <updated>2020-12-01T09:01:45.404Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;文章转载自 &lt;a href=&quot;https://medium.com/@cheukfung/redis%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97-f4f75404647f&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis进阶之分布式锁</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
+    <published>2020-11-28T12:00:00.000Z</published>
+    <updated>2020-12-01T08:34:30.542Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;hr&gt;
+&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis进阶之缓存</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-6/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-6/</id>
+    <published>2020-11-28T12:00:00.000Z</published>
+    <updated>2020-12-01T07:22:35.315Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;缓存的收益和成本&quot;&gt;&lt;a href=&quot;#缓存的收益和成本&quot; class=&quot;headerlink&quot; title=&quot;缓存的收益和成本&quot;&gt;&lt;/a&gt;缓存的收益和成本&lt;/h2&gt;&lt;p&gt;收益:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;加速读写:
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>redis进阶之集群</title>
     <link href="http://seanthefish.com/2020/11/28/redis-5/"/>
     <id>http://seanthefish.com/2020/11/28/redis-5/</id>
@@ -122,11 +203,11 @@
   </entry>
   
   <entry>
-    <title>redis进阶之主从复制</title>
+    <title>redis进阶之复制</title>
     <link href="http://seanthefish.com/2020/11/28/redis-2/"/>
     <id>http://seanthefish.com/2020/11/28/redis-2/</id>
     <published>2020-11-28T08:00:00.000Z</published>
-    <updated>2020-11-29T11:13:05.115Z</updated>
+    <updated>2020-11-30T14:54:08.390Z</updated>
     
     <summary type="html">
     
@@ -482,96 +563,6 @@
         
         
           &lt;p&gt;内容转载自 &lt;a href=&quot;https://www.beikejiedeliulangmao.top/java/concurrent/concurrent-linked-queue/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之PriorityBlockingQueue</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-12/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-12/</id>
-    <published>2020-11-24T05:00:00.000Z</published>
-    <updated>2020-11-24T10:07:38.209Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自  &lt;a href=&quot;https://www.jianshu.com/p/bf6ef56646e5&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt; https://www.jianshu.com/p/28c9d9e34b29&lt;/a&gt;  
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之LinkedBlockingQueue、SynchronousQueue</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-11/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-11/</id>
-    <published>2020-11-24T04:00:00.000Z</published>
-    <updated>2020-11-24T10:02:56.798Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自   &lt;a href=&quot;https://www.jianshu.com/p/28c9d9e34b29&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://www.jianshu.com/p/28c9d9e34b29&lt;/a&gt;  
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之ArrayBlockingQueue</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-10/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-10/</id>
-    <published>2020-11-24T03:00:00.000Z</published>
-    <updated>2020-11-24T11:24:50.838Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自 &lt;a href=&quot;https://juejin.cn/post/6844903989788540941&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://juejin.cn/post/6844903989788540941&lt;/a&gt;
         
       
     

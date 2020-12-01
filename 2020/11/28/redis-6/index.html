@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            redis进阶之缓存 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,redis">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/28/redis-6/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/28/redis-6/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="redis进阶之缓存 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="redis"> 
+
+    
+        <meta property="article:published_time" content="Sat Nov 28 2020 20:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 01 2020 15:22:35 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/28/redis-6/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/28/redis-6/index.html",
+    "headline": "redis进阶之缓存",
+    "datePublished": "Sat Nov 28 2020 20:00:00 GMT+0800",
+    "dateModified": "Tue Dec 01 2020 15:22:35 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",redis小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#缓存的收益和成本"><span class="post-toc-number">1.</span> <span class="post-toc-text">缓存的收益和成本</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#缓存更新策略"><span class="post-toc-number">2.</span> <span class="post-toc-text">缓存更新策略</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#LRU-LFU-FIFO算法剔除"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">LRU/LFU/FIFO算法剔除</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#超时剔除"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">超时剔除</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#主动更新"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">主动更新</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#最佳实践"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">最佳实践</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#缓存粒度控制"><span class="post-toc-number">3.</span> <span class="post-toc-text">缓存粒度控制</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#穿透优化"><span class="post-toc-number">4.</span> <span class="post-toc-text">穿透优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#缓存空对象"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">缓存空对象</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#布隆过滤器拦截"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">布隆过滤器拦截</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#无底洞优化"><span class="post-toc-number">5.</span> <span class="post-toc-text">无底洞优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#串行命令"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">串行命令</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#串行IO"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">串行IO</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#并行IO"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">并行IO</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#hash-tag实现"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">hash_tag实现</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#雪崩优化"><span class="post-toc-number">6.</span> <span class="post-toc-text">雪崩优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#保证缓存层服务高可用性"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">保证缓存层服务高可用性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#依赖隔离组件为后端限流并降级"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">依赖隔离组件为后端限流并降级</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#打散过期时间"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">打散过期时间</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#热点key重建优化（缓存击穿）"><span class="post-toc-number">7.</span> <span class="post-toc-text">热点key重建优化（缓存击穿）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#互斥锁-分布式锁"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">互斥锁/分布式锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#永远不过期"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">永远不过期</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#热key处理"><span class="post-toc-number">8.</span> <span class="post-toc-text">热key处理</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#bigkey处理"><span class="post-toc-number">9.</span> <span class="post-toc-text">bigkey处理</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                redis进阶之缓存
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 28, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACW0lEQVR42u3aQU7DQAwF0N7/0rBFQqTf9kwyVC8rhEozL4vYfPv19dHXCw8PDw8PDw8P7zDeK76u/+r37/O7/PzMgrPh4eHh3cJ786r948b7HtDobHh4eHg38vJbVl/0VXbvbHh4eHgn8/LG+howeax4eHh4/4uXNL55SNFr3PHw8PBO4CX/8OfBwV+k6888nLXg4eHhxbxJxLD751vne3h4eHgBr7zSVBxuTb7ngZ0yPDw8vIDXG1PlDfGqFa78QeDh4eHt5lUjhmTE1SsGeexbiHHx8PDwNvMKQ6YNZaM6TisXBjw8PLylvHmDWx2M9QpAs6XGw8PDW8qbH3cy5u818ctWB/Dw8PA28HpDrORh5fFuuajg4eHhPcSbjKCSkpCHC+USgoeHh3cj7/qF22xwWy3yqFzh4eHh3chbFdRWVw16o7JlYQQeHh7emBeN54Olgd7QqzoGw8PDwzuBN6FOVqnyx71xdQAPDw8v5lVvnLfCqxYU8geHh4eHt5vXiw+qUezaYPfNyfHw8PA28+bRaiEmiNl52FEII/Dw8PCW8qqHrjJ6RaLa9OPh4eHdz+utBRRe2XEhqbbdeHh4eOfwkmNNSsi8/ODh4eHdz6tevWB3XoqSR4yHh4d3D2/3C706+soXEcoDMDw8PLylvF7EkKxhVb95S2HAw8PD28abL5Lm6wi9xdboLnh4eHhH8qqtdo7sBcR4eHh45/PmDXSvyR6tDuDh4eFt4FWPtaMdz5tsPDw8vGd51QggH/xXB2OFuDbfKcPDw8Nbyvu8Cw8PDw8PDw8P74DrG9mFSLQAOZmjAAAAAElFTkSuQmCC">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/redis/">redis</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=redis进阶之缓存&url=http://seanthefish.com/2020/11/28/redis-6/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/28/redis-6/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=redis进阶之缓存&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/28/redis-6/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="缓存的收益和成本"><a href="#缓存的收益和成本" class="headerlink" title="缓存的收益和成本"></a>缓存的收益和成本</h2><p>收益:</p>
+<ul>
+<li>加速读写: 因为缓存通常都是全内存的(例如Redis、Memcache)，而 存储层通常读写性能不够强悍(例如MySQL)，通过缓存的使用可以有效 地加速读写，优化用户体验。</li>
+<li>降低后端负载: 帮助后端减少访问量和复杂计算(例如很复杂的SQL 语句)，在很大程度降低了后端的负载。</li>
+</ul>
+<p>成本: </p>
+<ul>
+<li>数据不一致性: 缓存层和存储层的数据存在着一定时间窗口的不一致性，时间窗口跟更新策略有关。</li>
+<li>代码维护成本: 加入缓存后，需要同时处理缓存层和存储层的逻辑， 增大了开发者维护代码的成本。</li>
+<li>运维成本: 以Redis Cluster为例，加入后无形中增加了运维成本。</li>
+</ul>
+<p>缓存的使用场景基本包含如下两种:</p>
+<ul>
+<li>开销大的复杂计算: 以MySQL为例子，一些复杂的操作或者计算(例 如大量联表操作、一些分组计算)，如果不加缓存，不但无法满足高并发量，同时也会给MySQL带来巨大的负担。</li>
+<li>加速请求响应: 即使查询单条后端数据足够快(例如select*from table where id=)，那么依然可以使用缓存，以Redis为例子，每秒可以完成数万次读写，并且提供的批量操作可以优化整个IO链的响应时间。</li>
+</ul>
+<h2 id="缓存更新策略"><a href="#缓存更新策略" class="headerlink" title="缓存更新策略"></a>缓存更新策略</h2><h3 id="LRU-LFU-FIFO算法剔除"><a href="#LRU-LFU-FIFO算法剔除" class="headerlink" title="LRU/LFU/FIFO算法剔除"></a>LRU/LFU/FIFO算法剔除</h3><p>使用场景</p>
+<p>剔除算法通常用于缓存使用量超过了预设的最大值时候，如 何对现有的数据进行剔除。例如Redis使用maxmemory-policy这个配置作为内 存最大值后对于数据的剔除策略。</p>
+<ul>
+<li>一致性：要清理哪些数据是由具体算法决定，开发人员只能决定使用哪种算法，所以数据的一致性是最差的。</li>
+<li>维护成本：算法不需要开发人员自己来实现，通常只需要配置最大 maxmemory和对应的策略即可。开发人员只需要知道每种算法的含义，选择适合自己的算法即可。</li>
+</ul>
+<p>Redis配置中和LRU有关的有三个：</p>
+<ul>
+<li>maxmemory: 配置Redis存储数据时指定限制的内存大小，比如100m。当缓存消耗的内存超过这个数值时, 将触发数据淘汰。该数据配置为0时，表示缓存的数据量没有限制, 即LRU功能不生效。64位的系统默认值为0，32位的系统默认内存限制为3GB</li>
+<li>maxmemory_policy: 触发数据淘汰后的淘汰策略</li>
+<li>maxmemory_samples: 随机采样的精度，也就是随即取出key的数目。该数值配置越大, 越接近于真实的LRU算法，但是数值越大，相应消耗也变高，对性能有一定影响，样本值默认为5。</li>
+</ul>
+<p>淘汰策略即maxmemory_policy的赋值有以下几种：</p>
+<ul>
+<li>noeviction: 如果缓存数据超过了maxmemory限定值，并且客户端正在执行的命令(大部分的写入指令，但DEL和几个指令例外)会导致内存分配，则向客户端返回错误响应</li>
+<li>allkeys-lru: 对所有的键都采取LRU淘汰</li>
+<li>volatile-lru: 仅对设置了过期时间的键采取LRU淘汰</li>
+<li>allkeys-random: 随机回收所有的键</li>
+<li>volatile-random: 随机回收设置过期时间的键</li>
+<li>volatile-ttl: 仅淘汰设置了过期时间的键—淘汰生存时间TTL(Time To Live)更小的键</li>
+</ul>
+<p>volatile-lru, volatile-random和volatile-ttl这三个淘汰策略使用的不是全量数据，有可能无法淘汰出足够的内存空间。在没有过期键或者没有设置超时属性的键的情况下，这三种策略和noeviction差不多。</p>
+<p>一般的经验规则:</p>
+<ul>
+<li>使用allkeys-lru策略：当预期请求符合一个幂次分布(二八法则等)，比如一部分的子集元素比其它元素被访问的更多时，可以选择这个策略。</li>
+<li>使用allkeys-random：循环连续的访问所有的键时，或者预期请求分布平均（所有元素被访问的概率都差不多）</li>
+<li>使用volatile-ttl：要采取这个策略，缓存对象的TTL值最好有差异</li>
+<li>volatile-lru 和 volatile-random策略：当你想要使用单一的Redis实例来同时实现 缓存淘汰 和 持久化一些经常使用的键集合 时很有用。未设置过期时间的键进行持久化保存，设置了过期时间的键参与缓存淘汰。不过一般运行两个实例是解决这个问题的更好方法。</li>
+</ul>
+<p>为键设置过期时间也是需要消耗内存的，所以使用allkeys-lru这种策略更加节省空间，因为这种策略下可以不为键设置过期时间。</p>
+<p>redis中的近似lru算法： <a href="https://zhuanlan.zhihu.com/p/34133067" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/34133067</a></p>
+<h3 id="超时剔除"><a href="#超时剔除" class="headerlink" title="超时剔除"></a>超时剔除</h3><p>使用场景</p>
+<p>超时剔除通过给缓存数据设置过期时间，让其在过期时间后自动删除，例如Redis提供的expire命令。如果业务可以容忍一段时间内，缓存层数据和存储层数据不一致，那么可以为其设置过期时间。在数据过期后，再从真实数据源获取数据，重新放到缓存并设置过期时间。例如一个视频的描述信息，可以容忍几分钟内数据不一致，但是涉及交易方面的业务， 后果可想而知。</p>
+<ul>
+<li>一致性：一段时间窗口内(取决于过期时间长短)存在一致性问题，即 缓存数据和真实数据源的数据不一致。</li>
+<li>维护成本：维护成本不是很高，只需设置expire过期时间即可，当然前提是应用方允许这段时间可能发生的数据不一致。</li>
+</ul>
+<h3 id="主动更新"><a href="#主动更新" class="headerlink" title="主动更新"></a>主动更新</h3><p>使用场景</p>
+<p>应用方对于数据的一致性要求高，需要在真实数据更新后，立即更新缓存数据。例如可以利用消息系统或者其他方式通知缓存更新。</p>
+<ul>
+<li>一致性：一致性最高，但如果主动更新发生了问题，那么这条数据很可 能很长时间不会更新，所以建议结合超时剔除一起使用效果会更好。</li>
+<li>维护成本：维护成本会比较高，开发者需要自己来完成更新，并保证更新操作的正确性。</li>
+</ul>
+<h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><ul>
+<li>低一致性业务建议配置最大内存和淘汰策略的方式使用。 </li>
+<li>高一致性业务可以结合使用超时剔除和主动更新，这样即使主动更新出了问题，也能保证数据过期时间后删除脏数据。</li>
+</ul>
+<h2 id="缓存粒度控制"><a href="#缓存粒度控制" class="headerlink" title="缓存粒度控制"></a>缓存粒度控制</h2><p>究竟是缓存全部属性还是只缓存部分重要属性呢?下面将从通用性、空间占用、代码维护三个角度进行说明。</p>
+<ul>
+<li>通用性：缓存全部数据比部分数据更加通用，但从实际经验看，很长时间内应用只需要几个重要的属性。</li>
+<li>空间占用：缓存全部数据要比部分数据占用更多的空间，可能存在以下问题:<ul>
+<li>全部数据会造成内存的浪费。 </li>
+<li>全部数据可能每次传输产生的网络流量会比较大，耗时相对较大，在极端情况下会阻塞网络。</li>
+<li>全部数据的序列化和反序列化的CPU开销更大。 </li>
+</ul>
+</li>
+<li>代码维护：全部数据的优势更加明显，而部分数据一旦要加新字段需要修改业务代码，而且修改后通常还需要刷新缓存数据。</li>
+</ul>
+<h2 id="穿透优化"><a href="#穿透优化" class="headerlink" title="穿透优化"></a>穿透优化</h2><p>缓存穿透是指查询一个根本不存在的数据，缓存层和存储层都不会命中，通常出于容错的考虑，如果从存储层查不到数据则不写入缓存层，整个过程分为如下3步:</p>
+<ul>
+<li>缓存层不命中。</li>
+<li>存储层不命中，不将空结果写回缓存。</li>
+<li>返回空结果。</li>
+</ul>
+<p>缓存穿透将导致不存在的数据每次请求都要到存储层去查询，失去了缓存保护后端存储的意义。</p>
+<p>缓存穿透问题可能会使后端存储负载加大，由于很多后端存储不具备高并发性，甚至可能造成后端存储宕掉。通常可以在程序中分别统计总调用数、缓存层命中数、存储层命中数，如果发现大量存储层空命中，可能就是出现了缓存穿透问题。</p>
+<p>造成缓存穿透的基本原因有两个</p>
+<ul>
+<li>自身业务代码或者数据出现问题</li>
+<li>一些恶意攻击、爬虫等造成大量空命中。下面我们来看一下如何解决缓存穿透问题。</li>
+</ul>
+<h3 id="缓存空对象"><a href="#缓存空对象" class="headerlink" title="缓存空对象"></a>缓存空对象</h3><p>如图11-4所示，当第2步存储层不命中后，仍然将空对象保留到缓存层中，之后再访问这个数据将会从缓存中获取，这样就保护了后端数据源。</p>
+<p><img src="https://i.loli.net/2020/11/30/MC2X6LWIj1dBFA5.png" alt="image.png"></p>
+<p>缓存空对象会有两个问题:</p>
+<ul>
+<li>空值做了缓存，意味着缓存层中存了更多的键，需要更多的内存空间(如果是攻击，问题更严重)，比较有效的方法是针对这类数据设置一个较短的过期时间，让其自动剔除。</li>
+<li>缓存层和存储层的数据会有一段时间窗口的不一致，可能会对业务有一定影响。 例如过期时间设置为5分钟，如果此时存储层添加了这个数据，那此段时间就会出现缓存层和存储层数据的不一致，此时可以利用消息系统或者其他方式清除掉缓存层中的空对象。</li>
+</ul>
+<h3 id="布隆过滤器拦截"><a href="#布隆过滤器拦截" class="headerlink" title="布隆过滤器拦截"></a>布隆过滤器拦截</h3><p>关于布隆过滤器, 这里不说了，这篇文章写得很好  <a href="https://segmentfault.com/a/1190000021136424" target="_blank" rel="noopener">https://segmentfault.com/a/1190000021136424</a></p>
+<p>guava中的布隆过滤器 <a href="https://www.jianshu.com/p/bef2ec1c361f" target="_blank" rel="noopener">https://www.jianshu.com/p/bef2ec1c361f</a></p>
+<p><img src="https://i.loli.net/2020/12/01/xf8VByNtwnQ7rkW.png" alt="image.png"></p>
+<p>可以利用Redis的Bitmaps实现布隆过滤器 <a href="https://github.com/erikdubbelboer/redis-lua-scaling-bloom-filter" target="_blank" rel="noopener">https://github.com/erikdubbelboer/redis-lua-scaling-bloom-filter</a></p>
+<p>其实挺简单的，本身布隆过滤器就是一个bitmap，只要加入的每个值计算多个hash，然后存入相应的偏移量上。取的时候同样计算hash，不过存在对应hash值偏移量上为0，就说明肯定没有这个key，不为0则说明有可能有这个key，因为布隆过滤器有误差。</p>
+<p>关于bitmap算法看这里 <a href="https://juejin.cn/post/6844903769201704973" target="_blank" rel="noopener">https://juejin.cn/post/6844903769201704973</a></p>
+<hr>
+<p>简单说一下redis里的Bitmaps吧</p>
+<p>Bitmap在Redis中并不是一个单独的数据类型，而是由字符串类型（Redis内部称Simple Dynamic String，SDS）之上定义的与比特相关的操作实现的，此时SDS就被当做位数组了。因为String是二进制安全的并且它们的最大长度是512MB，所以String类型很合适去作为一个2^32长度的位数组。下面是在redis-cli中使用getbit和setbit指令的操作示例。</p>
+<pre><code># 字符串&quot;meow&quot;的二进制表示：01101101 01100101 01101111 01110111
+es1:19000&gt; set bitmap_cat &quot;meow&quot;
+OK
+# 最低位下标为0。取得第3位的比特（0）
+es1:19000&gt; getbit bitmap_cat 3
+(integer) 0
+# 取得第23位的比特（1）
+es1:19000&gt; getbit bitmap_cat 23
+(integer) 1
+# 将第7位设为0
+es1:19000&gt; setbit bitmap_cat 7 0
+(integer) 1
+# 将第14位设为1
+es1:19000&gt; setbit bitmap_cat 14 1
+(integer) 0
+# 修改过后的字符串变成了&quot;lgow&quot;
+es1:19000&gt; get bitmap_cat
+&quot;lgow&quot;
+</code></pre><p>Redis的Bitmap是自动扩容的，亦即get/set到高位时，就会主动填充0。此外，还有bitcount指令用于计算特定字节范围内1的个数，bitop指令用来执行位运算（支持and、or、xor和not）。</p>
+<p>bitmap一个最大的优势是它通常能在存储信息的时候节省大量空间。比方说一个用增量ID来辨别用户的系统，可以用仅仅512MB的空间来标识40亿个用户是否想要接受通知。</p>
+<p>下面举一个bitmaps的实际例子，将每个独立用户是否访问过网站存放在Bitmaps中，将访问的用户记做1，没有访问的用户记做0，用偏移量作为用户的id。</p>
+<p>设置值</p>
+<p><code>setbit key offset value</code></p>
+<p>设置键的第offset个位的值(从0算起)，假设现在有20个用户， userid=0，5，11，15，19的用户对网站进行了访问，那么当前Bitmaps初始 化结果如图3-11所示。</p>
+<p><img src="https://i.loli.net/2020/12/01/ZekhxaCH9soduAy.png" alt="image.png"></p>
+<p>具体操作过程如下，unique:users:2016-04-05代表2016-04-05这天的独立访问用户的Bitmaps:</p>
+<pre><code>127.0.0.1:6379&gt; setbit unique:users:2016-04-05 0 1 
+(integer) 0
+127.0.0.1:6379&gt; setbit unique:users:2016-04-05 5 1 
+(integer) 0
+127.0.0.1:6379&gt; setbit unique:users:2016-04-05 11 1 
+(integer) 0
+127.0.0.1:6379&gt; setbit unique:users:2016-04-05 15 1 
+(integer) 0
+127.0.0.1:6379&gt; setbit unique:users:2016-04-05 19 1 
+(integer) 0
+</code></pre><p>如果此时有一个userid=50的用户访问了网站，那么Bitmaps的结构变成了图3-12，第20位~49位都是0。</p>
+<p><img src="https://i.loli.net/2020/12/01/sEg48cXMQL5OP3Y.png" alt="image.png"></p>
+<p>很多应用的用户id以一个指定数字(例如10000)开头，直接将用户id 和Bitmaps的偏移量对应势必会造成一定的浪费，通常的做法是每次做setbit 操作时将用户id减去这个指定数字。在第一次初始化Bitmaps时，假如偏移 量非常大，那么整个初始化过程执行会比较慢，可能会造成Redis的阻塞。</p>
+<p>获取值</p>
+<p><code>gitbit key offset</code></p>
+<p>获取键的第offset位的值(从0开始算)，下面操作获取id=8的用户是否 在2016-04-05这天访问过，返回0说明没有访问过:</p>
+<pre><code>127.0.0.1:6379&gt; getbit unique:users:2016-04-05 8 
+(integer) 0
+</code></pre><p>由于offset=1000000根本就不存在，所以返回结果也是0:</p>
+<pre><code>127.0.0.1:6379&gt; getbit unique:users:2016-04-05 1000000
+(integer) 0
+</code></pre><p>获取Bitmaps指定范围值为1的个数</p>
+<p><code>bitcount [start][end]</code></p>
+<p>下面操作计算2016-04-05这天的独立访问用户数量:</p>
+<pre><code>127.0.0.1:6379&gt; bitcount unique:users:2016-04-05
+(integer) 5
+</code></pre><p>[start]和[end]代表起始和结束字节数，下面操作计算用户id在第1个字节 到第3个字节之间的独立访问用户数，对应的用户id是11，15，19。</p>
+<pre><code>127.0.0.1:6379&gt; bitcount unique:users:2016-04-05 1 3 
+(integer) 3
+</code></pre><p>Bitmaps间的运算</p>
+<p><code>bitop op destkey key[key....]</code></p>
+<p>bitop是一个复合操作，它可以做多个Bitmaps的and(交集)、or(并集)、not(非)、xor(异或)操作并将结果保存在destkey中。假设2016-04-04访问网站的userid=1，2，5，9，如图3-13所示。</p>
+<p><img src="https://i.loli.net/2020/12/01/pJHyF7MBXbcvV93.png" alt="image.png"></p>
+<p>下面操作计算出2016-04-04和2016-04-03两天都访问过网站的用户数量，如图3-14所示。</p>
+<pre><code>127.0.0.1:6379&gt; bitop and unique:users:and:2016-04-04_03 unique: users:2016-04-03 unique:users:2016-04-03
+(integer) 2
+127.0.0.1:6379&gt; bitcount unique:users:and:2016-04-04_03 
+(integer) 2
+</code></pre><p>如果想算出2016-04-04和2016-04-03任意一天都访问过网站的用户数量 (例如月活跃就是类似这种)，可以使用or求并集，具体命令如下:</p>
+<pre><code>127.0.0.1:6379&gt; bitop or unique:users:or:2016-04-04_03 unique: users:2016-04-03 unique:users:2016-04-03
+(integer) 2
+127.0.0.1:6379&gt; bitcount unique:users:or:2016-04-04_03 
+(integer) 6
+</code></pre><p><img src="https://i.loli.net/2020/12/01/DqS2otmZaXHRey8.png" alt="image.png"></p>
+<p>Bitmaps分析 </p>
+<p>假设网站有1亿用户，每天独立访问的用户有5千万，如果每天用集合类型和Bitmaps分别存储活跃用户可以得到表3-3。</p>
+<p><img src="https://i.loli.net/2020/12/01/fG4jhEoTDYZFrQ6.png" alt="image.png"></p>
+<p>很明显，这种情况下使用Bitmaps能节省很多的内存空间，尤其是随着 时间推移节省的内存还是非常可观的.</p>
+<p>但Bitmaps并不是万金油，假如该网站每天的独立访问用户很少，例如 只有10万(大量的僵尸用户)，那么两者的对比如表3-5所示，很显然，这 时候使用Bitmaps就不太合适了，因为基本上大部分位都是0。</p>
+<hr>
+<h2 id="无底洞优化"><a href="#无底洞优化" class="headerlink" title="无底洞优化"></a>无底洞优化</h2><p>2010年，Facebook的Memcache节点已经达到了3000个，承载着TB级别 的缓存数据。但开发和运维人员发现了一个问题，为了满足业务要求添加了 大量新Memcache节点，但是发现性能不但没有好转反而下降了，当时将这 种现象称为缓存的“无底洞”现象。</p>
+<p>那么为什么会产生这种现象呢，通常来说添加节点使得Memcache集群 性能应该更强了，但事实并非如此。键值数据库由于通常采用哈希函数将 key映射到各个节点上，造成key的分布与业务无关，但是由于数据量和访问 量的持续增长，造成需要添加大量节点做水平扩容，导致键值分布到更多的 节点上，所以无论是Memcache还是Redis的分布式，批量操作通常需要从不同节点上获取，相比于单机批量操作只涉及一次网络操作，分布式批量操作 会涉及多次网络时间。</p>
+<p>无底洞问题分析:</p>
+<ul>
+<li>客户端一次批量操作会涉及多次网络操作，也就意味着批量操作会随着节点的增多，耗时会不断增大。</li>
+<li>网络连接数变多，对节点的性能也有一定影响。</li>
+</ul>
+<p>用一句通俗的话总结就是，更多的节点不代表更高的性能，所谓“无底洞”就是说投入越多不一定产出越多。但是分布式又是不可以避免的，因为访问量和数据量越来越大，一个节点根本抗不住，所以如何高效地在分布式缓存中批量操作是一个难点。</p>
+<p>下面介绍如何在分布式条件下优化批量操作。在介绍具体的方法之前， 我们来看一下常见的IO优化思路:</p>
+<ul>
+<li>命令本身的优化，例如优化SQL语句等。</li>
+<li>减少网络通信次数。</li>
+<li>降低接入成本，例如客户端使用长连/连接池、NIO等。</li>
+</ul>
+<p>这里我们假设命令、客户端连接已经为最优，重点讨论减少网络操作次数。<br>以Redis批量获取n个字符串为例，有三种实现方法：</p>
+<ul>
+<li>客户端n次get: n次网络+n次get命令本身。 </li>
+<li>客户端1次pipeline get: 1次网络+n次get命令本身。 </li>
+<li>客户端1次mget: 1次网络+1次mget命令本身。</li>
+</ul>
+<p>上面已经给出了IO的优化思路以及单个节点的批量操作优化方式，下面我们将结合Redis Cluster的一些特性对四种分布式的批量操作方式进行说明。</p>
+<h3 id="串行命令"><a href="#串行命令" class="headerlink" title="串行命令"></a>串行命令</h3><p>由于n个key是比较均匀地分布在Redis Cluster的各个节点上，因此无法使用mget命令一次性获取，所以通常来讲要获取n个key的值，最简单的方法，就是逐次执行n个get命令，这种操作时间复杂度较高，它的操作时间=<code>n次网络时间+n次命令时间</code>，网络次数是n。很显然这种方案不是最优的，但是实现起来比较简单。</p>
+<h3 id="串行IO"><a href="#串行IO" class="headerlink" title="串行IO"></a>串行IO</h3><p>Redis Cluster使用CRC16算法计算出散列值，再取对16383的余数就可以算出slot值，我们之前提到过Smart客户端会保存slot和节点的对应关系，有了这两个数据就可以将属于同一个节点的key进行归档，得到每个节点的key子列表，之后对每个节点执行mget或者Pipeline操作，它的操作时间=<code>node次网络时间+n次命令时间</code>，网络次数是node的个数.</p>
+<h3 id="并行IO"><a href="#并行IO" class="headerlink" title="并行IO"></a>并行IO</h3><p>此方案是将方案2中的最后一步改为多线程执行，网络次数虽然还是节 点个数，但由于使用多线程网络时间变为O(1)，这种方案会增加编程的复杂度。它的操作时间为: <code>max_slow(node网络时间)+n次命令时间</code></p>
+<h3 id="hash-tag实现"><a href="#hash-tag实现" class="headerlink" title="hash_tag实现"></a>hash_tag实现</h3><p>hash_tag功能(KEY里面加大括号)，它可以将多个key强制分配到一个节点上，它的操作时间=<code>1次网络时间+n次命令时间</code>, 但hash_tag容易出现数据倾斜</p>
+<h2 id="雪崩优化"><a href="#雪崩优化" class="headerlink" title="雪崩优化"></a>雪崩优化</h2><p>由于缓存层承载着大量请求，有效地保护了存储层，但是如果缓存层由于某些原因不能提供服务，于是所有的请求都会达到存储层，存储层的调用量会暴增，造成存储层也会级联宕机的情况。预防和解决缓存雪崩问题，可以从以下三个方面进行着手。</p>
+<h3 id="保证缓存层服务高可用性"><a href="#保证缓存层服务高可用性" class="headerlink" title="保证缓存层服务高可用性"></a>保证缓存层服务高可用性</h3><p>和飞机都有多个引擎一样，如果缓存层设计成高可用的，即使个别节点、个别机器、甚至是机房宕掉，依然可以提供服务，例如前面介绍过的Redis Sentinel和Redis Cluster都实现了高可用。</p>
+<h3 id="依赖隔离组件为后端限流并降级"><a href="#依赖隔离组件为后端限流并降级" class="headerlink" title="依赖隔离组件为后端限流并降级"></a>依赖隔离组件为后端限流并降级</h3><p>无论是缓存层还是存储层都会有出错的概率，可以将它们视同为资源。作为并发量较大的系统，假如有一个资源不可用，可能会造成线程全部阻塞(hang)在这个资源上，造成整个系统不可用。</p>
+<p>降级机制在高并发系统中是非常普遍的: 比如推荐服务中，如果个性化推荐服务不可用，可以降级补充热点数据，不至于造成前端页面是开天窗。</p>
+<p>在实际项目中，我们需要对重要的资源(例如Redis、MySQL、 HBase、外部接口)都进行隔离，让每种资源都单独运行在自己的线程池中，即使个别资源出现了问题，对其他服务没有影响。但是线程池如何管理，比如如何关闭资源池、开启资源池、资源池阀值管理，这些做起来还是相当复杂的。</p>
+<h3 id="打散过期时间"><a href="#打散过期时间" class="headerlink" title="打散过期时间"></a>打散过期时间</h3><p>为了避免大量的缓存在同一时间过期，可以把不同的key过期时间随机生成，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。但随机可能会对业务有影响，但可以根据业务特点进行设置，总之是让过期时间分散。也有是通过定时刷新过期时间，类似于refresh token机制。</p>
+<h2 id="热点key重建优化（缓存击穿）"><a href="#热点key重建优化（缓存击穿）" class="headerlink" title="热点key重建优化（缓存击穿）"></a>热点key重建优化（缓存击穿）</h2><p>开发人员使用“缓存+过期时间”的策略既可以加速数据读写，又保证数 据的定期更新，这种模式基本能够满足绝大部分需求。但是有两个问题如果同时出现，可能就会对应用造成致命的危害:</p>
+<ul>
+<li>当前key是一个热点key(例如一个热门的娱乐新闻)，并发量非常大。</li>
+<li>重建缓存不能在短时间完成，可能是一个复杂计算，例如复杂的 SQL、多次IO、多个依赖等。</li>
+</ul>
+<p>在缓存失效的瞬间，有大量线程来重建缓存，造成后端负载加大，甚至可能会让应用崩溃。</p>
+<h3 id="互斥锁-分布式锁"><a href="#互斥锁-分布式锁" class="headerlink" title="互斥锁/分布式锁"></a>互斥锁/分布式锁</h3><p>此方法只允许一个线程重建缓存更新key，其他线程等待重建缓存的线程执行完，重新从缓存获取数据即可（加入队列，排队更新也可以）</p>
+<h3 id="永远不过期"><a href="#永远不过期" class="headerlink" title="永远不过期"></a>永远不过期</h3><p>“永远不过期”包含两层意思:</p>
+<ul>
+<li>从缓存层面来看，确实没有设置过期时间，所以不会出现热点key过期后产生的问题，也就是“物理”不过期。</li>
+<li>从功能层面来看，为每个value设置一个逻辑过期时间，当发现超过逻辑过期时间后，会使用单独的线程去构建缓存。</li>
+</ul>
+<p>从实战看，此方法有效杜绝了热点key产生的问题，但唯一不足的就是重构缓存期间，会出现数据不一致的情况，这取决于应用方是否容忍这种不一致。</p>
+<h2 id="热key处理"><a href="#热key处理" class="headerlink" title="热key处理"></a>热key处理</h2><ul>
+<li>拆分复杂数据结构: 如果当前key的类型是一个二级数据结构，例如 哈希类型。如果该哈希元素个数较多，可以考虑将当前hash进行拆分，这样该热点key可以拆分为若干个新的key分布到不同Redis节点上，从而减轻压力。</li>
+<li>迁移热点key: 以Redis Cluster为例，可以将热点key所在的slot单独 迁移到一个新的Redis节点上，但此操作会增加运维成本。</li>
+<li>本地缓存加通知机制: 可以将热点key放在业务端的本地缓存中，因为是在业务端的本地内存中，处理能力要高出Redis数十倍，但当数据更新时，此种模式会造成各个业务端和Redis数据不一致，通常会使用发布订阅机制来解决类似问题。</li>
+</ul>
+<h2 id="bigkey处理"><a href="#bigkey处理" class="headerlink" title="bigkey处理"></a>bigkey处理</h2><p>bigkey是指key对应的value所占的内存空间比较大，例如一个字符串类 型的value可以最大存到512MB，一个列表类型的value最多可以存储232-1个 元素。如果按照数据结构来细分的话，一般分为字符串类型bigkey和非字符串类型bigkey。</p>
+<p>bigkey的危害:</p>
+<ul>
+<li>内存空间不均匀(平衡):例如在Redis Cluster中，bigkey会造成节点的内存空间使用不均匀。</li>
+<li>超时阻塞: 由于Redis单线程的特性，操作bigkey比较耗时，也就意味 着阻塞Redis可能性增大。</li>
+<li>网络拥塞: 每次获取bigkey产生的网络流量较大，假设一个bigkey为 1MB，每秒访问量为1000，那么每秒产生1000MB的流量，对于普通的千兆 网卡(按照字节算是128MB/s)的服务器来说简直是灭顶之灾，而且一般服 务器会采用单机多实例的方式来部署，也就是说一个bigkey可能会对其他实 例造成影响，其后果不堪设想。</li>
+</ul>
+<p>解决：</p>
+<ul>
+<li>string可以直接删除</li>
+<li>集合对field循环删除</li>
+<li>Redis4.0，lazy delete free模式</li>
+<li>业务优化，避免bigkey</li>
+</ul>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/28/redis-6/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/28/redis-6/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/11/28/redis-7/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/28/redis-5/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">42</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/">cas<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/cas/并发/">并发<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">20</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">20</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
