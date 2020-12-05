@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            网络基础 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,network">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/01/network-1/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/12/01/network-1/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="网络基础 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="network"> 
+
+    
+        <meta property="article:published_time" content="Tue Dec 01 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Fri Dec 04 2020 17:52:20 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/12/01/network-1/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/01/network-1/index.html",
+    "headline": "网络基础",
+    "datePublished": "Tue Dec 01 2020 10:00:00 GMT+0800",
+    "dateModified": "Fri Dec 04 2020 17:52:20 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",network小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#分层"><span class="post-toc-number">1.</span> <span class="post-toc-text">分层</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#链路层"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">链路层</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Mac地址"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">Mac地址</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#子网"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">子网</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#网络层"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">网络层</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#IP协议"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">IP协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#子码掩码"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">子码掩码</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ARP协议"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">ARP协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#nat协议"><span class="post-toc-number">1.2.4.</span> <span class="post-toc-text">nat协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ICMP协议"><span class="post-toc-number">1.2.5.</span> <span class="post-toc-text">ICMP协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#路由协议"><span class="post-toc-number">1.2.6.</span> <span class="post-toc-text">路由协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#一些名义上属于应用层，但却跟ip紧密相关的协议"><span class="post-toc-number">1.2.7.</span> <span class="post-toc-text">一些名义上属于应用层，但却跟ip紧密相关的协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#dhcp协议"><span class="post-toc-number">1.2.8.</span> <span class="post-toc-text">dhcp协议</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#DNS"><span class="post-toc-number">1.2.9.</span> <span class="post-toc-text">DNS</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#传输层"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">传输层</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#TCP"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">TCP</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#TCP头的介绍"><span class="post-toc-number">1.3.1.1.</span> <span class="post-toc-text">TCP头的介绍</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#三次握手"><span class="post-toc-number">1.3.1.2.</span> <span class="post-toc-text">三次握手</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#四次挥手"><span class="post-toc-number">1.3.1.3.</span> <span class="post-toc-text">四次挥手</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#通过序列号与确认应答提高可靠性"><span class="post-toc-number">1.3.1.4.</span> <span class="post-toc-text">通过序列号与确认应答提高可靠性</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#重发超时的确定"><span class="post-toc-number">1.3.1.5.</span> <span class="post-toc-text">重发超时的确定</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#利用窗口控制提高速度"><span class="post-toc-number">1.3.1.6.</span> <span class="post-toc-text">利用窗口控制提高速度</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#滑动窗口控制"><span class="post-toc-number">1.3.1.7.</span> <span class="post-toc-text">滑动窗口控制</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#窗口控制中的重发控制"><span class="post-toc-number">1.3.1.8.</span> <span class="post-toc-text">窗口控制中的重发控制</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#UDP"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">UDP</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#协议差别"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">协议差别</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据包"><span class="post-toc-number">2.</span> <span class="post-toc-text">数据包</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                网络基础
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>12月 01, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACbklEQVR42u3aSW7DMBAEQP//08kDAis9i2jBKJ2MWLJYPAyZ5rx+vvp64eHh4eHh4eHhPYz3iq+/9//9nXd/SZ56920+Njw8PLyTvH9K7eCeZCJycPT7eHh4eAd514tBMojrX0uWnIWx4eHh4T2MV73n3RY5ihXw8PDwvo53vQBUYY9bGPDw8PCWwojqQBNqHmTcnrXg4eHhxbxeZHDm8wfO9/Dw8PAuedUrGVay1c5bEMojxMPDw7uZl2xnk6Ahf3Z+LfzHgIeHhzfg5a1OeQzRWwbmE42Hh4d3hpcX8d3wN19Oyu/Fw8PDu5mXH/8nrQP50PMNd370hYeHh3eGNzn06sUW+dTkzV54eHh4n+Il29mkZPeemgQWeHh4eCd5k9KfbHPzweUTt5xS4+Hh4RV5vRKfRwO9xSYJOMopNR4eHt4SrxoBVA+9ko173jQwSqnx8PDwVnlbccOkrK81fuHh4eEd4eVH+5Nt9EJEuxvj4uHh4Y15CSA/psoDiLxNYRRG4OHh4S3xkmFN8MnmeDIRUdMVHh4e3s28QgkuFvTeclJ+Cx4eHt7NvK2SXQ1br991zS73lOHh4eEd5PWCiXyDPo+M/9lS4+Hh4d3AqxblattBr9wXlgE8PDy847zy8dLqdPSCjGZPGR4eHt4Sr1qUC6/plfWg/avcOoCHh4d3Ay8/6Op9Ww04koik3DqAh4eHdwMvXwx6m+mtkKK5MODh4eF9iFc9zp9TyzEHHh4e3iN5vULfa1bIlwQ8PDy887w8btiNGKpxAx4eHt4TeJMDsLyszxehaCrx8PDwbuZ934WHh4eHh4eHh/eA6xf2C7Wp2qk1LwAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/network/">network</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=网络基础&url=http://seanthefish.com/2020/12/01/network-1/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/01/network-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=网络基础&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/01/network-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>文章参考 <a href="https://zhuanlan.zhihu.com/p/147370653" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/147370653</a> <a href="https://zhuanlan.zhihu.com/p/40676462" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/40676462</a> <a href="https://zhuanlan.zhihu.com/p/33797520" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/33797520</a> <a href="https://www.cnblogs.com/dolphinx/p/3460545.html" target="_blank" rel="noopener">https://www.cnblogs.com/dolphinx/p/3460545.html</a> <a href="https://blog.csdn.net/qzcsu/article/details/72861891" target="_blank" rel="noopener">https://blog.csdn.net/qzcsu/article/details/72861891</a></p>
+<p>深感要弄明白网络编程，就得先弄明白计算机网络的基础，这一节就是补基础的。</p>
+<h2 id="分层"><a href="#分层" class="headerlink" title="分层"></a>分层</h2><table>
+<thead>
+<tr>
+<th>tcp/ip网络</th>
+<th>功能</th>
+<th>协议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应用层</td>
+<td>文件传输/电子邮件/虚拟终端</td>
+<td>http，dns，dhcp，telnet，smtp，ftp</td>
+</tr>
+<tr>
+<td>传输层</td>
+<td>提供端对端的接口（端口）</td>
+<td>tcp，udp</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>为数据包选择路由（路由器）</td>
+<td>ip，nat，icmp，bgp</td>
+</tr>
+<tr>
+<td>链路层/物理层</td>
+<td>传输有地址的帧和错误检测功能（交换机）</td>
+<td>mac，arp</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://i.loli.net/2020/12/04/oQ4n3SdVAJbOyM5.png" alt="image.png"></p>
+<p>说一下每一层负责的事情</p>
+<h3 id="链路层"><a href="#链路层" class="headerlink" title="链路层"></a>链路层</h3><h4 id="Mac地址"><a href="#Mac地址" class="headerlink" title="Mac地址"></a>Mac地址</h4><p>简单来说链路层负责的就是mac地址间的通信，连入网络的每一个计算机都会有网卡接口，每一个网卡都会一个地址，这个地址就叫做MAC地址。计算机之间的数据传送，就是通过MAC地址来唯一寻找、传送的。MAC地址在网卡生产是就被唯一标识了。</p>
+<h4 id="子网"><a href="#子网" class="headerlink" title="子网"></a>子网</h4><p><img src="https://i.loli.net/2020/12/04/7ndVKWO2NBYtCym.png" alt="image.png"></p>
+<p>假如计算机A知道了计算机B的MAC地址，然后计算机A想要给计算机B传送数据，虽然计算机A知道了计算机B的MAC地址，可是它要怎么给它传送数据呢？计算机A不仅连着计算机B，而且计算机A也还连着其他的计算机。 虽然计算机A知道计算机B的MAC地址，可是计算机A是无法知道计算机B是分布在哪边路线上的。实际上，计算机A是通过广播的方式把数据发送给计算机B。在同一个子网中，计算机A要向计算机B发送一个数据包，这个数据包包含接收者的MAC地址。这个时候同一个子网中的计算机C,D也会收到这个数据包的，然后收到这个数据包的计算机，会把数据包的MAC地址取出来，与自身的MAC地址对比，如果两者相同，则接受这个数据包，否则就丢弃这个数据包。这种发送方式我们称之为广播,就像我们平时在广场上通过广播的形式呼叫某个人一样。</p>
+<h3 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h3><p>上面我们有说到子网这个关键词，实际上我们所处的网络，是由无数个子网络构成的。广播的时候，也只有同一个子网里面的计算机能够收到。 假如没有子网这种划分的话，计算机A发一个数据包给计算机B,其他所有计算机也都能收到这个数据包，然后进行对比再舍弃。世界上有那么多它计算机，每一台计算机都能收到其他所有计算机的数据包，那就不得了了。那还不得奔溃。 因此产生了子网这么一个东西。</p>
+<p>那么问题来了，我们如何区分哪些MAC地址是属于同一个子网的呢？假如是同一个子网，那我们就用广播的形式把数据传送给对方，如果不是同一个子网的，我们就会把数据发给网关，让网关进行转发。</p>
+<p>为了解决这个问题我们引入了一套新的地址协议，这个地址协议能够帮助我们区分MAC地址是否处于同一个子网中。这也是网络层负责解决的问题。</p>
+<h4 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h4><p>这个协议就是IP协议，它所定义的地址，我们称之为IP地址。IP协议有两种版本，一种是IPv4,另一种是IPv6。不过我们目前大多数用的还是IPv4，我们现在也只讨论IPv4这个版本的协议。</p>
+<p>这个IP地址由32为的二进制数组成，我们一般把它分成4段的十进制表示，地址范围为0.0.0.0（全0）~255.255.255.255（全1）</p>
+<p>每一台想要联网的计算机都会有一个IP地址。这个IP地址被分为两部分，前面一部分代表网络部分，后面一部分代表主机部分。并且网络部分和主机部分的二进制位数是不固定的。</p>
+<p>假如两台计算机的网络部分是一模一样的，我们就说这两台计算机是处于同一个子网中。例如192.168.43.1和192.168.43.2,假如这两个IP地址的网络部分为24为，主机部分为8位。那么他们的网络部分都为192.168.43，所以他们处于同一个子网中。</p>
+<p>可是问题来了，你怎么知道网络部分是占几位。也就是说，单单从两台计算机的IP地址，我们是无法判断他们的是否处于同一个子网中的。</p>
+<h4 id="子码掩码"><a href="#子码掩码" class="headerlink" title="子码掩码"></a>子码掩码</h4><p>这就引申出了另一个关键词————子码掩码。子码掩码和IP地址一样也是32位二进制数，不过它的网络部分规定全部为1，主机部分规定全部为0.也就是说，假如上面那两个IP地址的网络部分为24为，主机部分为8为的话，那他们的子码掩码都为11111111.11111111.11111111.00000000，即255.255.255.0。</p>
+<p>那有了子字码掩码，如何来判端IP地址是否处于同一个子网中呢。显然，知道了子码掩码，相当于我们知道了网络部分是几位，主机部分是几位。我们只需要把IP地址与它的子码掩码做与(and)运算，然后把各自的结果进行比较就行了，如果比较的结果相同，则代表是同一个子网，否则不是同一个子网。</p>
+<p>例如，192.168.43.1和192.168.43.2的子码掩码都为255.255.255.0，把IP与子码掩码相与，可以得到他们都为192.168.43.0，进而他们处于同一个子网中。</p>
+<h4 id="ARP协议"><a href="#ARP协议" class="headerlink" title="ARP协议"></a>ARP协议</h4><p>有了上面IP协议的知识，我们讲一下ARP协议。</p>
+<p>ARP（Address Resolution Protocol）即地址解析协议， 用于实现从 IP 地址到 MAC 地址的映射，即询问目标IP对应的MAC地址。简单来说，就是用来把IP地址翻译成mac地址的。</p>
+<p>虽然我们说arp协议是工作在链路层，但这并不准确，其实是作为链路层和网络层的传输桥梁。</p>
+<p>有了两台计算机的IP地址，我们就可以判断出它们是否处于同一个子网之中。 假如他们处于同一个子网之中，计算机A要给计算机B发送数据时。我们可以通过ARP协议来得到计算机B的MAC地址。ARP协议也是通过广播的形式给同一个子网中的每台电脑发送一个数据包(当然，这个数据包会包含接收方的IP地址)。对方收到这个数据包之后，会取出IP地址与自身的对比，如果相同，则把自己的MAC地址回复给对方，否则就丢弃这个数据包（大多数的网络请求都会有三种处理方式，接受，拒绝，丢弃）。这样，计算机A就能知道计算机B的MAC地址了。</p>
+<p>可能有人会问，知道了MAC地址之后，发送数据是通过广播的形式发送，询问对方的MAC地址也是通过广播的形式来发送，那其他计算机怎么知道你是要传送数据还是要询问MAC地址呢？其实在询问MAC地址的数据包中，在对方的MAC地址这一栏中，填的是一个特殊的MAC地址，大部分的广播包，它们有一个共同特征：二层封装时目的MAC是全f（ffff.ffff.ffff）或三层封装时目的IP是全1（255.255.255.255）。可以这样更方便的记住：目的地址最大的，就是广播。</p>
+<p>但是arp每一次请求都是广播的么？并不是，在发送过arp请求后，arp协议会在本地进行arp缓存，此后就可以单播的形式发送了。注意，在目的地址会用arp请求的时候，也会以单播的形式回应。</p>
+<p>假如两台计算机的IP不是处于同一个子网之中，这个时候，我们就会把数据包发送给网关，然后让网关让我们进行转发传送。</p>
+<h4 id="nat协议"><a href="#nat协议" class="headerlink" title="nat协议"></a>nat协议</h4><p>NAT，Network Address Translation 地址转换，是路由器将内网地址转换为公网地址的一种技术。</p>
+<p>我们都知道现在ipv4的地址已经严重不足了，所以为世界上每一台主机都申请一个公网IP是一个不现实的事，所以我们的路由器会随机分配一个动态的公网IP，而通过这个公网IP，我们可以进行内网IP的地址转换，从而实现内网中多个主机使用一个公网IP上网，这就是nat解决的问题。</p>
+<p>NAT的实现方式主要有三种：</p>
+<ul>
+<li><p>静态转换：静态转换是一对一的转换，有多少内网地址需要转换，就需要相应的公网地址；用得很少（似乎企业级路由，或者云上的主机，用的都是static nat？）</p>
+</li>
+<li><p>动态转换：动态转换是多对多的转换，通常需要转换的内网地址略多于相应的公网地址；将公网地址放在一个地址池里，当有内网地址需要访问外部网站时，从地址池中取出一个公网地址，用于内网地址到公网地址的转换；该方式适用于内网地址略多于给定的公网地址，如果内网地址远大于公网地址，当多台内网机器需要访问公网时，会出现地址池枯竭，无法获得对应的公网地址；</p>
+</li>
+<li><p>端口多路复用：通常是多对一的关系，当只存在一个公网地址时，可用这种方式；通过端口号来确定内网的具体机器。例如内网机器192.168.1.116 需要访问外部网站; 在数据包通过路由器转发时，NAT会产生一个session，保存地址对应的端口信息，再将数据包中的IP地址转换为 202.11.25.56:1234 （原地址）—&gt;对应网站（目的地址） ，转发出去。其中的端口1234应该是动态生成，并记录下来。当 对应网站 有响应信息时，响应数据包经过路由器时，NAT查询对应端口对应的内网IP，将数据包内的地址更改回去，转发进内网，这样就实现了数据的交换。但这也造成外网不能主动访问内网的设备。</p>
+</li>
+</ul>
+<h4 id="ICMP协议"><a href="#ICMP协议" class="headerlink" title="ICMP协议"></a>ICMP协议</h4><p>其实就是我们经常使用的ping包</p>
+<p>ICMP协议的功能主要有：</p>
+<ul>
+<li>确认IP包是否成功到达目标地址</li>
+<li>通知在发送过程中IP包被丢弃的原因（目标不可达，源抑制和超时报文）</li>
+</ul>
+<h4 id="路由协议"><a href="#路由协议" class="headerlink" title="路由协议"></a>路由协议</h4><p>bgp，ospf都是路由协议，具体比较复杂，这里不打算深入展开来说。</p>
+<ul>
+<li>发送数据包时所使用的地址是网络层的地址，即 IP 地址。然而仅仅有 IP 地址还不足以实现将数据包发送到对端目标地址，在数据发送过程中还需要类似于“指明路由器或主机”的信息，以便真正发往目标地址。保存这种信息的就是路由控制表。</li>
+<li>该路由控制表的形成方式有两种：一种是管理员手动设置，另一种是路由器与其他路由器相互交换信息时自动刷新。前者也叫做静态路由控制，而后者叫做动态路由控制。</li>
+<li>IP 协议始终认为路由表是正确的。然后，IP 本身并没有定义制作路由控制表的协议。即 IP 没有制作路由控制表的机制。该表示由一个叫做“路由协议”的协议制作而成。</li>
+<li>动态路由协议可以让路由器自动学习到其他路由器的网络，并且网络拓扑发生改变后自动更新路由表。网络管理员只需要配置动态路由协议即可，相比人工指定转发策略，工作量大大减少。</li>
+</ul>
+<h4 id="一些名义上属于应用层，但却跟ip紧密相关的协议"><a href="#一些名义上属于应用层，但却跟ip紧密相关的协议" class="headerlink" title="一些名义上属于应用层，但却跟ip紧密相关的协议"></a>一些名义上属于应用层，但却跟ip紧密相关的协议</h4><h4 id="dhcp协议"><a href="#dhcp协议" class="headerlink" title="dhcp协议"></a>dhcp协议</h4><p>nat为主机提供ip转换的功能，那么内网中的ip分配功能由谁提供呢？就是dhcp</p>
+<p>如果逐一为每一台主机设置 IP 地址会是非常繁琐的事情。特别是在移动使用笔记本电脑、只能终端以及平板电脑等设备时，每移动到一个新的地方，都要重新设置 IP 地址。</p>
+<p>于是，为了实现自动设置 IP 地址、统一管理 IP 地址分配，就产生了 DHCP（Dynamic Host Configuration Protocol）协议。有了 DHCP，计算机只要连接到网络，就可以进行 TCP/IP 通信。也就是说，DHCP 让即插即用变得可能。</p>
+<p>你把电脑/手机/平板插上网线/连上WiFi，操作系统的DHCP客户端就会开始工作，尝试联系网络里的DHCP服务器，然后从那里“租”一个IP地址。DHCP服务器维护了一个地址池，它只会从这个池子里分配地址，一个MAC对应一个地址，如果不用了就放回池子，这样就可以避免搞出重复的IP地址——当然，你也可以给电脑/手机/平板直接填一个IP，这样就可能重复了，DHCP服务器管不着你，但你这样用也可能碰到冲突、动不动断网。</p>
+<h4 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h4><p>这个大家应该很熟悉了，就是把网址翻译成ip地址，不展开说了，严格来说dns不属于网络协议</p>
+<h3 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h3><p>经过了网络层之后，我们已经建立起两台计算机之间的对应关系了，但这还不够，我们最终使用的都是应用程序，也就是说是进程之间的通信。</p>
+<p>这个时候，端口(Port)就上场了，也就是说，我们在从计算机A传数据给计算表B的时候，还得指定一个端口，以供特定的应用程序来接受处理。</p>
+<p>也就是说，传输层的功能就是建立端口到端口的通信。相比网络层的功能是建立主机到主机的通信。</p>
+<p>除了IP和端口，我们还需要在传输层指定协议名称（tcp/udp），来区别是哪种方式进行通信。</p>
+<h4 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h4><p>TCP 是面向连接的、可靠的流协议。流就是指不间断的数据结构，当应用程序采用 TCP 发送消息时，虽然可以保证发送的顺序，但还是犹如没有任何间隔的数据流发送给接收端。TCP 为提供可靠性传输，实行“顺序控制”或“重发控制”机制。此外还具备“流控制（流量控制）”、“拥塞控制”、提高网络利用率等众多功能。</p>
+<h5 id="TCP头的介绍"><a href="#TCP头的介绍" class="headerlink" title="TCP头的介绍"></a>TCP头的介绍</h5><p><img src="https://i.loli.net/2020/12/04/iLpaRNckzE9yJo1.png" alt="image.png"></p>
+<ul>
+<li>源端口和目的端口，各占2个字节，分别写入源端口和目的端口；</li>
+<li>序号，占4个字节，TCP连接中传送的字节流中的每个字节都按顺序编号。例如，一段报文的序号字段值是 301 ，而携带的数据共有100字段，显然下一个报文段（如果还有的话）的数据序号应该从401开始；</li>
+<li>确认号，占4个字节，是期望收到对方下一个报文的第一个数据字节的序号。例如，B收到了A发送过来的报文，其序列号字段是501，而数据长度是200字节，这表明B正确的收到了A发送的到序号700为止的数据。因此，B期望收到A的下一个数据序号是701，于是B在发送给A的确认报文段中把确认号置为701；</li>
+<li>数据偏移，占4位，它指出TCP报文的数据距离TCP报文段的起始处有多远；</li>
+<li>保留，占6位，保留今后使用，但目前应都位0；</li>
+<li>紧急URG，当URG=1，表明紧急指针字段有效。告诉系统此报文段中有紧急数据；</li>
+<li>确认ACK，仅当ACK=1时，确认号字段才有效。TCP规定，在连接建立后所有报文的传输都必须把ACK置1；</li>
+<li>推送PSH，当两个应用进程进行交互式通信时，有时在一端的应用进程希望在键入一个命令后立即就能收到对方的响应，这时候就将PSH=1；</li>
+<li>复位RST，当RST=1，表明TCP连接中出现严重差错，必须释放连接，然后再重新建立连接；</li>
+<li>同步SYN，在连接建立时用来同步序号。当SYN=1，ACK=0，表明是连接请求报文，若同意连接，则响应报文中应该使SYN=1，ACK=1；</li>
+<li>终止FIN，用来释放连接。当FIN=1，表明此报文的发送方的数据已经发送完毕，并且要求释放；</li>
+<li>窗口，占2字节，指的是通知接收方，发送本报文你需要有多大的空间来接受；</li>
+<li>检验和，占2字节，校验首部和数据这两部分；</li>
+<li>紧急指针，占2字节，指出本报文段中的紧急数据的字节数；</li>
+<li>选项，长度可变，定义一些其他的可选的参数。</li>
+</ul>
+<p>【注意两个ack，我们通常认为大写的ACK为确认值(Acknowledgement)，为1即确认链接；小写的ack为确认编号(Acknowledgement Number)，即接收到的上一次远端主机传来的seq然后+1，再发送给远端主机。提示远端主机已经成功接收上一次所有数据。这俩在tcp头中都能找到对应位置】</p>
+<h5 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h5><p><img src="https://i.loli.net/2020/12/04/LanstxozAChbRUH.png" alt="image.png"></p>
+<ul>
+<li>最开始的时候客户端和服务器都是处于CLOSED状态。主动打开连接的为客户端，被动打开连接的是服务器。</li>
+<li>TCP服务器进程先创建传输控制块TCB，时刻准备接受客户进程的连接请求，此时服务器就进入了LISTEN（监听）状态；</li>
+<li>TCP客户进程也是先创建传输控制块TCB，然后向服务器发出连接请求报文，这是报文首部中的同部位SYN=1，同时选择一个初始序列号 seq=x ，此时，TCP客户端进程进入了 SYN-SENT（同步已发送状态）状态。TCP规定，SYN报文段（SYN=1的报文段）不能携带数据，但需要消耗掉一个序号。</li>
+<li>TCP服务器收到请求报文后，如果同意连接，则发出确认报文。确认报文中应该 ACK=1，SYN=1，确认编号是ack=x+1，同时也要为自己初始化一个序列号 seq=y，此时，TCP服务器进程进入了SYN-RCVD（同步收到）状态。这个报文也不能携带数据，但是同样要消耗一个序号。</li>
+<li>TCP客户进程收到确认后，还要向服务器给出确认。确认报文的ACK=1，ack=y+1，自己的序列号seq=x+1，此时，TCP连接建立，客户端进入ESTABLISHED（已建立连接）状态。TCP规定，ACK报文段可以携带数据，但是如果不携带数据则不消耗序号。</li>
+<li>当服务器收到客户端的确认后也进入ESTABLISHED状态，此后双方就可以开始通信了。</li>
+</ul>
+<p><strong>为什么TCP客户端最后还要发送一次确认呢？</strong></p>
+<p>一句话，主要防止已经失效的连接请求报文突然又传送到了服务器，从而产生错误。</p>
+<p>如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，这个报文本该是失效的，但是，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。</p>
+<p>如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接。</p>
+<h5 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h5><p><img src="https://i.loli.net/2020/12/04/IqLoYZ9tFfrXWaC.png" alt="image.png"></p>
+<ul>
+<li>数据传输完毕后，双方都可释放连接。最开始的时候，客户端和服务器都是处于ESTABLISHED状态，然后客户端主动关闭，服务器被动关闭。</li>
+<li>客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。</li>
+<li>服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。</li>
+<li>客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。</li>
+<li>服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。</li>
+<li>客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2*MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。</li>
+<li>服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。</li>
+</ul>
+<p><strong>为什么客户端最后还要等待2MSL？</strong></p>
+<p>MSL（Maximum Segment Lifetime），TCP允许不同的实现可以设置不同的MSL值。</p>
+<p>第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。</p>
+<p>第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。</p>
+<p><strong>为什么建立连接是三次握手，关闭连接确是四次挥手呢？</strong></p>
+<p>建立连接的时候，服务器在LISTEN状态下，收到建立连接请求的SYN报文后，把ACK和SYN放在一个报文里发送给客户端。<br>而关闭连接时，服务器收到对方的FIN报文时，仅仅表示对方不再发送数据了但是还能接收数据，而自己也未必全部数据都发送给对方了，所以己方可以立即关闭，也可以发送一些数据给对方后，再发送FIN报文给对方来表示同意现在关闭连接，因此，己方ACK和FIN一般都会分开发送，从而导致多了一次。</p>
+<p><strong>如果已经建立了连接，但是客户端突然出现故障了怎么办？</strong></p>
+<p>TCP还设有一个保活计时器，显然，客户端如果出现故障，服务器不能一直等下去，白白浪费资源。服务器每收到一次客户端的请求后都会重新复位这个计时器，时间通常是设置为2小时，若两小时还没有收到客户端的任何数据，服务器就会发送一个探测报文段，以后每隔75秒发送一次。若一连发送10个探测报文仍然没反应，服务器就认为客户端出了故障，接着就关闭连接。</p>
+<h5 id="通过序列号与确认应答提高可靠性"><a href="#通过序列号与确认应答提高可靠性" class="headerlink" title="通过序列号与确认应答提高可靠性"></a>通过序列号与确认应答提高可靠性</h5><ul>
+<li>在 TCP 中，当发送端的数据到达接收主机时，接收端主机会返回一个已收到消息的通知。这个消息叫做确认应答（大写的ACK）。当发送端将数据发出之后会等待对端的确认应答。如果有确认应答，说明数据已经成功到达对端。反之，则数据丢失的可能性很大。</li>
+<li>在一定时间内没有等待到确认应答，发送端就可以认为数据已经丢失，并进行重发。由此，即使产生了丢包，仍然能够保证数据能够到达对端，实现可靠传输。</li>
+<li>未收到确认应答并不意味着数据一定丢失。也有可能是数据对方已经收到，只是返回的确认应答在途中丢失。这种情况也会导致发送端误以为数据没有到达目的地而重发数据。</li>
+<li>此外，也有可能因为一些其他原因导致确认应答延迟到达，在源主机重发数据以后才到达的情况也屡见不鲜。此时，源主机只要按照机制重发数据即可。</li>
+<li>对于目标主机来说，反复收到相同的数据是不可取的。为了对上层应用提供可靠的传输，目标主机必须放弃重复的数据包。为此我们引入了序列号。</li>
+<li>序列号（seq）是按照顺序给发送数据的每一个字节（8位字节）都标上号码的编号。接收端查询接收数据 TCP 首部中的序列号和数据的长度，将自己下一步应该接收的序列号作为确认应答（小写的ack）返送回去。通过序列号和确认应答号，TCP 能够识别是否已经接收数据，又能够判断是否需要接收，从而实现可靠传输。（所以ack=seq+1，下一步收到的seq=上一步发出的ack）</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/Ngk1oESxm5AqfYK.png" alt="image.png"></p>
+<h5 id="重发超时的确定"><a href="#重发超时的确定" class="headerlink" title="重发超时的确定"></a>重发超时的确定</h5><ul>
+<li>重发超时是指在重发数据之前，等待确认应答到来的那个特定时间间隔。如果超过这个时间仍未收到确认应答，发送端将进行数据重发。最理想的是，找到一个最小时间，它能保证“确认应答一定能在这个时间内返回”。</li>
+<li>TCP 要求不论处在何种网络环境下都要提供高性能通信，并且无论网络拥堵情况发生何种变化，都必须保持这一特性。为此，它在每次发包时都会计算往返时间及其偏差。将这个往返时间和偏差时间相加，重发超时的时间就是比这个总和要稍大一点的值。</li>
+<li>在 BSD 的 Unix 以及 Windows 系统中，超时都以0.5秒为单位进行控制，因此重发超时都是0.5秒的整数倍。不过，最初其重发超时的默认值一般设置为6秒左右。</li>
+<li>数据被重发之后若还是收不到确认应答，则进行再次发送。此时，等待确认应答的时间将会以2倍、4倍的指数函数延长。</li>
+<li>此外，数据也不会被无限、反复地重发。达到一定重发次数之后，如果仍没有任何确认应答返回，就会判断为网络或对端主机发生了异常，强制关闭连接。并且通知应用通信异常强行终止。</li>
+<li>TCP重发幂等吗?答案是肯定的，在网络不稳定时，操作系统可以肆无忌惮的重发TCP报文片段。TCP协议能够保证幂等的核心在于sequence number字段，一个序列号的在较长的一段时间内均不会出现重复。而服务端在处理过一个seq后不会再重复处理。</li>
+</ul>
+<h5 id="利用窗口控制提高速度"><a href="#利用窗口控制提高速度" class="headerlink" title="利用窗口控制提高速度"></a>利用窗口控制提高速度</h5><ul>
+<li>TCP 以1个段为单位，每发送一个段进行一次确认应答的处理。这样的传输方式有一个缺点，就是包的往返时间越长通信性能就越低。</li>
+<li>为解决这个问题，TCP 引入了窗口这个概念。确认应答不再是以每个分段，而是以更大的单位进行确认，转发时间将会被大幅地缩短。也就是说，发送端主机，在发送了一个段以后不必要一直等待确认应答，而是继续发送。如下图所示：</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/eqQNBDd3hiJ17lE.png" alt="image.png"></p>
+<ul>
+<li>窗口大小就是指无需等待确认应答而可以继续发送数据的最大值。上图中窗口大小为4个段。这个机制实现了使用大量的缓冲区，通过对多个段同时进行确认应答的功能。</li>
+</ul>
+<h5 id="滑动窗口控制"><a href="#滑动窗口控制" class="headerlink" title="滑动窗口控制"></a>滑动窗口控制</h5><p><img src="https://i.loli.net/2020/12/04/xnvEyUzXkm58jPw.png" alt="image.png"></p>
+<ul>
+<li>上图中的窗口内的数据即便没有收到确认应答也可以被发送出去。不过，在整个窗口的确认应答没有到达之前，如果其中部分数据出现丢包，那么发送端仍然要负责重传。为此，发送端主机需要设置缓存保留这些待被重传的数据，直到收到他们的确认应答。</li>
+<li>在滑动窗口以外的部分（包括未发送的数据 以及已经确认对端已收到的数据），当数据发出后若如期收到确认应答就可以不用再进行重发，此时数据就可以从缓存区清除。</li>
+<li>收到确认应答的情况下，将窗口滑动到确认应答中的序列号的位置。这样可以顺序地将多个段同时发送提高通信性能。这种机制也别称为滑动窗口控制。</li>
+</ul>
+<h5 id="窗口控制中的重发控制"><a href="#窗口控制中的重发控制" class="headerlink" title="窗口控制中的重发控制"></a>窗口控制中的重发控制</h5><p>在使用窗口控制中， 出现丢包一般分为两种情况：</p>
+<ul>
+<li>确认应答未能返回的情况。在这种情况下，数据已经到达对端，是不需要再进行重发的，如下图：</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/qi8X5EeCMhIzJ9w.png" alt="image.png"></p>
+<ul>
+<li>某个报文段丢失的情况。接收主机如果收到一个自己应该接收的序列号以外的数据时，会针对当前为止收到数据返回确认应答。如下图所示，当某一报文段丢失后，发送端会一直收到序号为1001的确认应答，因此，在窗口比较大，又出现报文段丢失的情况下，同一个序列号的确认应答将会被重复不断地返回。而发送端主机如果连续3次收到同一个确认应答，就会将其对应的数据进行重发。这种机制比之前提到的超时管理更加高效，因此也被称为高速重发控制。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/5hxEg8CbeIPy1Jt.png" alt="image.png"></p>
+<h4 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h4><p>无连接的UDP协议</p>
+<p>“无连接”就是在正式通信前不必与对方先建立连接，不管对方状态就直接发送。与手机短信非常相似：你在发短信的时候，只需要输入对方手机号就OK了。</p>
+<p>UDP传输协议是一种不可靠的、面向无连接、可以实现多对一、一对多和一对一连接的通信协议。UDP在传输数据前既不需要建立通道，在数据传输完毕后也不需要将通道关闭。只要客户端给服务端发送一个请求，服务端就会一次性地把所有数据发送完毕。</p>
+<p>UDP在传输数据时不会对数据的完整性进行验证，在数据丢失或数据出错时也不会要求重新传输，因此也节省了很多用于验证数据包的时间，所以以UDP建立的连接的延迟会比以TCP建立的连接的延迟更低。UDP不会根据当前的网络情况来控制数据的发送速度，因此无论网络情况是好是坏，服务端都会以恒定的速率发送数据。虽然这样有时会造成数据的丢失与损坏，但是这一点对于一些实时应用来说是十分重要的。基于以上三点，UDP在数据传输方面速度更快，延迟更低，实时性更好，因此被广泛地用于通信领域和视频网站当中。</p>
+<h4 id="协议差别"><a href="#协议差别" class="headerlink" title="协议差别"></a>协议差别</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否连接</td>
+<td>面向连接</td>
+<td>无连接</td>
+</tr>
+<tr>
+<td>传输可靠性</td>
+<td>可靠的</td>
+<td>不可靠的</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>传输少量数据</td>
+<td>大量数据</td>
+</tr>
+<tr>
+<td>速度</td>
+<td>慢</td>
+<td>快</td>
+</tr>
+<tr>
+<td>重发</td>
+<td>有</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<h2 id="数据包"><a href="#数据包" class="headerlink" title="数据包"></a>数据包</h2><p>有了上面的基础后，再来理解数据包的组成和发送过程就很容易了。</p>
+<p>网络中传输的数据包由两部分组成：一部分是协议所要用到的首部，另一部分是上一层传过来的数据。首部的结构由协议的具体规范详细定义。在数据包的首部，明确标明了协议应该如何读取数据。反过来说，看到首部，也就能够了解该协议必要的信息以及所要处理的数据。包首部就像协议的脸。</p>
+<p>下图以用户 a 向用户 b 发送邮件为例子：</p>
+<p><img src="https://i.loli.net/2020/12/04/EHmG2excC6V9niK.png" alt="image.png"></p>
+<p>① 应用程序处理<br>首先应用程序会进行编码处理，这些编码相当于 OSI 的表示层功能；<br>编码转化后，邮件不一定马上被发送出去，这种何时建立通信连接何时发送数据的管理功能，相当于 OSI 的会话层功能。<br>② TCP 模块的处理<br>TCP 根据应用的指示，负责建立连接、发送数据以及断开连接。TCP 提供将应用层发来的数据顺利发送至对端的可靠传输。为了实现这一功能，需要在应用层数据的前端附加一个 TCP 首部。<br>③ IP 模块的处理<br>IP 将 TCP 传过来的 TCP 首部和 TCP 数据合起来当做自己的数据，并在 TCP 首部的前端加上自己的 IP 首部。IP 包生成后，参考路由控制表决定接受此 IP 包的路由或主机。<br>④ 网络接口（以太网驱动）的处理<br>从 IP 传过来的 IP 包对于以太网来说就是数据。给这些数据附加上以太网首部并进行发送处理，生成的以太网数据包将通过物理层传输给接收端。<br>⑤ 网络接口（以太网驱动）的处理<br>主机收到以太网包后，首先从以太网包首部找到 MAC 地址判断是否为发送给自己的包，若不是则丢弃数据。<br>如果是发送给自己的包，则从以太网包首部中的类型确定数据类型，再传给相应的模块，如 IP、ARP 等。这里的例子则是 IP 。<br>⑥ IP 模块的处理<br>IP 模块接收到 数据后也做类似的处理。从包首部中判断此 IP 地址是否与自己的 IP 地址匹配，如果匹配则根据首部的协议类型将数据发送给对应的模块，如 TCP、UDP。这里的例子则是 TCP。<br>另外吗，对于有路由器的情况，接收端地址往往不是自己的地址，此时，需要借助路由控制表，在调查应该送往的主机或路由器之后再进行转发数据。<br>⑦ TCP 模块的处理<br>在 TCP 模块中，首先会计算一下校验和，判断数据是否被破坏。然后检查是否在按照序号接收数据。最后检查端口号，确定具体的应用程序。数据被完整地接收以后，会传给由端口号识别的应用程序。<br>⑧ 应用程序的处理<br>接收端应用程序会直接接收发送端发送的数据。通过解析数据，展示相应的内容。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/12/01/network-1/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/01/network-1/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/12/01/nio-1/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/11/30/deep-copy/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">43</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/">Java module<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/Java-9/Java-module/gradle/">gradle<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/">OIDC<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/OIDC/spring/">spring<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/">classLoader<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/classLoader/jvm/">jvm<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/">fe<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/fe/oauth/">oauth<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/java/">java<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/java/nio/">nio<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/">juc<span class="sidebar_archives-count">21</span></a></li><li><a class="sidebar_archives-link" href="/categories/juc/并发/">并发<span class="sidebar_archives-count">21</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/gc/">gc<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/jvm/">jvm<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

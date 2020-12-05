@@ -3,6 +3,1269 @@
   
     
     <entry>
+      <title><![CDATA[nio]]></title>
+      <url>/2020/12/01/nio-3/</url>
+      <content type="html"><![CDATA[<p>转载自 海纳老师的专栏 <a href="https://zhuanlan.zhihu.com/p/27296046" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/27296046</a>  但结合网上内容做了比较大的改动</p>
+<p>感谢海纳老师，我的Java进阶路上的引路人，三年前初到北京找工作的时候就看的海纳老师的专栏，三年后再看还是会有收获。</p>
+<p>本文也参考 <a href="https://www.cnblogs.com/yulinfeng/p/8095326.html" target="_blank" rel="noopener">https://www.cnblogs.com/yulinfeng/p/8095326.html</a>  <a href="https://www.jianshu.com/p/2b71ea919d49：" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49：</a></p>
+<p>关于Java io的部分我们就略过了，只需记住io主要是针对文件写入输出操作的， 分为字节流和字符流，是基于流操作的。</p>
+<p>而nio是为了解决网络编程问题诞生的。</p>
+<p>接下来对于非阻塞式输入输出（NIO）的学习以及理解首先从它的三个基础概念讲起。</p>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="Channel（通道）"><a href="#Channel（通道）" class="headerlink" title="Channel（通道）"></a>Channel（通道）</h3><p>在NIO中，你需要忘掉“流”这个概念，取而代之的是“通道”。举例在网络应用程序中有多个客户端连接，此时数据传输的概念并不是“流”而“通道”，通道与流最大的不同就是，通道是双向的，而流是单向的（例如InputStream、OutputStream）。</p>
+<p><img src="https://i.loli.net/2020/12/04/AUCaHTgQuhXWqF9.png" alt="image.png"></p>
+<h3 id="Buffer（缓冲区）"><a href="#Buffer（缓冲区）" class="headerlink" title="Buffer（缓冲区）"></a>Buffer（缓冲区）</h3><p>在NIO中并不是简单的将流的概念替换为了通道，与通道搭配的是缓冲区。在BIO的字节流中并不会使用到缓冲区，而是直接操作文件通过字节方式直接读取，而NIO则不同，它会将通道中的数据读入缓存区，或者将缓存区的数据写入通道。</p>
+<p><img src="https://i.loli.net/2020/12/04/IusoiG6dnXH3h2v.png" alt="image.png"></p>
+<h3 id="Selector（选择器）"><a href="#Selector（选择器）" class="headerlink" title="Selector（选择器）"></a>Selector（选择器）</h3><p>如果使用NIO的应用程序中只有一个Channel，选择器则是可以不需要的，而如果有多个Channel，换言之有多个连接时，此时通过选择器，在服务器端的应用程序中就只需要1个线程对多个连接进行管理。当然从最开始就说到Channel是双向的，所以在最终图的示例为下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/04/1Hu48MKWqQhzOdL.png" alt="image.png"></p>
+<p>接下来进行详细的介绍</p>
+<h2 id="buffer"><a href="#buffer" class="headerlink" title="buffer"></a>buffer</h2><p>在没有使用nio之前，我们只能自己维护一个byte数组或者是char数组来进行批量读写，或者使用BufferedReader，BufferedInputStream来做读写缓冲。在nio里，就可以使用buffer了。</p>
+<h3 id="缓冲区基础"><a href="#缓冲区基础" class="headerlink" title="缓冲区基础"></a>缓冲区基础</h3><p>本质上，缓冲区是就是一个数组。所有的缓冲区都具有四个属性来提供关于其所包含的数组的信息。它们是：</p>
+<ul>
+<li>容量（Capacity） 缓冲区能够容纳的数据元素的最大数量。容量在缓冲区创建时被设定，并且永远不能被改变。</li>
+<li>上界（Limit） 缓冲区里的数据的总数，代表了当前缓冲区中一共有多少数据。</li>
+<li>位置（Position） 下一个要被读或写的元素的位置。Position会自动由相应的 get( )和 put( )函数更新。</li>
+<li>标记（Mark） 一个备忘位置。用于记录上一次读写的位置。一会儿，我会通过reset方法来说明这个属性的含义。</li>
+</ul>
+<p>我们以字节缓冲区为例，ByteBuffer是一个抽象类，不能直接通过 new 语句来创建，只能通过一个static方法 allocate 来创建：</p>
+<pre><code class="java">// allocate是堆内内存，allocateDirect是对外内存
+ByteBuffer byteBuffer = ByteBuffer.allocate(256);
+</code></pre>
+<p>以上的语句可以创建一个大小为256字节的ByteBuffer，此时，mark = -1, pos = 0, limit = 256, capacity = 256。capacity在初始化的时候确定了，运行时就不会再变化了，而另外三个变量是随着程序的执行而不断变化的。</p>
+<h3 id="缓冲区的存取"><a href="#缓冲区的存取" class="headerlink" title="缓冲区的存取"></a>缓冲区的存取</h3><p>缓冲区用于存取的方法定义主要是put , get。</p>
+<p>put 方法有多种重载，我们看其中一个：</p>
+<pre><code class="java">    public ByteBuffer put(byte x) {
+        hb[ix(nextPutIndex())] = x;
+        return this;
+    }
+
+    final int nextPutIndex() {                          // package-private
+        if (position &gt;= limit)
+            throw new BufferOverflowException();
+        return position++;
+    }
+</code></pre>
+<p>这个方法是把一个byte变量 x 放到缓冲区中去。position会加1。再来看一下get方法，也是从position的位置去取缓冲区中的一个字节：</p>
+<pre><code class="java">  public byte get() {
+        return hb[ix(nextGetIndex())];
+    }
+
+    final int nextGetIndex() {                          // package-private
+        if (position &gt;= limit)
+            throw new BufferUnderflowException();
+        return position++;
+    }
+</code></pre>
+<p>那比如，我要是想在一个Buffer中放入了数据，然后想从中读取的话，就要把position调到我想读的那个位置才行。为此，ByteBuffer上定义了一个方法：</p>
+<pre><code class="java">public final Buffer position(int newPosition) {
+        if ((newPosition &gt; limit) || (newPosition &lt; 0))
+            throw new IllegalArgumentException();
+        position = newPosition;
+        if (mark &gt; position) mark = -1;
+        return this;
+    }
+</code></pre>
+<p>这里面用到了limit，想一下上面的定义，limit代表可写或者可读的总数。一个新创建的bytebuffer，它可写的总数就是它的capacity。如果写入了一些数据以后，想从头开始读的话，这时候的limit应该就是当前ByteBuffer中数据的总长度。下面的这个图比较直观地说明了这个问题：</p>
+<p><img src="https://i.loli.net/2020/12/03/yYe7d1brWGEVpCw.png" alt="image.png"></p>
+<p>为了达到从写数据的情况变成读数据的情况，还需要修改limit，这就要用到limit方法：</p>
+<pre><code class="java">    public final Buffer limit(int newLimit) {
+        if ((newLimit &gt; capacity) || (newLimit &lt; 0))
+            throw new IllegalArgumentException();
+        limit = newLimit;
+        if (position &gt; limit) position = limit;
+        if (mark &gt; limit) mark = -1;
+        return this;
+    }
+</code></pre>
+<p>我们可以这样写，就把byteBuffer从读变成写了：</p>
+<pre><code class="java">byteBuffer.limit(byteBuffer.position())
+byteBuffer.position(0);
+</code></pre>
+<p>当然，由于这个操作非常频繁，jdk就为我们封装了一个这样的方法，叫做flip:</p>
+<pre><code class="java">    public final Buffer flip() {
+        limit = position;
+        position = 0;
+        mark = -1;
+        return this;
+    }
+</code></pre>
+<p>使用这个反转方法，思路一定要清晰，稍有不慎，就会带来莫名其妙的错误，比如，连续调用flip会对ByteBuffer有什么样的影响呢？这其实会使得Buffer的limit变成0，从而既不能读也不能写了。</p>
+<p>limit的设计确实可以加速数据溢出情况的检查，但是造成使用上和理解上的困难，我还是觉得得不偿失。我一直觉得limit这个设计很蠢（个人意见，如果有误，请各位指正）。</p>
+<h3 id="缓冲区标记"><a href="#缓冲区标记" class="headerlink" title="缓冲区标记"></a>缓冲区标记</h3><p>今天最后一个内容，是讲一下mark的作用。在理解了position的作用以后，mark就很容易理解了，它就是记住当前的位置用的：</p>
+<pre><code class="java">    public final Buffer mark() {
+        mark = position;
+        return this;
+    }
+</code></pre>
+<p>我们在调用过mark以后，再进行缓冲区的读写操作，position就会发生变化，为了再回到当初的位置，我们可以调用reset方法恢复position的值：</p>
+<pre><code class="java"> public final Buffer reset() {
+        int m = mark;
+        if (m &lt; 0)
+            throw new InvalidMarkException();
+        position = m;
+        return this;
+    }
+</code></pre>
+<h2 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h2><p>NIO中通过channel封装了对数据源的操作，通过 channel 我们可以操作数据源，但又不必关心数据源的具体物理结构。</p>
+<p>这个数据源可能是多种的。比如，可以是文件，也可以是网络socket。在大多数应用中，channel 与文件描述符或者 socket 是一一对应的。</p>
+<p>在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。</p>
+<p>可以认为每建立一个channel就是建立了一个socket链接。</p>
+<h2 id="Channel的作用"><a href="#Channel的作用" class="headerlink" title="Channel的作用"></a>Channel的作用</h2><p>channel 最主要的作用还是用于非阻塞式读写。这一条我们以后会讲，今天，主要看一下如何使用Channel进行编程。</p>
+<p>Channel可以使用 ByteBuffer 进行读写，这是它的一个方便之处。我们先看一个例子，这个例子中，创建了一个ServerSocketChannel 并且在本机的8000端口上进行监听。可以看到，bind, listen这些操作，可以猜想到SocketChannel的具体实现，本质上也是对socket的一种封装而已。</p>
+<pre><code class="java">public class WebServer {
+    public static void main(String args[]) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+            SocketChannel socketChannel = ssc.accept();
+
+            ByteBuffer readBuffer = ByteBuffer.allocate(128);
+            socketChannel.read(readBuffer);
+
+            readBuffer.flip();
+            while (readBuffer.hasRemaining()) {
+                System.out.println((char)readBuffer.get());
+            }
+
+            socketChannel.close();
+            ssc.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>用静态的 open( )工厂方法创建一个新的 ServerSocketChannel 对象，将会返回同一个未绑定的 java.net.ServerSocket 关联的通道。这个相关联的 ServerSocket 可以通过在 ServerSocketChannel 上调用 socket( )方法来获取。我们在这个例子中，使用了socket().bind来实现socket的绑定。</p>
+<p>bind方法，监听这个端口上的所有coming的socket链接，源码里bind实际上是调用了Linux bind listen两个函数。</p>
+<p>accept方法，源码调用了Linux的accept函数，会阻塞当前线程，直到有socket链接coming。</p>
+<p>read方法，源码调用了Linux的read函数，会阻塞当前线程，直到socket有数据发送过来。</p>
+<p>客户端代码：</p>
+<pre><code class="java">public class WebClient {
+    public static void main(String[] args) {
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+            writeBuffer.put(&quot;hello world&quot;.getBytes());
+
+            writeBuffer.flip();
+            socketChannel.write(writeBuffer);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>新创建的 SocketChannel 虽已打开却是未连接的。在一个未连接的 SocketChannel 对象上尝试一 个 I/O 操作会导致 NotYetConnectedException 异常。我们可以通过在通道上直接调用 connect() 方法或在通道关联的 Socket 对象上调用 connect()来实现socket的连接。一旦一个 socket 通道被连接，它将保持连接状态直到被关闭。我们可以通过调用 isConnected()方法来测试某个 SocketChannel 是否已连接。</p>
+<p>本节课程所使用的ByteBuffer上一课也有讲解，如果对flip，get, put 等操作还是感到不理解的，可以去查看上一节课程。</p>
+<p>先运行服务端，再运行客户端，所得到的结果如下：</p>
+<p><img src="https://i.loli.net/2020/12/03/mK1bzr2lgt6ifpP.png" alt="image.png"></p>
+<p>就是说，我们把客户端发送过来的字符串逐字符地打印出来了。</p>
+<p>其实，熟悉Java IO的读者都知道，我们同样可以使用InputStream和OutputStream进行字节流的读写，而且看起来，ByteBuffer似乎还没有直接使用byte[] 进行读写来得直观。实际上，channel 最大的作用并不仅限于此，它的最大作用是封装了异步操作，后面我会在 selector 的地方详细解释。</p>
+<h2 id="Scatter-Gather"><a href="#Scatter-Gather" class="headerlink" title="Scatter / Gather"></a>Scatter / Gather</h2><p>Channel 提供了一种被称为 Scatter/Gather 的新功能，也称为本地矢量 I/O。Scatter/Gather 是指在多个缓冲区上实现一个简单的 I/O 操作。对于一个 write 操作而言，数据是从几个缓冲区（通常就是一个缓冲区数组）按顺序抽取（称为 gather）并使用 channel 发送出去。缓冲区本身并不需要具备这种 gather 的能力。gather 过程等效于全部缓冲区的内容被连结起来，并在发送数据前存放到一个大的缓冲区中。对于 read 操作而言，从 通道读取的数据会按顺序被散布（称为 scatter）到多个缓冲区，将每个缓冲区填满直至通道中的数据或者缓冲区的最大空间被消耗完。</p>
+<p>大多数现代操作系统都支持本地矢量 I/O（native vectored I/O）。我们在一个通道上发起一个 Scatter/Gather 操作时，该请求会被翻译为适当的本地调用来直接填充或抽取缓冲区。这是一个很大的进步，因为减少或避免了缓冲区拷贝和系统调用。Scatter/Gather 应该使用直接的 ByteBuffers 以从本地 I/O 获取最大性能优势。</p>
+<p>例如，我们可以把客户端改写成这个样子：</p>
+<pre><code class="JAVA">public class WebClient {
+    public static void main(String[] args) {
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+            ByteBuffer buffer2 = ByteBuffer.allocate(16);
+            writeBuffer.put(&quot;hello &quot;.getBytes());
+            buffer2.put(&quot;world&quot;.getBytes());
+
+            writeBuffer.flip();
+            buffer2.flip();
+            ByteBuffer[] bufferArray = {writeBuffer, buffer2};
+            socketChannel.write(bufferArray);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>这样就实现了一个Gather IO。Gather IO 在现在还看不出来有什么作用。我们后面会看到，在并发场景下，这是一个非常好用的特性。</p>
+<h2 id="阻塞式io"><a href="#阻塞式io" class="headerlink" title="阻塞式io"></a>阻塞式io</h2><p>这里直接略过了，因为上面的例子就是阻塞式io</p>
+<pre><code class="java">socketChannel = SocketChannel.open();
+socketChannel.connect(new InetSocketAddress(&quot;192.168.0.13&quot;, 8000));
+System.out.println(&quot;Hello&quot;);
+</code></pre>
+<p>你会看到，在connect没有完成之前，最后第三行的println根本不会执行。也就是说客户端会阻塞在这个地方。</p>
+<h2 id="非阻塞式io"><a href="#非阻塞式io" class="headerlink" title="非阻塞式io"></a>非阻塞式io</h2><p>在Java中要使用非阻塞非常简单，只需要在socketChannel上调用：</p>
+<p><code>socketChannel.configureBlocking(false);</code></p>
+<pre><code class="java">public class NetClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8001));
+
+            socketChannel.configureBlocking(false);
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
+            writeBuffer.put(&quot;hello world!&quot;.getBytes());
+            writeBuffer.flip();
+
+            socketChannel.write(writeBuffer);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>可以看到服务端没啥变化，实际上我们也可以把服务端改造成非阻塞，但这样就会因为buffer中收不到数据而抛出空指针异常。</p>
+<p>所以这里我们先不改造服务端，接着下面说</p>
+<h2 id="io多路复用"><a href="#io多路复用" class="headerlink" title="io多路复用"></a>io多路复用</h2><h3 id="引入多路复用的原因"><a href="#引入多路复用的原因" class="headerlink" title="引入多路复用的原因"></a>引入多路复用的原因</h3><p>实际上，在服务端与客户端一对一通信的时候，同步阻塞式地读写并不会有太大的问题，最典型的就是两个对等机器之间建立了TCP连接，并且通过TCP连接来发送一个大文件，有大量的数据传输。在这种场景中，阻塞式的写法简单高效。</p>
+<p>但是，在服务器场景下，例如，一个 Web Server，它的特点是客户端很多，连接时间很短，数据发送量很小（一个网页几十到几百K），为了让每一个用户都能得到及时的响应，我们可以使用多线程的方式来实现服务端，例如这节课的例子：多线程服务端。</p>
+<p>但是，一台服务器能创建的线程数是十分有限的，在Java中创建线程，一个线程默认就会预留1M的空间，那么1G的内存也不过只能支持1000个线程创建而已。而且，随着线程数的增多，线程之间的调度和切换，引发的资源竞争也会加剧，使整个系统变得很慢。</p>
+<p>这个问题的最佳解决方案，就是select 和 epoll/poll。</p>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><p>在Java中，Selector这个类是select/epoll/poll的外包类，在不同的平台上，底层的实现可能有所不同，但其基本原理是一样的，其原理图如下所示：</p>
+<p><img src="https://i.loli.net/2020/12/04/tEDmRAT6OhkzBI7.png" alt="image.png"></p>
+<p>所有的Channel都归Selector管理，这些channel中只要有至少一个有IO动作，就可以通过Selector.select方法检测到，并且使用selectedKeys得到这些有IO的channel，然后对它们调用相应的IO操作。</p>
+<p>我这里有一个服务端的例子：</p>
+<pre><code class="java">public class EpollServer {
+    public static void main(String[] args) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            // 设置为非阻塞
+            ssc.configureBlocking(false);
+
+            Selector selector = Selector.open();
+
+            // 将selector和Channel绑定，并为该Channel注册SelectionKey.OP_ACCEPT事件,注册该事件后，
+            // 当该事件到达时，selector.select()会返回，如果该事件没到达selector.select()会一直阻塞。
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+
+            // 设置读写buffer
+            ByteBuffer readBuff = ByteBuffer.allocate(1024);
+            ByteBuffer writeBuff = ByteBuffer.allocate(128);
+            writeBuff.put(&quot;received&quot;.getBytes());
+            writeBuff.flip();
+
+            // 采用轮询的方式监听selector上是否有需要处理的事件，如果有，则进行处理
+            while (true) {
+                // 当注册的事件到达时，方法返回；否则,该方法会一直阻塞
+                selector.select();
+                // 获得selector中选中的项的迭代器，选中的项为注册的事件
+                Set&lt;SelectionKey&gt; keys = selector.selectedKeys();
+                Iterator&lt;SelectionKey&gt; it = keys.iterator();
+
+                while (it.hasNext()) {
+                    SelectionKey key = it.next();
+                    // 删除已选的key,以防重复处理
+                    it.remove();
+
+                    // 获得了客户端请求连接事件
+                    if (key.isAcceptable()) {
+                        // 获得和客户端连接的通道
+                        SocketChannel socketChannel = ssc.accept();
+                        // 设为非阻塞
+                        socketChannel.configureBlocking(false);
+                        // 把连接注册到selector上，而且，
+                        // 声明这个channel只对读操作感兴趣。
+                        socketChannel.register(selector, SelectionKey.OP_READ);
+                    }
+                    // 获得了可读的事件
+                    else if (key.isReadable()) {
+                        //  得到事件发生的Socket channel
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        readBuff.clear();
+                        socketChannel.read(readBuff);
+
+                        readBuff.flip();
+                        System.out.println(&quot;received : &quot; + Charset.forName(&quot;utf-8&quot;).decode(readBuff).toString());
+                        key.interestOps(SelectionKey.OP_WRITE);
+                    }
+                    // 获得了写的事件
+                    else if (key.isWritable()) {
+                        writeBuff.rewind();
+                        //  得到事件发生的Socket channel
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        // 向channel写入buffer
+                        socketChannel.write(writeBuff);
+                        // 告诉selector我们只对读感兴趣
+                        key.interestOps(SelectionKey.OP_READ);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>这个例子的关键点：</p>
+<ul>
+<li>创建一个ServerSocketChannel，和一个Selector，并且把这个server channel 注册到 selector上，注册的时间指定，这个channel 所感觉兴趣的事件是 SelectionKey.OP_ACCEPT，这个事件代表的是有客户端发起TCP连接请求。</li>
+<li>使用 select 方法阻塞住线程，当select 返回的时候，线程被唤醒。再通过selectedKeys方法得到所有可用channel的集合。</li>
+<li>遍历这个集合，如果其中channel 上有连接到达，就接受新的连接，然后把这个新的连接也注册到selector中去。</li>
+<li>如果有channel是读，那就把数据读出来，并且把它感兴趣的事件改成写。如果是写，就把数据写出去，并且把感兴趣的事件改成读。</li>
+</ul>
+<p>客户端：</p>
+<pre><code class="java">public class EpollClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(32);
+            ByteBuffer readBuffer = ByteBuffer.allocate(32);
+
+            writeBuffer.put(&quot;hello&quot;.getBytes());
+            writeBuffer.flip();
+
+            while (true) {
+                writeBuffer.rewind();
+                socketChannel.write(writeBuffer);
+                readBuffer.clear();
+                socketChannel.read(readBuffer);
+            }
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>这个客户端不断地向服务端发送”hello”，并且从服务端接收”received”。</p>
+<p>大家多启几个客户端程序，去连接同一个服务端，观察一下现象，动手改一下客户端代码，让它发送的更丰富一点，不要让每一个客户端发的都一样。</p>
+<h3 id="原理和实现"><a href="#原理和实现" class="headerlink" title="原理和实现"></a>原理和实现</h3><p>这里参考 <a href="https://www.jianshu.com/p/2b71ea919d49" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49</a> </p>
+<p>先复习一下epoll的函数</p>
+<pre><code class="c">//创建一个eventpoll,返回它的文件描述符，内有一颗红黑树，用来保存监听的socket
+int epoll_create(int size);
+//用来添加，删除以及修改监听的socket（修改红黑树的节点）
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+//等待监听的socket返回，进行后续操作
+//它的主体是ep_poll()，该函数在for循环中检查epitem（完成队列）中有没有已经完成的事件 
+//有的话就把结果返回
+//没有的话调用schedule_timeout()进入休眠，直到进程被再度唤醒或者超时。
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+</code></pre>
+<p>实现Java nio版本epoll的核心逻辑就在Selector，Selector内封装了大部分epoll的操作。</p>
+<p>先看一下Selector#open()</p>
+<pre><code class="java"> public static Selector open() throws IOException {
+        return SelectorProvider.provider().openSelector();
+    }
+</code></pre>
+<p>其实就是对应着不同os的SelectorProvider，这里以Linux下的EPollSelectorImpl为例：</p>
+<pre><code class="java">// File descriptors used for interrupt
+protected int fd0;
+protected int fd1;
+
+// The poll object
+EPollArrayWrapper pollWrapper;
+
+// Maps from file descriptors to keys
+private Map&lt;Integer,SelectionKeyImpl&gt; fdToKey;
+
+EPollSelectorImpl(SelectorProvider sp) throws IOException {
+        super(sp);
+        long pipeFds = IOUtil.makePipe(false);
+        fd0 = (int) (pipeFds &gt;&gt;&gt; 32);
+        fd1 = (int) pipeFds;
+        try {
+            pollWrapper = new EPollArrayWrapper();
+            pollWrapper.initInterrupt(fd0, fd1);
+            fdToKey = new HashMap&lt;&gt;();
+        } catch (Throwable t) {
+            try {
+                FileDispatcherImpl.closeIntFD(fd0);
+            } catch (IOException ioe0) {
+                t.addSuppressed(ioe0);
+            }
+            try {
+                FileDispatcherImpl.closeIntFD(fd1);
+            } catch (IOException ioe1) {
+                t.addSuppressed(ioe1);
+            }
+            throw t;
+        }
+    }
+
+void initInterrupt(int fd0, int fd1) {
+    outgoingInterruptFD = fd1;
+    incomingInterruptFD = fd0;
+    epollCtl(epfd, EPOLL_CTL_ADD, fd0, EPOLLIN);
+}
+</code></pre>
+<p>EPollSelectorImpl构造函数完成：</p>
+<ul>
+<li>EPollArrayWrapper的构建，EpollArrayWapper将Linux的epoll相关系统调用封装成了native方法供EpollSelectorImpl使用。<ul>
+<li>EPollArrayWrapper会初始化epoll的文件描述符，并构建了一个用于存放epoll_wait返回结果的epoll_event数组。</li>
+</ul>
+</li>
+<li>通过EPollArrayWrapper向epoll注册中断事件。fd0是incomingInterruptFD，fd1是outgoingInterruptFD，并调用Linux的epollCtl函数，并调用epoll_ctl, 添加这个epoll的文件描述符</li>
+<li>初始化fdToKey：构建文件描述符-SelectionKeyImpl映射表，所有注册到selector的channel（socket）对应的SelectionKey和与之对应的文件描述符都会放入到该映射表中。</li>
+</ul>
+<p>再来看serverChannel#register(selector, SelectionKey.OP_ACCEPT);</p>
+<pre><code class="java">    public final SelectionKey register(Selector sel, int ops,
+                                       Object att)
+        throws ClosedChannelException
+    {
+        synchronized (regLock) {
+            if (!isOpen())
+                throw new ClosedChannelException();
+            if ((ops &amp; ~validOps()) != 0)
+                throw new IllegalArgumentException();
+            if (blocking)
+                throw new IllegalBlockingModeException();
+            SelectionKey k = findKey(sel);
+            if (k != null) {
+                k.interestOps(ops);
+                k.attach(att);
+            }
+            if (k == null) {
+                // New registration
+                synchronized (keyLock) {
+                    if (!isOpen())
+                        throw new ClosedChannelException();
+                    k = ((AbstractSelector)sel).register(this, ops, att);
+                    addKey(k);
+                }
+            }
+            return k;
+        }
+    }
+
+        protected final SelectionKey register(AbstractSelectableChannel ch,
+                                          int ops,
+                                          Object attachment)
+    {
+        if (!(ch instanceof SelChImpl))
+            throw new IllegalSelectorException();
+        SelectionKeyImpl k = new SelectionKeyImpl((SelChImpl)ch, this);
+        k.attach(attachment);
+        synchronized (publicKeys) {
+            implRegister(k);
+        }
+        k.interestOps(ops);
+        return k;
+    }
+</code></pre>
+<ul>
+<li>构建代表channel(socket)和selector间关系的SelectionKey对象</li>
+<li>implRegister(k)将channel(socket)注册到epoll中</li>
+<li>k.interestOps(int) 完成下面两个操作：<ul>
+<li>会将注册的感兴趣的事件和其对应的文件描述存储到EPollArrayWrapper对象的eventsLow或eventsHigh中，这是给底层实现epoll_wait时使用的。</li>
+<li>同时该操作还会将设置SelectionKey的interestOps字段，这是给我们程序员获取使用的。</li>
+</ul>
+</li>
+</ul>
+<p>EPollSelectorImpl#implRegister</p>
+<pre><code class="java">    protected void implRegister(SelectionKeyImpl ski) {
+        if (closed)
+            throw new ClosedSelectorException();
+        SelChImpl ch = ski.channel;
+        int fd = Integer.valueOf(ch.getFDVal());
+        fdToKey.put(fd, ski);
+        pollWrapper.add(fd);
+        keys.add(ski);
+    }
+</code></pre>
+<ul>
+<li>将channel对应的fd(文件描述符)和对应的SelectionKeyImpl放到fdToKey映射表中。</li>
+<li>将channel对应的fd(文件描述符)添加到EPollArrayWrapper中，并强制初始化fd的事件为0 ( 强制初始更新事件为0，因为该事件可能存在于之前被取消过的注册中。)</li>
+<li>将selectionKey放入到keys集合中。</li>
+</ul>
+<p>Selection操作</p>
+<p>selection操作有3中类型：</p>
+<ul>
+<li>select()：该方法会一直阻塞直到至少一个channel被选择(即，该channel注册的事件发生了)为止，除非当前线程发生中断或者selector的wakeup方法被调用。</li>
+<li>select(long time)：该方法和select()类似，该方法也会导致阻塞直到至少一个channel被选择(即，该channel注册的事件发生了)为止，除非下面3种情况任意一种发生：<ul>
+<li>设置的超时时间到达；</li>
+<li>当前线程发生中断；</li>
+<li>selector的wakeup方法被调用</li>
+</ul>
+</li>
+<li>selectNow()：该方法不会发生阻塞，如果没有一个channel被选择也会立即返回。</li>
+</ul>
+<p>这里我们主要关注select()所调用的EPollSelectorImpl#doSelect方法</p>
+<pre><code class="java">    protected int doSelect(long timeout) throws IOException {
+        if (closed)
+            throw new ClosedSelectorException();
+        // 从cancelledKeys集合中依次取出注销的SelectionKey，执行注销操作
+        // 将处理后的SelectionKey从cancelledKeys集合中移除。
+        // 执行processDeregisterQueue()后cancelledKeys集合会为空。
+        // 这里会对EPollArrayWrapper进行操作，把这些不再关心的channel（socket）从EPollArrayWrapper的数据结构中移出，并修改fdToKey映射
+        // 注意直到这里，我们都还没有调用过epoll_ctl去对epoll中的红黑树进行修改，这里只是修改Java中保存的channel
+        processDeregisterQueue();
+        try {
+            begin();
+            // 看后面，这里实际上是会阻塞线程
+            pollWrapper.poll(timeout);
+        } finally {
+            end();
+        }
+        processDeregisterQueue();
+        // 通过EPollArrayWrapper pollWrapper 以及 fdToKey( 构建文件描述符-SelectorKeyImpl映射表 )来获取有事件触发的SelectionKeyImpl对象，
+        // 然后将SelectionKeyImpl放到selectedKey集合( 有事件触发的selectionKey集合，可以通过selector.selectedKeys()方法获得 )中，即selectedKeys。
+        // 并重新设置SelectionKeyImpl中相关的readyOps值。
+        int numKeysUpdated = updateSelectedKeys();
+        if (pollWrapper.interrupted()) {
+            // Clear the wakeup pipe
+            pollWrapper.putEventOps(pollWrapper.interruptedIndex(), 0);
+            synchronized (interruptLock) {
+                pollWrapper.clearInterrupted();
+                IOUtil.drain(fd0);
+                interruptTriggered = false;
+            }
+        }
+        return numKeysUpdated;
+    }
+</code></pre>
+<ul>
+<li>先处理注销的selectionKey队列</li>
+<li>进行底层的epoll_wait操作</li>
+<li>再次对注销的selectionKey队列进行处理</li>
+<li>更新被选择的selectionKey</li>
+</ul>
+<p>接着我们来看EPollArrayWrapper#poll(timeout)：</p>
+<pre><code class="java">    int poll(long timeout) throws IOException {
+        updateRegistrations();
+        updated = epollWait(pollArrayAddress, NUM_EPOLLEVENTS, timeout, epfd);
+        for (int i=0; i&lt;updated; i++) {
+            if (getDescriptor(i) == incomingInterruptFD) {
+                interruptedIndex = i;
+                interrupted = true;
+                break;
+            }
+        }
+        return updated;
+    }
+</code></pre>
+<ul>
+<li>updateRegistrations()方法会将已经注册到该selector的事件(eventsLow或eventsHigh)通过调用epollCtl(epfd, opcode, fd, events); 注册到epoll的红黑树中</li>
+<li>这里epollWait就会调用linux底层的epoll_wait方法，并返回在epoll_wait期间有事件触发的channel的个数</li>
+</ul>
+<h4 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h4><p>Selector中封装了Linux epoll的操作，当调用selector.select();时，当前线程会阻塞（体现同步io操作），这个select方法实际上是调用epoll中的epoll_wait方法，来监听不同的channel（socket）是否有事件返回，通过一个selector线程来监听多个channel（socket），并且不用阻塞住channel（socket）（操作系统帮我们处理），这体现了非阻塞的概念。所以说，epoll是同步非阻塞的模型。（我的理解，实际上就是一个事件驱动的模型）</p>
+<h3 id="关于aio"><a href="#关于aio" class="headerlink" title="关于aio"></a>关于aio</h3><p>看这里 <a href="https://www.pdai.tech/md/java/io/java-io-aio.html" target="_blank" rel="noopener">https://www.pdai.tech/md/java/io/java-io-aio.html</a></p>
+<p>简单来说，就是通过订阅-通知模式，由channel通道直接到操作系统注册监听，来监听多个channel上的数据，主线程不再阻塞。当操作系统发生IO事件，并且准备好数据后，在主动通知应用程序，触发相应的回调函数。使用“AsynchronousServerSocketChannel”（服务器监听通道）、“AsynchronousSocketChannel”（socket套接字通道）。</p>
+<h3 id="关于nio的堆外内存分配"><a href="#关于nio的堆外内存分配" class="headerlink" title="关于nio的堆外内存分配"></a>关于nio的堆外内存分配</h3><p>如果说，我们使用普通的ByteBuffer，那么这个ByteBuffer就会在Java堆内，被JVM所管理：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocate(1024);
+</code></pre>
+<p>当 buf 被JVM所管理时，它会在变成垃圾以后，自动被回收，这个不需要我们来操心。但它有个问题，后面会讲到，在执行GC的时候，JVM实际上会做一些整理内存的工作，也就说buf这个对象在内存中的实际地址是会发生变化的。有些时候，ByteBuffer里都是大量的字节，这些字节在JVM GC整理内存时就显得很笨重，把它们在内存中拷来拷去显然不是一个好主意。</p>
+<p>那这时候，我们就会想能不能给我一块内存，可以脱离JVM的管理呢？在这样的背景下，就有了DirectBuffer。先看一下用法：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocateDirect(1024);
+</code></pre>
+<p>我们对比一下，allocate方法和allocateDirect方法就知道了：</p>
+<pre><code class="java">public static ByteBuffer allocateDirect(int capacity) {
+        return new DirectByteBuffer(capacity);
+    }
+
+    public static ByteBuffer allocate(int capacity) {
+        if (capacity &lt; 0)
+            throw new IllegalArgumentException();
+        return new HeapByteBuffer(capacity, capacity);
+    }
+</code></pre>
+<p>其中allocate中所创建的HeapByteBuffer刚好就是我们前边所介绍的，在堆里分配一个ByteBuffer，而DirectBuffer则是在堆外分配，使用了unsafe.allocateMemory来分配内存.</p>
+<h4 id="DirectBuffer优缺点"><a href="#DirectBuffer优缺点" class="headerlink" title="DirectBuffer优缺点"></a>DirectBuffer优缺点</h4><p>堆外内存的申请与普通的Java对象是有巨大的差别的。在以后的课程里，大家会发现，Java对象在Java堆里申请内存的时候，实际上是比malloc(堆外内存)要快的，所以DirectBuffer的创建效率往往是比Heap Buffer差的。</p>
+<p>但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了，说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码。</p>
+<p>share/classes/sun/nio/ch/IOUtil.java</p>
+<pre><code class="java">    static int write(FileDescriptor fd, ByteBuffer src, long position,
+                     NativeDispatcher nd) 
+        throws IOException
+    {   
+        if (src instanceof DirectBuffer)
+            return writeFromNativeBuffer(fd, src, position, nd);
+
+        // Substitute a native buffer
+        int pos = src.position();
+        int lim = src.limit();
+        assert (pos &lt;= lim);
+        int rem = (pos &lt;= lim ? lim - pos : 0); 
+        ByteBuffer bb = Util.getTemporaryDirectBuffer(rem);
+        try {
+            bb.put(src);
+            bb.flip();
+        // ................略
+</code></pre>
+<p>关键点在这个方法的第一行，如果src是DirectBuffer，就直接调用writeFromNativeBuffer，如果不是，则要先创建一个临时的DirectBuffer，把src拷进去，然后再调用真正的写操作。为什么要这么干呢？还是要从DirectBuffer不会被GC移动说起。</p>
+<p>writeFromNativeBuffer的实现，最终会把Buffer的address传给操作系统，让操作系统把address开始的那一段内存发送到网络上。这就要求在操作系统进行发送的时候，这块内存是不能动的。而我们知道，GC是会乱搬Java堆里的东西的，所以无奈，我们必须得弄一块地址不会变化的内存，然后把这个地址发给操作系统。(回头再把这部分堆外内存给拿掉)</p>
+<p>DirectBuffer当然还有一个直观的优点，不被GC管理，所以发生GC的时候，整理内存的压力就会小。当然，我后面也会讲，它并不是完全不被GC管理，它还是能被回收的，但是在GC平常整理内存的时候确实是不会去管它的。</p>
+<p>堆外内存的管理，我在jvm的章节介绍过了。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> java </category>
+            
+            <category> nio </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> nio </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[epoll的本质]]></title>
+      <url>/2020/12/01/nio-2/</url>
+      <content type="html"><![CDATA[<p>放三个链接，目前能看到讲解epoll最好的文章，感谢作者。</p>
+<p><a href="https://zhuanlan.zhihu.com/p/63179839" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/63179839</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/64138532" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/64138532</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/64746509" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/64746509</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> java </category>
+            
+            <category> nio </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> nio </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[认识socket和Linux io模型]]></title>
+      <url>/2020/12/01/nio-1/</url>
+      <content type="html"><![CDATA[<h2 id="什么是socket"><a href="#什么是socket" class="headerlink" title="什么是socket"></a>什么是socket</h2><p>我们知道两个进程如果需要进行通讯最基本的一个前提能能够唯一的标示一个进程，在本地进程通讯中我们可以使用PID来唯一标示一个进程，但PID只在本地唯一，网络中的两个进程PID冲突几率很大，这时候我们需要另辟它径了，我们知道IP层的ip地址可以唯一标示主机，而TCP层协议和端口号可以唯一标示主机的一个进程，这样我们可以利用ip地址＋协议＋端口号唯一标示网络中的一个进程。</p>
+<p>能够唯一标示网络中的进程后，它们就可以利用socket进行通信了，什么是socket呢？我们经常把socket翻译为套接字，socket是在应用层和传输层之间的一个抽象层，它把TCP/IP层复杂的操作抽象为几个简单的接口供应用层调用已实现进程在网络中通信。</p>
+<p><img src="https://i.loli.net/2020/12/04/qjp1MLaVeWCwyO5.png" alt="image.png"></p>
+<p>socket起源于UNIX，在Unix一切皆文件哲学的思想下，socket是一种”打开—读/写—关闭”模式的实现，服务器和客户端各自维护一个”文件”，在建立连接打开后，可以向自己文件写入内容供对方读取或者读取对方内容，通讯结束时关闭文件。（Linux认为所有操作都是基于文件的，所以每建立一个socket链接都会返回一个文件名描述符，即socket描述符）</p>
+<p>所以每建立一个socket链接，其实就是不同计算机上的两个进程通过socket这种形式进行通信，而通信的过程伴随着缓冲区的读写，操作系统会创建一个由文件系统管理的socket对象，进行文件的读和写，这就被称为网络io。</p>
+<h2 id="socket通信流程"><a href="#socket通信流程" class="headerlink" title="socket通信流程"></a>socket通信流程</h2><p>socket是”打开—读/写—关闭”模式的实现，以使用TCP协议通讯的socket为例，其交互流程大概是这样子的</p>
+<p><img src="https://i.loli.net/2020/12/04/a2WIDYql8Bv4yMO.png" alt="image.png"></p>
+<p>可以看到跟三次握手是能对应上的</p>
+<p><img src="https://i.loli.net/2020/12/04/nFvcRCQMWtUeu9J.png" alt="image.png"></p>
+<h2 id="linux-上的网络编程接口"><a href="#linux-上的网络编程接口" class="headerlink" title="linux 上的网络编程接口"></a>linux 上的网络编程接口</h2><h3 id="socket-函数"><a href="#socket-函数" class="headerlink" title="socket()函数"></a>socket()函数</h3><p><code>int socket(int domain, int type, int protocol);</code></p>
+<p>socket函数对应于普通文件的打开操作。普通文件的打开操作返回一个文件描述符，socket()用于创建一个socket描述符（socket descriptor），它唯一标识一个socket。这个socket描述符跟文件描述符一样，后续的操作都有用到它，把它作为参数，通过它来进行一些读写操作。</p>
+<p><a href="https://segmentfault.com/a/1190000009724931" target="_blank" rel="noopener">什么是文件描述符?</a></p>
+<p>正如可以给fopen的传入不同参数值，以打开不同的文件。创建socket的时候，也可以指定不同的参数创建不同的socket描述符，socket函数的三个参数分别为：</p>
+<p>domain：即协议域，又称为协议族（family）。常用的协议族有，AF_INET、AF_INET6、AF_LOCAL（或称AF_UNIX，Unix域socket）、AF_ROUTE等等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如AF_INET决定了要用ipv4地址（32位的）与端口号（16位的）的组合、AF_UNIX决定了要用一个绝对路径名作为地址。</p>
+<p>type：指定socket类型。常用的socket类型有，SOCK_STREAM、SOCK_DGRAM、SOCK_RAW、SOCK_PACKET、SOCK_SEQPACKET等等。</p>
+<p>protocol：故名思意，就是指定协议。常用的协议有，IPPROTO_TCP、IPPTOTO_UDP、IPPROTO_SCTP、IPPROTO_TIPC等，它们分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议。</p>
+<p>注意：并不是上面的type和protocol可以随意组合的，如SOCK_STREAM不可以跟IPPROTO_UDP组合。当protocol为0时，会自动选择type类型对应的默认协议。</p>
+<p>当我们调用 socket 创建一个socket时，没有一个具体的地址。如果想要给它赋值一个地址，就必须调用bind()函数。</p>
+<h3 id="bind-函数"><a href="#bind-函数" class="headerlink" title="bind()函数"></a>bind()函数</h3><p>正如上面所说bind()函数把一个地址族中的特定地址赋给socket。例如对AF_INET、AF_INET6就是把一个ipv4或ipv6地址和端口号组合赋给socket。</p>
+<p><code>int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);</code></p>
+<p>函数的三个参数分别为：</p>
+<p>sockfd：即socket描述符，它是通过socket()函数创建了，唯一标识一个socket。bind()函数就是将给这个描述符绑定一个名字。</p>
+<p>addr：一个const struct sockaddr *指针，指向要绑定给sockfd的协议地址。这个地址结构根据地址创建socket时的地址协议族的不同而不同。</p>
+<p>通常服务器在启动的时候都会绑定一个众所周知的地址（如ip地址+端口号），用于提供服务，客户就可以通过它来接连服务器；而客户端就不用指定，有系统自动分配一个端口号和自身的ip地址组合。这就是为什么通常服务器端在listen之前会调用bind()，而客户端就不会调用，而是在connect()时由系统随机生成一个。</p>
+<h3 id="listen-函数"><a href="#listen-函数" class="headerlink" title="listen()函数"></a>listen()函数</h3><p>如果作为一个服务器，在调用socket()、bind()之后就会调用listen()来监听这个socket，</p>
+<p><code>int listen(int sockfd, int backlog);</code></p>
+<p>listen函数的第一个参数即为要监听的socket描述符，第二个参数为相应socket可以排队的最大连接个数。socket()函数创建的socket默认是一个主动类型的，listen函数将socket变为被动类型的，等待客户的连接请求。</p>
+<h3 id="connect-函数"><a href="#connect-函数" class="headerlink" title="connect()函数"></a>connect()函数</h3><p><code>int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);</code></p>
+<p>如果客户端这时调用connect()发出连接请求，服务器端就会接收到这个请求。</p>
+<p>connect函数的第一个参数即为客户端的socket描述符，第二参数为服务器的socket地址，第三个参数为socket地址的长度。客户端通过调用connect函数来建立与TCP服务器的连接。</p>
+<h3 id="accept-函数"><a href="#accept-函数" class="headerlink" title="accept()函数"></a>accept()函数</h3><p>TCP服务器端依次调用socket()、bind()、listen()之后，就会监听指定的socket地址了。TCP客户端依次调用socket()、connect()之后就想TCP服务器发送了一个连接请求。TCP服务器监听到这个请求之后，就会调用accept()函数取接收请求，这样连接就建立好了。之后就可以开始网络I/O操作了，即类同于普通文件的读写I/O操作。</p>
+<p><code>int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);</code></p>
+<p>accept函数的第一个参数为服务器的socket描述符，第二个参数为指向struct sockaddr *的指针，用于返回客户端的协议地址，第三个参数为协议地址的长度。如果accpet成功，那么其返回值是由内核自动生成的一个全新的描述符，代表与返回客户的TCP连接。</p>
+<p>注意：accept的第一个参数为服务器的socket描述符，是服务器开始调用socket()函数生成的，称为监听socket描述符；而accept函数返回的是已连接的socket描述符。一个服务器通常通常仅仅只创建一个监听socket描述符，它在该服务器的生命周期内一直存在。内核为每个由服务器进程接受的客户连接创建了一个已连接socket描述符，当服务器完成了对某个客户的服务，相应的已连接socket描述符就被关闭。</p>
+<h3 id="read-、write-等函数"><a href="#read-、write-等函数" class="headerlink" title="read()、write()等函数"></a>read()、write()等函数</h3><p>服务器与客户已经建立好连接了。可以调用网络I/O进行读写操作了，即实现了网咯中不同进程之间的通信！网络I/O操作有下面几组：</p>
+<ul>
+<li>read()/write()</li>
+<li>recv()/send()</li>
+<li>readv()/writev()</li>
+<li>recvmsg()/sendmsg()</li>
+<li>recvfrom()/sendto()</li>
+</ul>
+<p>read函数是负责从fd中读取内容。当读成功时，read返回实际所读的字节数，如果返回的值是0表示已经读到文件的结束了，小于0表示出现了错误。如果错误为EINTR说明读是由中断引起的，如果是ECONNREST表示网络连接出了问题。</p>
+<p>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数。失败时返回-1，并设置errno变量。 在网络程序中，当我们向套接字文件描述符写时有俩种可能。</p>
+<ul>
+<li>write的返回值大于0，表示写了部分或者是全部的数据。</li>
+<li>返回的值小于0，此时出现了错误。我们要根据错误类型来处理。如果错误为EINTR表示在写的时候出现了中断错误。如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接)。</li>
+</ul>
+<p>其它的就不一一介绍了。这几对I/O函数了，具体参见man文档或者使用搜索引擎，下面的例子中将使用到send/recv。</p>
+<h3 id="close-函数"><a href="#close-函数" class="headerlink" title="close()函数"></a>close()函数</h3><p>在服务器与客户端建立连接之后，会进行一些读写操作，完成了读写操作就要关闭相应的socket描述符，好比操作完打开的文件要调用fclose关闭打开的文件。</p>
+<p><code>int close(int fd);</code></p>
+<p>close一个TCP socket的缺省行为时把该socket标记为以关闭，然后立即返回到调用进程。该描述字不能再由调用进程使用，也就是说不能再作为read或write的第一个参数。</p>
+<p>close操作只是使相应socket描述字的引用计数-1，只有当引用计数为0的时候，才会触发TCP客户端向服务器发送终止连接请求。</p>
+<h2 id="IO模型"><a href="#IO模型" class="headerlink" title="IO模型"></a>IO模型</h2><p>首先说一下同步异步，阻塞非阻塞的问题 看这里</p>
+<p>怎样理解阻塞非阻塞与同步异步的区别？ - 萧萧的回答 - 知乎<br><a href="https://www.zhihu.com/question/19732473/answer/241673170" target="_blank" rel="noopener">https://www.zhihu.com/question/19732473/answer/241673170</a></p>
+<p>其实阻塞和非阻塞描述的是进程的一个操作是否会使得进程转变为“等待”的状态， 但是为什么我们总是把它和 IO 连在一起讨论呢？原因是， 阻塞这个词是与系统调用 System Call 紧紧联系在一起的， 因为要让一个进程进入 等待（waiting） 的状态, 要么是它主动调用 wait() 或 sleep() 等挂起自己的操作， 另一种就是它调用 System Call, 而 System Call 因为涉及到了 I/O 操作， 不能立即完成， 于是内核就会先将该进程置为等待状态， 调度其他进程的运行， 等到 它所请求的 I/O 操作完成了以后， 再将其状态更改回 ready 。</p>
+<p>非阻塞I/O 系统调用( nonblocking system call ) 和 异步I/O系统调用 （asychronous system call）的区别是：</p>
+<ul>
+<li>一个非阻塞I/O 系统调用 read() 操作立即返回的是任何可以立即拿到的数据， 可以是完整的结果， 也可以是不完整的结果， 还可以是一个空值。</li>
+<li>而异步I/O系统调用 read（）结果必须是完整的， 但是这个操作完成的通知可以延迟到将来的一个时间点。</li>
+</ul>
+<p>《unix网络编程》里总结了五类IO模型。为了更好地理解，我会举一个叫外卖的例子来说明。</p>
+<h3 id="阻塞模型"><a href="#阻塞模型" class="headerlink" title="阻塞模型"></a>阻塞模型</h3><p>第一种是完全阻塞模型，它的示意图如下：</p>
+<p><img src="https://i.loli.net/2020/12/03/WAuepSV81YTRtGH.png" alt="image.png"></p>
+<p>就是说，如果我客户端发起了connect请求，那么当前线程就会休眠，等待服务端响应完毕，返回消息，才会继续走下去。</p>
+<p>就好比，我叫个外卖，然后我就去大门口傻等着，外卖不送到，我也什么都不做，就坐在门口打盹，直到外卖小哥过来，把我叫醒，我才拿着外卖回家去吃。这样做显然效率不高，显得脑子有水。</p>
+<h3 id="非阻塞式IO"><a href="#非阻塞式IO" class="headerlink" title="非阻塞式IO"></a>非阻塞式IO</h3><p>把非阻塞的文件描述符称为非阻塞I/O。可以通过设置SOCK_NONBLOCK标记创建非阻塞的socket fd，或者使用fcntl将fd设置为非阻塞。</p>
+<p>对非阻塞fd调用系统接口时，不需要等待事件发生而立即返回，事件没有发生，接口返回-1，此时需要通过errno的值来区分是否出错，有过网络编程的经验的应该都了解这点。不同的接口，立即返回时的errno值不尽相同，如，recv、send、accept errno通常被设置为EAGIN 或者EWOULDBLOCK，connect 则为EINPRO- GRESS 。</p>
+<p><img src="https://i.loli.net/2020/12/03/AJevsGaucQbYj9w.png" alt="image.png"></p>
+<p>就是说，客户端程序会不停地去尝试读取数据，但是不会阻塞在那个读方法里，如果读的时候，没有读到内容，也会立即返回。这就允许我们在客户端里，读到不数据的时候可以搞点其他的事情了。<br>仍然以外卖举例，就相当于，我一边扫地，一边等外卖。我不再像原来一样，在门口傻等了，而是扫两下，就跑到门口看看外卖到了没有。一直这样循环，直到我取到外卖，才从这个循环中跳出来，进入吃的流程。</p>
+<h3 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h3><p>最常用的I/O事件通知机制就是I/O复用(I/O multiplexing)。Linux 环境中使用select/poll/epoll_wait 实现I/O复用，I/O复用接口本身是阻塞的（epoll本身要阻塞在那里等待socket返回），在应用程序中通过I/O复用接口向内核注册fd所关注的事件，当关注事件触发时，通过I/O复用接口的返回值通知到应用程序。I/O复用接口可以同时监听多个I/O事件以提高事件处理效率。</p>
+<p><img src="https://i.loli.net/2020/12/03/rw8SdgpQUYcIRPO.png" alt="image.png"></p>
+<p>还是外卖的例子，如果我们整栋楼的人，很多人叫了外卖，都有下楼来看外卖到没到的需求，于是物业就出了个招，让门卫小哥帮大家看着，整栋楼上的，不管是谁的外卖到了，先放到门卫小哥那里，然后门卫小哥再通知你下来拿自己的外卖。这样一来，我们就把本来多个人要跑去看自己的外卖到了这件事交给门卫小哥去做了。而我们解放出来，就可以继续看电视，打扫卫生，刷知乎了。由于我们可以继续做自己的事情，外卖小哥和门卫小哥在同时也在工作，互不干扰，所以这种工作方式就被称为异步模型。</p>
+<h3 id="SIGIO"><a href="#SIGIO" class="headerlink" title="SIGIO"></a>SIGIO</h3><p>除了I/O复用方式通知I/O事件，还可以通过SIGIO信号来通知I/O事件，如图所示。两者不同的是，在等待数据达到期间，I/O复用是会阻塞应用程序，而SIGIO方式是不会阻塞应用程序的。</p>
+<p><img src="https://i.loli.net/2020/12/03/3TDm1NUaHlZ2Rju.png" alt="image.png"></p>
+<p>上面这张图，就是我们现实生活中真正的外卖。数据到达以后，给客户端发一个消息，让客户端过来取数据。这就像外卖小哥到你家门口给你打电话，让你出来取一下。显然，这种是最方便的，也是最合理的。</p>
+<p>但实际上，在真正的编程中，我们很少使用这种模型。</p>
+<h3 id="async-io"><a href="#async-io" class="headerlink" title="async io"></a>async io</h3><p>POSIX规范定义了一组异步操作I/O的接口，不用关心fd 是阻塞还是非阻塞，异步I/O是由内核接管应用层对fd的I/O操作。异步I/O向应用层通知I/O操作完成的事件，这与前面介绍的I/O 复用模型、SIGIO模型通知事件就绪的方式明显不同。以aio_read 实现异步读取IO数据为例，如图所示，在等待I/O操作完成期间，不会阻塞应用程序。</p>
+<p><img src="https://i.loli.net/2020/12/03/D4usxU8mARNQbjg.png" alt="image.png"></p>
+<p>这个图，如果对应到外卖有点不合适了，比较像网购空调，我所要做的，只是下单，而快递小哥会把空调送过来，他也不会让你自己去取，他会让安装师傅直接帮你安装。这个过程中，你什么都不需要做。你所要做的仅仅是发起一个请求。这种IO模型就是纯正的异步IO。</p>
+<p>这种纯异步IO的最典型例子就是node.js中的callback。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> java </category>
+            
+            <category> nio </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> nio </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[网络基础]]></title>
+      <url>/2020/12/01/network-1/</url>
+      <content type="html"><![CDATA[<p>文章参考 <a href="https://zhuanlan.zhihu.com/p/147370653" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/147370653</a> <a href="https://zhuanlan.zhihu.com/p/40676462" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/40676462</a> <a href="https://zhuanlan.zhihu.com/p/33797520" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/33797520</a> <a href="https://www.cnblogs.com/dolphinx/p/3460545.html" target="_blank" rel="noopener">https://www.cnblogs.com/dolphinx/p/3460545.html</a> <a href="https://blog.csdn.net/qzcsu/article/details/72861891" target="_blank" rel="noopener">https://blog.csdn.net/qzcsu/article/details/72861891</a></p>
+<p>深感要弄明白网络编程，就得先弄明白计算机网络的基础，这一节就是补基础的。</p>
+<h2 id="分层"><a href="#分层" class="headerlink" title="分层"></a>分层</h2><table>
+<thead>
+<tr>
+<th>tcp/ip网络</th>
+<th>功能</th>
+<th>协议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应用层</td>
+<td>文件传输/电子邮件/虚拟终端</td>
+<td>http，dns，dhcp，telnet，smtp，ftp</td>
+</tr>
+<tr>
+<td>传输层</td>
+<td>提供端对端的接口（端口）</td>
+<td>tcp，udp</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>为数据包选择路由（路由器）</td>
+<td>ip，nat，icmp，bgp</td>
+</tr>
+<tr>
+<td>链路层/物理层</td>
+<td>传输有地址的帧和错误检测功能（交换机）</td>
+<td>mac，arp</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://i.loli.net/2020/12/04/oQ4n3SdVAJbOyM5.png" alt="image.png"></p>
+<p>说一下每一层负责的事情</p>
+<h3 id="链路层"><a href="#链路层" class="headerlink" title="链路层"></a>链路层</h3><h4 id="Mac地址"><a href="#Mac地址" class="headerlink" title="Mac地址"></a>Mac地址</h4><p>简单来说链路层负责的就是mac地址间的通信，连入网络的每一个计算机都会有网卡接口，每一个网卡都会一个地址，这个地址就叫做MAC地址。计算机之间的数据传送，就是通过MAC地址来唯一寻找、传送的。MAC地址在网卡生产是就被唯一标识了。</p>
+<h4 id="子网"><a href="#子网" class="headerlink" title="子网"></a>子网</h4><p><img src="https://i.loli.net/2020/12/04/7ndVKWO2NBYtCym.png" alt="image.png"></p>
+<p>假如计算机A知道了计算机B的MAC地址，然后计算机A想要给计算机B传送数据，虽然计算机A知道了计算机B的MAC地址，可是它要怎么给它传送数据呢？计算机A不仅连着计算机B，而且计算机A也还连着其他的计算机。 虽然计算机A知道计算机B的MAC地址，可是计算机A是无法知道计算机B是分布在哪边路线上的。实际上，计算机A是通过广播的方式把数据发送给计算机B。在同一个子网中，计算机A要向计算机B发送一个数据包，这个数据包包含接收者的MAC地址。这个时候同一个子网中的计算机C,D也会收到这个数据包的，然后收到这个数据包的计算机，会把数据包的MAC地址取出来，与自身的MAC地址对比，如果两者相同，则接受这个数据包，否则就丢弃这个数据包。这种发送方式我们称之为广播,就像我们平时在广场上通过广播的形式呼叫某个人一样。</p>
+<h3 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h3><p>上面我们有说到子网这个关键词，实际上我们所处的网络，是由无数个子网络构成的。广播的时候，也只有同一个子网里面的计算机能够收到。 假如没有子网这种划分的话，计算机A发一个数据包给计算机B,其他所有计算机也都能收到这个数据包，然后进行对比再舍弃。世界上有那么多它计算机，每一台计算机都能收到其他所有计算机的数据包，那就不得了了。那还不得奔溃。 因此产生了子网这么一个东西。</p>
+<p>那么问题来了，我们如何区分哪些MAC地址是属于同一个子网的呢？假如是同一个子网，那我们就用广播的形式把数据传送给对方，如果不是同一个子网的，我们就会把数据发给网关，让网关进行转发。</p>
+<p>为了解决这个问题我们引入了一套新的地址协议，这个地址协议能够帮助我们区分MAC地址是否处于同一个子网中。这也是网络层负责解决的问题。</p>
+<h4 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h4><p>这个协议就是IP协议，它所定义的地址，我们称之为IP地址。IP协议有两种版本，一种是IPv4,另一种是IPv6。不过我们目前大多数用的还是IPv4，我们现在也只讨论IPv4这个版本的协议。</p>
+<p>这个IP地址由32为的二进制数组成，我们一般把它分成4段的十进制表示，地址范围为0.0.0.0（全0）~255.255.255.255（全1）</p>
+<p>每一台想要联网的计算机都会有一个IP地址。这个IP地址被分为两部分，前面一部分代表网络部分，后面一部分代表主机部分。并且网络部分和主机部分的二进制位数是不固定的。</p>
+<p>假如两台计算机的网络部分是一模一样的，我们就说这两台计算机是处于同一个子网中。例如192.168.43.1和192.168.43.2,假如这两个IP地址的网络部分为24为，主机部分为8位。那么他们的网络部分都为192.168.43，所以他们处于同一个子网中。</p>
+<p>可是问题来了，你怎么知道网络部分是占几位。也就是说，单单从两台计算机的IP地址，我们是无法判断他们的是否处于同一个子网中的。</p>
+<h4 id="子码掩码"><a href="#子码掩码" class="headerlink" title="子码掩码"></a>子码掩码</h4><p>这就引申出了另一个关键词————子码掩码。子码掩码和IP地址一样也是32位二进制数，不过它的网络部分规定全部为1，主机部分规定全部为0.也就是说，假如上面那两个IP地址的网络部分为24为，主机部分为8为的话，那他们的子码掩码都为11111111.11111111.11111111.00000000，即255.255.255.0。</p>
+<p>那有了子字码掩码，如何来判端IP地址是否处于同一个子网中呢。显然，知道了子码掩码，相当于我们知道了网络部分是几位，主机部分是几位。我们只需要把IP地址与它的子码掩码做与(and)运算，然后把各自的结果进行比较就行了，如果比较的结果相同，则代表是同一个子网，否则不是同一个子网。</p>
+<p>例如，192.168.43.1和192.168.43.2的子码掩码都为255.255.255.0，把IP与子码掩码相与，可以得到他们都为192.168.43.0，进而他们处于同一个子网中。</p>
+<h4 id="ARP协议"><a href="#ARP协议" class="headerlink" title="ARP协议"></a>ARP协议</h4><p>有了上面IP协议的知识，我们讲一下ARP协议。</p>
+<p>ARP（Address Resolution Protocol）即地址解析协议， 用于实现从 IP 地址到 MAC 地址的映射，即询问目标IP对应的MAC地址。简单来说，就是用来把IP地址翻译成mac地址的。</p>
+<p>虽然我们说arp协议是工作在链路层，但这并不准确，其实是作为链路层和网络层的传输桥梁。</p>
+<p>有了两台计算机的IP地址，我们就可以判断出它们是否处于同一个子网之中。 假如他们处于同一个子网之中，计算机A要给计算机B发送数据时。我们可以通过ARP协议来得到计算机B的MAC地址。ARP协议也是通过广播的形式给同一个子网中的每台电脑发送一个数据包(当然，这个数据包会包含接收方的IP地址)。对方收到这个数据包之后，会取出IP地址与自身的对比，如果相同，则把自己的MAC地址回复给对方，否则就丢弃这个数据包（大多数的网络请求都会有三种处理方式，接受，拒绝，丢弃）。这样，计算机A就能知道计算机B的MAC地址了。</p>
+<p>可能有人会问，知道了MAC地址之后，发送数据是通过广播的形式发送，询问对方的MAC地址也是通过广播的形式来发送，那其他计算机怎么知道你是要传送数据还是要询问MAC地址呢？其实在询问MAC地址的数据包中，在对方的MAC地址这一栏中，填的是一个特殊的MAC地址，大部分的广播包，它们有一个共同特征：二层封装时目的MAC是全f（ffff.ffff.ffff）或三层封装时目的IP是全1（255.255.255.255）。可以这样更方便的记住：目的地址最大的，就是广播。</p>
+<p>但是arp每一次请求都是广播的么？并不是，在发送过arp请求后，arp协议会在本地进行arp缓存，此后就可以单播的形式发送了。注意，在目的地址会用arp请求的时候，也会以单播的形式回应。</p>
+<p>假如两台计算机的IP不是处于同一个子网之中，这个时候，我们就会把数据包发送给网关，然后让网关让我们进行转发传送。</p>
+<h4 id="nat协议"><a href="#nat协议" class="headerlink" title="nat协议"></a>nat协议</h4><p>NAT，Network Address Translation 地址转换，是路由器将内网地址转换为公网地址的一种技术。</p>
+<p>我们都知道现在ipv4的地址已经严重不足了，所以为世界上每一台主机都申请一个公网IP是一个不现实的事，所以我们的路由器会随机分配一个动态的公网IP，而通过这个公网IP，我们可以进行内网IP的地址转换，从而实现内网中多个主机使用一个公网IP上网，这就是nat解决的问题。</p>
+<p>NAT的实现方式主要有三种：</p>
+<ul>
+<li><p>静态转换：静态转换是一对一的转换，有多少内网地址需要转换，就需要相应的公网地址；用得很少（似乎企业级路由，或者云上的主机，用的都是static nat？）</p>
+</li>
+<li><p>动态转换：动态转换是多对多的转换，通常需要转换的内网地址略多于相应的公网地址；将公网地址放在一个地址池里，当有内网地址需要访问外部网站时，从地址池中取出一个公网地址，用于内网地址到公网地址的转换；该方式适用于内网地址略多于给定的公网地址，如果内网地址远大于公网地址，当多台内网机器需要访问公网时，会出现地址池枯竭，无法获得对应的公网地址；</p>
+</li>
+<li><p>端口多路复用：通常是多对一的关系，当只存在一个公网地址时，可用这种方式；通过端口号来确定内网的具体机器。例如内网机器192.168.1.116 需要访问外部网站; 在数据包通过路由器转发时，NAT会产生一个session，保存地址对应的端口信息，再将数据包中的IP地址转换为 202.11.25.56:1234 （原地址）—&gt;对应网站（目的地址） ，转发出去。其中的端口1234应该是动态生成，并记录下来。当 对应网站 有响应信息时，响应数据包经过路由器时，NAT查询对应端口对应的内网IP，将数据包内的地址更改回去，转发进内网，这样就实现了数据的交换。但这也造成外网不能主动访问内网的设备。</p>
+</li>
+</ul>
+<h4 id="ICMP协议"><a href="#ICMP协议" class="headerlink" title="ICMP协议"></a>ICMP协议</h4><p>其实就是我们经常使用的ping包</p>
+<p>ICMP协议的功能主要有：</p>
+<ul>
+<li>确认IP包是否成功到达目标地址</li>
+<li>通知在发送过程中IP包被丢弃的原因（目标不可达，源抑制和超时报文）</li>
+</ul>
+<h4 id="路由协议"><a href="#路由协议" class="headerlink" title="路由协议"></a>路由协议</h4><p>bgp，ospf都是路由协议，具体比较复杂，这里不打算深入展开来说。</p>
+<ul>
+<li>发送数据包时所使用的地址是网络层的地址，即 IP 地址。然而仅仅有 IP 地址还不足以实现将数据包发送到对端目标地址，在数据发送过程中还需要类似于“指明路由器或主机”的信息，以便真正发往目标地址。保存这种信息的就是路由控制表。</li>
+<li>该路由控制表的形成方式有两种：一种是管理员手动设置，另一种是路由器与其他路由器相互交换信息时自动刷新。前者也叫做静态路由控制，而后者叫做动态路由控制。</li>
+<li>IP 协议始终认为路由表是正确的。然后，IP 本身并没有定义制作路由控制表的协议。即 IP 没有制作路由控制表的机制。该表示由一个叫做“路由协议”的协议制作而成。</li>
+<li>动态路由协议可以让路由器自动学习到其他路由器的网络，并且网络拓扑发生改变后自动更新路由表。网络管理员只需要配置动态路由协议即可，相比人工指定转发策略，工作量大大减少。</li>
+</ul>
+<h4 id="一些名义上属于应用层，但却跟ip紧密相关的协议"><a href="#一些名义上属于应用层，但却跟ip紧密相关的协议" class="headerlink" title="一些名义上属于应用层，但却跟ip紧密相关的协议"></a>一些名义上属于应用层，但却跟ip紧密相关的协议</h4><h4 id="dhcp协议"><a href="#dhcp协议" class="headerlink" title="dhcp协议"></a>dhcp协议</h4><p>nat为主机提供ip转换的功能，那么内网中的ip分配功能由谁提供呢？就是dhcp</p>
+<p>如果逐一为每一台主机设置 IP 地址会是非常繁琐的事情。特别是在移动使用笔记本电脑、只能终端以及平板电脑等设备时，每移动到一个新的地方，都要重新设置 IP 地址。</p>
+<p>于是，为了实现自动设置 IP 地址、统一管理 IP 地址分配，就产生了 DHCP（Dynamic Host Configuration Protocol）协议。有了 DHCP，计算机只要连接到网络，就可以进行 TCP/IP 通信。也就是说，DHCP 让即插即用变得可能。</p>
+<p>你把电脑/手机/平板插上网线/连上WiFi，操作系统的DHCP客户端就会开始工作，尝试联系网络里的DHCP服务器，然后从那里“租”一个IP地址。DHCP服务器维护了一个地址池，它只会从这个池子里分配地址，一个MAC对应一个地址，如果不用了就放回池子，这样就可以避免搞出重复的IP地址——当然，你也可以给电脑/手机/平板直接填一个IP，这样就可能重复了，DHCP服务器管不着你，但你这样用也可能碰到冲突、动不动断网。</p>
+<h4 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h4><p>这个大家应该很熟悉了，就是把网址翻译成ip地址，不展开说了，严格来说dns不属于网络协议</p>
+<h3 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h3><p>经过了网络层之后，我们已经建立起两台计算机之间的对应关系了，但这还不够，我们最终使用的都是应用程序，也就是说是进程之间的通信。</p>
+<p>这个时候，端口(Port)就上场了，也就是说，我们在从计算机A传数据给计算表B的时候，还得指定一个端口，以供特定的应用程序来接受处理。</p>
+<p>也就是说，传输层的功能就是建立端口到端口的通信。相比网络层的功能是建立主机到主机的通信。</p>
+<p>除了IP和端口，我们还需要在传输层指定协议名称（tcp/udp），来区别是哪种方式进行通信。</p>
+<h4 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h4><p>TCP 是面向连接的、可靠的流协议。流就是指不间断的数据结构，当应用程序采用 TCP 发送消息时，虽然可以保证发送的顺序，但还是犹如没有任何间隔的数据流发送给接收端。TCP 为提供可靠性传输，实行“顺序控制”或“重发控制”机制。此外还具备“流控制（流量控制）”、“拥塞控制”、提高网络利用率等众多功能。</p>
+<h5 id="TCP头的介绍"><a href="#TCP头的介绍" class="headerlink" title="TCP头的介绍"></a>TCP头的介绍</h5><p><img src="https://i.loli.net/2020/12/04/iLpaRNckzE9yJo1.png" alt="image.png"></p>
+<ul>
+<li>源端口和目的端口，各占2个字节，分别写入源端口和目的端口；</li>
+<li>序号，占4个字节，TCP连接中传送的字节流中的每个字节都按顺序编号。例如，一段报文的序号字段值是 301 ，而携带的数据共有100字段，显然下一个报文段（如果还有的话）的数据序号应该从401开始；</li>
+<li>确认号，占4个字节，是期望收到对方下一个报文的第一个数据字节的序号。例如，B收到了A发送过来的报文，其序列号字段是501，而数据长度是200字节，这表明B正确的收到了A发送的到序号700为止的数据。因此，B期望收到A的下一个数据序号是701，于是B在发送给A的确认报文段中把确认号置为701；</li>
+<li>数据偏移，占4位，它指出TCP报文的数据距离TCP报文段的起始处有多远；</li>
+<li>保留，占6位，保留今后使用，但目前应都位0；</li>
+<li>紧急URG，当URG=1，表明紧急指针字段有效。告诉系统此报文段中有紧急数据；</li>
+<li>确认ACK，仅当ACK=1时，确认号字段才有效。TCP规定，在连接建立后所有报文的传输都必须把ACK置1；</li>
+<li>推送PSH，当两个应用进程进行交互式通信时，有时在一端的应用进程希望在键入一个命令后立即就能收到对方的响应，这时候就将PSH=1；</li>
+<li>复位RST，当RST=1，表明TCP连接中出现严重差错，必须释放连接，然后再重新建立连接；</li>
+<li>同步SYN，在连接建立时用来同步序号。当SYN=1，ACK=0，表明是连接请求报文，若同意连接，则响应报文中应该使SYN=1，ACK=1；</li>
+<li>终止FIN，用来释放连接。当FIN=1，表明此报文的发送方的数据已经发送完毕，并且要求释放；</li>
+<li>窗口，占2字节，指的是通知接收方，发送本报文你需要有多大的空间来接受；</li>
+<li>检验和，占2字节，校验首部和数据这两部分；</li>
+<li>紧急指针，占2字节，指出本报文段中的紧急数据的字节数；</li>
+<li>选项，长度可变，定义一些其他的可选的参数。</li>
+</ul>
+<p>【注意两个ack，我们通常认为大写的ACK为确认值(Acknowledgement)，为1即确认链接；小写的ack为确认编号(Acknowledgement Number)，即接收到的上一次远端主机传来的seq然后+1，再发送给远端主机。提示远端主机已经成功接收上一次所有数据。这俩在tcp头中都能找到对应位置】</p>
+<h5 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h5><p><img src="https://i.loli.net/2020/12/04/LanstxozAChbRUH.png" alt="image.png"></p>
+<ul>
+<li>最开始的时候客户端和服务器都是处于CLOSED状态。主动打开连接的为客户端，被动打开连接的是服务器。</li>
+<li>TCP服务器进程先创建传输控制块TCB，时刻准备接受客户进程的连接请求，此时服务器就进入了LISTEN（监听）状态；</li>
+<li>TCP客户进程也是先创建传输控制块TCB，然后向服务器发出连接请求报文，这是报文首部中的同部位SYN=1，同时选择一个初始序列号 seq=x ，此时，TCP客户端进程进入了 SYN-SENT（同步已发送状态）状态。TCP规定，SYN报文段（SYN=1的报文段）不能携带数据，但需要消耗掉一个序号。</li>
+<li>TCP服务器收到请求报文后，如果同意连接，则发出确认报文。确认报文中应该 ACK=1，SYN=1，确认编号是ack=x+1，同时也要为自己初始化一个序列号 seq=y，此时，TCP服务器进程进入了SYN-RCVD（同步收到）状态。这个报文也不能携带数据，但是同样要消耗一个序号。</li>
+<li>TCP客户进程收到确认后，还要向服务器给出确认。确认报文的ACK=1，ack=y+1，自己的序列号seq=x+1，此时，TCP连接建立，客户端进入ESTABLISHED（已建立连接）状态。TCP规定，ACK报文段可以携带数据，但是如果不携带数据则不消耗序号。</li>
+<li>当服务器收到客户端的确认后也进入ESTABLISHED状态，此后双方就可以开始通信了。</li>
+</ul>
+<p><strong>为什么TCP客户端最后还要发送一次确认呢？</strong></p>
+<p>一句话，主要防止已经失效的连接请求报文突然又传送到了服务器，从而产生错误。</p>
+<p>如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，这个报文本该是失效的，但是，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。</p>
+<p>如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接。</p>
+<h5 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h5><p><img src="https://i.loli.net/2020/12/04/IqLoYZ9tFfrXWaC.png" alt="image.png"></p>
+<ul>
+<li>数据传输完毕后，双方都可释放连接。最开始的时候，客户端和服务器都是处于ESTABLISHED状态，然后客户端主动关闭，服务器被动关闭。</li>
+<li>客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。</li>
+<li>服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。</li>
+<li>客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。</li>
+<li>服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。</li>
+<li>客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2*MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。</li>
+<li>服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。</li>
+</ul>
+<p><strong>为什么客户端最后还要等待2MSL？</strong></p>
+<p>MSL（Maximum Segment Lifetime），TCP允许不同的实现可以设置不同的MSL值。</p>
+<p>第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。</p>
+<p>第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。</p>
+<p><strong>为什么建立连接是三次握手，关闭连接确是四次挥手呢？</strong></p>
+<p>建立连接的时候，服务器在LISTEN状态下，收到建立连接请求的SYN报文后，把ACK和SYN放在一个报文里发送给客户端。<br>而关闭连接时，服务器收到对方的FIN报文时，仅仅表示对方不再发送数据了但是还能接收数据，而自己也未必全部数据都发送给对方了，所以己方可以立即关闭，也可以发送一些数据给对方后，再发送FIN报文给对方来表示同意现在关闭连接，因此，己方ACK和FIN一般都会分开发送，从而导致多了一次。</p>
+<p><strong>如果已经建立了连接，但是客户端突然出现故障了怎么办？</strong></p>
+<p>TCP还设有一个保活计时器，显然，客户端如果出现故障，服务器不能一直等下去，白白浪费资源。服务器每收到一次客户端的请求后都会重新复位这个计时器，时间通常是设置为2小时，若两小时还没有收到客户端的任何数据，服务器就会发送一个探测报文段，以后每隔75秒发送一次。若一连发送10个探测报文仍然没反应，服务器就认为客户端出了故障，接着就关闭连接。</p>
+<h5 id="通过序列号与确认应答提高可靠性"><a href="#通过序列号与确认应答提高可靠性" class="headerlink" title="通过序列号与确认应答提高可靠性"></a>通过序列号与确认应答提高可靠性</h5><ul>
+<li>在 TCP 中，当发送端的数据到达接收主机时，接收端主机会返回一个已收到消息的通知。这个消息叫做确认应答（大写的ACK）。当发送端将数据发出之后会等待对端的确认应答。如果有确认应答，说明数据已经成功到达对端。反之，则数据丢失的可能性很大。</li>
+<li>在一定时间内没有等待到确认应答，发送端就可以认为数据已经丢失，并进行重发。由此，即使产生了丢包，仍然能够保证数据能够到达对端，实现可靠传输。</li>
+<li>未收到确认应答并不意味着数据一定丢失。也有可能是数据对方已经收到，只是返回的确认应答在途中丢失。这种情况也会导致发送端误以为数据没有到达目的地而重发数据。</li>
+<li>此外，也有可能因为一些其他原因导致确认应答延迟到达，在源主机重发数据以后才到达的情况也屡见不鲜。此时，源主机只要按照机制重发数据即可。</li>
+<li>对于目标主机来说，反复收到相同的数据是不可取的。为了对上层应用提供可靠的传输，目标主机必须放弃重复的数据包。为此我们引入了序列号。</li>
+<li>序列号（seq）是按照顺序给发送数据的每一个字节（8位字节）都标上号码的编号。接收端查询接收数据 TCP 首部中的序列号和数据的长度，将自己下一步应该接收的序列号作为确认应答（小写的ack）返送回去。通过序列号和确认应答号，TCP 能够识别是否已经接收数据，又能够判断是否需要接收，从而实现可靠传输。（所以ack=seq+1，下一步收到的seq=上一步发出的ack）</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/Ngk1oESxm5AqfYK.png" alt="image.png"></p>
+<h5 id="重发超时的确定"><a href="#重发超时的确定" class="headerlink" title="重发超时的确定"></a>重发超时的确定</h5><ul>
+<li>重发超时是指在重发数据之前，等待确认应答到来的那个特定时间间隔。如果超过这个时间仍未收到确认应答，发送端将进行数据重发。最理想的是，找到一个最小时间，它能保证“确认应答一定能在这个时间内返回”。</li>
+<li>TCP 要求不论处在何种网络环境下都要提供高性能通信，并且无论网络拥堵情况发生何种变化，都必须保持这一特性。为此，它在每次发包时都会计算往返时间及其偏差。将这个往返时间和偏差时间相加，重发超时的时间就是比这个总和要稍大一点的值。</li>
+<li>在 BSD 的 Unix 以及 Windows 系统中，超时都以0.5秒为单位进行控制，因此重发超时都是0.5秒的整数倍。不过，最初其重发超时的默认值一般设置为6秒左右。</li>
+<li>数据被重发之后若还是收不到确认应答，则进行再次发送。此时，等待确认应答的时间将会以2倍、4倍的指数函数延长。</li>
+<li>此外，数据也不会被无限、反复地重发。达到一定重发次数之后，如果仍没有任何确认应答返回，就会判断为网络或对端主机发生了异常，强制关闭连接。并且通知应用通信异常强行终止。</li>
+<li>TCP重发幂等吗?答案是肯定的，在网络不稳定时，操作系统可以肆无忌惮的重发TCP报文片段。TCP协议能够保证幂等的核心在于sequence number字段，一个序列号的在较长的一段时间内均不会出现重复。而服务端在处理过一个seq后不会再重复处理。</li>
+</ul>
+<h5 id="利用窗口控制提高速度"><a href="#利用窗口控制提高速度" class="headerlink" title="利用窗口控制提高速度"></a>利用窗口控制提高速度</h5><ul>
+<li>TCP 以1个段为单位，每发送一个段进行一次确认应答的处理。这样的传输方式有一个缺点，就是包的往返时间越长通信性能就越低。</li>
+<li>为解决这个问题，TCP 引入了窗口这个概念。确认应答不再是以每个分段，而是以更大的单位进行确认，转发时间将会被大幅地缩短。也就是说，发送端主机，在发送了一个段以后不必要一直等待确认应答，而是继续发送。如下图所示：</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/eqQNBDd3hiJ17lE.png" alt="image.png"></p>
+<ul>
+<li>窗口大小就是指无需等待确认应答而可以继续发送数据的最大值。上图中窗口大小为4个段。这个机制实现了使用大量的缓冲区，通过对多个段同时进行确认应答的功能。</li>
+</ul>
+<h5 id="滑动窗口控制"><a href="#滑动窗口控制" class="headerlink" title="滑动窗口控制"></a>滑动窗口控制</h5><p><img src="https://i.loli.net/2020/12/04/xnvEyUzXkm58jPw.png" alt="image.png"></p>
+<ul>
+<li>上图中的窗口内的数据即便没有收到确认应答也可以被发送出去。不过，在整个窗口的确认应答没有到达之前，如果其中部分数据出现丢包，那么发送端仍然要负责重传。为此，发送端主机需要设置缓存保留这些待被重传的数据，直到收到他们的确认应答。</li>
+<li>在滑动窗口以外的部分（包括未发送的数据 以及已经确认对端已收到的数据），当数据发出后若如期收到确认应答就可以不用再进行重发，此时数据就可以从缓存区清除。</li>
+<li>收到确认应答的情况下，将窗口滑动到确认应答中的序列号的位置。这样可以顺序地将多个段同时发送提高通信性能。这种机制也别称为滑动窗口控制。</li>
+</ul>
+<h5 id="窗口控制中的重发控制"><a href="#窗口控制中的重发控制" class="headerlink" title="窗口控制中的重发控制"></a>窗口控制中的重发控制</h5><p>在使用窗口控制中， 出现丢包一般分为两种情况：</p>
+<ul>
+<li>确认应答未能返回的情况。在这种情况下，数据已经到达对端，是不需要再进行重发的，如下图：</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/qi8X5EeCMhIzJ9w.png" alt="image.png"></p>
+<ul>
+<li>某个报文段丢失的情况。接收主机如果收到一个自己应该接收的序列号以外的数据时，会针对当前为止收到数据返回确认应答。如下图所示，当某一报文段丢失后，发送端会一直收到序号为1001的确认应答，因此，在窗口比较大，又出现报文段丢失的情况下，同一个序列号的确认应答将会被重复不断地返回。而发送端主机如果连续3次收到同一个确认应答，就会将其对应的数据进行重发。这种机制比之前提到的超时管理更加高效，因此也被称为高速重发控制。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/04/5hxEg8CbeIPy1Jt.png" alt="image.png"></p>
+<h4 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h4><p>无连接的UDP协议</p>
+<p>“无连接”就是在正式通信前不必与对方先建立连接，不管对方状态就直接发送。与手机短信非常相似：你在发短信的时候，只需要输入对方手机号就OK了。</p>
+<p>UDP传输协议是一种不可靠的、面向无连接、可以实现多对一、一对多和一对一连接的通信协议。UDP在传输数据前既不需要建立通道，在数据传输完毕后也不需要将通道关闭。只要客户端给服务端发送一个请求，服务端就会一次性地把所有数据发送完毕。</p>
+<p>UDP在传输数据时不会对数据的完整性进行验证，在数据丢失或数据出错时也不会要求重新传输，因此也节省了很多用于验证数据包的时间，所以以UDP建立的连接的延迟会比以TCP建立的连接的延迟更低。UDP不会根据当前的网络情况来控制数据的发送速度，因此无论网络情况是好是坏，服务端都会以恒定的速率发送数据。虽然这样有时会造成数据的丢失与损坏，但是这一点对于一些实时应用来说是十分重要的。基于以上三点，UDP在数据传输方面速度更快，延迟更低，实时性更好，因此被广泛地用于通信领域和视频网站当中。</p>
+<h4 id="协议差别"><a href="#协议差别" class="headerlink" title="协议差别"></a>协议差别</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是否连接</td>
+<td>面向连接</td>
+<td>无连接</td>
+</tr>
+<tr>
+<td>传输可靠性</td>
+<td>可靠的</td>
+<td>不可靠的</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>传输少量数据</td>
+<td>大量数据</td>
+</tr>
+<tr>
+<td>速度</td>
+<td>慢</td>
+<td>快</td>
+</tr>
+<tr>
+<td>重发</td>
+<td>有</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<h2 id="数据包"><a href="#数据包" class="headerlink" title="数据包"></a>数据包</h2><p>有了上面的基础后，再来理解数据包的组成和发送过程就很容易了。</p>
+<p>网络中传输的数据包由两部分组成：一部分是协议所要用到的首部，另一部分是上一层传过来的数据。首部的结构由协议的具体规范详细定义。在数据包的首部，明确标明了协议应该如何读取数据。反过来说，看到首部，也就能够了解该协议必要的信息以及所要处理的数据。包首部就像协议的脸。</p>
+<p>下图以用户 a 向用户 b 发送邮件为例子：</p>
+<p><img src="https://i.loli.net/2020/12/04/EHmG2excC6V9niK.png" alt="image.png"></p>
+<p>① 应用程序处理<br>首先应用程序会进行编码处理，这些编码相当于 OSI 的表示层功能；<br>编码转化后，邮件不一定马上被发送出去，这种何时建立通信连接何时发送数据的管理功能，相当于 OSI 的会话层功能。<br>② TCP 模块的处理<br>TCP 根据应用的指示，负责建立连接、发送数据以及断开连接。TCP 提供将应用层发来的数据顺利发送至对端的可靠传输。为了实现这一功能，需要在应用层数据的前端附加一个 TCP 首部。<br>③ IP 模块的处理<br>IP 将 TCP 传过来的 TCP 首部和 TCP 数据合起来当做自己的数据，并在 TCP 首部的前端加上自己的 IP 首部。IP 包生成后，参考路由控制表决定接受此 IP 包的路由或主机。<br>④ 网络接口（以太网驱动）的处理<br>从 IP 传过来的 IP 包对于以太网来说就是数据。给这些数据附加上以太网首部并进行发送处理，生成的以太网数据包将通过物理层传输给接收端。<br>⑤ 网络接口（以太网驱动）的处理<br>主机收到以太网包后，首先从以太网包首部找到 MAC 地址判断是否为发送给自己的包，若不是则丢弃数据。<br>如果是发送给自己的包，则从以太网包首部中的类型确定数据类型，再传给相应的模块，如 IP、ARP 等。这里的例子则是 IP 。<br>⑥ IP 模块的处理<br>IP 模块接收到 数据后也做类似的处理。从包首部中判断此 IP 地址是否与自己的 IP 地址匹配，如果匹配则根据首部的协议类型将数据发送给对应的模块，如 TCP、UDP。这里的例子则是 TCP。<br>另外吗，对于有路由器的情况，接收端地址往往不是自己的地址，此时，需要借助路由控制表，在调查应该送往的主机或路由器之后再进行转发数据。<br>⑦ TCP 模块的处理<br>在 TCP 模块中，首先会计算一下校验和，判断数据是否被破坏。然后检查是否在按照序号接收数据。最后检查端口号，确定具体的应用程序。数据被完整地接收以后，会传给由端口号识别的应用程序。<br>⑧ 应用程序的处理<br>接收端应用程序会直接接收发送端发送的数据。通过解析数据，展示相应的内容。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> network </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> network </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[深拷贝与浅拷贝]]></title>
+      <url>/2020/11/30/deep-copy/</url>
+      <content type="html"><![CDATA[<p>转自 <a href="https://zhuanlan.zhihu.com/p/95686213" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/95686213</a>  有改动</p>
+<h2 id="创建对象的5种方式"><a href="#创建对象的5种方式" class="headerlink" title="创建对象的5种方式"></a>创建对象的5种方式</h2><ul>
+<li>通过 new 关键字<br>这是最常用的一种方式，通过 new 关键字调用类的有参或无参构造方法来创建对象。比如 Object obj = new Object();</li>
+<li>通过 Class 类的 newInstance() 方法<br>这种默认是调用类的无参构造方法创建对象。比如 Person p2 = (Person) Class.forName(“com.ys.test.Person”).newInstance();</li>
+<li>通过 Constructor 类的 newInstance 方法<br>这和第二种方法类时，都是通过反射来实现。通过 java.lang.relect.Constructor 类的 newInstance() 方法指定某个构造器来创建对象。Person p3 = (Person) Person.class.getConstructors()[0].newInstance();<br>实际上第二种方法利用 Class 的 newInstance() 方法创建对象，其内部调用还是 Constructor 的 newInstance() 方法。</li>
+<li>利用 Clone 方法<br>Clone 是 Object 类中的一个方法，通过 对象A.clone() 方法会创建一个内容和对象 A 一模一样的对象 B，clone 克隆，顾名思义就是创建一个一模一样的对象出来。<br>Person p4 = (Person) p3.clone();</li>
+<li>反序列化<br>序列化是把堆内存中的 Java 对象数据，通过某种方式把对象存储到磁盘文件中或者传递给其他网络节点（在网络上传输）。而反序列化则是把磁盘文件中的对象数据或者把网络节点上的对象数据，恢复成Java对象模型的过程。</li>
+</ul>
+<h2 id="直接赋值"><a href="#直接赋值" class="headerlink" title="直接赋值"></a>直接赋值</h2><p>直接赋值是我们最常用的方式，在我们代码中的体现是Persona = new Person();Person b = a，是一种简单明了的方式，但是它只是拷贝了对象引用地址而已，并没有在内存中生成新的对象，我们可以通过下面这个例子来证明这一点</p>
+<pre><code class="java">/ person 对象
+public class Person {
+    // 姓名
+    private String name;
+    // 年龄
+    private int age;
+    // 邮件
+    private String email;
+    // 描述
+    private String desc;
+    ...省略get/set...
+ }
+ // main 方法
+public class PersonApp {
+   public static void main(String[] args) {
+       // 初始化一个对象
+       Person person = new Person(&quot;张三&quot;,20,&quot;123456@qq.com&quot;,&quot;我是张三&quot;);
+       // 复制对象
+       Person person1 = person;
+       // 改变 person1 的属性值
+       person1.setName(&quot;我不是张三了&quot;);
+        System.out.println(&quot;person对象：&quot;+person);
+        System.out.println(&quot;person1对象：&quot;+person1);
+
+   }
+}
+</code></pre>
+<p>运行上面代码，你会得到如下结果：</p>
+<pre><code>person对象：Person{name=&#39;我不是张三了&#39;, age=20, email=&#39;123456@qq.com&#39;, desc=&#39;我是张三&#39;}
+person1对象：Person{name=&#39;我不是张三了&#39;, age=20, email=&#39;123456@qq.com&#39;, desc=&#39;我是张三&#39;}
+</code></pre><p>我们将 person 对象复制给了 person1 对象，我们对 person1 对象的 name 属性进行了修改，并未修改 person 对象的name 属性值，但是我们最后发现 person 对象的 name 属性也发生了变化，其实不止这一个值，对于其他值也是一样的，所以这结果证明了我们上面的结论：直接赋值的方式没有生产新的对象，只是生新增了一个对象引用，直接赋值在 Java 内存中的模型大概是这样的</p>
+<p><img src="https://i.loli.net/2020/12/02/FKznv7wxp6jWsuQ.png" alt="image.png"></p>
+<h2 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h2><p>浅拷贝也可以实现对象克隆，从这名字你或许可以知道，这种拷贝一定存在某种缺陷，是的，它就是存在一定的缺陷，先来看看浅拷贝的定义：</p>
+<p>如果原型对象的成员变量是 值类型，将复制一份给克隆对象，也就是说在堆中拥有独立的空间；如果原型对象的成员变量是 引用类型，则将引用对象的地址复制一份给克隆对象，也就是说原型对象和克隆对象的成员变量指向相同的内存地址。换句话说，在浅克隆中，当对象被复制时，只复制它本身和其中包含的值类型的成员变量，而引用类型的成员对象并没有复制。 可能你没太理解这段话，那么我们在来看看浅拷贝的通用模型：</p>
+<p><img src="https://i.loli.net/2020/12/02/A4I9zlNayhdLxg3.png" alt="image.png"></p>
+<p>要实现对象浅拷贝还是比较简单的，只需要被复制类需要实现 Cloneable 接口，重写 clone 方法即可，对 person 类进行改造，使其可以支持浅拷贝。</p>
+<pre><code class="java">public class Person implements Cloneable {
+    // 姓名
+    private String name;
+    // 年龄
+    private int age;
+    // 邮件
+    private String email;
+    // 描述
+    private String desc;
+
+    /*
+    * 重写 clone 方法，需要将权限改成 public ，直接调用父类的 clone 方法就好了
+    */
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+    ...省略...
+}
+</code></pre>
+<p>改造很简单只需要让 person 继承 Cloneable 接口，并且重写 clone 方法即可，clone 也非常简单只需要调用 object 的 clone 方法就好，唯一需要注意的地方就是 clone 方法需要用 public 来修饰，在简单的修改 main 方法</p>
+<pre><code class="java">public class PersonApp {
+    public static void main(String[] args) throws Exception {
+        // 初始化一个对象
+        Person person = new Person(&quot;张三&quot;,20,&quot;123456@qq.com&quot;,&quot;我是张三&quot;);
+        // 复制对象
+        Person person1 = (Person) person.clone();
+        // 改变 person1 的属性值
+        person1.setName(&quot;我是张三的克隆对象&quot;);
+        // 修改 person age 的值
+        person1.setAge(22);
+        System.out.println(&quot;person对象：&quot;+person);
+        System.out.println();
+        System.out.println(&quot;person1对象：&quot;+person1);
+
+    }
+}
+</code></pre>
+<p>重新运行 main 方法，结果如下：</p>
+<pre><code>person对象：Person{name=&#39;张三&#39;, age=20, email=&#39;123456@qq.com&#39;, desc=&#39;我是张三&#39;}
+
+person1对象：Person{name=&#39;我是张三的克隆对象&#39;, age=22, email=&#39;123456@qq.com&#39;, desc=&#39;我是张三&#39;}
+</code></pre><p>看到这个结果，你是否有所质疑呢？说好的引用对象只是拷贝了地址，为啥修改了 person1 对象的 name 属性值，person 对象没有改变？这里就是一个非常重要的知识点了，原因在于：</p>
+<p>String、Integer 等包装类都是不可变的对象，当需要修改不可变对象的值时，需要在内存中生成一个新的对象来存放新的值，然后将原来的引用指向新的地址，所以在这里我们修改了 person1 对象的 name 属性值，person1 对象的 name 字段指向了内存中新的 name 对象，但是我们并没有改变 person 对象的 name 字段的指向，所以 person 对象的 name 还是指向内存中原来的 name 地址，也就没有变化</p>
+<p>这种引用是一种特列，因为这些引用具有不可变性，并不具备通用性，所以我们就自定义一个类，来演示浅拷贝，我们定义一个 PersonDesc 类用来存放person 对象中的 desc 字段，，然后在 person 对象中引用 PersonDesc 类，具体代码如下：</p>
+<pre><code class="java">// 新增 PersonDesc 
+public class PersonDesc {
+    // 描述
+    private String desc;
+
+}
+public class Person implements Cloneable {
+    // 姓名
+    private String name;
+    // 年龄
+    private int age;
+    // 邮件
+    private String email;
+    // 将原来的 string desc 变成了 PersonDesc 对象，这样 personDesc 就是引用类型
+    private PersonDesc personDesc;
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+    public void setDesc(String desc) {
+        this.personDesc.setDesc(desc);
+    }
+    public Person(String name, int age, String email, String desc) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+        this.personDesc = new PersonDesc();
+        this.personDesc.setDesc(desc);
+    }
+     ...省略...
+}
+</code></pre>
+<p>修改 main 方法</p>
+<pre><code class="java">public class PersonApp {
+    public static void main(String[] args) throws Exception {
+        // 初始化一个对象
+        Person person = new Person(&quot;平头&quot;,20,&quot;123456@qq.com&quot;,&quot;技术&quot;);
+        // 复制对象
+        Person person1 = (Person) person.clone();
+        // 改变 person1 的属性值
+        person1.setName(&quot;我是平头的克隆对象&quot;);
+        // 修改 person age 的值
+        person1.setAge(22);
+        person1.setDesc(&quot;我已经关注了技术&quot;);
+        System.out.println(&quot;person对象：&quot;+person);
+        System.out.println();
+        System.out.println(&quot;person1对象：&quot;+person1);
+    }
+}
+</code></pre>
+<p>运行 main 方法，得到如下结果：</p>
+<pre><code>person对象：Person{name=&#39;平头&#39;, age=20, email=&#39;123456@qq.com&#39;, desc=&#39;我已经关注了技术&#39;}
+
+person1对象：Person{name=&#39;我是平头的克隆对象&#39;, age=22, email=&#39;123456@qq.com&#39;, desc=&#39;我已经关注了技术&#39;}
+</code></pre><p>我们修改 person1 的 desc 字段之后，person 的 desc 也发生了改变，这说明 person 对象和 person1 对象指向是同一个 PersonDesc 对象地址，这也符合浅拷贝引用对象只拷贝引用地址并未创建新对象的定义，到这你应该知道浅拷贝了吧。</p>
+<h2 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h2><p>深拷贝也是对象克隆的一种方式，相对于浅拷贝，深拷贝是一种完全拷贝，无论是值类型还是引用类型都会完完全全的拷贝一份，在内存中生成一个新的对象，简单点说就是拷贝对象和被拷贝对象没有任何关系，互不影响。深拷贝的通用模型如下：</p>
+<p><img src="https://i.loli.net/2020/12/02/nIiLf3POJyYdroh.png" alt="image.png"></p>
+<p>深拷贝有两种方式，一种是跟浅拷贝一样实现 Cloneable 接口，另一种是实现 Serializable 接口，用序列化的方式来实现深拷贝，我们分别用这两种方式来实现深拷贝</p>
+<h3 id="实现-Cloneable-接口方式"><a href="#实现-Cloneable-接口方式" class="headerlink" title="实现 Cloneable 接口方式"></a>实现 Cloneable 接口方式</h3><p>实现 Cloneable 接口的方式跟浅拷贝相差不大，我们需要引用对象也实现 Cloneable 接口，具体代码改造如下：</p>
+<pre><code class="java">public class PersonDesc implements Cloneable{
+
+    // 描述
+    private String desc;
+    ...省略...
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+public class Person implements Cloneable {
+    // 姓名
+    private String name;
+    // 年龄
+    private int age;
+    // 邮件
+    private String email;
+
+    private PersonDesc personDesc;
+
+    /**
+    * clone 方法不是简单的调用super的clone 就好，
+    */
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Person person = (Person)super.clone();
+        // 需要将引用对象也克隆一次
+        person.personDesc = (PersonDesc) personDesc.clone();
+        return person;
+    }
+    ...省略...
+}
+</code></pre>
+<p>main 方法不需要任何改动，我们再次运行 main 方法，得到如下结果：</p>
+<pre><code>person对象：Person{name=&#39;平头&#39;, age=20, email=&#39;123456@qq.com&#39;, desc=&#39;技术&#39;}
+
+person1对象：Person{name=&#39;平头的克隆对象&#39;, age=22, email=&#39;123456@qq.com&#39;, desc=&#39;我已经关注了技术&#39;}
+</code></pre><p>可以看出，修改 person1 的 desc 时对 person 的 desc 已经没有影响了，说明进行了深拷贝，在内存中重新生成了一个新的对象。</p>
+<h3 id="实现-Serializable-接口方式"><a href="#实现-Serializable-接口方式" class="headerlink" title="实现 Serializable 接口方式"></a>实现 Serializable 接口方式</h3><p>实现 Serializable 接口方式也可以实现深拷贝，而且这种方式还可以解决多层克隆的问题，多层克隆就是引用类型里面又有引用类型，层层嵌套下去，用 Cloneable 方式实现还是比较麻烦的，一不小心写错了就不能实现深拷贝了，使用 Serializable 序列化的方式就需要所有的对象对实现 Serializable 接口，我们对代码进行改造，改造成序列化的方式</p>
+<pre><code class="java">public class Person implements Serializable {
+
+    private static final long serialVersionUID = 369285298572941L;
+    // 姓名
+    private String name;
+    // 年龄
+    private int age;
+    // 邮件
+    private String email;
+
+    private PersonDesc personDesc;
+
+    public Person clone() {
+        Person person = null;
+        try { 
+            // 将该对象序列化成流, 因为写在流里的是对象的一个拷贝，而原对象仍然存在于JVM里面。所以利用这个特性可以实现对象的深拷贝
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            // 将流序列化成对象
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            person = (Person) ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return person;
+    }
+
+    public void setDesc(String desc) {
+        this.personDesc.setDesc(desc);
+    }
+  ...省略...
+}
+public class PersonDesc implements Serializable {
+
+    private static final long serialVersionUID = 872390113109L; 
+    // 描述
+    private String desc;
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+}
+public class PersonApp {
+    public static void main(String[] args) throws Exception {
+        // 初始化一个对象
+        Person person = new Person(&quot;平头&quot;,20,&quot;123456@qq.com&quot;,&quot;技术&quot;);
+        // 复制对象
+        Person person1 = (Person) person.clone();
+        // 改变 person1 的属性值
+        person1.setName(&quot;我是平头的克隆对象&quot;);
+        // 修改 person age 的值
+        person1.setAge(22);
+        person1.setDesc(&quot;我已经关注了技术&quot;);
+        System.out.println(&quot;person对象：&quot;+person);
+        System.out.println();
+        System.out.println(&quot;person1对象：&quot;+person1);
+    }
+}
+</code></pre>
+<p>运行 main 方法，我们可以得到跟 Cloneable 方式一样的结果，序列化的方式也实现了深拷贝。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 基础 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[raft算法]]></title>
       <url>/2020/11/29/raft/</url>
       <content type="html"><![CDATA[<p>本来想在k8s章节里在说raft算法的，但看redis选主的时候发现用的也是raft算法，故提前把raft算法拿出来说一下。</p>
@@ -575,6 +1838,41 @@ es1:19000&gt; get bitmap_cat
 <li>Redis4.0，lazy delete free模式</li>
 <li>业务优化，避免bigkey</li>
 </ul>
+<h2 id="双写一致问题"><a href="#双写一致问题" class="headerlink" title="双写一致问题"></a>双写一致问题</h2><p>涉及到数据更新：数据库和缓存更新，就容易出现缓存和数据库间的数据一致性问题。不管是先写数据库，再删除缓存；还是先删除缓存，再写库，都有可能出现数据不一致的情况。举个例子：</p>
+<ul>
+<li>如果删除了缓存Redis，还没有来得及写库MySQL，另一个线程就来读取，发现缓存为空，则去数据库中读取数据写入缓存，此时缓存中为脏数据。</li>
+<li>如果先写了库，在删除缓存前，写库的线程宕机了，没有删除掉缓存，则也会出现数据不一致情况。</li>
+</ul>
+<p>因为写和读是并发的，没法保证顺序,就会出现缓存和数据库的数据不一致的问题。如何解决？这里给出两个解决方案，先易后难，结合业务和技术代价选择使用。</p>
+<h3 id="延时双删策略"><a href="#延时双删策略" class="headerlink" title="延时双删策略"></a>延时双删策略</h3><p>在写库前后都进行redis.del(key)操作，并且设定合理的超时时间。具体步骤是：</p>
+<ul>
+<li>先删除缓存</li>
+<li>再写数据库</li>
+<li>休眠500毫秒（根据具体的业务时间来定）</li>
+<li>再次删除缓存。</li>
+</ul>
+<p>这么做的目的，就是确保读请求结束，写请求可以删除读请求造成的缓存脏数据。</p>
+<p>那么，这个500毫秒怎么确定的，具体该休眠多久呢？需要评估自己的项目的读数据业务逻辑的耗时。</p>
+<p>当然，这种策略还要考虑 redis 和数据库主从同步的耗时。最后的写数据的休眠时间：则在读数据业务逻辑的耗时的基础上，加上几百ms即可。比如：休眠1秒。</p>
+<h3 id="设置缓存的过期时间"><a href="#设置缓存的过期时间" class="headerlink" title="设置缓存的过期时间"></a>设置缓存的过期时间</h3><p>从理论上来说，给缓存设置过期时间，是保证最终一致性的解决方案。所有的写操作以数据库为准，只要到达缓存过期时间，则后面的读请求自然会从数据库中读取新值然后回填缓存</p>
+<p>结合双删策略+缓存超时设置，这样最差的情况就是在超时时间内数据存在不一致，而且又增加了写请求的耗时。</p>
+<p>如何写完数据库后，再次删除缓存成功？</p>
+<p>上述的方案有一个缺点，那就是操作完数据库后，由于种种原因删除缓存失败，这时，可能就会出现数据不一致的情况。这里，我们需要提供一个保障重试的方案。</p>
+<p>1、方案一具体流程</p>
+<p>（1）更新数据库数据；</p>
+<p>（2）缓存因为种种问题删除失败；</p>
+<p>（3）将需要删除的key发送至消息队列；</p>
+<p>（4）自己消费消息，获得需要删除的key；</p>
+<p>（5）继续重试删除操作，直到成功。</p>
+<p>然而，该方案有一个缺点，对业务线代码造成大量的侵入。于是有了方案二，在方案二中，启动一个订阅程序去订阅数据库的binlog，获得需要操作的数据。在应用程序中，另起一段程序，获得这个订阅程序传来的信息，进行删除缓存操作。</p>
+<p>2、方案二具体流程</p>
+<p>（1）更新数据库数据；</p>
+<p>（2）数据库会将操作信息写入binlog日志当中；</p>
+<p>（3）订阅程序提取出所需要的数据以及key；</p>
+<p>（4）另起一段非业务代码，获得该信息；</p>
+<p>（5）尝试删除缓存操作，发现删除失败；</p>
+<p>（6）将这些信息发送至消息队列；</p>
+<p>（7）重新从消息队列中获得该数据，重试操作。</p>
 ]]></content>
       
         <categories>
@@ -4922,9 +6220,9 @@ class ConcreteObserver2 implements Observer {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -5416,9 +6714,9 @@ public class Hosee {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -5442,9 +6740,9 @@ public class Hosee {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -6132,9 +7430,9 @@ public void run() {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -6433,9 +7731,9 @@ static final class HeadIndex&lt;K,V&gt; extends Index&lt;K,V&gt; {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -7550,9 +8848,9 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -7653,9 +8951,9 @@ public boolean addIfAbsent(E e) {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -7838,9 +9136,9 @@ void lazySetNext(Node&lt;E&gt; val) {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -8116,9 +9414,9 @@ private E dequeue(){
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -8511,9 +9809,9 @@ public E poll(long timeout, TimeUnit unit) throws InterruptedException{
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -8905,9 +10203,9 @@ public E take() throws InterruptedException {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -9353,9 +10651,9 @@ ABASE = U.arrayBaseOffset(ak) + (1 &lt;&lt; ASHIFT);
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -9611,9 +10909,9 @@ private void breakBarrier() {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -9726,9 +11024,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -10082,9 +11380,9 @@ public boolean await(long timeout, TimeUnit unit)
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -10526,9 +11824,9 @@ private transient int firstReaderHoldCount;
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -10905,9 +12203,9 @@ final ConditionObject newCondition() {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -11121,9 +12419,9 @@ final ConditionObject newCondition() {
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -11513,9 +12811,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -11585,9 +12883,9 @@ static final int PROPAGATE = -3;
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> juc </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -12266,7 +13564,7 @@ public class TicketLock {
       
         <categories>
             
-            <category> cas </category>
+            <category> juc </category>
             
             <category> 并发 </category>
             
@@ -12275,7 +13573,7 @@ public class TicketLock {
         
         <tags>
             
-            <tag> cas </tag>
+            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -12286,7 +13584,10 @@ public class TicketLock {
     <entry>
       <title><![CDATA[jvm与并发]]></title>
       <url>/2020/11/18/jvm-multithread/</url>
-      <content type="html"><![CDATA[<h2 id="Java中的内存并发模型"><a href="#Java中的内存并发模型" class="headerlink" title="Java中的内存并发模型"></a>Java中的内存并发模型</h2><p>“内存模型”，它可以理解为在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象。</p>
+      <content type="html"><![CDATA[<h2 id="Java的线程实现"><a href="#Java的线程实现" class="headerlink" title="Java的线程实现"></a>Java的线程实现</h2><p>Java的线程是Linux中的内核线程，即轻量级进程。</p>
+<p>程序一般不会直接使用内核线程，而是使用内核线程的一种高级接口——轻量级进程(Light Weight Process，LWP)，轻量级进程就是我们通常意义上所讲的线程，由于每个轻量级进程都由一个 内核线程支持，因此只有先支持内核线程，才能有轻量级进程。这种轻量级进程与内核线程之间1:1 的关系称为一对一的线程模型。</p>
+<p>浅谈Linux线程模型<br><a href="https://zhuanlan.zhihu.com/p/57349087" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/57349087</a></p>
+<h2 id="Java中的内存并发模型"><a href="#Java中的内存并发模型" class="headerlink" title="Java中的内存并发模型"></a>Java中的内存并发模型</h2><p>“内存模型”，它可以理解为在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象。</p>
 <p>Java内存模型规定了所有的变量都存储在主内存(Main Memory)中。每条线程还有自己的工作内存(Working Memory ，可与前面讲的处理器高速缓存类比)，线程的工作内存中保存了被该线程使用的变量的主内存副本，线程对变量的所有操作(读取、赋值等)都必须在工作内存中进行，而不能直接读写主内存中的数据。</p>
 <p>此处的变量(Variables)与Java编程中所说的变量有所区别，它包括了实例字段、静态字段和构成数组对象的元素，但是不包括局部变量与方法参数，因为后者是线程私有的，不会被共享，自然就不会存在竞争问题。</p>
 <p><img src="https://s3.ax1x.com/2020/11/20/DQQT2Q.png" alt="DQQT2Q.png"></p>
@@ -12352,6 +13653,7 @@ private void doSomething(){
   }
 }
 </code></pre>
+<p>加一点解释（自己的理解，不一定准确），在Linux中其实没有线程的，只有进程，我们也知道Java的线程是有进程产生的，但问题是Linux进程只有waiting这种状态，没有block，也就是说，我们在Linux层面讨论，阻塞，挂起，其实都是进入了waiting状态，Java实际上是在线程等待锁的时候自己设置了一个block的状态，这个状态实际上是有Linux的mutex lock实现的，关于mutex lock详见 <a href="https://www.cnblogs.com/huangchaosong/p/7127532.html" target="_blank" rel="noopener">https://www.cnblogs.com/huangchaosong/p/7127532.html</a> 。简单来说，进程会自旋进行计数器的cas来试图获取锁，获取锁的进程就进入临界区了，没有获取到锁的进程会停止自旋，进入waiting状态，并将进程标识为不可中断（这也是Synchronized不能被中断的原因），并进入waiting队列，等待锁释放的信号。在得到锁释放的信号后，会重新进行上面的操作试图获取锁。这个过程就是Java线程的block状态。</p>
 <h2 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h2><ul>
 <li>程序次序规则: 在一个线程内，按照控制流顺序，书写在前面的操作先行发生于书写在后面的操作。注意，这里说的是控制流顺序而不是程序代码顺序，因为要考虑分支、循环等结构。</li>
 <li>管程锁定规则: 一个unlock操作先行发生于后面对同一个锁的lock操作。这里必须强调的是“同一个锁”，而“后面”是指时间上的先后。</li>
@@ -12399,8 +13701,8 @@ private void doSomething(){
 </li>
 </ul>
 <p>其中，interrupt 方法是唯一能将中断状态设置为 true 的方法。静态方法 interrupted 会将当前线程的中断状态清除，但这个方法的命名极不直观，很容易造成误解，需要特别注意。</p>
-<p>Thread.interrupt()方法仅仅是在当前线程中打了一个停止的标识将中断标志修改为true，并没有真正的停止线程。如果在此基础上进入堵塞状态（sleep(),wait(),join()）,马上就会抛出一个InterruptedException，且中断标志被清除，重新设置为false。记住一点，当调用Thread.interrupt()，还没有进行中断时，此时的中断标志位是true，当发生中断之后（执行到sleep(),wait(),join()），这个时候的中断标志位就是false了。</p>
-<p>中断是通过调用Thread.interrupt()方法来做的. 这个方法通过修改了被调用线程的中断状态来告知那个线程, 说它被中断了. 对于非阻塞中的线程, 只是改变了中断状态, 即Thread.isInterrupted()将返回true; 对于可取消的阻塞状态中的线程, 比如等待在这些函数上的线程, Thread.sleep(), Object.wait(), Thread.join(), 这个线程收到中断信号后, 会抛出InterruptedException, 同时会把中断状态置回为false.但调用Thread.interrupted()会对中断状态进行复位。</p>
+<p>Thread.interrupt()方法仅仅是在当前线程中打了一个停止的标识将中断标志修改为true，并没有真正的停止线程。如果在此基础上进入waiting状态（sleep(),wait(),join()）,马上就会抛出一个InterruptedException，且中断标志被清除，重新设置为false。记住一点，当调用Thread.interrupt()，还没有进行中断时，此时的中断标志位是true，当发生中断之后（执行到sleep(),wait(),join()），这个时候的中断标志位就是false了。</p>
+<p>中断是通过调用Thread.interrupt()方法来做的. 这个方法通过修改了被调用线程的中断状态来告知那个线程, 说它被中断了. 对于非waiting中的线程, 只是改变了中断状态, 即Thread.isInterrupted()将返回true; 对于可取消的waiting状态中的线程, 比如等待在这些函数上的线程, Thread.sleep(), Object.wait(), Thread.join(), 这个线程收到中断信号后, 会抛出InterruptedException, 同时会把中断状态置回为false.但调用Thread.interrupted()会对中断状态进行复位。</p>
 <h4 id="响应中断的方法和不响应中断的方法"><a href="#响应中断的方法和不响应中断的方法" class="headerlink" title="响应中断的方法和不响应中断的方法"></a>响应中断的方法和不响应中断的方法</h4><p>响应中断的方法： 线程进入等待或是超时等待的状态后，调用interrupt方法都是会响应中断的，所以响应中断的方法：Object.wait()、Thread.join、Thread.sleep、LockSupport.park的有参和无参方法。</p>
 <p>不响应中断的方法：线程进入阻塞状态后，是不响应中断的，等待进入synchronized的方法或是代码块，都是会被阻塞的，此时不会响应中断，另外还有一个不响应中断的，那就是阻塞在ReentrantLock.lock方法里面的线程，也是不响应中断的，如果想要响应中断，可以使用ReentrantLock.lockInterruptibly方法。</p>
 <p>其ReentrantLock底层是使用LockSupport.park方法进行等待的，前面说了LockSupport.park是响应中断的。</p>

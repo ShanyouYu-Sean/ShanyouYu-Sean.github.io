@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-11-30T07:07:07.843Z</updated>
+  <updated>2020-12-05T14:22:08.955Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,150 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>nio</title>
+    <link href="http://seanthefish.com/2020/12/01/nio-3/"/>
+    <id>http://seanthefish.com/2020/12/01/nio-3/</id>
+    <published>2020-12-01T05:00:00.000Z</published>
+    <updated>2020-12-05T14:22:08.955Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;转载自 海纳老师的专栏 &lt;a href=&quot;https://zhuanlan.zhihu.com/p/27296046&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://zhuanlan.zhihu.com/p/27296046&lt;/a&gt; 
+        
+      
+    
+    </summary>
+    
+      <category term="java" scheme="http://seanthefish.com/categories/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/categories/java/nio/"/>
+    
+    
+      <category term="java" scheme="http://seanthefish.com/tags/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/tags/nio/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>epoll的本质</title>
+    <link href="http://seanthefish.com/2020/12/01/nio-2/"/>
+    <id>http://seanthefish.com/2020/12/01/nio-2/</id>
+    <published>2020-12-01T04:00:00.000Z</published>
+    <updated>2020-12-05T12:51:14.432Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;放三个链接，目前能看到讲解epoll最好的文章，感谢作者。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/63179839&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="java" scheme="http://seanthefish.com/categories/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/categories/java/nio/"/>
+    
+    
+      <category term="java" scheme="http://seanthefish.com/tags/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/tags/nio/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>认识socket和Linux io模型</title>
+    <link href="http://seanthefish.com/2020/12/01/nio-1/"/>
+    <id>http://seanthefish.com/2020/12/01/nio-1/</id>
+    <published>2020-12-01T03:00:00.000Z</published>
+    <updated>2020-12-05T12:51:23.611Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;什么是socket&quot;&gt;&lt;a href=&quot;#什么是socket&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="java" scheme="http://seanthefish.com/categories/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/categories/java/nio/"/>
+    
+    
+      <category term="java" scheme="http://seanthefish.com/tags/java/"/>
+    
+      <category term="nio" scheme="http://seanthefish.com/tags/nio/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>网络基础</title>
+    <link href="http://seanthefish.com/2020/12/01/network-1/"/>
+    <id>http://seanthefish.com/2020/12/01/network-1/</id>
+    <published>2020-12-01T02:00:00.000Z</published>
+    <updated>2020-12-04T09:52:20.009Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;文章参考 &lt;a href=&quot;https://zhuanlan.zhihu.com/p/147370653&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://zhuanlan.zhihu.com/p/147370653&lt;/a&gt; &lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="network" scheme="http://seanthefish.com/categories/network/"/>
+    
+    
+      <category term="network" scheme="http://seanthefish.com/tags/network/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深拷贝与浅拷贝</title>
+    <link href="http://seanthefish.com/2020/11/30/deep-copy/"/>
+    <id>http://seanthefish.com/2020/11/30/deep-copy/</id>
+    <published>2020-11-30T02:00:00.000Z</published>
+    <updated>2020-12-05T08:51:38.191Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;转自 &lt;a href=&quot;https://zhuanlan.zhihu.com/p/95686213&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://zhuanlan.zhihu.com/p/95686213&lt;/a&gt;  有改动&lt;/p&gt;
+&lt;h2
+        
+      
+    
+    </summary>
+    
+      <category term="基础" scheme="http://seanthefish.com/categories/%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="基础" scheme="http://seanthefish.com/tags/%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
   
   <entry>
     <title>raft算法</title>
@@ -101,7 +245,7 @@
     <link href="http://seanthefish.com/2020/11/28/redis-6/"/>
     <id>http://seanthefish.com/2020/11/28/redis-6/</id>
     <published>2020-11-28T12:00:00.000Z</published>
-    <updated>2020-12-01T07:22:35.315Z</updated>
+    <updated>2020-12-04T11:56:24.852Z</updated>
     
     <summary type="html">
     
@@ -361,9 +505,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -391,9 +535,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
+    
+      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -422,160 +566,9 @@
       <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
       <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
     
-  </entry>
-  
-  <entry>
-    <title>juc之ThreadPoolExecutor</title>
-    <link href="http://seanthefish.com/2020/11/25/juc-17/"/>
-    <id>http://seanthefish.com/2020/11/25/juc-17/</id>
-    <published>2020-11-25T03:00:00.000Z</published>
-    <updated>2020-11-26T16:15:12.227Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;类图&quot;&gt;&lt;a href=&quot;#类图&quot; class=&quot;headerlink&quot; title=&quot;类图&quot;&gt;&lt;/a&gt;类图&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2020/11/25/2F5etwLdmrR9fTn.png&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
       <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之ConcurrentSkipListMap</title>
-    <link href="http://seanthefish.com/2020/11/25/juc-16/"/>
-    <id>http://seanthefish.com/2020/11/25/juc-16/</id>
-    <published>2020-11-25T02:00:00.000Z</published>
-    <updated>2020-11-25T15:38:41.277Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;跳表&quot;&gt;&lt;a href=&quot;#跳表&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之ConcurrentHashMap</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-15/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-15/</id>
-    <published>2020-11-24T07:00:00.000Z</published>
-    <updated>2020-11-25T05:44:09.890Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;搬运自 &lt;a href=&quot;https://my.oschina.net/xiaolyuh/blog/3080609&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之CoryOnWriteArrayList、CopyOnWriteArraySet</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-14/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-14/</id>
-    <published>2020-11-24T06:01:00.000Z</published>
-    <updated>2020-11-25T06:35:01.205Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;CopyOnWrite（简称：COW）：即复制再写入，就是在添加元素的时候，先把原 List 列表复制一份，再添加新的元素&lt;/p&gt;
-&lt;p&gt;CopyOnWriteArrayList
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>juc之ConcurrentLinkedQueue</title>
-    <link href="http://seanthefish.com/2020/11/24/juc-13/"/>
-    <id>http://seanthefish.com/2020/11/24/juc-13/</id>
-    <published>2020-11-24T06:00:00.000Z</published>
-    <updated>2020-11-24T10:13:55.473Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;内容转载自 &lt;a href=&quot;https://www.beikejiedeliulangmao.top/java/concurrent/concurrent-linked-queue/&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="juc" scheme="http://seanthefish.com/categories/juc/"/>
-    
-      <category term="并发" scheme="http://seanthefish.com/categories/juc/%E5%B9%B6%E5%8F%91/"/>
-    
-    
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-      <category term="juc" scheme="http://seanthefish.com/tags/juc/"/>
     
   </entry>
   
