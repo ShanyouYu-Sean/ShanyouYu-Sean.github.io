@@ -7,7 +7,7 @@
       <url>/2020/12/01/nio-3/</url>
       <content type="html"><![CDATA[<p>转载自 海纳老师的专栏 <a href="https://zhuanlan.zhihu.com/p/27296046" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/27296046</a>  但结合网上内容做了比较大的改动</p>
 <p>感谢海纳老师，我的Java进阶路上的引路人，三年前初到北京找工作的时候就看的海纳老师的专栏，三年后再看还是会有收获。</p>
-<p>本文也参考 <a href="https://www.cnblogs.com/yulinfeng/p/8095326.html" target="_blank" rel="noopener">https://www.cnblogs.com/yulinfeng/p/8095326.html</a>  <a href="https://www.jianshu.com/p/2b71ea919d49：" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49：</a></p>
+<p>本文也参考 <a href="https://www.cnblogs.com/yulinfeng/p/8095326.html" target="_blank" rel="noopener">https://www.cnblogs.com/yulinfeng/p/8095326.html</a>  <a href="https://www.jianshu.com/p/2b71ea919d49" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49</a>  <a href="https://juejin.cn/post/6844903440573792270" target="_blank" rel="noopener">https://juejin.cn/post/6844903440573792270</a></p>
 <p>关于Java io的部分我们就略过了，只需记住io主要是针对文件写入输出操作的， 分为字节流和字符流，是基于流操作的。</p>
 <p>而nio是为了解决网络编程问题诞生的。</p>
 <p>接下来对于非阻塞式输入输出（NIO）的学习以及理解首先从它的三个基础概念讲起。</p>
@@ -333,8 +333,90 @@ System.out.println(&quot;Hello&quot;);
 </code></pre>
 <p>这个客户端不断地向服务端发送”hello”，并且从服务端接收”received”。</p>
 <p>大家多启几个客户端程序，去连接同一个服务端，观察一下现象，动手改一下客户端代码，让它发送的更丰富一点，不要让每一个客户端发的都一样。</p>
-<h3 id="原理和实现"><a href="#原理和实现" class="headerlink" title="原理和实现"></a>原理和实现</h3><p>这里参考 <a href="https://www.jianshu.com/p/2b71ea919d49" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49</a> </p>
-<p>先复习一下epoll的函数</p>
+<h3 id="详解selector使用"><a href="#详解selector使用" class="headerlink" title="详解selector使用"></a>详解selector使用</h3><h4 id="创建Selector"><a href="#创建Selector" class="headerlink" title="创建Selector"></a>创建Selector</h4><p>Selector对象是通过调用静态工厂方法open()来实例化的，如下：</p>
+<pre><code class="java">Selector Selector=Selector.open()；
+</code></pre>
+<p>类方法open()实际上向SPI发出请求，通过默认的SelectorProvider对象获取一个新的实例。</p>
+<h4 id="将Channel注册到Selector"><a href="#将Channel注册到Selector" class="headerlink" title="将Channel注册到Selector"></a>将Channel注册到Selector</h4><p>要实现Selector管理Channel，需要将channel注册到相应的Selector上，如下：</p>
+<pre><code class="java">channel.configureBlocking(false);
+SelectionKey key= channel.register(selector,SelectionKey,OP_READ);
+</code></pre>
+<p>通过调用通道的register()方法会将它注册到一个选择器上。与Selector一起使用时，Channel必须处于非阻塞模式下，否则将抛出IllegalBlockingModeException异常，这意味着不能将FileChannel与Selector一起使用，因为FileChannel不能切换到非阻塞模式，而套接字通道都可以。另外通道一旦被注册，将不能再回到阻塞状态，此时若调用通道的configureBlocking(true)将抛出BlockingModeException异常。</p>
+<p>register()方法的第二个参数是“interest集合”，表示选择器所关心的通道操作，它实际上是一个表示选择器在检查通道就绪状态时需要关心的操作的比特掩码。比如一个选择器对通道的read和write操作感兴趣，那么选择器在检查该通道时，只会检查通道的read和write操作是否已经处在就绪状态。<br>它有以下四种操作类型：</p>
+<ul>
+<li>Connect 连接</li>
+<li>Accept 接受</li>
+<li>Read 读</li>
+<li>Write 写</li>
+</ul>
+<p>需要注意并非所有的操作在所有的可选择通道上都能被支持，比如ServerSocketChannel支持Accept，而SocketChannel中不支持。我们可以通过通道上的validOps()方法来获取特定通道下所有支持的操作集合。</p>
+<p>JAVA中定义了四个常量来表示这四种操作类型：</p>
+<pre><code class="java">SelectionKey.OP_CONNECT
+SelectionKey.OP_ACCEPT
+SelectionKey.OP_READ
+SelectionKey.OP_WRITE
+</code></pre>
+<p>如果Selector对通道的多操作类型感兴趣，可以用“位或”操作符来实现：<br><code>int interestSet=SelectionKey.OP_READ|SelectionKey.OP_WRITE;</code></p>
+<p>当通道触发了某个操作之后，表示该通道的某个操作已经就绪，可以被操作。因此，某个SocketChannel成功连接到另一个服务器称为“连接就绪”(OP_CONNECT)。一个ServerSocketChannel准备好接收新进入的连接称为“接收就绪”（OP_ACCEPT）。一个有数据可读的通道可以说是“读就绪”(OP_READ)。等待写数据的通道可以说是“写就绪”(OP_WRITE)。</p>
+<p>我们注意到register（）方法会返回一个SelectionKey对象，我们称之为键对象。该对象包含了以下四种属性：</p>
+<ul>
+<li>interest集合</li>
+<li>read集合</li>
+<li>Channel</li>
+<li>Selector</li>
+</ul>
+<p>interest集合是Selector感兴趣的集合，用于指示选择器对通道关心的操作，可通过SelectionKey对象的interestOps()获取。最初，该兴趣集合是通道被注册到Selector时传进来的值。该集合不会被选择器改变，但是可通过interestOps()改变。我们可以通过以下方法来判断Selector是否对Channel的某种事件感兴趣：</p>
+<pre><code class="java">   int interestSet=selectionKey.interestOps();
+   boolean isInterestedInAccept  = (interestSet &amp; SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT；
+</code></pre>
+<p>这里有一个需要注意的点，很重要，就是 <code>key.interestOps(SelectionKey.OP_WRITE);</code> 不仅仅是转换关注的事件状态，还会主动的将当前channel的状态进行转换，如果不主动把channel关闭，写事件会无限的被触发！</p>
+<p>为什么？这里涉及到一个边缘触发还是水平触发的问题，详见：<a href="https://www.jianshu.com/p/6bdee8cfee90" target="_blank" rel="noopener">https://www.jianshu.com/p/6bdee8cfee90</a></p>
+<p>简单来说：</p>
+<p>触发的方式有两种</p>
+<ul>
+<li>水平触发(level-triggered，也被称为条件触发)LT: 只要满足条件，就触发一个事件(只要有数据没有被获取，内核就不断通知你)</li>
+<li>边缘触发(edge-triggered)ET: 每当状态变化时，触发一个事件。<br>水平触发：</li>
+<li>对于读操作 ：只要内核缓冲区内容不为空，LT模式返回读就绪。</li>
+<li>对于写操作 ：只要内核缓冲区还不满，LT模式会返回写就绪。<br>Java NIO属于水平触发，即条件触发</li>
+</ul>
+<p>所以，如果read事件中buffer没被读完，也是会被重新触发的。</p>
+<p>再说什么时候写入channel，我们可不可以直接在read事件中写入channel呢？经实测是可以的，但为什么最好不要这么做呢？</p>
+<p>因为：</p>
+<p>如果有channel在Selector上注册了SelectionKey.OP_WRITE事件，在调用selector.select();时，系统会检查内核写缓冲区是否可写（什么时候是不可写的呢，比如缓冲区已满，channel调用了shutdownOutPut等等），如果可写，selector.select();立即返回，随后进入key.isWritable()分支。</p>
+<p>当然你在channel上可以直接调用write(…)，也可以将数据发送出去，但这样不够灵活，而且可能浪费CPU。</p>
+<p>详见：<a href="https://segmentfault.com/a/1190000017777939" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017777939</a></p>
+<p>所以正确用法：</p>
+<p>要触发写事件，需要先向 selector 注册该通道的写事件，跟注册读事件一样，当底层写缓冲区有空闲就会触发写事件了，而一般来说底层的写缓冲区大部分都是空闲的。所以一般只要注册了写事件，就会立马触发了，为了避免 cpu 空转，在写操作完成后需要把写事件取消掉，然后下次再有写操作时重新注册写事件。</p>
+<p>再说read集合：</p>
+<p>read集合是通道已经就绪的操作的集合，表示一个通道准备好要执行的操作了,可通过SelctionKey对象的readyOps()来获取相关通道已经就绪的操作。它是interest集合的子集，并且表示了interest集合中从上次调用select()以后已经就绪的那些操作。（比如选择器对通道的read,write操作感兴趣，而某时刻通道的read操作已经准备就绪可以被选择器获知了，前一种就是interest集合，后一种则是read集合。）。JAVA中定义以下几个方法用来检查这些操作是否就绪：</p>
+<pre><code class="java">    //int readSet=selectionKey.readOps()
+    selectionKey.isAcceptable()
+    selectionKey.isConnectable()
+    selectionKey.isReadable()
+    selectionKey.isWritable()
+</code></pre>
+<p>这几个方法全都调用readyOps()方法</p>
+<p>需要注意的是，通过相关的选择键的readyOps()方法返回的就绪状态指示只是一个提示，底层的通道在任何时候都会不断改变，而其他线程也可能在通道上执行操作并影响到它的就绪状态。另外，我们不能直接修改read集合。</p>
+<p>取出SelectionKey所关联的Selector和Channel<br>通过SelectionKey访问对应的Selector和Channel：</p>
+<pre><code class="java">Channel channel = selectionKey.channel();
+Selector selector = selectionKey.selector();
+</code></pre>
+<h4 id="取消SelectionKey对象"><a href="#取消SelectionKey对象" class="headerlink" title="取消SelectionKey对象"></a>取消SelectionKey对象</h4><p>我们可以通过SelectionKey对象的cancel()方法来取消特定的注册关系。该方法调用之后，该SelectionKey对象将会被”拷贝”至已取消键的集合中，该键此时已经失效，但是该注册关系并不会立刻终结。在下一次select()时，已取消键的集合中的元素会被清除，相应的注册关系也真正终结。</p>
+<p>所以SelectionKey到底谁什么？</p>
+<p>我们可以把SelectionKey理解为epoll中的监视channel（socket）返回事件的一个监控对象，每当有一个channel注册到selector中时，就会有一个SelectionKey对象生成，通过SelectionKey我们可以得到当前channel中我们关心的事件的就绪列表，通过readyOps()方法得到已经就绪的channel后，我们通过其channel()方法来获取channel并向缓冲区读写数据。</p>
+<h4 id="为SelectionKey绑定附加对象"><a href="#为SelectionKey绑定附加对象" class="headerlink" title="为SelectionKey绑定附加对象"></a>为SelectionKey绑定附加对象</h4><p>可以将一个或者多个附加对象绑定到SelectionKey上，以便容易的识别给定的通道。通常有两种方式： </p>
+<ul>
+<li>在注册的时候直接绑定：<br><code>SelectionKey key=channel.register(selector,SelectionKey.OP_READ,theObject);</code></li>
+<li>在绑定完成之后附加：<br><code>selectionKey.attach(theObject);//绑定</code></li>
+</ul>
+<p>绑定之后，可通过对应的SelectionKey取出该对象:<br><code>selectionKey.attachment();</code><br>如果要取消该对象，则可以通过该种方式:<br><code>selectionKey.attach(null);</code></p>
+<p>需要注意的是如果附加的对象不再使用，一定要人为清除，因为垃圾回收器不会回收该对象，若不清除的话会成内存泄漏。</p>
+<p>需要注意的是attachment并不是epoll中的方法，我们来看一下attachment的解释：</p>
+<p>通常，我们需要将某个应用程序的特定数据与某个selectionKey相关联，例如表示http 状态的对象，我们在得到了一个读事件（一个http request）后，会首先将这个读事件进行解析，并把需要保存的数据和状态保存到attachment中，以供处理写事件时处理。在我们解析完读事件后，我们会继续调用interestOps()方法将其转换成写事件，并在写事件中得到这个attachment，并进行状态转换，写入channel返回。</p>
+<p>ps：一个用nio实现的http server：<a href="https://cloud.tencent.com/developer/article/1109637" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1109637</a></p>
+<p>多个并发线程可安全地使用selectionKey。一般情况下，读取和写入 interest 集合的操作将与selector的某些操作保持同步。具体如何执行该同步与实现有关：在一般实现中，如果正在进行某个selector操作，那么读取或写入 interest 集合可能会无限期地阻塞；在高性能的实现中，可能只会暂时阻塞。无论在哪种情况下，selector操作将始终使用该操作开始时当前的 interest 集合值。</p>
+<p>一个单独的通道可被注册到多个选择器中，有些时候我们需要通过isRegistered（）方法来检查一个通道是否已经被注册到任何一个选择器上。 通常来说，我们并不会这么做。</p>
+<h3 id="原理和实现"><a href="#原理和实现" class="headerlink" title="原理和实现"></a>原理和实现</h3><p>先复习一下epoll的函数</p>
 <pre><code class="c">//创建一个eventpoll,返回它的文件描述符，内有一颗红黑树，用来保存监听的socket
 int epoll_create(int size);
 //用来添加，删除以及修改监听的socket（修改红黑树的节点）
@@ -538,7 +620,7 @@ void initInterrupt(int fd0, int fd1) {
     }
 </code></pre>
 <ul>
-<li>updateRegistrations()方法会将已经注册到该selector的事件(eventsLow或eventsHigh)通过调用epollCtl(epfd, opcode, fd, events); 注册到epoll的红黑树中</li>
+<li>updateRegistrations()方法会将已经注册到该selector的事件(events, 就是SelectionKey的option，也是epoll中的epoll_events)通过调用epollCtl(epfd, opcode, fd, events); 注册到epoll的红黑树中</li>
 <li>这里epollWait就会调用linux底层的epoll_wait方法，并返回在epoll_wait期间有事件触发的channel的个数</li>
 </ul>
 <h4 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h4><p>Selector中封装了Linux epoll的操作，当调用selector.select();时，当前线程会阻塞（体现同步io操作），这个select方法实际上是调用epoll中的epoll_wait方法，来监听不同的channel（socket）是否有事件返回，通过一个selector线程来监听多个channel（socket），并且不用阻塞住channel（socket）（操作系统帮我们处理），这体现了非阻塞的概念。所以说，epoll是同步非阻塞的模型。（我的理解，实际上就是一个事件驱动的模型）</p>
@@ -647,6 +729,7 @@ void initInterrupt(int fd0, int fd1) {
 <p>所以每建立一个socket链接，其实就是不同计算机上的两个进程通过socket这种形式进行通信，而通信的过程伴随着缓冲区的读写，操作系统会创建一个由文件系统管理的socket对象，进行文件的读和写，这就被称为网络io。</p>
 <h2 id="socket通信流程"><a href="#socket通信流程" class="headerlink" title="socket通信流程"></a>socket通信流程</h2><p>socket是”打开—读/写—关闭”模式的实现，以使用TCP协议通讯的socket为例，其交互流程大概是这样子的</p>
 <p><img src="https://i.loli.net/2020/12/04/a2WIDYql8Bv4yMO.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2020/12/06/VPRHSDWou9hBjyX.png" alt="image.png"></p>
 <p>可以看到跟三次握手是能对应上的</p>
 <p><img src="https://i.loli.net/2020/12/04/nFvcRCQMWtUeu9J.png" alt="image.png"></p>
 <h2 id="linux-上的网络编程接口"><a href="#linux-上的网络编程接口" class="headerlink" title="linux 上的网络编程接口"></a>linux 上的网络编程接口</h2><h3 id="socket-函数"><a href="#socket-函数" class="headerlink" title="socket()函数"></a>socket()函数</h3><p><code>int socket(int domain, int type, int protocol);</code></p>
@@ -14841,11 +14924,12 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
 <p>一是增加年轻代的大小, 设置JVM启动参数, 类似这样: -Xmx64m -XX:NewSize=32m, 程序在执行时, Full GC 的次数自然会减少很多, 只会对 minor GC的持续时间产生影响:</p>
 <p>二是减少每次批处理的数量, 也能得到类似的结果. 至于选用哪个方案, 要根据业务需求决定。在某些情况下, 业务逻辑不允许减少批处理的数量, 那就只能增加堆内存,或者重新指定年轻代的大小。</p>
 <p>如果都不可行, 就只能优化数据结构, 减少内存消耗。但总体目标依然是一致的: 让临时数据能够在年轻代存放得下。</p>
-<h3 id="Weak-Soft-及-Phantom-引用"><a href="#Weak-Soft-及-Phantom-引用" class="headerlink" title="Weak, Soft 及 Phantom 引用"></a>Weak, Soft 及 Phantom 引用</h3><ul>
+<h3 id="Weak-Soft-及-Phantom-引用"><a href="#Weak-Soft-及-Phantom-引用" class="headerlink" title="Weak, Soft 及 Phantom 引用"></a>Weak, Soft 及 Phantom 引用</h3><p><a href="https://blog.csdn.net/qq_40955824/article/details/90035050" target="_blank" rel="noopener">https://blog.csdn.net/qq_40955824/article/details/90035050</a></p>
+<ul>
 <li>强引用：代码中普遍存在的类似<code>object obj = new object()</code>的引用，只要强引用存在，垃圾处理器就不会回收。</li>
 <li>软引用：描述有些还有用但非必须的对象。在系统将要发生内存溢出时，会将这些对象列为回收范围进行二次回收，如果这次回收后还没有足够的内存，才会oom。Java中SoftReference类表示软引用。</li>
-<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示软引用。</li>
-<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示软引用。</li>
+<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示弱引用。</li>
+<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示虚引用。</li>
 </ul>
 <h4 id="弱引用的缺点"><a href="#弱引用的缺点" class="headerlink" title="弱引用的缺点"></a>弱引用的缺点</h4><p>首先, 弱引用(weak reference) 是可以被GC强制回收的。当垃圾收集器发现一个弱可达对象(weakly reachable,即指向该对象的引用只剩下弱引用) 时, 就会将其置入相应的ReferenceQueue 中, 变成可终结的对象. 之后可能会遍历这个 reference queue, 并执行相应的清理。典型的示例是清除缓存中不再引用的KEY。</p>
 <p>当然, 在这个时候, 我们还可以将该对象赋值给新的强引用, 在最后终结和回收前, GC会再次确认该对象是否可以安全回收。因此, 弱引用对象的回收过程是横跨多个GC周期的。</p>
@@ -14854,9 +14938,10 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
 <p>最后, 使用虚引用(phantom reference)时, 必须手动进行内存管理, 以标识这些对象是否可以安全地回收。表面上看起来很正常, 但实际上并不是这样。 javadoc 中写道:</p>
 <p>为了防止可回收对象的残留, 虚引用对象不应该被获取: phantom reference 的 get 方法返回值永远是 null。</p>
 <p>令人惊讶的是, 很多开发者忽略了下一段内容(这才是重点):</p>
-<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到调用此引用的 clear 方法, 或者引用自身变为不可达。</p>
-<p>也就是说,我们必须手动调用 clear()) 来清除虚引用, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
+<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到引用自身变为不可达。（如果虚引用为clearer对象，会主动调用其clean方法进行引用自身变为不可达的操作）</p>
+<p>也就是说,我们必须手动使虚引用变为不可达状态（把引用置为null）, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
 <p>建议使用JVM参数 -XX:+PrintReferenceGC 来看看各种引用对GC的影响。</p>
+<p>弱引用的典型代表使threadlocal。<br>虚引用的典型代表使堆外内存。</p>
 <h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><p>如果程序确实碰到了 mis-, ab- 问题或者滥用 weak, soft, phantom 引用, 一般都要修改程序的实现逻辑。每个系统不一样, 因此很难提供通用的指导建议, 但有一些常用的办法:</p>
 <ul>
 <li>弱引用(Weak references) —— 如果某个内存池的使用量增大, 造成了性能问题, 那么增加这个内存池的大小(可能也要增加堆内存的最大容量)。如, 增加堆内存的大小, 以及年轻代的大小, 可以减轻症状。</li>
@@ -14924,29 +15009,119 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
 <li>加载该类的类加载器已经被回收，这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常是很难达成的。</li>
 <li>该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
 </ul>
-<h3 id="堆外内存的回收"><a href="#堆外内存的回收" class="headerlink" title="堆外内存的回收"></a>堆外内存的回收</h3><p>JDK中使用DirectByteBuffer对象来表示堆外内存，每个DirectByteBuffer对象在初始化时，都会创建一个对应的Cleaner对象，用于保存堆外内存的元信息（开始地址、大小和容量等），当DirectByteBuffer被GC回收后，Cleaner对象被放入ReferenceQueue中，然后由ReferenceHandler守护线程调用unsafe.freeMemory(address)，回收堆外内存。 在Cleaner 内部中通过一个列表，维护了一个针对每一个 directBuffer 的一个回收堆外内存的 线程对象(Runnable)，回收操作是发生在 Cleaner 的 clean() 方法中。</p>
-<p>Direct Memory是受GC控制的，例如ByteBuffer bb = ByteBuffer.allocateDirect(1024)，这段代码的执行会在堆外占用1k的内存，Java堆内只会占用一个对象的指针引用的大小，堆外的这1k的空间只有当bb对象被回收时，才会被回收，这里会发现一个明显的不对称现象，就是堆外可能占用了很多，而堆内没占用多少，导致还没触发GC，那就很容易出现Direct Memory造成物理内存耗光。</p>
-<p>Direct ByteBuffer分配出去的内存其实也是由GC负责回收的，而不像Unsafe是完全自行管理的，Hotspot在GC时会扫描Direct ByteBuffer对象是否有引用，如没有则同时也会回收其占用的堆外内存。</p>
-<p>主动回收（推荐）：对于Sun的JDK，只要从DirectByteBuffer里取出那个sun.misc.Cleaner，然后调用它的clean()就行；</p>
-<p>基于 GC 回收：堆内的DirectByteBuffer对象被GC时，会调用cleaner回收其引用的堆外内存。</p>
-<p><img src="https://s3.ax1x.com/2020/11/16/DAD9rn.png" alt="DAD9rn.png"></p>
-<p>堆外内存注意<br>java.nio.DirectByteBuffer对象在创建过程中会先通过Unsafe接口直接通过os::malloc来分配内存，然后将内存的起始地址和大小存到java.nio.DirectByteBuffer对象，这样就可以直接操作这些内存。这些内存只有在DirectByteBuffer回收掉之后才有机会被回收。</p>
-<p>当我们基于GC回收时，YGC只会将新生代里的不可达的DirectByteBuffer对象及其堆外内存回收，如果有大量的DirectByteBuffer对象移到了old区，但是又一直没有做CMS GC或者FGC，而只进行YGC，物理内存会被慢慢耗光，触发OutOfMemoryError。</p>
-<p>因此为了避免这种悲剧的发生，通过-XX:MaxDirectMemorySize来指定最大的堆外内存大小，当使用达到了阈值的时候将调用System.gc来做一次full gc，以此来回收掉没有被使用的堆外内存。</p>
-<p>堆外内存优缺点<br>优点：</p>
-<ul>
-<li>提升了IO效率（避免了数据从用户态向内核态的拷贝）。堆内内存由JVM管理，属于“用户态”；而堆外内存由OS管理，属于“内核态”。如果从堆内向磁盘写数据时，数据会被先复制到堆外内存，即内核缓冲区，然后再由OS写入磁盘，使用堆外内存避免了数据从用户内向内核态的拷贝。</li>
-<li>对垃圾回收停顿的改善因为full gc意味着彻底回收，彻底回收时，垃圾收集器会对所有分配的堆内内存进行完整的扫描，这意味着一个重要的事实——这样一次垃圾收集对Java应用造成的影响，跟堆的大小是成正比的。过大的堆会影响Java应用的性能。如果使用堆外内存的话，堆外内存是直接受操作系统管理( 而不是虚拟机 )。这样做的结果就是能保持一个较小的堆内内存，以减少垃圾收集对应用的影响。</li>
-<li>可以在进程间共享，减少JVM间的对象复制，使得JVM的分割部署更容易实现</li>
-<li>可以扩展至更大的内存空间。比如超过1TB甚至比主存还大的空间</li>
-<li>它的持久化存储可以支持快速重启，同时还能够在测试环境中重现生产数据</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>分配和回收堆外内存比分配和回收堆内存耗时；（解决方案：通过对象池避免频繁地创建和销毁堆外内存）</li>
-<li>堆外内存的泄漏问题</li>
-<li>堆外内存的数据结构问题：堆外内存最大的问题就是你的数据结构变得不那么直观，如果数据结构比较复杂，就要对它进行串行化（serialization），而串行化本身也会影响性能。另一个问题是由于你可以使用更大的内存，你可能开始担心虚拟内存（即硬盘）的速度对你的影响了。</li>
-</ul>
+<h3 id="堆外内存的回收"><a href="#堆外内存的回收" class="headerlink" title="堆外内存的回收"></a>堆外内存的回收</h3><p>ps：此处涉及到虚引用知识，最好对着下一篇文章关于虚引用的知识一起食用。</p>
+<p>JDK的ByteBuffer类提供了一个接口allocateDirect(int capacity)进行堆外内存的申请</p>
+<p>先说一下堆外内存的好处：</p>
+<p>实际上在网络io读写的时候，堆内内存会先复制一份到堆外内存，操作完了后再去finanlly去回收这块内存。这样做的原因是在io读写的时候，需要一块连续不变的内存地址，但jvm gc的时候会移动堆内的内存地址，导致io读写的异常。因此使用堆外内存可以避免内存的复制，反而效率更高。</p>
+<p>那么堆外内存何时回收呢？</p>
+<p>我们先梳理一下回收堆外内存的调用逻辑：</p>
+<p>在DirectByteBuffer#new的时候，会调用Cleaner.create(this, new Deallocator(base, size, cap))去创建一个Cleaner对象。Cleaner是PhantomReference的子类，并通过自身的next和prev字段维护的一个双向链表。PhantomReference的作用在于跟踪垃圾回收过程，并不会对对象的垃圾回收过程造成任何的影响。 所以cleaner = Cleaner.create(this, new Deallocator(base, size, cap)); 用于对当前构造的DirectByteBuffer对象的垃圾回收过程进行跟踪。当DirectByteBuffer对象从pending状态 ——&gt; enqueue状态时，会触发Cleaner的clean()，而Cleaner的clean()的方法会实现通过unsafe对堆外内存的释放。</p>
+<p>我们看到PhantomReference#new会直接调用其父类Reference#new，而Reference中的静态代码块里，会启动ReferenceHandler线程，该线程会调用Reference#tryHandlePending方法，进而调用Cleaner的clean()方法，把cleaner对象自己从双向链表中移出，并通过启动DirectByteBuffer$Deallocator线程调用Unsafe#freeMemory完成对外内存的释放。</p>
+<pre><code class="java">DirectByteBuffer(int cap) {                   // package-private
+       // 省略若干代码
+        cleaner = Cleaner.create(this, new Deallocator(base, size, cap));
+    }
+</code></pre>
+<pre><code class="java">public static Cleaner create(Object var0, Runnable var1) {
+        return var1 == null ? null : add(new Cleaner(var0, var1));
+    }
+private static synchronized Cleaner add(Cleaner var0) {
+    if (first != null) {
+        var0.next = first;
+        first.prev = var0;
+    }
+
+    first = var0;
+    return var0;
+}
+private Cleaner(Object var1, Runnable var2) {
+  // 这个super调用PhantomReference构造器
+        super(var1, dummyQueue);
+        this.thunk = var2;
+    }
+</code></pre>
+<pre><code class="java">public PhantomReference(T referent, ReferenceQueue&lt;? super T&gt; q) {
+  // 这个super调用Reference构造器
+        super(referent, q);
+    }
+</code></pre>
+<pre><code class="java">Reference(T referent, ReferenceQueue&lt;? super T&gt; queue) {
+        this.referent = referent;
+        this.queue = (queue == null) ? ReferenceQueue.NULL : queue;
+    }
+static {
+        // 省略若干代码
+        Thread handler = new ReferenceHandler(tg, &quot;Reference Handler&quot;);
+        /* If there were a special system-only priority greater than
+         * MAX_PRIORITY, it would be used here
+         */
+        handler.setPriority(Thread.MAX_PRIORITY);
+        handler.setDaemon(true);
+        handler.start();
+    }
+</code></pre>
+<pre><code class="java">// 这块代码留着吧
+    static boolean tryHandlePending(boolean waitForNotify) {
+        Reference&lt;Object&gt; r;
+        Cleaner c;
+        try {
+            synchronized (lock) {
+                if (pending != null) {
+                    r = pending;
+                    // &#39;instanceof&#39; might throw OutOfMemoryError sometimes
+                    // so do this before un-linking &#39;r&#39; from the &#39;pending&#39; chain...
+                    c = r instanceof Cleaner ? (Cleaner) r : null;
+                    // unlink &#39;r&#39; from &#39;pending&#39; chain
+                    pending = r.discovered;
+                    r.discovered = null;
+                } else {
+                    // The waiting on the lock may cause an OutOfMemoryError
+                    // because it may try to allocate exception objects.
+                    if (waitForNotify) {
+                        lock.wait();
+                    }
+                    // retry if waited
+                    return waitForNotify;
+                }
+            }
+        } catch (OutOfMemoryError x) {
+            // Give other threads CPU time so they hopefully drop some live references
+            // and GC reclaims some space.
+            // Also prevent CPU intensive spinning in case &#39;r instanceof Cleaner&#39; above
+            // persistently throws OOME for some time...
+            Thread.yield();
+            // retry
+            return true;
+        } catch (InterruptedException x) {
+            // retry
+            return true;
+        }
+// 主动调用clean方法回收
+        // Fast path for cleaners
+        if (c != null) {
+            c.clean();
+            return true;
+        }
+
+        ReferenceQueue&lt;? super Object&gt; q = r.queue;
+        if (q != ReferenceQueue.NULL) q.enqueue(r);
+        return true;
+    }
+</code></pre>
+<p>因此DirectByteBuffer对象实际上只包含了堆外内存的引用指针，在任何gc的情况下，只要确定可以被gc，他都是可以被回收的。</p>
+<p>但是Cleaner对象不会，因为他是一个虚引用，还保存着自己双向链表中的引用，只有当jvm开始full gc时，虚引用对象才会被加入ReferenceQueue当中去。</p>
+<p>通常情况下，虚引用不会被gc回收，因为与软引用和弱引用不同，加入ReferenceQueue中的虚引用对象并不会被gc，因为其get方法永远返回null，只有在虚引用被清除或者自身变得不可访问时（手动置为null），才会被gc。</p>
+<p>但是Cleaner对象作为一种特殊的虚引用对象，会在入队后主动调用自身的clean方法，因此，我们关心的堆外内存就会在这个时候被回收。</p>
+<p>所以，所谓堆外内存的自动回收，其实就是等着full gc发生的时候进行回收。因此，我们要尽量的在使用完对外内存后，手动的调用cleaner的clean方法对其进行手动回收，来避免full gc一直没有发生所造成的堆外内存溢出。</p>
+<p>下面我们来walk through一下这个过程：</p>
+<p>当初始化一块堆外内存时，对象的引用关系如下：</p>
+<p><img src="https://i.loli.net/2020/12/06/uF5AHmejw1UxXJQ.png" alt="image.png"></p>
+<p>其中first是Cleaner类的静态变量，Cleaner对象在初始化时会被添加到Cleaner链表中，和first形成引用关系，ReferenceQueue是用来保存需要回收的Cleaner对象。</p>
+<p>如果该DirectByteBuffer对象在一次GC中被回收了</p>
+<p><img src="https://i.loli.net/2020/12/06/DXCcBwg1UKT8kmy.png" alt="image.png"></p>
+<p>此时，只有Cleaner对象唯一保存了堆外内存的数据（开始地址、大小和容量），在下一次FGC时，把该Cleaner对象放入到ReferenceQueue中，并触发clean方法。</p>
+<p>Cleaner对象的clean方法主要有两个作用：<br>1、把自身从Clener链表删除，从而在下次GC时能够被回收<br>2、释放堆外内存</p>
+<p>此外，其实在初始化DirectByteBuffer对象时，如果当前堆外内存的条件很苛刻时，会主动调用System.gc()强制执行FGC，不过很多线上环境的JVM参数有-XX:+DisableExplicitGC，导致了System.gc()等于一个空函数，根本不会触发FGC，这一点也需要注意。</p>
 <h2 id="回收算法"><a href="#回收算法" class="headerlink" title="回收算法"></a>回收算法</h2><h3 id="分带与跨带"><a href="#分带与跨带" class="headerlink" title="分带与跨带"></a>分带与跨带</h3><p>设计者一般至少会把Java堆划分为新生代(Young Generation)和老年代(Old Generation)两个区域。顾名思义，在新生代中，对象是朝生夕灭的，每次垃圾收集时都发现有大批对象死去，而每次回收后存活的少量对象，将会逐步晋升到老年代中存放。</p>
 <p>但是，对象不是孤立的，对象之间会存在跨代引用。如果老年代中引用了新生代的对象，在新生代中做可达性分析时就会带上老年代，反而降低效率。</p>
 <p>所以有了 跨代引用假说(Intergenerational Reference Hypothesis):跨代引用相对于同代引用来说仅占极少数。</p>

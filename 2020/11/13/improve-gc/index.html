@@ -252,7 +252,7 @@
 
     
         <meta property="article:published_time" content="Fri Nov 13 2020 10:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Wed Nov 18 2020 09:53:01 GMT+0800">
+        <meta property="article:modified_time" content="Sun Dec 06 2020 20:54:31 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -275,7 +275,7 @@
     "mainEntityOfPage": "http://seanthefish.com/2020/11/13/improve-gc/index.html",
     "headline": "gc调优",
     "datePublished": "Fri Nov 13 2020 10:00:00 GMT+0800",
-    "dateModified": "Wed Nov 18 2020 09:53:01 GMT+0800",
+    "dateModified": "Sun Dec 06 2020 20:54:31 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -694,11 +694,12 @@
 <p>一是增加年轻代的大小, 设置JVM启动参数, 类似这样: -Xmx64m -XX:NewSize=32m, 程序在执行时, Full GC 的次数自然会减少很多, 只会对 minor GC的持续时间产生影响:</p>
 <p>二是减少每次批处理的数量, 也能得到类似的结果. 至于选用哪个方案, 要根据业务需求决定。在某些情况下, 业务逻辑不允许减少批处理的数量, 那就只能增加堆内存,或者重新指定年轻代的大小。</p>
 <p>如果都不可行, 就只能优化数据结构, 减少内存消耗。但总体目标依然是一致的: 让临时数据能够在年轻代存放得下。</p>
-<h3 id="Weak-Soft-及-Phantom-引用"><a href="#Weak-Soft-及-Phantom-引用" class="headerlink" title="Weak, Soft 及 Phantom 引用"></a>Weak, Soft 及 Phantom 引用</h3><ul>
+<h3 id="Weak-Soft-及-Phantom-引用"><a href="#Weak-Soft-及-Phantom-引用" class="headerlink" title="Weak, Soft 及 Phantom 引用"></a>Weak, Soft 及 Phantom 引用</h3><p><a href="https://blog.csdn.net/qq_40955824/article/details/90035050" target="_blank" rel="noopener">https://blog.csdn.net/qq_40955824/article/details/90035050</a></p>
+<ul>
 <li>强引用：代码中普遍存在的类似<code>object obj = new object()</code>的引用，只要强引用存在，垃圾处理器就不会回收。</li>
 <li>软引用：描述有些还有用但非必须的对象。在系统将要发生内存溢出时，会将这些对象列为回收范围进行二次回收，如果这次回收后还没有足够的内存，才会oom。Java中SoftReference类表示软引用。</li>
-<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示软引用。</li>
-<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示软引用。</li>
+<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示弱引用。</li>
+<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示虚引用。</li>
 </ul>
 <h4 id="弱引用的缺点"><a href="#弱引用的缺点" class="headerlink" title="弱引用的缺点"></a>弱引用的缺点</h4><p>首先, 弱引用(weak reference) 是可以被GC强制回收的。当垃圾收集器发现一个弱可达对象(weakly reachable,即指向该对象的引用只剩下弱引用) 时, 就会将其置入相应的ReferenceQueue 中, 变成可终结的对象. 之后可能会遍历这个 reference queue, 并执行相应的清理。典型的示例是清除缓存中不再引用的KEY。</p>
 <p>当然, 在这个时候, 我们还可以将该对象赋值给新的强引用, 在最后终结和回收前, GC会再次确认该对象是否可以安全回收。因此, 弱引用对象的回收过程是横跨多个GC周期的。</p>
@@ -707,9 +708,10 @@
 <p>最后, 使用虚引用(phantom reference)时, 必须手动进行内存管理, 以标识这些对象是否可以安全地回收。表面上看起来很正常, 但实际上并不是这样。 javadoc 中写道:</p>
 <p>为了防止可回收对象的残留, 虚引用对象不应该被获取: phantom reference 的 get 方法返回值永远是 null。</p>
 <p>令人惊讶的是, 很多开发者忽略了下一段内容(这才是重点):</p>
-<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到调用此引用的 clear 方法, 或者引用自身变为不可达。</p>
-<p>也就是说,我们必须手动调用 clear()) 来清除虚引用, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
+<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到引用自身变为不可达。（如果虚引用为clearer对象，会主动调用其clean方法进行引用自身变为不可达的操作）</p>
+<p>也就是说,我们必须手动使虚引用变为不可达状态（把引用置为null）, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
 <p>建议使用JVM参数 -XX:+PrintReferenceGC 来看看各种引用对GC的影响。</p>
+<p>弱引用的典型代表使threadlocal。<br>虚引用的典型代表使堆外内存。</p>
 <h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><p>如果程序确实碰到了 mis-, ab- 问题或者滥用 weak, soft, phantom 引用, 一般都要修改程序的实现逻辑。每个系统不一样, 因此很难提供通用的指导建议, 但有一些常用的办法:</p>
 <ul>
 <li>弱引用(Weak references) —— 如果某个内存池的使用量增大, 造成了性能问题, 那么增加这个内存池的大小(可能也要增加堆内存的最大容量)。如, 增加堆内存的大小, 以及年轻代的大小, 可以减轻症状。</li>
