@@ -674,16 +674,12 @@ void initInterrupt(int fd0, int fd1) {
       
         <categories>
             
-            <category> java </category>
-            
             <category> nio </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> java </tag>
             
             <tag> nio </tag>
             
@@ -702,16 +698,12 @@ void initInterrupt(int fd0, int fd1) {
       
         <categories>
             
-            <category> java </category>
-            
             <category> nio </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> java </tag>
             
             <tag> nio </tag>
             
@@ -808,16 +800,12 @@ void initInterrupt(int fd0, int fd1) {
       
         <categories>
             
-            <category> java </category>
-            
             <category> nio </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> java </tag>
             
             <tag> nio </tag>
             
@@ -6294,16 +6282,12 @@ class ConcreteObserver2 implements Observer {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -6788,16 +6772,12 @@ public class Hosee {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -6814,16 +6794,12 @@ public class Hosee {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -7504,16 +7480,12 @@ public void run() {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -7805,16 +7777,12 @@ static final class HeadIndex&lt;K,V&gt; extends Index&lt;K,V&gt; {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -8922,16 +8890,12 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -9025,16 +8989,12 @@ public boolean addIfAbsent(E e) {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -9210,16 +9170,12 @@ void lazySetNext(Node&lt;E&gt; val) {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -9488,16 +9444,12 @@ private E dequeue(){
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -9883,16 +9835,12 @@ public E poll(long timeout, TimeUnit unit) throws InterruptedException{
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -10277,16 +10225,12 @@ public E take() throws InterruptedException {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -10725,16 +10669,12 @@ ABASE = U.arrayBaseOffset(ak) + (1 &lt;&lt; ASHIFT);
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -10983,16 +10923,12 @@ private void breakBarrier() {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -11098,16 +11034,12 @@ public boolean await(long timeout, TimeUnit unit)
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -11454,16 +11386,12 @@ public boolean await(long timeout, TimeUnit unit)
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -11898,16 +11826,12 @@ private transient int firstReaderHoldCount;
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -12277,16 +12201,12 @@ final ConditionObject newCondition() {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -12493,16 +12413,12 @@ final ConditionObject newCondition() {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -12885,16 +12801,12 @@ static final int PROPAGATE = -3;
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -12957,16 +12869,12 @@ static final int PROPAGATE = -3;
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -13647,16 +13555,12 @@ public class TicketLock {
       
         <categories>
             
-            <category> juc </category>
-            
             <category> 并发 </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> juc </tag>
             
             <tag> 并发 </tag>
             
@@ -13816,14 +13720,10 @@ private void doSomething(){
             
             <category> 并发 </category>
             
-            <category> jvm </category>
-            
         </categories>
         
         
         <tags>
-            
-            <tag> jvm </tag>
             
             <tag> 并发 </tag>
             
@@ -14206,16 +14106,12 @@ static void reserveMemory(long size) {
             
             <category> jvm </category>
             
-            <category> gc </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> jvm </tag>
-            
-            <tag> gc </tag>
             
         </tags>
         
@@ -14588,16 +14484,12 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
       
         <categories>
             
-            <category> classLoader </category>
-            
             <category> jvm </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> classLoader </tag>
             
             <tag> jvm </tag>
             
@@ -14736,16 +14628,12 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
       
         <categories>
             
-            <category> classLoader </category>
-            
             <category> jvm </category>
             
         </categories>
         
         
         <tags>
-            
-            <tag> classLoader </tag>
             
             <tag> jvm </tag>
             
@@ -14954,16 +14842,12 @@ classLoader.setSearchExternalFirst(searchExternalFirst);
             
             <category> jvm </category>
             
-            <category> gc </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> jvm </tag>
-            
-            <tag> gc </tag>
             
         </tags>
         
@@ -15264,16 +15148,12 @@ static {
             
             <category> jvm </category>
             
-            <category> gc </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> jvm </tag>
-            
-            <tag> gc </tag>
             
         </tags>
         
@@ -15301,8 +15181,6 @@ static {
       
         <categories>
             
-            <category> k8s </category>
-            
             <category> jvm </category>
             
         </categories>
@@ -15311,8 +15189,6 @@ static {
         <tags>
             
             <tag> jvm </tag>
-            
-            <tag> k8s </tag>
             
         </tags>
         
@@ -15916,18 +15792,14 @@ export class AuthorizationService {
       
         <categories>
             
-            <category> fe </category>
-            
-            <category> oauth </category>
+            <category> OAuth </category>
             
         </categories>
         
         
         <tags>
             
-            <tag> fe </tag>
-            
-            <tag> oauth </tag>
+            <tag> OAuth </tag>
             
         </tags>
         
@@ -16157,18 +16029,14 @@ export class AuthorizationService {
       
         <categories>
             
-            <category> fe </category>
-            
-            <category> oauth </category>
+            <category> OAuth </category>
             
         </categories>
         
         
         <tags>
             
-            <tag> fe </tag>
-            
-            <tag> oauth </tag>
+            <tag> OAuth </tag>
             
         </tags>
         
@@ -16731,10 +16599,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       
         <categories>
             
-            <category> OAuth </category>
-            
-            <category> OIDC </category>
-            
             <category> spring </category>
             
         </categories>
@@ -16742,11 +16606,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
         <tags>
             
-            <tag> OAuth </tag>
-            
             <tag> spring </tag>
-            
-            <tag> OIDC </tag>
             
         </tags>
         
@@ -19379,16 +19239,12 @@ if(isset($_GET[&#39;code&#39;])) {
             
             <category> OAuth </category>
             
-            <category> OIDC </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> OAuth </tag>
-            
-            <tag> OIDC </tag>
             
         </tags>
         
@@ -19892,20 +19748,12 @@ run {
             
             <category> Java 9 </category>
             
-            <category> Java module </category>
-            
-            <category> gradle </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> Java 9 </tag>
-            
-            <tag> Java module </tag>
-            
-            <tag> gradle </tag>
             
         </tags>
         
@@ -19922,13 +19770,14 @@ run {
 <p>正如JSR所述，模块系统是为了提供可靠的配置，使程序组件相互显式的声明依赖，配合其强大的封装能力，使组件允许声明其中哪些公共类型可供其他组件访问，哪些不可以，并以此来替换脆弱，容易出错的类路径机制。</p>
 <p>这些功能将直接对Java SE平台本身、Java应用程序开发人员，Java类库开发人员有利，而且也会间接地实现可伸缩平台、更高的平台完整性和更高的性能。</p>
 <h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
-<li><a href="#定义模块">定义模块</a><ul>
+<li><a href="#目录">目录</a></li>
+<li><a href="#定义模块">定义模块</a><ul>
 <li><a href="#模块声明">模块声明</a></li>
 <li><a href="#模块打包">模块打包</a></li>
 <li><a href="#模块描述符">模块描述符</a></li>
-<li><a href="#平台模块">平台模块</a></li>
 </ul>
 </li>
+<li><a href="#平台模块">平台模块</a></li>
 <li><a href="#使用模块">使用模块</a><ul>
 <li><a href="#模块路径">模块路径</a></li>
 <li><a href="#解决依赖">解决依赖</a></li>
@@ -19938,7 +19787,7 @@ run {
 </ul>
 </li>
 <li><a href="#兼容性和迁移">兼容性和迁移</a><ul>
-<li><a href="#未命名模块">未命名模块</a></li>
+<li><a href="#未命名模块">未命名模块</a></li>
 <li><a href="#自下而上的迁移">自下而上的迁移</a></li>
 <li><a href="#自动模块">自动模块</a></li>
 <li><a href="#与类路径建立联系">与类路径建立联系</a></li>
@@ -20242,16 +20091,12 @@ if (providerName != null) {
             
             <category> Java 9 </category>
             
-            <category> Java module </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> Java 9 </tag>
-            
-            <tag> Java module </tag>
             
         </tags>
         
@@ -20538,16 +20383,12 @@ java --patch-module java.base=mypatches/java.base ...
             
             <category> Java 9 </category>
             
-            <category> Java module </category>
-            
         </categories>
         
         
         <tags>
             
             <tag> Java 9 </tag>
-            
-            <tag> Java module </tag>
             
         </tags>
         
