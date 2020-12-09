@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            mysql之query | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,mysql">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/03/mysql-4-query/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/12/03/mysql-4-query/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="mysql之query | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="mysql"> 
+
+    
+        <meta property="article:published_time" content="Thu Dec 03 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Dec 09 2020 18:10:01 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/12/03/mysql-4-query/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/03/mysql-4-query/index.html",
+    "headline": "mysql之query",
+    "datePublished": "Thu Dec 03 2020 10:00:00 GMT+0800",
+    "dateModified": "Wed Dec 09 2020 18:10:01 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",mysql小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#优化数据访问"><span class="post-toc-number">1.</span> <span class="post-toc-text">优化数据访问</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#请求了不需要的数据"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">请求了不需要的数据</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#万恶之源-SELECT"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">万恶之源 SELECT *</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#重复查询数据"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">重复查询数据</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#扫描额外的记录"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">扫描额外的记录</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#重构查询方式"><span class="post-toc-number">2.</span> <span class="post-toc-text">重构查询方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#将一个复杂查询拆分成多个查询"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">将一个复杂查询拆分成多个查询</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#切分查询"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">切分查询</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#分解关联查询"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">分解关联查询</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MySql-查询过程"><span class="post-toc-number">3.</span> <span class="post-toc-text">MySql 查询过程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MySQL-通信协议"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">MySQL 通信协议</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#查询缓存"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">查询缓存</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#查询优化处理"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">查询优化处理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#MySQL-对关联表顺序优化"><span class="post-toc-number">3.3.1.</span> <span class="post-toc-text">MySQL 对关联表顺序优化</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#执行计划"><span class="post-toc-number">3.3.2.</span> <span class="post-toc-text">执行计划</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#关联查询优化器"><span class="post-toc-number">3.3.3.</span> <span class="post-toc-text">关联查询优化器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MySQL-查询优化器的局限性"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">MySQL 查询优化器的局限性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#子查询"><span class="post-toc-number">3.4.1.</span> <span class="post-toc-text">子查询</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#UNION"><span class="post-toc-number">3.4.2.</span> <span class="post-toc-text">UNION</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#并发执行"><span class="post-toc-number">3.4.3.</span> <span class="post-toc-text">并发执行</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#最大值和最小值"><span class="post-toc-number">3.4.4.</span> <span class="post-toc-text">最大值和最小值</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#特定优化查询"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">特定优化查询</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化-COUNT-查询"><span class="post-toc-number">3.5.1.</span> <span class="post-toc-text">优化 COUNT 查询</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#使用近似值"><span class="post-toc-number">3.5.1.1.</span> <span class="post-toc-text">使用近似值</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#更复杂的优化"><span class="post-toc-number">3.5.1.2.</span> <span class="post-toc-text">更复杂的优化</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化关联查询"><span class="post-toc-number">3.5.2.</span> <span class="post-toc-text">优化关联查询</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化子查询"><span class="post-toc-number">3.5.3.</span> <span class="post-toc-text">优化子查询</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化-GROUP-BY-和-DISTINCT"><span class="post-toc-number">3.5.4.</span> <span class="post-toc-text">优化 GROUP BY 和 DISTINCT</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化-LIMIT-分页"><span class="post-toc-number">3.5.5.</span> <span class="post-toc-text">优化 LIMIT 分页</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化-SQL-CALC-FOUND-ROWS"><span class="post-toc-number">3.5.6.</span> <span class="post-toc-text">优化 SQL_CALC_FOUND_ROWS</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#优化-UNION-查询"><span class="post-toc-number">3.5.7.</span> <span class="post-toc-text">优化 UNION 查询</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#视图"><span class="post-toc-number">4.</span> <span class="post-toc-text">视图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#外间约束"><span class="post-toc-number">5.</span> <span class="post-toc-text">外间约束</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                mysql之query
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>12月 03, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACZUlEQVR42u3aQZLCMAwEwPz/07svSDKSYhOo9oliIbh9sLVjHX8/PQ48PDw8PDw8PLyX8Y54RI8++Xzy5Oq3Tn8LDw8PbwsvmXSVdw3IP1OdGx4eHt5O3nxak43+mlc4TvDw8PBezEveyUnzgwQPDw/vu3jXxW4zVsDDw8N7PS/5h39yYFyX170QBA8PD+9TvGr5u/P11vs9PDw8vIBXbmlqFcS9g+EDPWV4eHh4AS/fiK+bq/Iwt1qyV5vA8PDw8Fbz8sC0FzpMmgbyX8fDw8PbycunVS2FewV3NQQpnHt4eHh4D/GS4+F0Cx7EsvkVV7ncx8PDw9vI623Q+SEx+Wse+OLh4eGt5vXChevJHYORPPkmsMDDw8PbyKuWyPPooVdY38wEDw8PbzFvcs2f/GSyHPlMRq0DeHh4eAt4eUTbQ06WrPBdPDw8vMW8Zzfu3tVavijlCzA8PDy8xby8xapX+FZJD/eU4eHh4T3azzkpYXuFdbJAvQYCPDw8vP28SWPBZFvPW69uync8PDy8xby8VK0uRy/meKAox8PDw9vISzblSXxQbSzoxcd4eHh4+3nVa62c1GvxT56Jh4eH9yledeuvIqvtCNWFwMPDw9vDq47J9VgSKCRPLjRd4eHh4S3g9bbj/CCpLllybVbuKcPDw8NbwMu38nzSD4ezk4MBDw8Pbxmvd5U1eZ2HF3n7Fx4eHt47efOlSa7HeoU7Hh4e3vt5VUAvrs1jDjw8PLydvDxESN6PGqTipqsksMDDw8PbyetFAHkDVt44lbd8nS4uHh4e3mLe7w08PDw8PDw8PLwXjH8Rku05XCV6WQAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/mysql/">mysql</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=mysql之query&url=http://seanthefish.com/2020/12/03/mysql-4-query/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/03/mysql-4-query/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=mysql之query&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/03/mysql-4-query/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>对 MySql 进行优化，必须对 Scheme，索引，查询语句一同优化。</p>
+<p>通过前面的章节我们掌握了 Scheme 和 索引的优化，最后我们来看一下查询优化。</p>
+<p>为了优化查询，我们必须先了解查询是怎样执行的，然后探讨优化器在哪些方面做得还不足，以帮助 MySql 更有效的执行查询。</p>
+<h2 id="优化数据访问"><a href="#优化数据访问" class="headerlink" title="优化数据访问"></a>优化数据访问</h2><p>在一条 Sql 语句执行的很慢的时候，可以从以下两个方面来分析：</p>
+<ul>
+<li>是否在检索的时候访问了太多的行或者列</li>
+<li>MySql 服务器是否在分析大量超过需要的行</li>
+</ul>
+<h3 id="请求了不需要的数据"><a href="#请求了不需要的数据" class="headerlink" title="请求了不需要的数据"></a>请求了不需要的数据</h3><h4 id="万恶之源-SELECT"><a href="#万恶之源-SELECT" class="headerlink" title="万恶之源 SELECT *"></a>万恶之源 SELECT *</h4><p>SELECT *必然要回表的，随意就算where子句命中了索引，还是要最后回表查询，效率低下，还会为服务器带来额外的I/O、内存和CPU的消耗。</p>
+<p>一个很好用的观点就是在每次使用 SELECT * 取出全部行的时候都要审视一下自己是否需要全部数据。</p>
+<p>取出所有列可能使得索引覆盖无效，一些 DBA 是严格禁止 SELECT * 的写法的。</p>
+<h4 id="重复查询数据"><a href="#重复查询数据" class="headerlink" title="重复查询数据"></a>重复查询数据</h4><p>有些地方可能会不小心的重复查询了相同的数据。比如在论坛中，如果一个人回复多次，很有可能会一不小心每次都去请求这个人的资料，一个有效的方法就是使用缓存。</p>
+<h3 id="扫描额外的记录"><a href="#扫描额外的记录" class="headerlink" title="扫描额外的记录"></a>扫描额外的记录</h3><p>确定查询只返回需要的数据以后，接下来该看一下为了返回需要的记录是否扫描了太多行了。有两个指标我们需要关注，一个是扫描的行数和返回行数的比值，另外一个是扫描的访问类型。</p>
+<p>扫描行数和返回行数的比值如果过低，则需要扫描大量的数据才能返回结果，通常可以使用如下的方法来保存数据：</p>
+<ul>
+<li>使用索引覆盖，把所有的列放入索引中，就无需扫描表了</li>
+<li>改变数据库结构，比如采用单独的表汇总表</li>
+<li>重新写这个 SQL 语句</li>
+</ul>
+<p>在 EXPLAIN 语句中的 type 列中反应了访问类型，从慢到快分别是：</p>
+<p>全表扫描，索引扫描，范围扫描，唯一索引查询，常数引用。</p>
+<p>如果查询没有使用合适的类型，可以合理的添加索引。</p>
+<h2 id="重构查询方式"><a href="#重构查询方式" class="headerlink" title="重构查询方式"></a>重构查询方式</h2><h3 id="将一个复杂查询拆分成多个查询"><a href="#将一个复杂查询拆分成多个查询" class="headerlink" title="将一个复杂查询拆分成多个查询"></a>将一个复杂查询拆分成多个查询</h3><p>MySql 从设计上让连接和断开都很快。如果只是返回一个小小的结果，MySql 非常高效。</p>
+<p>当然能一个查询就解决的要尽量写成一个查询，只是告诉大家不要太惧怕把查询拆分开来会带来性能损失。</p>
+<h3 id="切分查询"><a href="#切分查询" class="headerlink" title="切分查询"></a>切分查询</h3><p>有时候一个大查询会占用表锁很久，影响业务。这时候可以将大查询分为小查询，每次执行这个查询的一小部分。</p>
+<p>比如定期清除大量数据的时候，如果有一个大的语句一次性完成，则可能会占住很多资源，影响其他查询。</p>
+<p>将删除改写成一次删除一小部分数据，分散开来在不同时间执行，可以将服务器压力分散到很长的一个时间段中。</p>
+<h3 id="分解关联查询"><a href="#分解关联查询" class="headerlink" title="分解关联查询"></a>分解关联查询</h3><p>很多高性能应用会将一个大的关联查询分解成多个单表查询。</p>
+<ul>
+<li>让缓存效率更高，许多应用可以缓存单表查询的结果，那么下次查询的时候可以跳过这次单表查询</li>
+<li>单个查询减少锁的竞争</li>
+<li>更容易对数据库进行拆分</li>
+<li>减少冗余记录查询</li>
+<li>查询本身效率也可能会有所提升。例如，使用IN()代替关联查询，可以让MySQL按照ID顺序进行查询，这可能比随机的关联要更高效。</li>
+</ul>
+<h2 id="MySql-查询过程"><a href="#MySql-查询过程" class="headerlink" title="MySql 查询过程"></a>MySql 查询过程</h2><ul>
+<li>客户端发送一条查询给服务器。</li>
+<li>服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。否则进入下一阶段。</li>
+<li>服务器端进行SQL解析、预处理，再由优化器生成对应的执行计划。</li>
+<li>MySQL根据优化器生成的执行计划，调用存储引擎的API来执行查询。</li>
+<li>将结果返回给客户端。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/09/AaxBK81qvcgdjfF.png" alt="image.png"></p>
+<h3 id="MySQL-通信协议"><a href="#MySQL-通信协议" class="headerlink" title="MySQL 通信协议"></a>MySQL 通信协议</h3><p>MySQL 客户端和服务端的通信是半双工的，这意味着同一个时刻内，客户端和服务端只有一方在发送数据。一旦一方开始发送数据，另外一端必须接受完整个消息才能进行响应。</p>
+<p>这就是为什么当查询语句特别长的时候，max_allowed_packet 特别重要了。</p>
+<p>当客户端从服务器取数据时，看起来是一个拉数据的过程，但实际上是MySQL在向客户端推送数据的过程。客户端不断地接收从服务器推送的数据，客户端也没法让服务器停下来。客户端像是“从消防水管喝水”. 所以在必要的时候需要添加 LIMIT 限制。</p>
+<p>多数连接MySQL的库函数都可以获得全部结果集并缓存到内存里，还可以逐行获取需要的数据。默认一般是获得全部结果集并缓存到内存中。MySQL通常需要等所有的数据都已经发送给客户端才能释放这条查询所占用的资源，所以接收全部结果并缓存通常可以减少服务器的压力，让查询能够早点结束、早点释放相应的资源。</p>
+<p><strong>查询状态</strong><br>对于一个 MySQL 连接，任何时刻都有一个状态，该状态表示了 MySQL 当前正在做什么，用 SHOW FULL PROCESSLIST 命令即可。</p>
+<ul>
+<li><p>Sleep 线程正在等待客户端发送新的请求。</p>
+</li>
+<li><p>Query 线程正在执行查询或者在将结果发送给客户端</p>
+</li>
+<li><p>Locked 该线程在等待表锁</p>
+</li>
+<li><p>Analyzing and statistics 线程正在收集存储引擎的统计信息，并且生成执行计划。</p>
+</li>
+<li><p>Copying to tmp table 线程正在把数据复制到一个临时表中，一般在 Group By 或者排序的时候会出现这个状态。</p>
+</li>
+<li><p>Sorting result 线程正在排序数据</p>
+</li>
+<li><p>Sending data 线程可能在多个状态之间传送数据，或者在向客户端返回数据。</p>
+</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><p>MySQL查询缓存是MySQL中比较独特的一个缓存区域，用来缓存特定Query的整个结果集信息，且共享给所有客户端。为了提高完全相同的Query语句的响应速度，MySQL Server会对查询语句进行Hash计算后，把得到的hash值与Query查询的结果集对应存放在Query Cache中。当MySQL打开Query Cache之后，MySQL会对接收到的每一个SELECT 语句通过特定的Hash算法计算该Query的Hash值，然后通过该hash值到Query Cache中去匹配。</p>
+<p>如果没有匹配，将这个hash值存放在一个hash链表中，并将Query的结果集存放到cache中，存放hash值链表的每个hash节点存放了相应Quey结果集在cache中的地址，以及该query所涉及到一些table相关信息；</p>
+<p>如果通过hash值匹配到了一样的Query，则直接将cache中相应的Query结果集返回给客户端。</p>
+<p>目前MySQL Query Cache只会cache select语句，其他类似show ，use的语句不会被cache。 MySQL 的每个Query Cache都是以SQL文本作为key来存储的，在应用Query Cache之前，SQL文本不会做任何处理。也就是说，两个SQL语句，只要相差哪怕一个字符(例如大小写不一样，多一个空格，多注释)，那么这两个SQL将使用不同的Cache地址。</p>
+<p>打开查询缓存对读和写操作都会带来额外的消耗：</p>
+<ul>
+<li>读查询在开始之前必须先检查是否命中缓存。</li>
+<li>如果这个读查询可以被缓存，那么当完成执行后，MySQL若发现查询缓存中没有这个查询，会将其结果存入查询缓存，这会带来额外的系统消耗。</li>
+<li>这对写操作也会有影响，因为当向某个表写入数据的时候，MySQL必须将对应表的所有缓存都设置失效。如果查询缓存非常大或者碎片很多，这个操作就可能会带来很大系统消耗</li>
+<li>如果查询缓存使用了很大量的内存，缓存失效操作就可能成为一个非常严重的问题瓶颈。如果缓存中存放了大量的查询结果，那么缓存失效操作时整个系统都可能会僵死一会儿。因为这个操作是靠一个全局锁操作保护的，所有需要做该操作的查询都要等待这个锁，而且无论是检测是否命中缓存、还是缓存失效检测都需要等待这个全局锁。</li>
+<li>对InnoDB表，当修改一个表时，设置了缓存失效，但是多版本特性会暂时将这修改对其他事务屏蔽，在这个事务提交之前，所有查询都无法使用缓存，直到这个事务被提交，所以长时间的事务，会大大降低查询缓存的命中</li>
+<li>相关系统变量设置不合理会造成大量的内存碎片，这样便会导致Query Cache频繁清理内存。</li>
+<li>查询语句不同，但查询结果相同的查询都会被缓存，缓存了却用不到，这样便会造成内存资源的过度消耗。</li>
+</ul>
+<p>正因为这些缺点，大多数情况下，缓存的命中率都比较低，简而言之，mysql缓存，不用为妙。</p>
+<h3 id="查询优化处理"><a href="#查询优化处理" class="headerlink" title="查询优化处理"></a>查询优化处理</h3><p>查询的生命周期的下一步是将一个SQL转换成一个执行计划，MySQL再依照这个执行计划和存储引擎进行交互。这包括多个子阶段：解析SQL、预处理、优化SQL执行计划。前两步不重要，这里重点说优化查询计划。</p>
+<h4 id="MySQL-对关联表顺序优化"><a href="#MySQL-对关联表顺序优化" class="headerlink" title="MySQL 对关联表顺序优化"></a>MySQL 对关联表顺序优化</h4><p>三种不同的关联方式：<a href="https://zhuanlan.zhihu.com/p/148517223" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/148517223</a></p>
+<p>MySQL 的优化器会对查询进行静态和动态优化，期中我们只挑最重要的优化讲，也就是对关联表顺序的优化。</p>
+<p>MySQL中“关联”一词所包含的意义比一般意义上理解的要更广泛。总的来说，MySQL认为任何一个查询都是一次“关联”——并不仅仅是一个查询需要到两个表匹配才叫关联，所以在MySQL中，每一个查询，每一个片段（包括子查询，甚至基于单表的SELECT）都可能是关联。</p>
+<p>我们先来看一个 UNION 的例子，对于 UNION 查询，MySQL 会将单个查询结构放入一个临时表（注意临时表是没有索引的）中，然后再重新读出临时表数据来完成 UNION 查询。</p>
+<p>当前MySQL关联执行的策略很简单：MySQL对任何关联都执行嵌套循环关联操作，即MySQL先在一个表中循环取出单条数据，然后再嵌套循环到下一个表中寻找匹配的行，依次下去，直到找到所有表中匹配的行为止。然后根据各个表匹配的行，返回查询中需要的各个列。MySQL会尝试在最后一个关联表中找到所有匹配的行，如果最后一个联表无法找到更多的行以后，MySQL返回到上一层次关联表，看是否能够找到更多的匹配记录，依此类推迭代执行。</p>
+<p>按照这样的方式查找第一个表记录，再嵌套查询下一个关联表，然后回溯到上一个表，在MySQL中是通过嵌套循环的方式实现——正如其名“嵌套循环关联”。</p>
+<p>这种方式被称为：嵌套循环，回溯操作</p>
+<p>请看下面的例子中的简单查询：</p>
+<pre><code class="sql">mysql&gt; SELECT tbl1.col1, tbl2.col2 FROM tbl1 INNER JOIN tbl2 USING (col3) WHERE tbl1.col1 IN(5,6)
+</code></pre>
+<p>假设MySQL按照查询中的表顺序进行关联操作，我们则可以用下面的伪代码表示MySQL将如何完成这个查询：</p>
+<pre><code class="sql">outer_iter = iterator over tbl1 where col1 IN(5,6) 
+outer_row  = outer_iter.next
+while outer_row
+  inner_iter = iterator over tbl2 where col3 = outer_row.col3
+  inner_row=inner_iter.next
+  while inner_row
+    output [outer_row.col1, inner_row.col2]
+    inner_row = inner_iter.next
+  end
+  outer_row=outer_iter.netxt
+end
+</code></pre>
+<p>上面的执行计划对于单表查询和多表关联查询都适用，如果是一个单表查询，那么只需完成上面外层的基本操作。对于外连接上面的执行过程仍然适用。</p>
+<p><img src="https://i.loli.net/2020/12/09/7QJy1p98xF5VCa3.png" alt="image.png"></p>
+<p>从本质上说，MySQL对所有的类型的查询都以同样的方式运行。例如，MySQL在FROM子句中遇到子查询时，先执行子查询并将其结果放到一个临时表中，然后将这个临时表当作一个普通表对待（正如其名“派生表”）。MySQL在执行UNION查询时也使用类似的临时表，在遇到右外连接的时候，MySQL将其改写成等价的左外连接。简而言之，当前版本的MySQL会将所有的查询类型都转换成类似的执行计划。</p>
+<h4 id="执行计划"><a href="#执行计划" class="headerlink" title="执行计划"></a>执行计划</h4><p>MySQL生成查询的一棵指令树，然后通过存储引擎执行完成这棵指令树并返回结果。最终的执行计划包含了重构查询的全部信息。任何多表查询都可以使用一棵树表示：</p>
+<p><img src="https://i.loli.net/2020/12/09/N8fzEeVYa4ZqbCp.png" alt="image.png"></p>
+<p>在计算机科学中，这被称为一颗平衡树。但是，这并不是MySQL执行查询的方式。正如我们前面章节介绍的，MySQL总是从一个表开始一直嵌套循环、回溯完成所有表关联。所以，MySQL的执行计划总是如图64所示，是一棵左测深度优先的树。</p>
+<p><img src="https://i.loli.net/2020/12/09/OsmwaEon28vXVGl.png" alt="image.png"></p>
+<h4 id="关联查询优化器"><a href="#关联查询优化器" class="headerlink" title="关联查询优化器"></a>关联查询优化器</h4><p>MySQL 优化器决定了多个表关联的顺序，关联优化器可以选择一个代价最小的关联顺序。（有可能先去查询得到结果集比较少的表，这样就可以减少回溯的次数）</p>
+<p>有时候优化器选择的不是最优的顺序，这时候可以使用 STRAUGHT_JOIN 关键字进行查询，让优化器按照你认为最优的顺序查询，但是一般来说人判断的都没有优化器好。</p>
+<p>优化器会尝试在所有的顺序中选择一个成本最小的关联顺序，但是当表非常多的时候，比如有 n 张表进行关联，就要进行 n！ 次比较。当表超过 optimizer_search_depth 的时候，就会选择贪婪搜索模式了。</p>
+<h3 id="MySQL-查询优化器的局限性"><a href="#MySQL-查询优化器的局限性" class="headerlink" title="MySQL 查询优化器的局限性"></a>MySQL 查询优化器的局限性</h3><h4 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h4><p>MySQL 的子查询优化的相当糟糕，最糟糕的一类是子查询中 WHERE 条件包含了 IN() 的子查询。比如用下面的语句查询</p>
+<pre><code class="sql">SELECT * FROM film WHERE film.id in (SELECT file_id from film_actor WHERE actor_id = 1)
+</code></pre>
+<p>我们可能会认为 MySQL 会执行后面的语句选择出 id 后才执行前面的查询，但是 MySQL 会将外层查询压入子查询中</p>
+<pre><code class="sql">SELECT * FORM film WHERE EXISTS(SELECT * FROM film_actor WHERE actor_id = 1 AND film_actor.film.id = film.id)
+</code></pre>
+<p>这个查询会对 film 进行全表扫描，性能非常糟糕。</p>
+<p>所以我们最好用联合查询来代替这个查询。</p>
+<p>这个问题直到 MySQL 5.5 还存在，MySQL 另外一个分支 MariaDB 在原有的基础上做了大量的改进，例如这里带 IN 的子查询。</p>
+<p>当一个查询能被写成子查询和联合查询的时候，最好通过一些测试来判断哪个写法更快一些</p>
+<h4 id="UNION"><a href="#UNION" class="headerlink" title="UNION"></a>UNION</h4><p>有时候 MySQL 无法将闲置条件由外层推到内层，这使得本能限制扫描行数的 LIMIT 在内层查询中不起作用。</p>
+<p>如果希望 UNION 的各个子句能根据 LIMIT 只取出部分结果集，或者希望能先排好序再分别使用这些子句，那么需要分别对这些查询使用 LIMIT 和 ORDER BY。</p>
+<pre><code class="sql">(SELECT * FROM XXX LIMIT 20) UNION ALL (SELECT * FROM XXX LIMIT 20)
+</code></pre>
+<h4 id="并发执行"><a href="#并发执行" class="headerlink" title="并发执行"></a>并发执行</h4><p>MySQL 无法利用多核特性来并发执行查询。</p>
+<h4 id="最大值和最小值"><a href="#最大值和最小值" class="headerlink" title="最大值和最小值"></a>最大值和最小值</h4><p>对于 MIN 和 MAX 查询，MySQL 的优化做的不是很好，</p>
+<p><code>SELECT MIN(id) FROM actor</code></p>
+<p>因为 id 是递增的，所以只需要扫描一行即可，但是 MySQL 仍然会做全表扫描。可以改下面的写法</p>
+<p><code>SELECT id FROM actor LIMIT 1</code></p>
+<h3 id="特定优化查询"><a href="#特定优化查询" class="headerlink" title="特定优化查询"></a>特定优化查询</h3><p>一般来说，使用 Percona Toolkit 中的 pt-query-advisor 能够解析查询日志，分析查询模式，然后给出详细的建议来帮助你优化 SQL 语句。</p>
+<h4 id="优化-COUNT-查询"><a href="#优化-COUNT-查询" class="headerlink" title="优化 COUNT 查询"></a>优化 COUNT 查询</h4><p>当 COUNT 的值不可能为空的时候，MySQL 会转向统计行数。如果我们想要统计行数的时候，最好直接使用 COUNT(*)。</p>
+<p>这种情况下通配符*并不会像我们猜想的那样扩展成所有的列，实际上，它会忽略所有的列而直接统计所有的行数。</p>
+<h5 id="使用近似值"><a href="#使用近似值" class="headerlink" title="使用近似值"></a>使用近似值</h5><p>有时候某些业务不需要精确值，此时可以用近似值来代替，EXPLAIN 出来的优化器估算的行数就是一个不错的近似值，执行 EXPLAIN 不需要去真正的执行查询，效率高很多。</p>
+<h5 id="更复杂的优化"><a href="#更复杂的优化" class="headerlink" title="更复杂的优化"></a>更复杂的优化</h5><p>通常来说，COUNT()都需要扫描大量的行（意味着要访问大量数据）才能获得精确的结果，因此是很难优化的。除了前面的方法，在MySQL层面还能做的就只有索引覆盖扫描了。</p>
+<h4 id="优化关联查询"><a href="#优化关联查询" class="headerlink" title="优化关联查询"></a>优化关联查询</h4><ul>
+<li>确保 ON 或者 USING 上的列有索引，在创建索引的时候需要考虑到关联列的顺序，比如说表 A，B 用列 c 进行关联的时候，如果优化器的关联顺序是 B，A，则只需要在 A 上建立索引即可。</li>
+<li>确保任何的 GROUP BY 和 ORDER BY 只涉及到一个表中的列</li>
+</ul>
+<h4 id="优化子查询"><a href="#优化子查询" class="headerlink" title="优化子查询"></a>优化子查询</h4><p>关于子查询给出的最主要的优化方法是：尽量使用关联查询代替子查询，因为 MySQL 的子查询优化的非常烂。不过这条意见只在旧版本有用，在 MySQL 5.6 以上和 MariaDB 中，可以忽略掉这条优化。</p>
+<h4 id="优化-GROUP-BY-和-DISTINCT"><a href="#优化-GROUP-BY-和-DISTINCT" class="headerlink" title="优化 GROUP BY 和 DISTINCT"></a>优化 GROUP BY 和 DISTINCT</h4><p>MySQL 经常用同样的方法来优化这两个查询，它们都会用索引来优化，这也是最有效的优化办法。</p>
+<p>当无法使用索引的时候，MySQL 会用临时表或者文件排序来执行 GROUP BY。</p>
+<p>如果需要对关联查询做分组，那么通常采用标识列来进行分组效率会比较高。</p>
+<h4 id="优化-LIMIT-分页"><a href="#优化-LIMIT-分页" class="headerlink" title="优化 LIMIT 分页"></a>优化 LIMIT 分页</h4><p>当系统需要进行分页操作的时候通常会使用 LIMIT 加 偏移量的操作，同时加上合适的 ORDER BY 语句。如果有对应的索引，效率通常会不错。</p>
+<p>但是当偏移量非常大的时候，LIMIT 10000,20，这种语句会导致扫描了10020 行，但是只返回 20 行。</p>
+<p>优化这种查询的方法有：</p>
+<ul>
+<li>使用索引覆盖，只搜索引覆盖的行，然后通过一次查询把所有需要的数据查找出来</li>
+<li>通过延迟关联，（先查询有索引覆盖的记录，例如主键，然后通过这些主键来得到需要的列，以避免mysql直接在巨大的废弃数据上回表）</li>
+</ul>
+<h4 id="优化-SQL-CALC-FOUND-ROWS"><a href="#优化-SQL-CALC-FOUND-ROWS" class="headerlink" title="优化 SQL_CALC_FOUND_ROWS"></a>优化 SQL_CALC_FOUND_ROWS</h4><p>分页的时候有时候会通过在 LIMIT 语句中加上 SQL_CALC_FOUND_ROWS。这样就可以获取去掉 LIMIT 条件后查询的行数，加上这个提示以后，不管是否需要，都会把全部的行都扫描一遍，而不是在满足了 LIMIT 的大小后停止扫描，这样会带来很大开销。</p>
+<p>解决这个问题有两个方法</p>
+<ul>
+<li>采用 EXPLAIN ROW 中的近似值，有时候不需要那么精准的数据</li>
+<li>先获得比较多的缓存集，比如设置一个 100 页和一个 100 页以后的按钮，当用户需要 100 页后的按钮再去获取。</li>
+</ul>
+<h4 id="优化-UNION-查询"><a href="#优化-UNION-查询" class="headerlink" title="优化 UNION 查询"></a>优化 UNION 查询</h4><p>除非确实需要服务器消除重复的行，否则必须要使用 UNION ALL。</p>
+<p>如果没有 ALL 关键字，MySQL 会给临时表加上 DISTINCT 选项，然后做一次查重操作，这将带来极大的开销。</p>
+<hr>
+<p>整体看下来，其实也就三点，不用子查询，子句用索引，select索引覆盖避免回表。</p>
+<hr>
+<p>这里说一下一些高级特性，因为不知道把这些东西分到哪里好。</p>
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><p>MySQL5.0版本之后开始引入视图。视图本身是一个虚拟表，不存放任何数据。在使用SQL语句访问视图的时候，它返回的数据是MySQL从其他表中生成的。视图和表是在同一个命名空间，MySQL在很多地方对于视图和表是同样对待的。不过视图和表也有不同，例如，不能对视图创建触发器，也不能使用DROPTABLE命令删除视图。</p>
+<p>实现视图更好的方法是，重写含有视图的查询，将视图的定义SQL直接包含进查询的SQL中。MySQL可以使用这两种办法中的任何一种来处理视图。这两种算法分别称为合并算法（MERGE）和临时表算法（TEMPTABLE）。</p>
+<p>如果视图中包含GROUYBY、DISTINCT、任何聚合函数、UNION、子查询等，只要无法在原表记录和视图记录中建立一一映射的场景中，MySQL都将使用临时表算法来实现视图。</p>
+<p>如果可能，会尽可能地使用合并算法。</p>
+<p><img src="https://i.loli.net/2020/12/09/EAWJLItQvbRsaTn.png" alt="image.png"></p>
+<p>在mysql中，试图对性能的影响十分有限。</p>
+<p>在其他的关系数据库中你可能使用过物化视图，MySQL还不支持物化视图（物化视图是指将视图结果数据存放在一个可以查看的表中，并定期从原始表中刷新数据到这个表中）。MySQL也不支持在视图中创建索引。不过，可以使用构建缓存表或者汇总表的办法来模拟物化视图和索引。</p>
+<p>看起来物化视图可以帮助我们在链表查询的时候加快数据库性能。pgsql就有。</p>
+<h2 id="外间约束"><a href="#外间约束" class="headerlink" title="外间约束"></a>外间约束</h2><p>InnoDB是目前MySQL中唯一支持外键的内置存储引擎。使用外键是有成本的。比如外键通常都要求每次在修改数据时都要在另外一张表中多执行一次查找操作。虽然InnoDB强制外键使用索引，但还是无法消除这种约束检查的开销。</p>
+<p>不过，在某些场景下，外键会提升一些性能。如果想确保两个相关表始终有一致的数据，那么使用外键比在应用程序中检查一致性的性能要高得多，此外，外键在相关数据的删除和更新上，也比在应用中维护要更高效，不过，外键维护操作是逐行进行的，所以这样的更新会比批量删除和更新要慢些。</p>
+<p>外键约束使得查询需要额外访问一些别的表，这也意味着需要额外的锁。如果向子表中写入一条记录，外键约束会让InnoDB检查对应的父表的记录，也就需要对父表对应记录进行加锁操作，来确保这条记录不会在这个事务完成之时就被删除了。这会导致额外的锁等待，甚至会导致一些死锁。因为没有直接访问这些表，所以这类死锁问题往往难以排查。</p>
+<p>总的来说，在代码里实现逻辑外建要比数据库里用物理外建更好。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/12/03/mysql-4-query/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/03/mysql-4-query/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/12/03/mysql-5-scale/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/12/02/mysql-3-lock/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">12</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">43</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">31</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">7</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">23</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

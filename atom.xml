@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-09T09:23:23.732Z</updated>
+  <updated>2020-12-09T09:34:26.245Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,82 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title></title>
+    <link href="http://seanthefish.com/2020/12/09/mysql-8-distributed-tx/"/>
+    <id>http://seanthefish.com/2020/12/09/mysql-8-distributed-tx/</id>
+    <published>2020-12-09T09:33:41.377Z</published>
+    <updated>2020-12-09T09:34:26.245Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://seanthefish.com/2020/12/09/mysql-7-ha/"/>
+    <id>http://seanthefish.com/2020/12/09/mysql-7-ha/</id>
+    <published>2020-12-09T09:33:16.720Z</published>
+    <updated>2020-12-09T09:33:16.720Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://seanthefish.com/2020/12/09/mysql-6-copy/"/>
+    <id>http://seanthefish.com/2020/12/09/mysql-6-copy/</id>
+    <published>2020-12-09T09:30:57.554Z</published>
+    <updated>2020-12-09T09:35:10.627Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>mysql之分区，分表，分库</title>
+    <link href="http://seanthefish.com/2020/12/03/mysql-5-scale/"/>
+    <id>http://seanthefish.com/2020/12/03/mysql-5-scale/</id>
+    <published>2020-12-03T03:00:00.000Z</published>
+    <updated>2020-12-09T13:39:14.520Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;分区：物理数据库的设计方式，还是一张表，但是表的数据存储在不同的硬盘。&lt;/p&gt;
+&lt;p&gt;分表：最终由N张表，系统读写时需要通过一定的规则找到数据需要映射到的表然后进行操作。&lt;/p&gt;
+&lt;p&gt;分库：多个数据库，每个数据库中有多张表。&lt;/p&gt;
+&lt;h2 id=&quot;切分方式&quot;&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="mysql" scheme="http://seanthefish.com/categories/mysql/"/>
+    
+    
+      <category term="mysql" scheme="http://seanthefish.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
     <title>mysql之query</title>
-    <link href="http://seanthefish.com/2020/12/03/mysql-query/"/>
-    <id>http://seanthefish.com/2020/12/03/mysql-query/</id>
+    <link href="http://seanthefish.com/2020/12/03/mysql-4-query/"/>
+    <id>http://seanthefish.com/2020/12/03/mysql-4-query/</id>
     <published>2020-12-03T02:00:00.000Z</published>
-    <updated>2020-12-09T09:23:23.732Z</updated>
+    <updated>2020-12-09T10:10:01.476Z</updated>
     
     <summary type="html">
     
@@ -45,10 +116,10 @@
   
   <entry>
     <title>mysql之锁和mvcc</title>
-    <link href="http://seanthefish.com/2020/12/02/mysql-lock/"/>
-    <id>http://seanthefish.com/2020/12/02/mysql-lock/</id>
+    <link href="http://seanthefish.com/2020/12/02/mysql-3-lock/"/>
+    <id>http://seanthefish.com/2020/12/02/mysql-3-lock/</id>
     <published>2020-12-02T04:00:00.000Z</published>
-    <updated>2020-12-09T00:29:22.777Z</updated>
+    <updated>2020-12-09T09:31:45.538Z</updated>
     
     <summary type="html">
     
@@ -71,10 +142,10 @@
   
   <entry>
     <title>mysql之索引优化</title>
-    <link href="http://seanthefish.com/2020/12/02/mysql-index/"/>
-    <id>http://seanthefish.com/2020/12/02/mysql-index/</id>
+    <link href="http://seanthefish.com/2020/12/02/mysql-2-index/"/>
+    <id>http://seanthefish.com/2020/12/02/mysql-2-index/</id>
     <published>2020-12-02T03:00:00.000Z</published>
-    <updated>2020-12-09T00:29:18.537Z</updated>
+    <updated>2020-12-09T09:31:31.250Z</updated>
     
     <summary type="html">
     
@@ -97,10 +168,10 @@
   
   <entry>
     <title>mysql之schema与数据类型优化</title>
-    <link href="http://seanthefish.com/2020/12/02/mysql-schema/"/>
-    <id>http://seanthefish.com/2020/12/02/mysql-schema/</id>
+    <link href="http://seanthefish.com/2020/12/02/mysql-1-schema/"/>
+    <id>http://seanthefish.com/2020/12/02/mysql-1-schema/</id>
     <published>2020-12-02T02:00:00.000Z</published>
-    <updated>2020-12-09T00:29:27.233Z</updated>
+    <updated>2020-12-09T09:31:20.727Z</updated>
     
     <summary type="html">
     
@@ -205,7 +276,7 @@
     <link href="http://seanthefish.com/2020/12/01/network-1/"/>
     <id>http://seanthefish.com/2020/12/01/network-1/</id>
     <published>2020-12-01T02:00:00.000Z</published>
-    <updated>2020-12-04T09:52:20.009Z</updated>
+    <updated>2020-12-09T12:49:08.785Z</updated>
     
     <summary type="html">
     
@@ -307,6 +378,33 @@
   </entry>
   
   <entry>
+    <title>redis进阶之分布式锁</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
+    <published>2020-11-28T12:00:00.000Z</published>
+    <updated>2020-12-01T08:34:30.542Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;hr&gt;
+&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>redis进阶之缓存</title>
     <link href="http://seanthefish.com/2020/11/28/redis-6/"/>
     <id>http://seanthefish.com/2020/11/28/redis-6/</id>
@@ -322,33 +420,6 @@
           &lt;h2 id=&quot;缓存的收益和成本&quot;&gt;&lt;a href=&quot;#缓存的收益和成本&quot; class=&quot;headerlink&quot; title=&quot;缓存的收益和成本&quot;&gt;&lt;/a&gt;缓存的收益和成本&lt;/h2&gt;&lt;p&gt;收益:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;加速读写:
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之分布式锁</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
-    <published>2020-11-28T12:00:00.000Z</published>
-    <updated>2020-12-01T08:34:30.542Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;hr&gt;
-&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
         
       
     
@@ -436,112 +507,6 @@
     
     
       <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之复制</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-2/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-2/</id>
-    <published>2020-11-28T08:00:00.000Z</published>
-    <updated>2020-11-30T14:54:08.390Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;建立复制&quot;&gt;&lt;a href=&quot;#建立复制&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis基础</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-1/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-1/</id>
-    <published>2020-11-28T07:00:00.000Z</published>
-    <updated>2020-11-29T11:08:37.222Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;为啥快&quot;&gt;&lt;a href=&quot;#为啥快&quot; class=&quot;headerlink&quot; title=&quot;为啥快&quot;&gt;&lt;/a&gt;为啥快&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;纯内存访问，Redis将所有数据放在内存中，内存的响应时长大
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>spring aop源码解析</title>
-    <link href="http://seanthefish.com/2020/11/27/spring-2/"/>
-    <id>http://seanthefish.com/2020/11/27/spring-2/</id>
-    <published>2020-11-27T07:00:00.000Z</published>
-    <updated>2020-11-28T14:31:51.318Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;直接看 &lt;a href=&quot;https://segmentfault.com/a/1190000022726755&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
-    
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>spring ioc源码解析</title>
-    <link href="http://seanthefish.com/2020/11/26/spring-1/"/>
-    <id>http://seanthefish.com/2020/11/26/spring-1/</id>
-    <published>2020-11-26T07:00:00.000Z</published>
-    <updated>2020-11-28T09:45:02.026Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;网上资料很多也很杂，这玩意我在公司开过session专门讲过，也算是比较了解，这里不啰嗦，直接用springboot的源码结合网上的资料总结下。&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;public static void main(String[]
-        
-      
-    
-    </summary>
-    
-      <category term="spring" scheme="http://seanthefish.com/categories/spring/"/>
-    
-    
-      <category term="spring" scheme="http://seanthefish.com/tags/spring/"/>
     
   </entry>
   
