@@ -3,7 +3,7 @@
   
     
     <entry>
-      <title></title>
+      <title><![CDATA[mysql之锁和mvcc]]></title>
       <url>/2020/12/02/mysql-lock/</url>
       <content type="html"><![CDATA[<p>参考 <a href="https://draveness.me/database-concurrency-control/" target="_blank" rel="noopener">https://draveness.me/database-concurrency-control/</a>  <a href="https://segmentfault.com/a/1190000016956088" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016956088</a>  <a href="https://yq.aliyun.com/aracles/626848" target="_blank" rel="noopener">https://yq.aliyun.com/aracles/626848</a>  <a href="https://zhuanlan.zhihu.com/p/73078137" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/73078137</a> <a href="https://tech.meituan.com/2014/08/20/innodb-lock.html" target="_blank" rel="noopener">https://tech.meituan.com/2014/08/20/innodb-lock.html</a> <a href="https://www.cnblogs.com/crazylqy/p/7611069.html" target="_blank" rel="noopener">https://www.cnblogs.com/crazylqy/p/7611069.html</a> <a href="https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/" target="_blank" rel="noopener">https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/</a></p>
 <h2 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h2><p>先说乐观锁吧，因为比较好解释，而且乐观锁不属于mysql的一部分。</p>
@@ -158,7 +158,7 @@
     </entry>
     
     <entry>
-      <title></title>
+      <title><![CDATA[mysql之索引优化]]></title>
       <url>/2020/12/02/mysql-index/</url>
       <content type="html"><![CDATA[<h2 id="索引的优点"><a href="#索引的优点" class="headerlink" title="索引的优点"></a>索引的优点</h2><ul>
 <li>索引大大减少了服务器需要扫描的数据量。</li>
@@ -298,7 +298,7 @@ FROM song;
     </entry>
     
     <entry>
-      <title></title>
+      <title><![CDATA[mysql之schema与数据类型优化]]></title>
       <url>/2020/12/02/mysql-schema/</url>
       <content type="html"><![CDATA[<h2 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h2><p><strong>更小的通常更好</strong></p>
 <p>一般情况下，应该尽量使用存储数据最小的数据单类型</p>
