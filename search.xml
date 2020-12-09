@@ -3,6 +3,188 @@
   
     
     <entry>
+      <title><![CDATA[mysql之query]]></title>
+      <url>/2020/12/03/mysql-query/</url>
+      <content type="html"><![CDATA[<p>对 MySql 进行优化，必须对 Scheme，索引，查询语句一同优化。</p>
+<p>通过前面的章节我们掌握了 Scheme 和 索引的优化，最后我们来看一下查询优化。</p>
+<p>为了优化查询，我们必须先了解查询是怎样执行的，然后探讨优化器在哪些方面做得还不足，以帮助 MySql 更有效的执行查询。</p>
+<h2 id="优化数据访问"><a href="#优化数据访问" class="headerlink" title="优化数据访问"></a>优化数据访问</h2><p>在一条 Sql 语句执行的很慢的时候，可以从以下两个方面来分析：</p>
+<ul>
+<li>是否在检索的时候访问了太多的行或者列</li>
+<li>MySql 服务器是否在分析大量超过需要的行</li>
+</ul>
+<h3 id="请求了不需要的数据"><a href="#请求了不需要的数据" class="headerlink" title="请求了不需要的数据"></a>请求了不需要的数据</h3><h4 id="万恶之源-SELECT"><a href="#万恶之源-SELECT" class="headerlink" title="万恶之源 SELECT *"></a>万恶之源 SELECT *</h4><p>SELECT *必然要回表的，随意就算where子句命中了索引，还是要最后回表查询，效率低下，还会为服务器带来额外的I/O、内存和CPU的消耗。</p>
+<p>一个很好用的观点就是在每次使用 SELECT * 取出全部行的时候都要审视一下自己是否需要全部数据。</p>
+<p>取出所有列可能使得索引覆盖无效，一些 DBA 是严格禁止 SELECT * 的写法的。</p>
+<h4 id="重复查询数据"><a href="#重复查询数据" class="headerlink" title="重复查询数据"></a>重复查询数据</h4><p>有些地方可能会不小心的重复查询了相同的数据。比如在论坛中，如果一个人回复多次，很有可能会一不小心每次都去请求这个人的资料，一个有效的方法就是使用缓存。</p>
+<h3 id="扫描额外的记录"><a href="#扫描额外的记录" class="headerlink" title="扫描额外的记录"></a>扫描额外的记录</h3><p>确定查询只返回需要的数据以后，接下来该看一下为了返回需要的记录是否扫描了太多行了。有两个指标我们需要关注，一个是扫描的行数和返回行数的比值，另外一个是扫描的访问类型。</p>
+<p>扫描行数和返回行数的比值如果过低，则需要扫描大量的数据才能返回结果，通常可以使用如下的方法来保存数据：</p>
+<ul>
+<li>使用索引覆盖，把所有的列放入索引中，就无需扫描表了</li>
+<li>改变数据库结构，比如采用单独的表汇总表</li>
+<li>重新写这个 SQL 语句</li>
+</ul>
+<p>在 EXPLAIN 语句中的 type 列中反应了访问类型，从慢到快分别是：</p>
+<p>全表扫描，索引扫描，范围扫描，唯一索引查询，常数引用。</p>
+<p>如果查询没有使用合适的类型，可以合理的添加索引。</p>
+<h2 id="重构查询方式"><a href="#重构查询方式" class="headerlink" title="重构查询方式"></a>重构查询方式</h2><h3 id="将一个复杂查询拆分成多个查询"><a href="#将一个复杂查询拆分成多个查询" class="headerlink" title="将一个复杂查询拆分成多个查询"></a>将一个复杂查询拆分成多个查询</h3><p>MySql 从设计上让连接和断开都很快。如果只是返回一个小小的结果，MySql 非常高效。</p>
+<p>当然能一个查询就解决的要尽量写成一个查询，只是告诉大家不要太惧怕把查询拆分开来会带来性能损失。</p>
+<h3 id="切分查询"><a href="#切分查询" class="headerlink" title="切分查询"></a>切分查询</h3><p>有时候一个大查询会占用表锁很久，影响业务。这时候可以将大查询分为小查询，每次执行这个查询的一小部分。</p>
+<p>比如定期清除大量数据的时候，如果有一个大的语句一次性完成，则可能会占住很多资源，影响其他查询。</p>
+<p>将删除改写成一次删除一小部分数据，分散开来在不同时间执行，可以将服务器压力分散到很长的一个时间段中。</p>
+<h3 id="分解关联查询"><a href="#分解关联查询" class="headerlink" title="分解关联查询"></a>分解关联查询</h3><p>很多高性能应用会将一个大的关联查询分解成多个单表查询。</p>
+<ul>
+<li>让缓存效率更高，许多应用可以缓存单表查询的结果，那么下次查询的时候可以跳过这次单表查询</li>
+<li>单个查询减少锁的竞争</li>
+<li>更容易对数据库进行拆分</li>
+<li>减少冗余记录查询</li>
+<li>查询本身效率也可能会有所提升。例如，使用IN()代替关联查询，可以让MySQL按照ID顺序进行查询，这可能比随机的关联要更高效。</li>
+</ul>
+<h2 id="MySql-查询过程"><a href="#MySql-查询过程" class="headerlink" title="MySql 查询过程"></a>MySql 查询过程</h2><ul>
+<li>客户端发送一条查询给服务器。</li>
+<li>服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。否则进入下一阶段。</li>
+<li>服务器端进行SQL解析、预处理，再由优化器生成对应的执行计划。</li>
+<li>MySQL根据优化器生成的执行计划，调用存储引擎的API来执行查询。</li>
+<li>将结果返回给客户端。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/09/AaxBK81qvcgdjfF.png" alt="image.png"></p>
+<h3 id="MySQL-通信协议"><a href="#MySQL-通信协议" class="headerlink" title="MySQL 通信协议"></a>MySQL 通信协议</h3><p>MySQL 客户端和服务端的通信是半双工的，这意味着同一个时刻内，客户端和服务端只有一方在发送数据。一旦一方开始发送数据，另外一端必须接受完整个消息才能进行响应。</p>
+<p>这就是为什么当查询语句特别长的时候，max_allowed_packet 特别重要了。</p>
+<p>当客户端从服务器取数据时，看起来是一个拉数据的过程，但实际上是MySQL在向客户端推送数据的过程。客户端不断地接收从服务器推送的数据，客户端也没法让服务器停下来。客户端像是“从消防水管喝水”. 所以在必要的时候需要添加 LIMIT 限制。</p>
+<p>多数连接MySQL的库函数都可以获得全部结果集并缓存到内存里，还可以逐行获取需要的数据。默认一般是获得全部结果集并缓存到内存中。MySQL通常需要等所有的数据都已经发送给客户端才能释放这条查询所占用的资源，所以接收全部结果并缓存通常可以减少服务器的压力，让查询能够早点结束、早点释放相应的资源。</p>
+<p><strong>查询状态</strong><br>对于一个 MySQL 连接，任何时刻都有一个状态，该状态表示了 MySQL 当前正在做什么，用 SHOW FULL PROCESSLIST 命令即可。</p>
+<ul>
+<li><p>Sleep 线程正在等待客户端发送新的请求。</p>
+</li>
+<li><p>Query 线程正在执行查询或者在将结果发送给客户端</p>
+</li>
+<li><p>Locked 该线程在等待表锁</p>
+</li>
+<li><p>Analyzing and statistics 线程正在收集存储引擎的统计信息，并且生成执行计划。</p>
+</li>
+<li><p>Copying to tmp table 线程正在把数据复制到一个临时表中，一般在 Group By 或者排序的时候会出现这个状态。</p>
+</li>
+<li><p>Sorting result 线程正在排序数据</p>
+</li>
+<li><p>Sending data 线程可能在多个状态之间传送数据，或者在向客户端返回数据。</p>
+</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><p>MySQL查询缓存是MySQL中比较独特的一个缓存区域，用来缓存特定Query的整个结果集信息，且共享给所有客户端。为了提高完全相同的Query语句的响应速度，MySQL Server会对查询语句进行Hash计算后，把得到的hash值与Query查询的结果集对应存放在Query Cache中。当MySQL打开Query Cache之后，MySQL会对接收到的每一个SELECT 语句通过特定的Hash算法计算该Query的Hash值，然后通过该hash值到Query Cache中去匹配。</p>
+<p>如果没有匹配，将这个hash值存放在一个hash链表中，并将Query的结果集存放到cache中，存放hash值链表的每个hash节点存放了相应Quey结果集在cache中的地址，以及该query所涉及到一些table相关信息；</p>
+<p>如果通过hash值匹配到了一样的Query，则直接将cache中相应的Query结果集返回给客户端。</p>
+<p>目前MySQL Query Cache只会cache select语句，其他类似show ，use的语句不会被cache。 MySQL 的每个Query Cache都是以SQL文本作为key来存储的，在应用Query Cache之前，SQL文本不会做任何处理。也就是说，两个SQL语句，只要相差哪怕一个字符(例如大小写不一样，多一个空格，多注释)，那么这两个SQL将使用不同的Cache地址。</p>
+<p>打开查询缓存对读和写操作都会带来额外的消耗：</p>
+<ul>
+<li>读查询在开始之前必须先检查是否命中缓存。</li>
+<li>如果这个读查询可以被缓存，那么当完成执行后，MySQL若发现查询缓存中没有这个查询，会将其结果存入查询缓存，这会带来额外的系统消耗。</li>
+<li>这对写操作也会有影响，因为当向某个表写入数据的时候，MySQL必须将对应表的所有缓存都设置失效。如果查询缓存非常大或者碎片很多，这个操作就可能会带来很大系统消耗</li>
+<li>如果查询缓存使用了很大量的内存，缓存失效操作就可能成为一个非常严重的问题瓶颈。如果缓存中存放了大量的查询结果，那么缓存失效操作时整个系统都可能会僵死一会儿。因为这个操作是靠一个全局锁操作保护的，所有需要做该操作的查询都要等待这个锁，而且无论是检测是否命中缓存、还是缓存失效检测都需要等待这个全局锁。</li>
+<li>对InnoDB表，当修改一个表时，设置了缓存失效，但是多版本特性会暂时将这修改对其他事务屏蔽，在这个事务提交之前，所有查询都无法使用缓存，直到这个事务被提交，所以长时间的事务，会大大降低查询缓存的命中</li>
+<li>相关系统变量设置不合理会造成大量的内存碎片，这样便会导致Query Cache频繁清理内存。</li>
+<li>查询语句不同，但查询结果相同的查询都会被缓存，缓存了却用不到，这样便会造成内存资源的过度消耗。</li>
+</ul>
+<p>正因为这些缺点，大多数情况下，缓存的命中率都比较低，简而言之，mysql缓存，不用为妙。</p>
+<h3 id="查询优化处理"><a href="#查询优化处理" class="headerlink" title="查询优化处理"></a>查询优化处理</h3><p>查询的生命周期的下一步是将一个SQL转换成一个执行计划，MySQL再依照这个执行计划和存储引擎进行交互。这包括多个子阶段：解析SQL、预处理、优化SQL执行计划。前两步不重要，这里重点说优化查询计划。</p>
+<h4 id="MySQL-对关联表顺序优化"><a href="#MySQL-对关联表顺序优化" class="headerlink" title="MySQL 对关联表顺序优化"></a>MySQL 对关联表顺序优化</h4><p>三种不同的关联方式：<a href="https://zhuanlan.zhihu.com/p/148517223" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/148517223</a></p>
+<p>MySQL 的优化器会对查询进行静态和动态优化，期中我们只挑最重要的优化讲，也就是对关联表顺序的优化。</p>
+<p>MySQL中“关联”一词所包含的意义比一般意义上理解的要更广泛。总的来说，MySQL认为任何一个查询都是一次“关联”——并不仅仅是一个查询需要到两个表匹配才叫关联，所以在MySQL中，每一个查询，每一个片段（包括子查询，甚至基于单表的SELECT）都可能是关联。</p>
+<p>我们先来看一个 UNION 的例子，对于 UNION 查询，MySQL 会将单个查询结构放入一个临时表（注意临时表是没有索引的）中，然后再重新读出临时表数据来完成 UNION 查询。</p>
+<p>当前MySQL关联执行的策略很简单：MySQL对任何关联都执行嵌套循环关联操作，即MySQL先在一个表中循环取出单条数据，然后再嵌套循环到下一个表中寻找匹配的行，依次下去，直到找到所有表中匹配的行为止。然后根据各个表匹配的行，返回查询中需要的各个列。MySQL会尝试在最后一个关联表中找到所有匹配的行，如果最后一个联表无法找到更多的行以后，MySQL返回到上一层次关联表，看是否能够找到更多的匹配记录，依此类推迭代执行。</p>
+<p>按照这样的方式查找第一个表记录，再嵌套查询下一个关联表，然后回溯到上一个表，在MySQL中是通过嵌套循环的方式实现——正如其名“嵌套循环关联”。</p>
+<p>这种方式被称为：嵌套循环，回溯操作</p>
+<p>请看下面的例子中的简单查询：</p>
+<pre><code class="sql">mysql&gt; SELECT tbl1.col1, tbl2.col2 FROM tbl1 INNER JOIN tbl2 USING (col3) WHERE tbl1.col1 IN(5,6)
+</code></pre>
+<p>假设MySQL按照查询中的表顺序进行关联操作，我们则可以用下面的伪代码表示MySQL将如何完成这个查询：</p>
+<pre><code class="sql">outer_iter = iterator over tbl1 where col1 IN(5,6) 
+outer_row  = outer_iter.next
+while outer_row
+  inner_iter = iterator over tbl2 where col3 = outer_row.col3
+  inner_row=inner_iter.next
+  while inner_row
+    output [outer_row.col1, inner_row.col2]
+    inner_row = inner_iter.next
+  end
+  outer_row=outer_iter.netxt
+end
+</code></pre>
+<p>上面的执行计划对于单表查询和多表关联查询都适用，如果是一个单表查询，那么只需完成上面外层的基本操作。对于外连接上面的执行过程仍然适用。</p>
+<p><img src="https://i.loli.net/2020/12/09/7QJy1p98xF5VCa3.png" alt="image.png"></p>
+<p>从本质上说，MySQL对所有的类型的查询都以同样的方式运行。例如，MySQL在FROM子句中遇到子查询时，先执行子查询并将其结果放到一个临时表中，然后将这个临时表当作一个普通表对待（正如其名“派生表”）。MySQL在执行UNION查询时也使用类似的临时表，在遇到右外连接的时候，MySQL将其改写成等价的左外连接。简而言之，当前版本的MySQL会将所有的查询类型都转换成类似的执行计划。</p>
+<h4 id="执行计划"><a href="#执行计划" class="headerlink" title="执行计划"></a>执行计划</h4><p>MySQL生成查询的一棵指令树，然后通过存储引擎执行完成这棵指令树并返回结果。最终的执行计划包含了重构查询的全部信息。任何多表查询都可以使用一棵树表示：</p>
+<p><img src="https://i.loli.net/2020/12/09/N8fzEeVYa4ZqbCp.png" alt="image.png"></p>
+<p>在计算机科学中，这被称为一颗平衡树。但是，这并不是MySQL执行查询的方式。正如我们前面章节介绍的，MySQL总是从一个表开始一直嵌套循环、回溯完成所有表关联。所以，MySQL的执行计划总是如图64所示，是一棵左测深度优先的树。</p>
+<p><img src="https://i.loli.net/2020/12/09/OsmwaEon28vXVGl.png" alt="image.png"></p>
+<h4 id="关联查询优化器"><a href="#关联查询优化器" class="headerlink" title="关联查询优化器"></a>关联查询优化器</h4><p>MySQL 优化器决定了多个表关联的顺序，关联优化器可以选择一个代价最小的关联顺序。（有可能先去查询得到结果集比较少的表，这样就可以减少回溯的次数）</p>
+<p>有时候优化器选择的不是最优的顺序，这时候可以使用 STRAUGHT_JOIN 关键字进行查询，让优化器按照你认为最优的顺序查询，但是一般来说人判断的都没有优化器好。</p>
+<p>优化器会尝试在所有的顺序中选择一个成本最小的关联顺序，但是当表非常多的时候，比如有 n 张表进行关联，就要进行 n！ 次比较。当表超过 optimizer_search_depth 的时候，就会选择贪婪搜索模式了。</p>
+<h3 id="MySQL-查询优化器的局限性"><a href="#MySQL-查询优化器的局限性" class="headerlink" title="MySQL 查询优化器的局限性"></a>MySQL 查询优化器的局限性</h3><h4 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h4><p>MySQL 的子查询优化的相当糟糕，最糟糕的一类是子查询中 WHERE 条件包含了 IN() 的子查询。比如用下面的语句查询</p>
+<pre><code class="sql">SELECT * FROM film WHERE film.id in (SELECT file_id from film_actor WHERE actor_id = 1)
+</code></pre>
+<p>我们可能会认为 MySQL 会执行后面的语句选择出 id 后才执行前面的查询，但是 MySQL 会将外层查询压入子查询中</p>
+<pre><code class="sql">SELECT * FORM film WHERE EXISTS(SELECT * FROM film_actor WHERE actor_id = 1 AND film_actor.film.id = film.id)
+</code></pre>
+<p>这个查询会对 film 进行全表扫描，性能非常糟糕。</p>
+<p>所以我们最好用联合查询来代替这个查询。</p>
+<p>这个问题直到 MySQL 5.5 还存在，MySQL 另外一个分支 MariaDB 在原有的基础上做了大量的改进，例如这里带 IN 的子查询。</p>
+<p>当一个查询能被写成子查询和联合查询的时候，最好通过一些测试来判断哪个写法更快一些</p>
+<h4 id="UNION"><a href="#UNION" class="headerlink" title="UNION"></a>UNION</h4><p>有时候 MySQL 无法将闲置条件由外层推到内层，这使得本能限制扫描行数的 LIMIT 在内层查询中不起作用。</p>
+<p>如果希望 UNION 的各个子句能根据 LIMIT 只取出部分结果集，或者希望能先排好序再分别使用这些子句，那么需要分别对这些查询使用 LIMIT 和 ORDER BY。</p>
+<pre><code class="sql">(SELECT * FROM XXX LIMIT 20) UNION ALL (SELECT * FROM XXX LIMIT 20)
+</code></pre>
+<h4 id="并发执行"><a href="#并发执行" class="headerlink" title="并发执行"></a>并发执行</h4><p>MySQL 无法利用多核特性来并发执行查询。</p>
+<h4 id="最大值和最小值"><a href="#最大值和最小值" class="headerlink" title="最大值和最小值"></a>最大值和最小值</h4><p>对于 MIN 和 MAX 查询，MySQL 的优化做的不是很好，</p>
+<p><code>SELECT MIN(id) FROM actor</code></p>
+<p>因为 id 是递增的，所以只需要扫描一行即可，但是 MySQL 仍然会做全表扫描。可以改下面的写法</p>
+<p><code>SELECT id FROM actor LIMIT 1</code></p>
+<h3 id="特定优化查询"><a href="#特定优化查询" class="headerlink" title="特定优化查询"></a>特定优化查询</h3><p>一般来说，使用 Percona Toolkit 中的 pt-query-advisor 能够解析查询日志，分析查询模式，然后给出详细的建议来帮助你优化 SQL 语句。</p>
+<h4 id="优化-COUNT-查询"><a href="#优化-COUNT-查询" class="headerlink" title="优化 COUNT 查询"></a>优化 COUNT 查询</h4><p>当 COUNT 的值不可能为空的时候，MySQL 会转向统计行数。如果我们想要统计行数的时候，最好直接使用 COUNT(*)。</p>
+<p>这种情况下通配符*并不会像我们猜想的那样扩展成所有的列，实际上，它会忽略所有的列而直接统计所有的行数。</p>
+<h5 id="使用近似值"><a href="#使用近似值" class="headerlink" title="使用近似值"></a>使用近似值</h5><p>有时候某些业务不需要精确值，此时可以用近似值来代替，EXPLAIN 出来的优化器估算的行数就是一个不错的近似值，执行 EXPLAIN 不需要去真正的执行查询，效率高很多。</p>
+<h5 id="更复杂的优化"><a href="#更复杂的优化" class="headerlink" title="更复杂的优化"></a>更复杂的优化</h5><p>通常来说，COUNT()都需要扫描大量的行（意味着要访问大量数据）才能获得精确的结果，因此是很难优化的。除了前面的方法，在MySQL层面还能做的就只有索引覆盖扫描了。</p>
+<h4 id="优化关联查询"><a href="#优化关联查询" class="headerlink" title="优化关联查询"></a>优化关联查询</h4><ul>
+<li>确保 ON 或者 USING 上的列有索引，在创建索引的时候需要考虑到关联列的顺序，比如说表 A，B 用列 c 进行关联的时候，如果优化器的关联顺序是 B，A，则只需要在 A 上建立索引即可。</li>
+<li>确保任何的 GROUP BY 和 ORDER BY 只涉及到一个表中的列</li>
+</ul>
+<h4 id="优化子查询"><a href="#优化子查询" class="headerlink" title="优化子查询"></a>优化子查询</h4><p>关于子查询给出的最主要的优化方法是：尽量使用关联查询代替子查询，因为 MySQL 的子查询优化的非常烂。不过这条意见只在旧版本有用，在 MySQL 5.6 以上和 MariaDB 中，可以忽略掉这条优化。</p>
+<h4 id="优化-GROUP-BY-和-DISTINCT"><a href="#优化-GROUP-BY-和-DISTINCT" class="headerlink" title="优化 GROUP BY 和 DISTINCT"></a>优化 GROUP BY 和 DISTINCT</h4><p>MySQL 经常用同样的方法来优化这两个查询，它们都会用索引来优化，这也是最有效的优化办法。</p>
+<p>当无法使用索引的时候，MySQL 会用临时表或者文件排序来执行 GROUP BY。</p>
+<p>如果需要对关联查询做分组，那么通常采用标识列来进行分组效率会比较高。</p>
+<h4 id="优化-LIMIT-分页"><a href="#优化-LIMIT-分页" class="headerlink" title="优化 LIMIT 分页"></a>优化 LIMIT 分页</h4><p>当系统需要进行分页操作的时候通常会使用 LIMIT 加 偏移量的操作，同时加上合适的 ORDER BY 语句。如果有对应的索引，效率通常会不错。</p>
+<p>但是当偏移量非常大的时候，LIMIT 10000,20，这种语句会导致扫描了10020 行，但是只返回 20 行。</p>
+<p>优化这种查询的方法有：</p>
+<ul>
+<li>使用索引覆盖，只搜索引覆盖的行，然后通过一次查询把所有需要的数据查找出来</li>
+<li>通过延迟关联，（先查询有索引覆盖的记录，例如主键，然后通过这些主键来得到需要的列，以避免mysql直接在巨大的废弃数据上回表）</li>
+</ul>
+<h4 id="优化-SQL-CALC-FOUND-ROWS"><a href="#优化-SQL-CALC-FOUND-ROWS" class="headerlink" title="优化 SQL_CALC_FOUND_ROWS"></a>优化 SQL_CALC_FOUND_ROWS</h4><p>分页的时候有时候会通过在 LIMIT 语句中加上 SQL_CALC_FOUND_ROWS。这样就可以获取去掉 LIMIT 条件后查询的行数，加上这个提示以后，不管是否需要，都会把全部的行都扫描一遍，而不是在满足了 LIMIT 的大小后停止扫描，这样会带来很大开销。</p>
+<p>解决这个问题有两个方法</p>
+<ul>
+<li>采用 EXPLAIN ROW 中的近似值，有时候不需要那么精准的数据</li>
+<li>先获得比较多的缓存集，比如设置一个 100 页和一个 100 页以后的按钮，当用户需要 100 页后的按钮再去获取。</li>
+</ul>
+<h4 id="优化-UNION-查询"><a href="#优化-UNION-查询" class="headerlink" title="优化 UNION 查询"></a>优化 UNION 查询</h4><p>除非确实需要服务器消除重复的行，否则必须要使用 UNION ALL。</p>
+<p>如果没有 ALL 关键字，MySQL 会给临时表加上 DISTINCT 选项，然后做一次查重操作，这将带来极大的开销。</p>
+<hr>
+<p>整体看下来，其实也就三点，不用子查询，子句用索引，select索引覆盖避免回表。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[mysql之锁和mvcc]]></title>
       <url>/2020/12/02/mysql-lock/</url>
       <content type="html"><![CDATA[<p>参考 <a href="https://draveness.me/database-concurrency-control/" target="_blank" rel="noopener">https://draveness.me/database-concurrency-control/</a>  <a href="https://segmentfault.com/a/1190000016956088" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016956088</a>  <a href="https://yq.aliyun.com/aracles/626848" target="_blank" rel="noopener">https://yq.aliyun.com/aracles/626848</a>  <a href="https://zhuanlan.zhihu.com/p/73078137" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/73078137</a> <a href="https://tech.meituan.com/2014/08/20/innodb-lock.html" target="_blank" rel="noopener">https://tech.meituan.com/2014/08/20/innodb-lock.html</a> <a href="https://www.cnblogs.com/crazylqy/p/7611069.html" target="_blank" rel="noopener">https://www.cnblogs.com/crazylqy/p/7611069.html</a> <a href="https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/" target="_blank" rel="noopener">https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/</a></p>
@@ -1868,178 +2050,6 @@ end
     </entry>
     
     <entry>
-      <title><![CDATA[redis进阶之分布式锁]]></title>
-      <url>/2020/11/28/redis-7/</url>
-      <content type="html"><![CDATA[<hr>
-<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
-<hr>
-<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
-<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
-<p>这里给出java版本的代码</p>
-<pre><code class="java">    // 加锁
-    @Override
-    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
-        try {
-            return lockRedisTemplate.execute(
-                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
-                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
-                    )
-            );
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 解锁
-    @Override
-    public boolean del(String key, String value) {
-        try {
-            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
-                    + &quot; return true; &quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end; &quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 锁续约
-    @Override
-    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
-        try {
-            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
-                    + &quot; return true;&quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end;&quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
-        } catch (Exception e){
-            if (!(e.getCause().getCause() instanceof InterruptedException)){
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }
-</code></pre>
-<p>需要注意的几点：</p>
-<ul>
-<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
-<li>锁有过期时间，为了防止死锁</li>
-<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
-<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
-          boolean failed = true;
-          try {
-              boolean interrupted = false;
-              for (;;) {
-                  final Node p = node.predecessor();
-                  if (p == head &amp;&amp; tryAcquire(arg)) {
-                      setHead(node);
-                      p.next = null;
-                      failed = false;
-                      return interrupted;
-                  }
-                  // 就是这一行
-                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
-                      interrupted = true;
-                  }
-              }
-          } finally {
-              if (failed) {
-                  cancelAcquire(node);
-              }
-          }
-      }
-</code></pre>
-</li>
-</ul>
-<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
-<ul>
-<li>客户端A获取 master 中的锁。</li>
-<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
-<li>slave 晋升为 master。</li>
-<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
-</ul>
-<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
-<ul>
-<li>它以毫秒为单位获取当前时间。</li>
-<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
-<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
-<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
-<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
-</ul>
-<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
-<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
-<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
-<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
-<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
-</li>
-<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
-</li>
-<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
-</li>
-</ol>
-<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
-<li><p>能够自动释放锁</p>
-</li>
-<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
-</li>
-<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
-</li>
-<li><p>重试获取锁要有一定次数限制</p>
-</li>
-</ol>
-<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
-<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
-</li>
-<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
-</li>
-<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
-</li>
-</ol>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
-<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
-</li>
-<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
-</li>
-<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
-</li>
-<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
-</li>
-<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
-</li>
-<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
-</li>
-</ol>
-]]></content>
-      
-        <categories>
-            
-            <category> redis </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> redis </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[redis进阶之缓存]]></title>
       <url>/2020/11/28/redis-6/</url>
       <content type="html"><![CDATA[<h2 id="缓存的收益和成本"><a href="#缓存的收益和成本" class="headerlink" title="缓存的收益和成本"></a>缓存的收益和成本</h2><p>收益:</p>
@@ -2319,6 +2329,178 @@ es1:19000&gt; get bitmap_cat
 <p>（5）尝试删除缓存操作，发现删除失败；</p>
 <p>（6）将这些信息发送至消息队列；</p>
 <p>（7）重新从消息队列中获得该数据，重试操作。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[redis进阶之分布式锁]]></title>
+      <url>/2020/11/28/redis-7/</url>
+      <content type="html"><![CDATA[<hr>
+<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<hr>
+<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
+<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
+<p>这里给出java版本的代码</p>
+<pre><code class="java">    // 加锁
+    @Override
+    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
+        try {
+            return lockRedisTemplate.execute(
+                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
+                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
+                    )
+            );
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 解锁
+    @Override
+    public boolean del(String key, String value) {
+        try {
+            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
+                    + &quot; return true; &quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end; &quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 锁续约
+    @Override
+    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
+        try {
+            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
+                    + &quot; return true;&quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end;&quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
+        } catch (Exception e){
+            if (!(e.getCause().getCause() instanceof InterruptedException)){
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+</code></pre>
+<p>需要注意的几点：</p>
+<ul>
+<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
+<li>锁有过期时间，为了防止死锁</li>
+<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
+<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
+          boolean failed = true;
+          try {
+              boolean interrupted = false;
+              for (;;) {
+                  final Node p = node.predecessor();
+                  if (p == head &amp;&amp; tryAcquire(arg)) {
+                      setHead(node);
+                      p.next = null;
+                      failed = false;
+                      return interrupted;
+                  }
+                  // 就是这一行
+                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                      interrupted = true;
+                  }
+              }
+          } finally {
+              if (failed) {
+                  cancelAcquire(node);
+              }
+          }
+      }
+</code></pre>
+</li>
+</ul>
+<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
+<ul>
+<li>客户端A获取 master 中的锁。</li>
+<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
+<li>slave 晋升为 master。</li>
+<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
+</ul>
+<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
+<ul>
+<li>它以毫秒为单位获取当前时间。</li>
+<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
+<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
+<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
+<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
+</ul>
+<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
+<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
+<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
+<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
+<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
+</li>
+<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
+</li>
+<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
+</li>
+</ol>
+<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
+<li><p>能够自动释放锁</p>
+</li>
+<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
+</li>
+<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
+</li>
+<li><p>重试获取锁要有一定次数限制</p>
+</li>
+</ol>
+<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
+<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
+</li>
+<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
+</li>
+<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
+</li>
+</ol>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
+<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
+</li>
+<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
+</li>
+<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
+</li>
+<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
+</li>
+<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
+</li>
+<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
+</li>
+</ol>
 ]]></content>
       
         <categories>
