@@ -5,7 +5,272 @@
     <entry>
       <title><![CDATA[分布式id算法]]></title>
       <url>/2020/12/04/distributed-id/</url>
-      <content type="html"></content>
+      <content type="html"><![CDATA[<p>转载自 <a href="https://tech.meituan.com/2017/04/21/mt-leaf.html" target="_blank" rel="noopener">https://tech.meituan.com/2017/04/21/mt-leaf.html</a></p>
+<h2 id="snowflake"><a href="#snowflake" class="headerlink" title="snowflake"></a>snowflake</h2><p><img src="https://i.loli.net/2020/12/11/PNKrUD7tVpgmE3w.png" alt="image.png"></p>
+<p>SnowFlake所生成的ID一共分成四部分：</p>
+<ul>
+<li>第一位<br>占用1bit，其值始终是0，没有实际作用。</li>
+<li>时间戳<br>占用41bit，精确到毫秒，总共可以容纳约140年的时间。</li>
+<li>工作机器id<br>占用10bit，其中高位5bit是数据中心ID（datacenterId），低位5bit是工作节点ID（workerId），做多可以容纳1024个节点。</li>
+<li>序列号<br>占用12bit，这个值在同一毫秒同一节点上从0开始不断累加，最多可以累加到4095。</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>毫秒数在高位，自增序列在低位，整个ID都是趋势递增的。</li>
+<li>不依赖数据库等第三方系统，以服务的方式部署，稳定性更高，生成ID的性能也是非常高的。</li>
+<li>可以根据自身业务特性分配bit位，非常灵活。</li>
+</ul>
+<p>缺点：</p>
+<p>强依赖机器时钟，如果机器上时钟回拨，会导致发号重复或者服务会处于不可用状态。</p>
+<h2 id="Leaf"><a href="#Leaf" class="headerlink" title="Leaf"></a>Leaf</h2><h3 id="Leaf-segment"><a href="#Leaf-segment" class="headerlink" title="Leaf-segment"></a>Leaf-segment</h3><p>在数据库自增id的基础上，改为利用proxy server批量获取，每次获取一个segment(step决定大小)号段的值。用完之后再去数据库获取新的号段，可以大大的减轻数据库的压力。 </p>
+<p>各个业务不同的发号需求用biz_tag字段来区分，每个biz-tag的ID获取相互隔离，互不影响。如果以后有性能需求需要对数据库扩容，不需要上述描述的复杂的扩容操作，只需要对biz_tag分库分表就行。</p>
+<p>数据库表设计如下：</p>
+<pre><code>+-------------+--------------+------+-----+-------------------+-----------------------------+
+| Field       | Type         | Null | Key | Default           | Extra                       |
++-------------+--------------+------+-----+-------------------+-----------------------------+
+| biz_tag     | varchar(128) | NO   | PRI |                   |                             |
+| max_id      | bigint(20)   | NO   |     | 1                 |                             |
+| step        | int(11)      | NO   |     | NULL              |                             |
+| desc        | varchar(256) | YES  |     | NULL              |                             |
+| update_time | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++-------------+--------------+------+-----+-------------------+-----------------------------+
+</code></pre><p>重要字段说明：</p>
+<ul>
+<li>biz_tag用来区分业务，</li>
+<li>max_id表示该biz_tag目前所被分配的ID号段的最大值，</li>
+<li>step表示每次分配的号段长度。</li>
+</ul>
+<p>原来获取ID每次都需要写数据库，现在只需要把step设置得足够大，比如1000。那么只有当1000个号被消耗完了之后才会去重新读写一次数据库。读写数据库的频率从1减小到了1/step，大致架构如下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/11/iqvSGutH7ULD53d.png" alt="image.png"></p>
+<p>test_tag在第一台Leaf机器上是1~1000的号段，当这个号段用完时，会去加载另一个长度为step=1000的号段，假设另外两台号段都没有更新，这个时候第一台机器新加载的号段就应该是3001~4000。同时数据库对应的biz_tag这条数据的max_id会从3000被更新成4000，更新号段的SQL语句如下：</p>
+<pre><code class="sql">Begin
+UPDATE table SET max_id=max_id+step WHERE biz_tag=xxx
+SELECT tag, max_id, step FROM table WHERE biz_tag=xxx
+Commit
+</code></pre>
+<p>这种模式有以下优缺点：</p>
+<p>优点：</p>
+<ul>
+<li>Leaf服务可以很方便的线性扩展，性能完全能够支撑大多数业务场景。</li>
+<li>ID号码是趋势递增的8byte的64位数字，满足上述数据库存储的主键要求。</li>
+<li>容灾性高：Leaf服务内部有号段缓存，即使DB宕机，短时间内Leaf仍能正常对外提供服务。</li>
+<li>可以自定义max_id的大小，非常方便业务从原有的ID方式上迁移过来。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>ID号码不够随机，能够泄露发号数量的信息，不太安全。</li>
+<li>TP999数据波动大，当号段使用完之后还是会hang在更新数据库的I/O上，tg999数据会出现偶尔的尖刺。</li>
+<li>DB宕机会造成整个系统不可用。</li>
+</ul>
+<h3 id="双buffer优化"><a href="#双buffer优化" class="headerlink" title="双buffer优化"></a>双buffer优化</h3><p>对于第二个缺点，Leaf-segment做了一些优化，简单的说就是：</p>
+<p>Leaf 取号段的时机是在号段消耗完的时候进行的，也就意味着号段临界点的ID下发时间取决于下一次从DB取回号段的时间，并且在这期间进来的请求也会因为DB号段没有取回来，导致线程阻塞。如果请求DB的网络和DB的性能稳定，这种情况对系统的影响是不大的，但是假如取DB的时候网络发生抖动，或者DB发生慢查询就会导致整个系统的响应时间变慢。</p>
+<p>为此，我们希望DB取号段的过程能够做到无阻塞，不需要在DB取号段的时候阻塞请求线程，即当号段消费到某个点时就异步的把下一个号段加载到内存中。而不需要等到号段用尽的时候才去更新号段。这样做就可以很大程度上的降低系统的TP999指标。详细实现如下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/11/kfwpoHznMdvL865.png" alt="image.png"></p>
+<p>采用双buffer的方式，Leaf服务内部有两个号段缓存区segment。当前号段已下发10%时，如果下一个号段未更新，则另启一个更新线程去更新下一个号段。当前号段全部下发完后，如果下个号段准备好了则切换到下个号段为当前segment接着下发，循环往复。</p>
+<ul>
+<li><p>每个biz-tag都有消费速度监控，通常推荐segment长度设置为服务高峰期发号QPS的600倍（10分钟），这样即使DB宕机，Leaf仍能持续发号10-20分钟不受影响。</p>
+</li>
+<li><p>每次请求来临时都会判断下个号段的状态，从而更新此号段，所以偶尔的网络抖动不会影响下个号段的更新。</p>
+</li>
+</ul>
+<h3 id="Leaf-snowflake"><a href="#Leaf-snowflake" class="headerlink" title="Leaf-snowflake"></a>Leaf-snowflake</h3><p>Leaf-segment方案可以生成趋势递增的ID，同时ID号是可计算的，不适用于订单ID生成场景，比如竞对在两天中午12点分别下单，通过订单id号相减就能大致计算出公司一天的订单量，这个是不能忍受的。面对这一问题，我们提供了 Leaf-snowflake方案。</p>
+<p><img src="https://i.loli.net/2020/12/11/6KBn8mZqvdisIe7.png" alt="image.png"></p>
+<p>Leaf-snowflake方案完全沿用snowflake方案的bit位设计，即是“1+41+10+12”的方式组装ID号。对于workerID的分配，当服务集群数量较小的情况下，完全可以手动配置。Leaf服务规模较大，动手配置成本太高。所以使用Zookeeper持久顺序节点的特性自动对snowflake节点配置wokerID。Leaf-snowflake是按照下面几个步骤启动的：</p>
+<ul>
+<li>启动Leaf-snowflake服务，连接Zookeeper，在leaf_forever父节点下检查自己是否已经注册过（是否有该顺序子节点）。</li>
+<li>如果有注册过直接取回自己的workerID（zk顺序节点生成的int类型ID号），启动服务。</li>
+<li>如果没有注册过，就在该父节点下面创建一个持久顺序节点，创建成功后取回顺序号当做自己的workerID号，启动服务。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/11/HTPO8ylAb1mCDt4.png" alt="image.png"></p>
+<h4 id="解决时钟问题"><a href="#解决时钟问题" class="headerlink" title="解决时钟问题"></a>解决时钟问题</h4><p><img src="https://i.loli.net/2020/12/11/djBTzVf8QmsoAwP.png" alt="image.png"></p>
+]]></content>
+      
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[mysql之分布式事务]]></title>
+      <url>/2020/12/04/mysql-8-ha/</url>
+      <content type="html"><![CDATA[<p>参考 <a href="http://mysql.taobao.org/monthly/2018/12/04/" target="_blank" rel="noopener">http://mysql.taobao.org/monthly/2018/12/04/</a>  <a href="https://zhuanlan.zhihu.com/p/25960208" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/25960208</a>  <a href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/" target="_blank" rel="noopener">https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/</a></p>
+<h2 id="故障恢复"><a href="#故障恢复" class="headerlink" title="故障恢复"></a>故障恢复</h2><h3 id="MySQL的事务处理—两阶段事务提交2PC"><a href="#MySQL的事务处理—两阶段事务提交2PC" class="headerlink" title="MySQL的事务处理—两阶段事务提交2PC"></a>MySQL的事务处理—两阶段事务提交2PC</h3><p>MySQL数据库的INNODB是一款支持OLTP的存储引擎，为支持MySQL的高可用，支持跨机搭建高可用数据库集群。</p>
+<p>MySQL采用了一种简单有效的机制 ———— 基于binlog的复制。</p>
+<p>binlog是binary log的简称，实际上它是一种逻辑日志，相对InnoDB引擎的物理日志，它的数据量更小，格式也更简单，更易于跨机复制，尤其是对于网络环境不是很好的情况下，更具有天然的优势。 </p>
+<p>那么MySQL是如何协调InnoDB引擎与Binlog日志之间的关系呢？</p>
+<p>MySQL采用了两阶段事务提交(Two-Phase Commit Protocol)协议，当操作完成后，首先Prepare事务，在binlog中实际上只是fake一下，不作任何事情，而是innodb层需要将prepare写入redolog中；然后执行commit事务，首先在binlog文件中写入这些操作的binlog日志，完成后再在Innodb的redolog中写入commit日志。（基于事务复制）</p>
+<p><img src="https://i.loli.net/2020/12/12/aZIExXQjld6TvBw.png" alt="image.png"></p>
+<p>注意在写binlog日志时，有个参数sync_binlog来控制何时将binlog fsync到磁盘。</p>
+<ul>
+<li>参数为0时，并不是立即fsync文件到磁盘，而是依赖于操作系统的fsync机制；</li>
+<li>参数为1时，立即fsync文件到磁盘；</li>
+<li>参数大于1时，则达到指定提交次数后，统一fsync到磁盘。 因此只有当sync_binlog参数为1时，才是最安全的，当其不为1时，都存在binlog未fsync到磁盘的风险，若此时发生断电等故障，就有可能出现此事务并未刷出到磁盘，从而故障恢复时将此事务回滚的情况。</li>
+</ul>
+<h3 id="基于binlog的事务恢复流程"><a href="#基于binlog的事务恢复流程" class="headerlink" title="基于binlog的事务恢复流程"></a>基于binlog的事务恢复流程</h3><p>了解了MySQL关于Innodb与Binlog的两阶段提交机制后，就可以更深入去探究MySQL在故障恢复时的处理过程。 </p>
+<p>在MySQL启动时，首先会初始化存储引擎，如本例中的InnoDB引擎，然后InnoDB引擎层会读取redolog进行InnoDB层的故障恢复，回滚未prepared和commit的事务，但对于已经prepared，但未commit的事务，暂时挂起，保存到一个链表中，等待后续读取binlog日志，然后根据binlog日志再对这部分prepared的事务进行处理。 </p>
+<p>接下来，MySQL会读取最后一个binlog文件。binlog文件通常是以固定的文件名加一组连续的编号来命名的，并且将其记录到一个binlog索引文件中，因此索引文件中的最后一个binlog文件即是MySQL将要读取的最后一个binlog文件。读取这个binlog文件时，通过文件头上是否存在标记LOG_EVENT_BINLOG_IN_USE_F，通过这个标记可以知道上次MySQL是正常关闭还是异常关闭，如果是异常关闭，则会进入故障恢复过程。 </p>
+<p>进入故障恢复过程后，会依次读取最后一个binlog文件中的所有log event，并将所有已提交事务的binlog日志中记录的xid提取出来添加到hash表中，以备后续对前述InnoDB故障恢复后遗留的Prepared事务继续处理。另外此处还要定位最后一个完整事务的位置，防止在上次系统异常关闭时有部分binlog日志未刷到磁盘上，即存在写了一半的binlog事务日志，这部分写了一半binlog日志的事务在MySQL中会按事务未提交来处理，后续会将其在存储引擎层回滚。</p>
+<p>当此文件中的内容全部读出之后，一是得到一个已提交事务的列表，另一个是最后一个完整事务的位置。 然后检查由InnoDB层得到的Prepared事务列表，若Prepared事务在从Binlog中得到的提交事务列表中，则在InnoDB层提交此事务，否则回滚此事务。</p>
+<p><img src="https://i.loli.net/2020/12/12/qrvKI2JkF7ubDRx.png" alt="image.png"></p>
+<h3 id="基于binlog的两阶段提交对高可用复制解决方案的影响"><a href="#基于binlog的两阶段提交对高可用复制解决方案的影响" class="headerlink" title="基于binlog的两阶段提交对高可用复制解决方案的影响"></a>基于binlog的两阶段提交对高可用复制解决方案的影响</h3><p>MySQL最常见的高可用解决方案就是基于binlog复制来完成的，通过将master的binlog复制到slave上，然后在slave上重放，从而达到master与slave上数据一致的效果。</p>
+<p>正常情况下，这个方案简单、易用，基本满足大部分用户的高可用需求，但在一些特殊情况下，这个方案还是存在一些不足，可能会导致master与slave存在数据不一致的情况。 如果master与slave之间采用异步模式进行binlog复制，显然就会存在部分binlog未复制到slave的情况。</p>
+<p>为提高可用性，MySQL支持semi-sync模式，也就是当master在提交事务之前，保证binlog已经复制到slave，并且收到slave回复的ACK后，master再将事务提交。Semi-sync模式的复制机制虽然已经极大提高了可用性，但是在极端情况下还是存在master与slave数据不一致的风险，甚至数据丢失的风险。</p>
+<p>考虑一下master出现故障后无法立即恢复的情况，为保障应用的持续性，需要将slave切换为master。若在故障发生前，master恰好有事务正准备提交，并且binlog日志已经刷到磁盘，但在将binlog复制给slave过程中master故障了，备机未收到或只收到部分binlog日志，若此时slave切换为master，显然这些未收到或只收到部分binlog日志的事务是无法重现的，也就是这部分事务是丢失的。</p>
+<p>理论上应用层并未得到事务提交的反馈，即使事务不存在也不是什么问题。问题是若此时用户查询这些事务不存在，准备重做这些事务，更糟的事情发生了，新的mater也发生故障了，并且无法立即恢复。万幸的是原来的master可以恢复工作了，直接作为master就好了，但问题出现了，用户已经在重做这些事务了，但这些事务在这个master已经存在了，原因如前述的基于binlog的事务恢复。这就好比之前买东西已经付钱给商家200块了，结果人家说没收到，我一查账户，也没少钱，那就再付一次吧，结果杯具了，付了400块给人家？？？</p>
+<p><img src="https://i.loli.net/2020/12/12/goV12tmjr9Y5w3M.png" alt="image.png"></p>
+<p>如上图所示：若T2的binlog日志尚未复制到slave时，master故障，原slave切换为master，而原master重启恢复后成为新的slave，如下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/12/c2mEqGQhoMXIrFO.png" alt="image.png"></p>
+<h3 id="高可用必杀技–基于RAFT的多副本集群"><a href="#高可用必杀技–基于RAFT的多副本集群" class="headerlink" title="高可用必杀技–基于RAFT的多副本集群"></a>高可用必杀技–基于RAFT的多副本集群</h3><p>基于RAFT协议的多副本架构，每一条数据都会被复制多份，通过多副本来增加系统的可用性，防止单副本失效而导致数据不可用。多副本之间基于RAFT协议来实现数据的一致性，只有数据存在于半数以上副本方可认为数据有效，而无效的副本数据系统会自动修复，从而确保系统只会提供一个统一的一致性视图。</p>
+<p><img src="https://i.loli.net/2020/12/12/f8HXjUnt7Fsa3lE.png" alt="image.png"></p>
+<h2 id="五大常见的MySQL高可用方案"><a href="#五大常见的MySQL高可用方案" class="headerlink" title="五大常见的MySQL高可用方案"></a>五大常见的MySQL高可用方案</h2><h3 id="主从或主主半同步复制"><a href="#主从或主主半同步复制" class="headerlink" title="主从或主主半同步复制"></a>主从或主主半同步复制</h3><p>使用双节点数据库，搭建单向或者双向的半同步复制。在5.7以后的版本中，由于lossless replication、logical多线程复制等一些列新特性的引入，使得MySQL原生半同步复制更加可靠。</p>
+<p>常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/akTGUXE7d6ejZyc.png" alt="image.png"></p>
+<p>通常会和proxy、keepalived等第三方软件同时使用，即可以用来监控数据库的健康，又可以执行一系列管理命令。如果主库发生故障，切换到备库后仍然可以继续使用数据库。</p>
+<p>优点：</p>
+<ul>
+<li>架构比较简单，使用原生半同步复制作为数据同步的依据；</li>
+<li>双节点，没有主机宕机后的选主问题，直接切换即可；</li>
+<li>双节点，需求资源少，部署简单；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>完全依赖于半同步复制，如果半同步复制退化为异步复制，数据一致性无法得到保证；</li>
+<li>需要额外考虑haproxy、keepalived的高可用机制。</li>
+</ul>
+<h3 id="半同步复制优化"><a href="#半同步复制优化" class="headerlink" title="半同步复制优化"></a>半同步复制优化</h3><p>半同步复制机制是可靠的。如果半同步复制一直是生效的，那么便可以认为数据是一致的。但是由于网络波动等一些客观原因，导致半同步复制发生超时而切换为异步复制，那么这时便不能保证数据的一致性。所以尽可能的保证半同步复制，便可提高数据的一致性。</p>
+<p>该方案同样使用双节点架构，但是在原有半同复制的基础上做了功能上的优化，使半同步复制的机制变得更加可靠。</p>
+<p>可参考的优化方案如下：</p>
+<h4 id="双通道复制"><a href="#双通道复制" class="headerlink" title="双通道复制"></a>双通道复制</h4><p><img src="https://i.loli.net/2020/12/12/xi1XBGUfAcqtMYy.png" alt="image.png"></p>
+<p>半同步复制由于发生超时后，复制断开，当再次建立起复制时，同时建立两条通道，其中一条半同步复制通道从当前位置开始复制，保证从机知道当前主机执行的进度。另外一条异步复制通道开始追补从机落后的数据。当异步复制通道追赶到半同步复制的起始位置时，恢复半同步复制。（无节点晋升，只保证恢复重连，不能重连还是丢数据）</p>
+<h4 id="binlog文件服务器"><a href="#binlog文件服务器" class="headerlink" title="binlog文件服务器"></a>binlog文件服务器</h4><p><img src="https://i.loli.net/2020/12/12/img84WpjaJSPh7r.png" alt="image.png"></p>
+<p>搭建两条半同步复制通道，其中连接文件服务器的半同步通道正常情况下不启用，当主从的半同步复制发生网络问题退化后，启动与文件服务器的半同步复制通道。当主从半同步复制恢复后，关闭与文件服务器的半同步复制通道。</p>
+<p>优点：</p>
+<ul>
+<li>双节点，需求资源少，部署简单；</li>
+<li>架构简单，没有选主的问题，直接切换即可;</li>
+<li>相比于原生复制，优化后的半同步复制更能保证数据的一致性。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要修改内核源码或者使用mysql通信协议。需要对源码有一定的了解，并能做一定程度的二次开发。</li>
+<li>依旧依赖于半同步复制，没有从根本上解决数据一致性问题。</li>
+</ul>
+<h3 id="高可用架构优化"><a href="#高可用架构优化" class="headerlink" title="高可用架构优化"></a>高可用架构优化</h3><p>将双节点数据库扩展到多节点数据库，或者多节点数据库集群。可以根据自己的需要选择一主两从、一主多从或者多主多从的集群。</p>
+<p>由于半同步复制，存在接收到一个从机的成功应答即认为半同步复制成功的特性，所以多从半同步复制的可靠性要优于单从半同步复制的可靠性。并且多节点同时宕机的几率也要小于单节点宕机的几率，所以多节点架构在一定程度上可以认为高可用性是好于双节点架构。</p>
+<p>但是由于数据库数量较多，所以需要数据库管理软件来保证数据库的可维护性。可以选择MMM、MHA或者各个版本的proxy等等。常见方案如下：</p>
+<h4 id="MHA-多节点集群"><a href="#MHA-多节点集群" class="headerlink" title="MHA+多节点集群"></a>MHA+多节点集群</h4><p><img src="https://i.loli.net/2020/12/12/hefHE17v5DTkOQB.png" alt="image.png"></p>
+<p>MHA Manager会定时探测集群中的master节点，当master出现故障时，它可以自动将最新数据的slave提升为新的master，然后将所有其他的slave重新指向新的master，整个故障转移过程对应用程序完全透明。</p>
+<p>MHA Node运行在每台MySQL服务器上，主要作用是切换时处理二进制日志，确保切换尽量少丢数据。</p>
+<p>MHA也可以扩展到如下的多节点集群：</p>
+<p><img src="https://i.loli.net/2020/12/12/zwF5tkgx2hlrCs9.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>可以进行故障的自动检测和转移;</li>
+<li>可扩展性较好，可以根据需要扩展MySQL的节点数量和结构;</li>
+<li>相比于双节点的MySQL复制，三节点/多节点的MySQL发生不可用的概率更低</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>至少需要三节点，相对于双节点需要更多的资源;</li>
+<li>逻辑较为复杂，发生故障后排查问题，定位问题更加困难;</li>
+<li>数据一致性仍然靠原生半同步复制保证，仍然存在数据不一致的风险;</li>
+<li>可能因为网络分区发生<a href="https://cloud.tencent.com/developer/article/1027323" target="_blank" rel="noopener">脑裂现象</a></li>
+</ul>
+<h4 id="zookeeper-proxy"><a href="#zookeeper-proxy" class="headerlink" title="zookeeper+proxy"></a>zookeeper+proxy</h4><p>Zookeeper使用分布式算法保证集群数据的一致性，使用zookeeper可以有效的保证proxy的高可用性，可以较好的避免网络分区现象的产生。</p>
+<p><img src="https://i.loli.net/2020/12/12/Q2RAf5alEyKYqhV.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>较好的保证了整个系统的高可用性，包括proxy、MySQL;</li>
+<li>扩展性较好，可以扩展为大规模集群;</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>数据一致性仍然依赖于原生的mysql半同步复制;</li>
+<li>引入zk，整个系统的逻辑变得更加复杂;</li>
+</ul>
+<h3 id="共享存储"><a href="#共享存储" class="headerlink" title="共享存储"></a>共享存储</h3><p>共享存储实现了数据库服务器和存储设备的解耦，不同数据库之间的数据同步不再依赖于MySQL的原生复制功能，而是通过磁盘数据同步的手段，来保证数据的一致性。</p>
+<h4 id="SAN共享储存"><a href="#SAN共享储存" class="headerlink" title="SAN共享储存"></a>SAN共享储存</h4><p>SAN的概念是允许存储设备和处理器（服务器）之间建立直接的高速网络（与LAN相比）连接，通过这种连接实现数据的集中式存储。常用架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/PkcQJvAft9NrLlS.png" alt="image.png"></p>
+<p>使用共享存储时，MySQL服务器能够正常挂载文件系统并操作，如果主库发生宕机，备库可以挂载相同的文件系统，保证主库和备库使用相同的数据。</p>
+<p>优点：</p>
+<ul>
+<li>两节点即可，部署简单，切换逻辑简单；</li>
+<li>很好的保证数据的强一致性；</li>
+<li>不会因为MySQL的逻辑错误发生数据不一致的情况；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要考虑共享存储的高可用；</li>
+<li>价格昂贵；</li>
+</ul>
+<h4 id="DRBD磁盘复制"><a href="#DRBD磁盘复制" class="headerlink" title="DRBD磁盘复制"></a>DRBD磁盘复制</h4><p>DRBD是一种基于软件、基于网络的块复制存储解决方案，主要用于对服务器之间的磁盘、分区、逻辑卷等进行数据镜像，当用户将数据写入本地磁盘时，还会将数据发送到网络中另一台主机的磁盘上，这样的本地主机(主节点)与远程主机(备节点)的数据就可以保证实时同步。常用架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/Gq2UgbweT4VlBAP.png" alt="image.png"></p>
+<p>当本地主机出现问题，远程主机上还保留着一份相同的数据，可以继续使用，保证了数据的安全。</p>
+<p>DRBD是linux内核模块实现的快级别的同步复制技术，可以与SAN达到相同的共享存储效果。</p>
+<p>优点：</p>
+<ul>
+<li>两节点即可，部署简单，切换逻辑简单；</li>
+<li>相比于SAN储存网络，价格低廉；</li>
+<li>保证数据的强一致性；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>对io性能影响较大；</li>
+<li>从库不提供读操作；</li>
+</ul>
+<h3 id="分布式协议"><a href="#分布式协议" class="headerlink" title="分布式协议"></a>分布式协议</h3><h4 id="MySQL-cluster"><a href="#MySQL-cluster" class="headerlink" title="MySQL cluster"></a>MySQL cluster</h4><p>MySQL cluster是官方集群的部署方案，通过使用NDB存储引擎实时备份冗余数据，实现数据库的高可用性和数据一致性。</p>
+<p><img src="https://i.loli.net/2020/12/12/GwRbnuOYQ7f8TMN.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>全部使用官方组件，不依赖于第三方软件；</li>
+<li>可以实现数据的强一致性；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>国内使用的较少；</li>
+<li>配置较复杂，需要使用NDB储存引擎，与MySQL常规引擎存在一定差异；</li>
+<li>至少三节点；</li>
+</ul>
+<h4 id="Galera"><a href="#Galera" class="headerlink" title="Galera"></a>Galera</h4><p>基于Galera的MySQL高可用集群， 是多主数据同步的MySQL集群解决方案，使用简单，没有单点故障，可用性高。常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/Uk3NCEagJ5sGtZb.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>多主写入，无延迟复制，能保证数据强一致性；</li>
+<li>有成熟的社区，有互联网公司在大规模的使用；</li>
+<li>自动故障转移，自动添加、剔除节点；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要为原生MySQL节点打wsrep补丁</li>
+<li>只支持innodb储存引擎</li>
+<li>至少三节点</li>
+</ul>
+<h4 id="POAXS"><a href="#POAXS" class="headerlink" title="POAXS"></a>POAXS</h4><p>Paxos 算法解决的问题是一个分布式系统如何就某个值（决议）达成一致。这个算法被认为是同类算法中最有效的。Paxos与MySQL相结合可以实现在分布式的MySQL数据的强一致性。常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/yXF7m9T2HsJhRBE.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>多主写入，无延迟复制，能保证数据强一致性；</li>
+<li>有成熟理论基础；</li>
+<li>自动故障转移，自动添加、剔除节点；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>只支持innodb储存引擎</li>
+<li>至少三节点；</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>看起来用mha保证主节点高可用，用raft保证半主从复制的数据一致，可能是一个比较好的办法。</p>
+<p>关于mmm和mha的扩展阅读：<a href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/" target="_blank" rel="noopener">https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/</a></p>
+]]></content>
       
         <categories>
             
@@ -364,6 +629,22 @@ commit;
 <li>在复制之外并行写入</li>
 <li>为复制线程预取缓存</li>
 </ul>
+<h2 id="半同步复制"><a href="#半同步复制" class="headerlink" title="半同步复制"></a>半同步复制</h2><p>半同步复制在提交过程中增加了一个延迟：当提交事务时，在客户端接收到查询结束反馈前，必须保证二进制日志已经传输到至少一台备库上。主库将事务提交到磁盘上之后会增加一些延迟。同样的，这也增加了客户端的延迟，因此其执行大量事务的速度，不会比将这些事务传递给备库的速度更快。</p>
+<p>关于半同步，有一些普遍的误解，下面是它不会去做的：</p>
+<ul>
+<li>在备库提示其已经收到事件前，会阻塞主库上的事务提交。事实上在主库上已经完成事务提交，只有通知客户端被延迟了。</li>
+<li>直到备库执行完事务后，才不会阻塞客户端。备库在接收到事务后发送反馈而非完成事务后发送。</li>
+<li>半同步不总是能够工作。如果备库一直没有回应已收到事件，会超时并转化为正常的异步复制模式。</li>
+</ul>
+<p>在性能方面，从客户端的角度来看，增加了事务提交的延时，延时的多少取决于网络传输，数据写入和刷新到备库磁盘的时间（如果开启了配置）以及备库反馈的网络时间。</p>
+<p>事实上半同步复制在某些场景下确实能够提供足够的灵活性以改善性能，在主库关闭sync_binlog的情况下保证更加安全。写入远程的内存（一台备库反馈）比写入本地的磁盘（写入并刷新）要更快。HenrikIngo运行了一些性能测试表明，使用半同步复制相比在主库上进行强持久化的性能有两倍的改善。在任何系统上都没有绝对的持久化——只有更加高的持久化层次——并且看起来半同步复制应该是一种比其他替代方案开销更小的系统数据持久化方法。除了半同步复制</p>
+<h3 id="mysql同步复制和异步复制的区别："><a href="#mysql同步复制和异步复制的区别：" class="headerlink" title="mysql同步复制和异步复制的区别："></a>mysql同步复制和异步复制的区别：</h3><ul>
+<li>异步复制<br>MySQL复制默认是异步复制，Master将事件写入binlog，提交事务，自身并不知道slave是否接收是否处理；<br>缺点：不能保证所有事务都被所有slave接收。</li>
+<li>同步复制<br>Master提交事务，直到事务在所有slave都已提交，才会返回客户端事务执行完毕信息；<br>缺点：完成一个事务可能造成延迟。</li>
+<li>半同步复制<br>当Master上开启半同步复制功能时，至少有一个slave开启其功能。当Master向slave提交事务，且事务已写入relay-log中并刷新到磁盘上，slave才会告知Master已收到；若Master提交事务受到阻塞，出现等待超时，在一定时间内Master 没被告知已收到，此时Master自动转换为异步复制机制；</li>
+</ul>
+<p>注：半同步复制功能要在Master和slave上开启才会起作用，只开启一边，依然是异步复制。</p>
+<h2 id="复制心跳"><a href="#复制心跳" class="headerlink" title="复制心跳"></a>复制心跳</h2><p>保证备库一直与主库相联系，避免悄无声息地断开连接。如果出现断开的网络连接，备库会注意到丢失的心跳数据。</p>
 ]]></content>
       
         <categories>
@@ -2689,6 +2970,178 @@ end
     </entry>
     
     <entry>
+      <title><![CDATA[redis进阶之分布式锁]]></title>
+      <url>/2020/11/28/redis-7/</url>
+      <content type="html"><![CDATA[<hr>
+<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<hr>
+<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
+<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
+<p>这里给出java版本的代码</p>
+<pre><code class="java">    // 加锁
+    @Override
+    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
+        try {
+            return lockRedisTemplate.execute(
+                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
+                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
+                    )
+            );
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 解锁
+    @Override
+    public boolean del(String key, String value) {
+        try {
+            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
+                    + &quot; return true; &quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end; &quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 锁续约
+    @Override
+    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
+        try {
+            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
+                    + &quot; return true;&quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end;&quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
+        } catch (Exception e){
+            if (!(e.getCause().getCause() instanceof InterruptedException)){
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+</code></pre>
+<p>需要注意的几点：</p>
+<ul>
+<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
+<li>锁有过期时间，为了防止死锁</li>
+<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
+<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
+          boolean failed = true;
+          try {
+              boolean interrupted = false;
+              for (;;) {
+                  final Node p = node.predecessor();
+                  if (p == head &amp;&amp; tryAcquire(arg)) {
+                      setHead(node);
+                      p.next = null;
+                      failed = false;
+                      return interrupted;
+                  }
+                  // 就是这一行
+                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                      interrupted = true;
+                  }
+              }
+          } finally {
+              if (failed) {
+                  cancelAcquire(node);
+              }
+          }
+      }
+</code></pre>
+</li>
+</ul>
+<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
+<ul>
+<li>客户端A获取 master 中的锁。</li>
+<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
+<li>slave 晋升为 master。</li>
+<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
+</ul>
+<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
+<ul>
+<li>它以毫秒为单位获取当前时间。</li>
+<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
+<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
+<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
+<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
+</ul>
+<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
+<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
+<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
+<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
+<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
+</li>
+<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
+</li>
+<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
+</li>
+</ol>
+<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
+<li><p>能够自动释放锁</p>
+</li>
+<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
+</li>
+<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
+</li>
+<li><p>重试获取锁要有一定次数限制</p>
+</li>
+</ol>
+<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
+<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
+</li>
+<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
+</li>
+<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
+</li>
+</ol>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
+<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
+</li>
+<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
+</li>
+<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
+</li>
+<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
+</li>
+<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
+</li>
+<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
+</li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[redis进阶之缓存]]></title>
       <url>/2020/11/28/redis-6/</url>
       <content type="html"><![CDATA[<h2 id="缓存的收益和成本"><a href="#缓存的收益和成本" class="headerlink" title="缓存的收益和成本"></a>缓存的收益和成本</h2><p>收益:</p>
@@ -2968,178 +3421,6 @@ es1:19000&gt; get bitmap_cat
 <p>（5）尝试删除缓存操作，发现删除失败；</p>
 <p>（6）将这些信息发送至消息队列；</p>
 <p>（7）重新从消息队列中获得该数据，重试操作。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> redis </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> redis </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[redis进阶之分布式锁]]></title>
-      <url>/2020/11/28/redis-7/</url>
-      <content type="html"><![CDATA[<hr>
-<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
-<hr>
-<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
-<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
-<p>这里给出java版本的代码</p>
-<pre><code class="java">    // 加锁
-    @Override
-    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
-        try {
-            return lockRedisTemplate.execute(
-                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
-                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
-                    )
-            );
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 解锁
-    @Override
-    public boolean del(String key, String value) {
-        try {
-            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
-                    + &quot; return true; &quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end; &quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 锁续约
-    @Override
-    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
-        try {
-            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
-                    + &quot; return true;&quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end;&quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
-        } catch (Exception e){
-            if (!(e.getCause().getCause() instanceof InterruptedException)){
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }
-</code></pre>
-<p>需要注意的几点：</p>
-<ul>
-<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
-<li>锁有过期时间，为了防止死锁</li>
-<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
-<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
-          boolean failed = true;
-          try {
-              boolean interrupted = false;
-              for (;;) {
-                  final Node p = node.predecessor();
-                  if (p == head &amp;&amp; tryAcquire(arg)) {
-                      setHead(node);
-                      p.next = null;
-                      failed = false;
-                      return interrupted;
-                  }
-                  // 就是这一行
-                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
-                      interrupted = true;
-                  }
-              }
-          } finally {
-              if (failed) {
-                  cancelAcquire(node);
-              }
-          }
-      }
-</code></pre>
-</li>
-</ul>
-<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
-<ul>
-<li>客户端A获取 master 中的锁。</li>
-<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
-<li>slave 晋升为 master。</li>
-<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
-</ul>
-<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
-<ul>
-<li>它以毫秒为单位获取当前时间。</li>
-<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
-<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
-<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
-<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
-</ul>
-<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
-<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
-<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
-<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
-<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
-</li>
-<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
-</li>
-<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
-</li>
-</ol>
-<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
-<li><p>能够自动释放锁</p>
-</li>
-<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
-</li>
-<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
-</li>
-<li><p>重试获取锁要有一定次数限制</p>
-</li>
-</ol>
-<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
-<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
-</li>
-<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
-</li>
-<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
-</li>
-</ol>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
-<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
-</li>
-<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
-</li>
-<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
-</li>
-<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
-</li>
-<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
-</li>
-<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
-</li>
-</ol>
 ]]></content>
       
         <categories>

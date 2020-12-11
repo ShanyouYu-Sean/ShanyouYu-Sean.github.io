@@ -52,7 +52,7 @@
     
     <title>
         
-            k8s中的jvm | 
+            mysql之分布式事务 | 
         
         小鱼肖恩
     </title>
@@ -63,7 +63,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta name="keywords" content="小鱼肖恩,jvm">
+    <meta name="keywords" content="小鱼肖恩,mysql">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -224,7 +224,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="小鱼肖恩">
-    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/11/jvm-in-container/">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/04/mysql-8-ha/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
@@ -243,16 +243,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="http://seanthefish.com/2020/11/11/jvm-in-container/">
+    <meta property="og:url" content="http://seanthefish.com/2020/12/04/mysql-8-ha/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="k8s中的jvm | 小鱼肖恩">
+    <meta property="og:title" content="mysql之分布式事务 | 小鱼肖恩">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
-    <meta property="og:article:tag" content="jvm"> 
+    <meta property="og:article:tag" content="mysql"> 
 
     
-        <meta property="article:published_time" content="Wed Nov 11 2020 10:00:00 GMT+0800">
-        <meta property="article:modified_time" content="Sun Dec 06 2020 21:20:42 GMT+0800">
+        <meta property="article:published_time" content="Fri Dec 04 2020 13:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Sat Dec 12 2020 00:35:22 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -260,7 +260,7 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="http://seanthefish.com/2020/11/11/jvm-in-container/index.html" />
+        <link rel="canonical" href="http://seanthefish.com/2020/12/04/mysql-8-ha/index.html" />
     
 
     <!-- Structured-data for SEO -->
@@ -272,10 +272,10 @@
 {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "mainEntityOfPage": "http://seanthefish.com/2020/11/11/jvm-in-container/index.html",
-    "headline": "k8s中的jvm",
-    "datePublished": "Wed Nov 11 2020 10:00:00 GMT+0800",
-    "dateModified": "Sun Dec 06 2020 21:20:42 GMT+0800",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/04/mysql-8-ha/index.html",
+    "headline": "mysql之分布式事务",
+    "datePublished": "Fri Dec 04 2020 13:00:00 GMT+0800",
+    "dateModified": "Sat Dec 12 2020 00:35:22 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Sean Yu",
@@ -293,7 +293,7 @@
             "url": "/img/favicon.png"
         }
     },
-    "keywords": ",jvm小鱼肖恩",
+    "keywords": ",mysql小鱼肖恩",
     "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
 }
 </script>
@@ -370,6 +370,15 @@
     <!-- Left aligned menu below button -->
     
     
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#故障恢复"><span class="post-toc-number">1.</span> <span class="post-toc-text">故障恢复</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MySQL的事务处理—两阶段事务提交2PC"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">MySQL的事务处理—两阶段事务提交2PC</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于binlog的事务恢复流程"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">基于binlog的事务恢复流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于binlog的两阶段提交对高可用复制解决方案的影响"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">基于binlog的两阶段提交对高可用复制解决方案的影响</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#高可用必杀技–基于RAFT的多副本集群"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">高可用必杀技–基于RAFT的多副本集群</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#五大常见的MySQL高可用方案"><span class="post-toc-number">2.</span> <span class="post-toc-text">五大常见的MySQL高可用方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#主从或主主半同步复制"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">主从或主主半同步复制</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#半同步复制优化"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">半同步复制优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#双通道复制"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">双通道复制</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#binlog文件服务器"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">binlog文件服务器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#高可用架构优化"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">高可用架构优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#MHA-多节点集群"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">MHA+多节点集群</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#zookeeper-proxy"><span class="post-toc-number">2.3.2.</span> <span class="post-toc-text">zookeeper+proxy</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#共享存储"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">共享存储</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#SAN共享储存"><span class="post-toc-number">2.4.1.</span> <span class="post-toc-text">SAN共享储存</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#DRBD磁盘复制"><span class="post-toc-number">2.4.2.</span> <span class="post-toc-text">DRBD磁盘复制</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#分布式协议"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">分布式协议</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#MySQL-cluster"><span class="post-toc-number">2.5.1.</span> <span class="post-toc-text">MySQL cluster</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Galera"><span class="post-toc-number">2.5.2.</span> <span class="post-toc-text">Galera</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#POAXS"><span class="post-toc-number">2.5.3.</span> <span class="post-toc-text">POAXS</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">3.</span> <span class="post-toc-text">总结</span></a></li></ol>
+    </ul>
+    
 
 
 
@@ -399,7 +408,7 @@
         
     
             <p class="article-headline-p">
-                k8s中的jvm
+                mysql之分布式事务
             </p>
         </div>
 
@@ -418,7 +427,7 @@
     <!-- Author Name & Date -->
     <div>
         <strong>Sean Yu</strong>
-        <span>11月 11, 2020</span>
+        <span>12月 04, 2020</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -440,7 +449,7 @@
 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
     <li class="mdl-menu__item">在其它设备中阅读本文章</li>
     
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACXUlEQVR42u3aQZLDIAwEwPz/07svSDySDCap9mmrNiY0B1AGvf5++nnh4eHh4eHh4eEdxnvFTzT0m88nI1ffevtdeHh4eFt4yaTzt6JJBMjm3PDw8PA28qpfmQB67N7c8PDw8E7mJQV3vt3nVDw8PLzv5X2eVjVQSAp3PDw8vDN5yQ/++XZ/dNaCh4eHF/N62/eev7fe7+Hh4eEFvHJLU7wEvYL75qYrPDw8vAW8fCOuFtx3tRGU54OHh4e3hZdEAL1IIqcmAXEzxsXDw8Nbxqtu0PPGgmrTVbSIeHh4eIt51Wklm35SsudvlRcODw8PbzEv38RH1/nFOKMXCuPh4eHt4SUb8eQguatdtRBY4OHh4S3m5cVrL3LNJ5oX7hdxMx4eHt5DvEkMMWkUmBfWeHh4eKt5+YSSyeX/zRsC8qAEDw8Pbw+vF0PkxXfvqiw/HvDw8PD28/IvztuhCpdVg4K7UFLj4eHhLeNdxKPFiKF3JVY9hPDw8PCe4uWFcjWEzVsEqrFvOcbFw8PDu4lXvcKfsJODJ49FyjEuHh4e3gJeMkRvunl025sVHh4e3gm8fJvOw9b8QmsUduDh4eFt5OWDJs1VeZRQjUIulhsPDw9vMa/65FdWvaK8twR4eHh4O3nVrX/+Vr5kNzRd4eHh4S3j9WLceTibjHbDwYCHh4e3jDdvqKpGDA9kLXh4eHgH83rI6iUZHh4e3nfxeq0D81atix8AeHh4eBt5yeZebbfKD5hqTIyHh4f3LG/eVvX5MEhii3Lo8G40PDw8vMW833vw8PDw8PDw8PAOeP4BtJyvWx3bKb8AAAAASUVORK5CYII=">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACbElEQVR42u3aO27DQAwFQN//0kmbIrDe42rXH4wqA4ZkjgpyTfLx89XXAw8PDw8PDw8P7814j/hK7vr77T8/HDzzhtjw8PDwjvAuUu3TcJPg8nuT13TxUvDw8PAO8pJEn4fbJvqEmhQhPDw8vPfnJUfk5/j8d/Hw8PA+l5eD81YCHh4e3ifykj/8bSs2eXJyTD/Ua8HDw8OLeW36Pvn56HwPDw8PL+DVK02j1J8Xhvb5F0tXeHh4eBt4eSKeBZevcK3Hg4eHh3eG17YJ8uDWkcmwbXikxsPDw1vgJYP8tkjMisrK+gIeHh7eq3h5IyAZ/OeFJB90Df8x4OHh4d3Ky9cFknbDDNC2My6O73h4eHibeXWTtEzl+YH7rqKCh4eHt5uXJN82lNkry1cN6rqHh4eHdyuvDeV54k6+TcZgyese9lrw8PDwbuXlzYWc0ZLadsbS6gAeHh7eBl4SSn7XbFTWHtbx8PDwzvBmw62VtkJbQpaWrvDw8PC28fKlgfwY3TYa2gUCPDw8vNfyVhatojbB6Dheryzg4eHhHeHNlgOep/t2fLXSsMDDw8M7z2sPwbPF09nwrF1xwMPDwzvJmzVwZ+UkZ982AMPDw8PbwMtTf35FAd1UfvDw8PDO8FbCzUtIkujb8hMVBjw8PLwNvDYdr68drC8T1KsDeHh4eBt4STFoG6+zpsOWwoCHh4e3jbeySNqS9i0i4OHh4b0nLw+uPUAXDDw8PLwP5CXsWXsif+bSfA8PDw9vmZc0I2brVm0JSY7XeHh4eK/lzVoACa8dpCXPuXjpeHh4eJt533fh4eHh4eHh4eG9wfULLxM1ALt5F1AAAAAASUVORK5CYII=">
     
 </ul>
 
@@ -454,7 +463,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        <a class="post_tag-link" href="/tags/jvm/">jvm</a>
+        <a class="post_tag-link" href="/tags/mysql/">mysql</a>
     </ul>
     
 
@@ -471,7 +480,7 @@
 
     <!-- Share Weibo -->
     
-        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=k8s中的jvm&url=http://seanthefish.com/2020/11/11/jvm-in-container/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=mysql之分布式事务&url=http://seanthefish.com/2020/12/04/mysql-8-ha/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
             <li class="mdl-menu__item">
                 分享到微博
             </li>
@@ -486,7 +495,7 @@
 
     <!-- Share Google+ -->
     
-        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/11/jvm-in-container/index.html" target="_blank">
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/04/mysql-8-ha/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 Google+
             </li>
@@ -498,7 +507,7 @@
 
     <!-- Share QQ -->
     
-        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=k8s中的jvm&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/11/jvm-in-container/index.html" target="_blank">
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=mysql之分布式事务&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/04/mysql-8-ha/index.html" target="_blank">
             <li class="mdl-menu__item">
                 分享到 QQ
             </li>
@@ -517,21 +526,173 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        <p>最近遇到了Java应用在k8s中频繁重启的问题，记录一下。</p>
-<p>起因是因为一个bug，使我们的一个请求会大量申请许多新空对象，但这些空对象并没有被即使的回收，直接导致了pod级别的oomkille，或者直接被驱逐，于是开始了调查。</p>
-<p>在Java 8u131和Java 9之前，JVM不能识别容器设置的内存或cpu限制。所以按照jvm的管理，最大堆的大小会设置为虚拟机内存的四分之一。我们当前node使用的虚拟机是64g的，因此xmx就被设置为了16g，但是我们并没有在pod中做memory limits的限制，当前node上又跑了许多其他的应用，这导致k8s无法给pod申请足够的内存，jvm的堆大小冲破了pod的实际可分配内存，直接被oomkilled并重启。被干掉的pod会留下一个Evicted状态的尸体，但这个pod尸体里没有events可以看，这增加了debug的难度。</p>
-<p>仅仅在pod层面增加memory limits并不能解决问题，我们的jvm无法感知到容器的内存变化，仍旧以虚拟机内存的四分之一来设置最大堆的大小。<br>我们确实可以通过简单设置xmx和pod的resource limits来解决，但是并不优雅，应用资源与容器资源强耦合，忘改一处即可能带来灾难。因此我们来探索下有没有其他方式。</p>
-<p>Java 8u131首先实现了称为的实验功能UseCGroupMemoryLimitForHeap。这是第一次尝试，但存在缺陷，为应用添加UnlockExperimentalVMOptions和UseCGroupMemoryLimitForHeap参数后，jvm确实可以感知到容器内存，并控制应用的实际堆大小。但是这并没有充分利用我们为容器分配的内存，jvm提供-XX:MaxRAMFraction标志来帮助更好的计算堆大小。</p>
-<p>MaxRAMFraction默认值是4（即除以4），但不幸的是，它是一个分数，而不是一个百分比，因此很难设置一个能有效利用可用内存的值，但是为什么我们不设置MaxRAMFraction为1，使其使用100％的可用内存呢？因为容器中可能正在运行其他进程，或者一些通过shell链接到容器的工具。</p>
-<p>Java 10附带了对容器环境的更好支持。如果你在Linux容器中运行Java应用程序，JVM将使用该UseContainerSupport选项自动检测内存限制。然后，您可以控制以下选项，InitialRAMPercentage，MaxRAMPercentage和MinRAMPercentage。这时，我们使用的是百分比而不是分数，这将更加准确。而这几个参数已经向下移植到Java 8u191。</p>
-<p>UseContainerSupport默认情况下是激活的。MaxRAMPercentage是25%，MinRAMPercentage是50%。这里min竟然比max大，不知道为啥。<br>我们可以设置-XX:MinRAMPercentage=50.0，-XX:MaxRAMPercentage=80.0来是我们的应用感知，并充分利用pod的resource limits。<br>需要注意的是，UseCGroupMemoryLimitForHeap虽然仍可以在最新版本的Java8中使用，但是已经被视为弃用的参数了。</p>
-<p>此外，在docker容器中运行JVM时，使用HeapDumpOnOutOfMemoryError参数可能是一个更明智的选择，因为，如果内存不足，jvm会将堆内存转储写入磁盘。默认情况下，堆内存会转储到VM的工作目录中的一个名为java_pid.hprof的文件中。您可以使用-XX:HeapDumpPath=来指定备用文件名或目录。例如，-XX:HeapDumpPath=/disk2/dumps将在/disk2/dumps目录中生成堆转储文件。请确保Java进程对堆转储的目录具有写入的访问权限。<br>接着在说一下cpu，pod可以给cpu的limits的限制，来确保pod可以调度到几个cpu核心，而jvm会根据cpu的核心数来设置是否使用ParallelGC，以及几个ParallelGCThreads。</p>
-<p>但是如果我们不为pod设置cpu限制的话，jvm也并不能感知到虚拟机所有的可用cpu，而是认为只有一核，并关闭ParallelGC功能。因此在我们需要ParallelGC功能时，我们最好还设置cpu的限制。</p>
-<p>而且通过查阅一些资料，发现cpu核数对jvm的工作线程也有着影响。<code>Runtime.getRuntime().availableProcessors()</code>，这段的代码常用于Java库，它会根据CPU的个数产生工作线程。如果没有正确设置docker中的参数，对实际的程序性能会产生很大的影响。availableProcessors就是根据核数而定的。</p>
-<p>题外话：<br>一个完整的jdk对gc和jvm问题的排查十分重要。jinfo，jstat都是十分有用的工具，并且学会看gclog也十分重要。</p>
-<p>一个小细节，我一直认为java -XX:+PrintFlagsFinal打印出的内容就是实际应用所在jvm进程的环境变量，但事实上，java -XX:+PrintFlagsFinal会单独建立一个进程，你打印出的东西都是这个命令所在进程的变量，而不是应用所在进程的变量。正确排查应用所在的jvm的进程的jvm变量还得用jinfo。</p>
-<p>此外，我们安装了阿里的Arthas来进行jvm故障的排查，很有用。但考虑到有的时候我们也想在生产环境安装Arthas，但是不希望为生产环境的应用安装完整的jdk，怎么办？可以使用sidecar的方式来安装Arthas，然后通过shareProcessNamespace: true参数来在pod中share不同容器里的进程，这样sidecar里的Arthas就可以attach到你应用的pid了。详见：<a href="https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。" target="_blank" rel="noopener">https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。</a></p>
-<p>先说到这，下回总结下gc的问题。</p>
+        <p>参考 <a href="http://mysql.taobao.org/monthly/2018/12/04/" target="_blank" rel="noopener">http://mysql.taobao.org/monthly/2018/12/04/</a>  <a href="https://zhuanlan.zhihu.com/p/25960208" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/25960208</a>  <a href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/" target="_blank" rel="noopener">https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/</a></p>
+<h2 id="故障恢复"><a href="#故障恢复" class="headerlink" title="故障恢复"></a>故障恢复</h2><h3 id="MySQL的事务处理—两阶段事务提交2PC"><a href="#MySQL的事务处理—两阶段事务提交2PC" class="headerlink" title="MySQL的事务处理—两阶段事务提交2PC"></a>MySQL的事务处理—两阶段事务提交2PC</h3><p>MySQL数据库的INNODB是一款支持OLTP的存储引擎，为支持MySQL的高可用，支持跨机搭建高可用数据库集群。</p>
+<p>MySQL采用了一种简单有效的机制 ———— 基于binlog的复制。</p>
+<p>binlog是binary log的简称，实际上它是一种逻辑日志，相对InnoDB引擎的物理日志，它的数据量更小，格式也更简单，更易于跨机复制，尤其是对于网络环境不是很好的情况下，更具有天然的优势。 </p>
+<p>那么MySQL是如何协调InnoDB引擎与Binlog日志之间的关系呢？</p>
+<p>MySQL采用了两阶段事务提交(Two-Phase Commit Protocol)协议，当操作完成后，首先Prepare事务，在binlog中实际上只是fake一下，不作任何事情，而是innodb层需要将prepare写入redolog中；然后执行commit事务，首先在binlog文件中写入这些操作的binlog日志，完成后再在Innodb的redolog中写入commit日志。（基于事务复制）</p>
+<p><img src="https://i.loli.net/2020/12/12/aZIExXQjld6TvBw.png" alt="image.png"></p>
+<p>注意在写binlog日志时，有个参数sync_binlog来控制何时将binlog fsync到磁盘。</p>
+<ul>
+<li>参数为0时，并不是立即fsync文件到磁盘，而是依赖于操作系统的fsync机制；</li>
+<li>参数为1时，立即fsync文件到磁盘；</li>
+<li>参数大于1时，则达到指定提交次数后，统一fsync到磁盘。 因此只有当sync_binlog参数为1时，才是最安全的，当其不为1时，都存在binlog未fsync到磁盘的风险，若此时发生断电等故障，就有可能出现此事务并未刷出到磁盘，从而故障恢复时将此事务回滚的情况。</li>
+</ul>
+<h3 id="基于binlog的事务恢复流程"><a href="#基于binlog的事务恢复流程" class="headerlink" title="基于binlog的事务恢复流程"></a>基于binlog的事务恢复流程</h3><p>了解了MySQL关于Innodb与Binlog的两阶段提交机制后，就可以更深入去探究MySQL在故障恢复时的处理过程。 </p>
+<p>在MySQL启动时，首先会初始化存储引擎，如本例中的InnoDB引擎，然后InnoDB引擎层会读取redolog进行InnoDB层的故障恢复，回滚未prepared和commit的事务，但对于已经prepared，但未commit的事务，暂时挂起，保存到一个链表中，等待后续读取binlog日志，然后根据binlog日志再对这部分prepared的事务进行处理。 </p>
+<p>接下来，MySQL会读取最后一个binlog文件。binlog文件通常是以固定的文件名加一组连续的编号来命名的，并且将其记录到一个binlog索引文件中，因此索引文件中的最后一个binlog文件即是MySQL将要读取的最后一个binlog文件。读取这个binlog文件时，通过文件头上是否存在标记LOG_EVENT_BINLOG_IN_USE_F，通过这个标记可以知道上次MySQL是正常关闭还是异常关闭，如果是异常关闭，则会进入故障恢复过程。 </p>
+<p>进入故障恢复过程后，会依次读取最后一个binlog文件中的所有log event，并将所有已提交事务的binlog日志中记录的xid提取出来添加到hash表中，以备后续对前述InnoDB故障恢复后遗留的Prepared事务继续处理。另外此处还要定位最后一个完整事务的位置，防止在上次系统异常关闭时有部分binlog日志未刷到磁盘上，即存在写了一半的binlog事务日志，这部分写了一半binlog日志的事务在MySQL中会按事务未提交来处理，后续会将其在存储引擎层回滚。</p>
+<p>当此文件中的内容全部读出之后，一是得到一个已提交事务的列表，另一个是最后一个完整事务的位置。 然后检查由InnoDB层得到的Prepared事务列表，若Prepared事务在从Binlog中得到的提交事务列表中，则在InnoDB层提交此事务，否则回滚此事务。</p>
+<p><img src="https://i.loli.net/2020/12/12/qrvKI2JkF7ubDRx.png" alt="image.png"></p>
+<h3 id="基于binlog的两阶段提交对高可用复制解决方案的影响"><a href="#基于binlog的两阶段提交对高可用复制解决方案的影响" class="headerlink" title="基于binlog的两阶段提交对高可用复制解决方案的影响"></a>基于binlog的两阶段提交对高可用复制解决方案的影响</h3><p>MySQL最常见的高可用解决方案就是基于binlog复制来完成的，通过将master的binlog复制到slave上，然后在slave上重放，从而达到master与slave上数据一致的效果。</p>
+<p>正常情况下，这个方案简单、易用，基本满足大部分用户的高可用需求，但在一些特殊情况下，这个方案还是存在一些不足，可能会导致master与slave存在数据不一致的情况。 如果master与slave之间采用异步模式进行binlog复制，显然就会存在部分binlog未复制到slave的情况。</p>
+<p>为提高可用性，MySQL支持semi-sync模式，也就是当master在提交事务之前，保证binlog已经复制到slave，并且收到slave回复的ACK后，master再将事务提交。Semi-sync模式的复制机制虽然已经极大提高了可用性，但是在极端情况下还是存在master与slave数据不一致的风险，甚至数据丢失的风险。</p>
+<p>考虑一下master出现故障后无法立即恢复的情况，为保障应用的持续性，需要将slave切换为master。若在故障发生前，master恰好有事务正准备提交，并且binlog日志已经刷到磁盘，但在将binlog复制给slave过程中master故障了，备机未收到或只收到部分binlog日志，若此时slave切换为master，显然这些未收到或只收到部分binlog日志的事务是无法重现的，也就是这部分事务是丢失的。</p>
+<p>理论上应用层并未得到事务提交的反馈，即使事务不存在也不是什么问题。问题是若此时用户查询这些事务不存在，准备重做这些事务，更糟的事情发生了，新的mater也发生故障了，并且无法立即恢复。万幸的是原来的master可以恢复工作了，直接作为master就好了，但问题出现了，用户已经在重做这些事务了，但这些事务在这个master已经存在了，原因如前述的基于binlog的事务恢复。这就好比之前买东西已经付钱给商家200块了，结果人家说没收到，我一查账户，也没少钱，那就再付一次吧，结果杯具了，付了400块给人家？？？</p>
+<p><img src="https://i.loli.net/2020/12/12/goV12tmjr9Y5w3M.png" alt="image.png"></p>
+<p>如上图所示：若T2的binlog日志尚未复制到slave时，master故障，原slave切换为master，而原master重启恢复后成为新的slave，如下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/12/c2mEqGQhoMXIrFO.png" alt="image.png"></p>
+<h3 id="高可用必杀技–基于RAFT的多副本集群"><a href="#高可用必杀技–基于RAFT的多副本集群" class="headerlink" title="高可用必杀技–基于RAFT的多副本集群"></a>高可用必杀技–基于RAFT的多副本集群</h3><p>基于RAFT协议的多副本架构，每一条数据都会被复制多份，通过多副本来增加系统的可用性，防止单副本失效而导致数据不可用。多副本之间基于RAFT协议来实现数据的一致性，只有数据存在于半数以上副本方可认为数据有效，而无效的副本数据系统会自动修复，从而确保系统只会提供一个统一的一致性视图。</p>
+<p><img src="https://i.loli.net/2020/12/12/f8HXjUnt7Fsa3lE.png" alt="image.png"></p>
+<h2 id="五大常见的MySQL高可用方案"><a href="#五大常见的MySQL高可用方案" class="headerlink" title="五大常见的MySQL高可用方案"></a>五大常见的MySQL高可用方案</h2><h3 id="主从或主主半同步复制"><a href="#主从或主主半同步复制" class="headerlink" title="主从或主主半同步复制"></a>主从或主主半同步复制</h3><p>使用双节点数据库，搭建单向或者双向的半同步复制。在5.7以后的版本中，由于lossless replication、logical多线程复制等一些列新特性的引入，使得MySQL原生半同步复制更加可靠。</p>
+<p>常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/akTGUXE7d6ejZyc.png" alt="image.png"></p>
+<p>通常会和proxy、keepalived等第三方软件同时使用，即可以用来监控数据库的健康，又可以执行一系列管理命令。如果主库发生故障，切换到备库后仍然可以继续使用数据库。</p>
+<p>优点：</p>
+<ul>
+<li>架构比较简单，使用原生半同步复制作为数据同步的依据；</li>
+<li>双节点，没有主机宕机后的选主问题，直接切换即可；</li>
+<li>双节点，需求资源少，部署简单；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>完全依赖于半同步复制，如果半同步复制退化为异步复制，数据一致性无法得到保证；</li>
+<li>需要额外考虑haproxy、keepalived的高可用机制。</li>
+</ul>
+<h3 id="半同步复制优化"><a href="#半同步复制优化" class="headerlink" title="半同步复制优化"></a>半同步复制优化</h3><p>半同步复制机制是可靠的。如果半同步复制一直是生效的，那么便可以认为数据是一致的。但是由于网络波动等一些客观原因，导致半同步复制发生超时而切换为异步复制，那么这时便不能保证数据的一致性。所以尽可能的保证半同步复制，便可提高数据的一致性。</p>
+<p>该方案同样使用双节点架构，但是在原有半同复制的基础上做了功能上的优化，使半同步复制的机制变得更加可靠。</p>
+<p>可参考的优化方案如下：</p>
+<h4 id="双通道复制"><a href="#双通道复制" class="headerlink" title="双通道复制"></a>双通道复制</h4><p><img src="https://i.loli.net/2020/12/12/xi1XBGUfAcqtMYy.png" alt="image.png"></p>
+<p>半同步复制由于发生超时后，复制断开，当再次建立起复制时，同时建立两条通道，其中一条半同步复制通道从当前位置开始复制，保证从机知道当前主机执行的进度。另外一条异步复制通道开始追补从机落后的数据。当异步复制通道追赶到半同步复制的起始位置时，恢复半同步复制。（无节点晋升，只保证恢复重连，不能重连还是丢数据）</p>
+<h4 id="binlog文件服务器"><a href="#binlog文件服务器" class="headerlink" title="binlog文件服务器"></a>binlog文件服务器</h4><p><img src="https://i.loli.net/2020/12/12/img84WpjaJSPh7r.png" alt="image.png"></p>
+<p>搭建两条半同步复制通道，其中连接文件服务器的半同步通道正常情况下不启用，当主从的半同步复制发生网络问题退化后，启动与文件服务器的半同步复制通道。当主从半同步复制恢复后，关闭与文件服务器的半同步复制通道。</p>
+<p>优点：</p>
+<ul>
+<li>双节点，需求资源少，部署简单；</li>
+<li>架构简单，没有选主的问题，直接切换即可;</li>
+<li>相比于原生复制，优化后的半同步复制更能保证数据的一致性。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要修改内核源码或者使用mysql通信协议。需要对源码有一定的了解，并能做一定程度的二次开发。</li>
+<li>依旧依赖于半同步复制，没有从根本上解决数据一致性问题。</li>
+</ul>
+<h3 id="高可用架构优化"><a href="#高可用架构优化" class="headerlink" title="高可用架构优化"></a>高可用架构优化</h3><p>将双节点数据库扩展到多节点数据库，或者多节点数据库集群。可以根据自己的需要选择一主两从、一主多从或者多主多从的集群。</p>
+<p>由于半同步复制，存在接收到一个从机的成功应答即认为半同步复制成功的特性，所以多从半同步复制的可靠性要优于单从半同步复制的可靠性。并且多节点同时宕机的几率也要小于单节点宕机的几率，所以多节点架构在一定程度上可以认为高可用性是好于双节点架构。</p>
+<p>但是由于数据库数量较多，所以需要数据库管理软件来保证数据库的可维护性。可以选择MMM、MHA或者各个版本的proxy等等。常见方案如下：</p>
+<h4 id="MHA-多节点集群"><a href="#MHA-多节点集群" class="headerlink" title="MHA+多节点集群"></a>MHA+多节点集群</h4><p><img src="https://i.loli.net/2020/12/12/hefHE17v5DTkOQB.png" alt="image.png"></p>
+<p>MHA Manager会定时探测集群中的master节点，当master出现故障时，它可以自动将最新数据的slave提升为新的master，然后将所有其他的slave重新指向新的master，整个故障转移过程对应用程序完全透明。</p>
+<p>MHA Node运行在每台MySQL服务器上，主要作用是切换时处理二进制日志，确保切换尽量少丢数据。</p>
+<p>MHA也可以扩展到如下的多节点集群：</p>
+<p><img src="https://i.loli.net/2020/12/12/zwF5tkgx2hlrCs9.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>可以进行故障的自动检测和转移;</li>
+<li>可扩展性较好，可以根据需要扩展MySQL的节点数量和结构;</li>
+<li>相比于双节点的MySQL复制，三节点/多节点的MySQL发生不可用的概率更低</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>至少需要三节点，相对于双节点需要更多的资源;</li>
+<li>逻辑较为复杂，发生故障后排查问题，定位问题更加困难;</li>
+<li>数据一致性仍然靠原生半同步复制保证，仍然存在数据不一致的风险;</li>
+<li>可能因为网络分区发生<a href="https://cloud.tencent.com/developer/article/1027323" target="_blank" rel="noopener">脑裂现象</a></li>
+</ul>
+<h4 id="zookeeper-proxy"><a href="#zookeeper-proxy" class="headerlink" title="zookeeper+proxy"></a>zookeeper+proxy</h4><p>Zookeeper使用分布式算法保证集群数据的一致性，使用zookeeper可以有效的保证proxy的高可用性，可以较好的避免网络分区现象的产生。</p>
+<p><img src="https://i.loli.net/2020/12/12/Q2RAf5alEyKYqhV.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>较好的保证了整个系统的高可用性，包括proxy、MySQL;</li>
+<li>扩展性较好，可以扩展为大规模集群;</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>数据一致性仍然依赖于原生的mysql半同步复制;</li>
+<li>引入zk，整个系统的逻辑变得更加复杂;</li>
+</ul>
+<h3 id="共享存储"><a href="#共享存储" class="headerlink" title="共享存储"></a>共享存储</h3><p>共享存储实现了数据库服务器和存储设备的解耦，不同数据库之间的数据同步不再依赖于MySQL的原生复制功能，而是通过磁盘数据同步的手段，来保证数据的一致性。</p>
+<h4 id="SAN共享储存"><a href="#SAN共享储存" class="headerlink" title="SAN共享储存"></a>SAN共享储存</h4><p>SAN的概念是允许存储设备和处理器（服务器）之间建立直接的高速网络（与LAN相比）连接，通过这种连接实现数据的集中式存储。常用架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/PkcQJvAft9NrLlS.png" alt="image.png"></p>
+<p>使用共享存储时，MySQL服务器能够正常挂载文件系统并操作，如果主库发生宕机，备库可以挂载相同的文件系统，保证主库和备库使用相同的数据。</p>
+<p>优点：</p>
+<ul>
+<li>两节点即可，部署简单，切换逻辑简单；</li>
+<li>很好的保证数据的强一致性；</li>
+<li>不会因为MySQL的逻辑错误发生数据不一致的情况；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要考虑共享存储的高可用；</li>
+<li>价格昂贵；</li>
+</ul>
+<h4 id="DRBD磁盘复制"><a href="#DRBD磁盘复制" class="headerlink" title="DRBD磁盘复制"></a>DRBD磁盘复制</h4><p>DRBD是一种基于软件、基于网络的块复制存储解决方案，主要用于对服务器之间的磁盘、分区、逻辑卷等进行数据镜像，当用户将数据写入本地磁盘时，还会将数据发送到网络中另一台主机的磁盘上，这样的本地主机(主节点)与远程主机(备节点)的数据就可以保证实时同步。常用架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/Gq2UgbweT4VlBAP.png" alt="image.png"></p>
+<p>当本地主机出现问题，远程主机上还保留着一份相同的数据，可以继续使用，保证了数据的安全。</p>
+<p>DRBD是linux内核模块实现的快级别的同步复制技术，可以与SAN达到相同的共享存储效果。</p>
+<p>优点：</p>
+<ul>
+<li>两节点即可，部署简单，切换逻辑简单；</li>
+<li>相比于SAN储存网络，价格低廉；</li>
+<li>保证数据的强一致性；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>对io性能影响较大；</li>
+<li>从库不提供读操作；</li>
+</ul>
+<h3 id="分布式协议"><a href="#分布式协议" class="headerlink" title="分布式协议"></a>分布式协议</h3><h4 id="MySQL-cluster"><a href="#MySQL-cluster" class="headerlink" title="MySQL cluster"></a>MySQL cluster</h4><p>MySQL cluster是官方集群的部署方案，通过使用NDB存储引擎实时备份冗余数据，实现数据库的高可用性和数据一致性。</p>
+<p><img src="https://i.loli.net/2020/12/12/GwRbnuOYQ7f8TMN.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>全部使用官方组件，不依赖于第三方软件；</li>
+<li>可以实现数据的强一致性；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>国内使用的较少；</li>
+<li>配置较复杂，需要使用NDB储存引擎，与MySQL常规引擎存在一定差异；</li>
+<li>至少三节点；</li>
+</ul>
+<h4 id="Galera"><a href="#Galera" class="headerlink" title="Galera"></a>Galera</h4><p>基于Galera的MySQL高可用集群， 是多主数据同步的MySQL集群解决方案，使用简单，没有单点故障，可用性高。常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/Uk3NCEagJ5sGtZb.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>多主写入，无延迟复制，能保证数据强一致性；</li>
+<li>有成熟的社区，有互联网公司在大规模的使用；</li>
+<li>自动故障转移，自动添加、剔除节点；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要为原生MySQL节点打wsrep补丁</li>
+<li>只支持innodb储存引擎</li>
+<li>至少三节点</li>
+</ul>
+<h4 id="POAXS"><a href="#POAXS" class="headerlink" title="POAXS"></a>POAXS</h4><p>Paxos 算法解决的问题是一个分布式系统如何就某个值（决议）达成一致。这个算法被认为是同类算法中最有效的。Paxos与MySQL相结合可以实现在分布式的MySQL数据的强一致性。常见架构如下：</p>
+<p><img src="https://i.loli.net/2020/12/12/yXF7m9T2HsJhRBE.png" alt="image.png"></p>
+<p>优点：</p>
+<ul>
+<li>多主写入，无延迟复制，能保证数据强一致性；</li>
+<li>有成熟理论基础；</li>
+<li>自动故障转移，自动添加、剔除节点；</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>只支持innodb储存引擎</li>
+<li>至少三节点；</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>看起来用mha保证主节点高可用，用raft保证半主从复制的数据一致，可能是一个比较好的办法。</p>
+<p>关于mmm和mha的扩展阅读：<a href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/" target="_blank" rel="noopener">https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/</a></p>
 
         
     
@@ -586,8 +747,8 @@
 
 <script type="text/javascript">
     var disqus_config = function () {
-        this.page.url = 'http://seanthefish.com/2020/11/11/jvm-in-container/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://seanthefish.com/2020/11/11/jvm-in-container/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = 'http://seanthefish.com/2020/12/04/mysql-8-ha/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/04/mysql-8-ha/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 </script>
 
@@ -636,7 +797,7 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2020/11/12/jvm-gc/" id="post_nav-newer" class="prev-content">
+        <a href="/2020/12/04/distributed-id/" id="post_nav-newer" class="prev-content">
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
                 <i class="material-icons">arrow_back</i>
             </button>
@@ -650,7 +811,7 @@
 
     <!-- Next Nav -->
     
-        <a href="/2020/11/04/reference/" id="post_nav-older" class="next-content">
+        <a href="/2020/12/04/mysql-7-distributed-tx/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
