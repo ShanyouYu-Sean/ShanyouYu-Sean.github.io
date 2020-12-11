@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            强软弱虚引用及其回收 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,jvm">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/11/04/reference/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/11/04/reference/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="强软弱虚引用及其回收 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="jvm"> 
+
+    
+        <meta property="article:published_time" content="Wed Nov 04 2020 15:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Fri Dec 11 2020 12:30:45 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/11/04/reference/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/11/04/reference/index.html",
+    "headline": "强软弱虚引用及其回收",
+    "datePublished": "Wed Nov 04 2020 15:00:00 GMT+0800",
+    "dateModified": "Fri Dec 11 2020 12:30:45 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",jvm小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四种引用"><span class="post-toc-number">1.</span> <span class="post-toc-text">四种引用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#弱引用"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">弱引用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#软引用"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">软引用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#虚引用"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">虚引用</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四种引用的例子"><span class="post-toc-number">2.</span> <span class="post-toc-text">四种引用的例子</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#强引用"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">强引用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#软引用-1"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">软引用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#弱引用-1"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">弱引用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#虚引用-1"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">虚引用</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#reference源码"><span class="post-toc-number">3.</span> <span class="post-toc-text">reference源码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Reference构造方法"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">Reference构造方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Reference的重要成员变量"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">Reference的重要成员变量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Reference状态及其转换"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">Reference状态及其转换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ReferenceHandler线程源码解析"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">ReferenceHandler线程源码解析</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ReferenceQueue源码解析"><span class="post-toc-number">4.</span> <span class="post-toc-text">ReferenceQueue源码解析</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                强软弱虚引用及其回收
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>11月 04, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACYklEQVR42u3aUXKjMBAEUN//0psDbOF0j4RMXI8vVwJCjw9GtOb176uPFx4eHh4eHh4e3sN4r/i4uupqnOQu/5+zYW54eHh4R3i/vGoXbnw1foIczg0PDw/vIO9qWu9/J1flRSK/Fx4eHt5f5OXL63wEPDw8vO/mJZNOluCzEfDw8PCewEs++JPC8P7v+TkfyFrw8PDwYl4exZ7/fXR/Dw8PDy/g1S1Nb6OHWUlIzj/UU4aHh4cX8NrIIGkpaAHvi1D7IPDw8PDu5rWf/feVgWTMOsbFw8PDu4E3i2jXY9x8Iy0/Bw8PD+8Mb29DQB7LRhMN7oWHh4f3KV67jG6Lx2zTq11M4+Hh4Z3htRFD3mY6a0qYlSU8PDy8k7xdL+58Y2wWIhexBR4eHt4DeEnAmgQTOWwWDePh4eGd4bWL4/VpJQ8uD3C3tQ7g4eHhlbzZBthKo0AbaiRFCA8PD+8Mrw1z2/+2DyVvZi2+GPDw8PCO8NaD2uSF3hakpZ4yPDw8vK289fLQBhNtEFy0duHh4eHdzGs3q2bbYOthbhE94+Hh4R3k7drCTxbQLaC4Fg8PD+8gbzZoi8mPPPbFw8PD+xRvZandMlYC3w11Dw8PD2+B1x5tyNsul1fatvDw8PDO8HYtcPP209kIw6YrPDw8vNt4STGYbeTnZSZ5lMPCgIeHh3cbb/aCnsW4szAiCprx8PDwHsxrQ4pZaFs/RDw8PLxH8maL7JXle9LshYeHh3eeN2sOaMtAvshuY2U8PDy8k7xZBNAGEPk5UVyb95Th4eHhbeV934GHh4eHh4eHh/eA4wcalhYRklqZgwAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/jvm/">jvm</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=强软弱虚引用及其回收&url=http://seanthefish.com/2020/11/04/reference/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/11/04/reference/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=强软弱虚引用及其回收&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/11/04/reference/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>之前总结对外内存回收感觉总结的不太好，把这个话题单拎出来，我们再说一次</p>
+<h2 id="四种引用"><a href="#四种引用" class="headerlink" title="四种引用"></a>四种引用</h2><ul>
+<li>强引用：代码中普遍存在的类似<code>object obj = new object()</code>的引用，只要强引用存在，垃圾处理器就不会回收。</li>
+<li>软引用：描述有些还有用但非必须的对象。在系统将要发生内存溢出时，会将这些对象列为回收范围进行二次回收，如果这次回收后还没有足够的内存，才会oom。Java中SoftReference类表示软引用。</li>
+<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示弱引用。</li>
+<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示虚引用。</li>
+</ul>
+<h3 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h3><p>首先, 弱引用(weak reference) 是可以被GC强制回收的。当垃圾收集器发现一个弱可达对象(weakly reachable,即指向该对象的引用只剩下弱引用) 时, 就会将其置入相应的ReferenceQueue 中, 变成可终结的对象. 之后可能会遍历这个 reference queue, 并执行相应的清理。典型的示例是weakhashmap中不再引用的KEY。</p>
+<p>当然, 在这个时候, 我们还可以将该对象赋值给新的强引用, 在最后终结和回收前, GC会再次确认该对象是否可以安全回收。因此, 弱引用对象的回收过程是横跨多个GC周期（至少两个，一次标记为引用对象不可达，自己入队，第二次再由gc回收）的。</p>
+<p>当你在构造WeakReference时传入一个ReferenceQueue对象，当该引用指向的对象被标记为垃圾的时候，这个引用对象会自动地加入到引用队列里面。接下来，你就可以在固定的周期，处理传入的引用队列，比如做一些清理工作来处理这些没有用的引用对象。</p>
+<h3 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h3><p>软引用基本上和弱引用差不多，只是相比弱引用，它阻止垃圾回收期回收其指向的对象的能力强一些。如果一个对象是弱引用可到达，那么这个对象会被垃圾回收器接下来的回收周期销毁。但是如果是软引用可以到达，那么这个对象会停留在内存更时间上长一些。当内存不足时垃圾回收器才会回收这些软引用可到达的对象。</p>
+<p>软引用比弱引用更难被垃圾收集器回收. 回收软引用没有确切的时间点, 由JVM自己决定. 一般只会在即将耗尽可用内存时, 才会回收软引用,以作最后手段。这意味着, 可能会有更频繁的 full GC, 暂停时间也比预期更长, 因为老年代中的存活对象会很多。</p>
+<h3 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h3><p>与软引用，弱引用不同，虚引用指向的对象十分脆弱，我们不可以通过get方法来得到其指向的对象。它的唯一作用就是当其指向的对象被回收之后，自己被加入到引用队列，用作记录该引用指向的对象已被销毁。</p>
+<p>使用虚引用时, 必须手动进行内存管理, 以标识这些对象是否可以安全地回收。表面上看起来很正常, 但实际上并不是这样。 javadoc 中写道:</p>
+<p>为了防止可回收对象的残留, 虚引用对象不应该被获取: phantom reference 的 get 方法返回值永远是 null。</p>
+<p>令人惊讶的是, 很多开发者忽略了下一段内容(这才是重点):</p>
+<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到引用自身变为不可达。（如果虚引用为clearer对象，会主动调用其clean方法进行引用自身变为不可达的操作）</p>
+<p>也就是说,我们必须手动使虚引用变为不可达状态（把引用置为null）, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
+<h2 id="四种引用的例子"><a href="#四种引用的例子" class="headerlink" title="四种引用的例子"></a>四种引用的例子</h2><h3 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h3><pre><code class="java">public class Student {
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println(&quot;Student 被回收了&quot;);
+    }
+}
+
+public class Strong {
+    public static void main(String[] args) {
+        Student student = new Student();
+        // help gc
+        student = null;
+        System.gc();
+    }
+}
+</code></pre>
+<p>结果： </p>
+<pre><code>&gt; Task :Strong.main()
+Student 被回收了
+</code></pre><h3 id="软引用-1"><a href="#软引用-1" class="headerlink" title="软引用"></a>软引用</h3><pre><code class="java">public class Soft {
+    public static void main(String[] args) {
+        SoftReference&lt;byte[]&gt; softReference = new SoftReference&lt;byte[]&gt;(new byte[1024*1024*10]);
+        System.out.println(softReference.get());
+        System.gc();
+        System.out.println(softReference.get());
+        byte[] bytes = new byte[1024 * 1024 * 10];
+        System.out.println(softReference.get());
+    }
+}
+</code></pre>
+<p>-Xmx20M 运行结果：</p>
+<pre><code>&gt; Task :Soft.main()
+[B@7852e922
+[B@7852e922
+null
+</code></pre><p>设置reference queue的软引用：</p>
+<pre><code class="java">public class Soft {
+    public static void main(String[] args) throws InterruptedException {
+        ReferenceQueue&lt;Object&gt; queue = new ReferenceQueue&lt;&gt;();
+        Object obj = new Object();
+        SoftReference softRef = new SoftReference&lt;Object&gt;(obj,queue);
+        //删除强引用
+        obj = null;
+        //调用gc
+        System.gc();
+        System.out.println(&quot;gc之后的值: &quot; + softRef.get()); // 对象依然存在
+        //申请较大内存使内存空间使用率达到阈值，强迫gc
+        byte[] bytes = new byte[100 * 1024 * 1024];
+        //如果obj被回收，则软引用会进入引用队列
+        Reference&lt;?&gt; reference = queue.remove();
+        if (reference != null){
+            System.out.println(&quot;对象已被回收: &quot;+ reference.get());  // 对象为null
+        }
+    }
+}
+</code></pre>
+<h3 id="弱引用-1"><a href="#弱引用-1" class="headerlink" title="弱引用"></a>弱引用</h3><pre><code class="java">public class Weak {
+    public static void main(String[] args) {
+        WeakReference&lt;byte[]&gt; weakReference = new WeakReference&lt;byte[]&gt;(new byte[1]);
+        System.out.println(weakReference.get());
+        System.gc();
+        System.out.println(weakReference.get());
+    }
+}
+</code></pre>
+<p>运行结果：</p>
+<pre><code>&gt; Task :Weak.main()
+[B@7852e922
+null
+</code></pre><p>设置reference queue的弱引用：</p>
+<pre><code class="java">public class Weak {
+    public static void main(String[] args) throws InterruptedException {
+        ReferenceQueue&lt;Object&gt; queue = new ReferenceQueue&lt;&gt;();
+        Object obj = new Object();
+        WeakReference weakRef = new WeakReference&lt;Object&gt;(obj,queue);
+        //删除强引用
+        obj = null;
+        System.out.println(&quot;gc之后的值: &quot; + weakRef.get()); // 对象依然存在
+        //调用gc
+        System.gc();
+        //如果obj被回收，则软引用会进入引用队列
+        Reference&lt;?&gt; reference = queue.remove();
+        if (reference != null){
+            System.out.println(&quot;对象已被回收: &quot;+ reference.get());  // 对象为null
+        }
+    }
+}
+</code></pre>
+<p>运行结果：</p>
+<pre><code>&gt; Task :Weak.main()
+gc之后的值: java.lang.Object@7852e922
+对象已被回收: null
+</code></pre><h3 id="虚引用-1"><a href="#虚引用-1" class="headerlink" title="虚引用"></a>虚引用</h3><p>参考  <a href="https://blog.csdn.net/shijiujiu33/article/details/104547837" target="_blank" rel="noopener">https://blog.csdn.net/shijiujiu33/article/details/104547837</a></p>
+<h2 id="reference源码"><a href="#reference源码" class="headerlink" title="reference源码"></a>reference源码</h2><p>参考 <a href="https://blog.csdn.net/zqz_zqz/article/details/79474314" target="_blank" rel="noopener">https://blog.csdn.net/zqz_zqz/article/details/79474314</a></p>
+<h3 id="Reference构造方法"><a href="#Reference构造方法" class="headerlink" title="Reference构造方法"></a>Reference构造方法</h3><p>我们先来看看这些引用类型的父类都给我们提供了什么？</p>
+<p>其内部提供2个构造函数,除了传入referent对象外，区别就是要不要传入一个ReferenceQueue队列</p>
+<pre><code class="java">Reference(Treferent) {
+
+    this(referent,null);
+
+}
+Reference(T referent,ReferenceQueue&lt;?super T&gt;queue){
+
+    this.referent =referent;
+
+    this.queue = (queue==null)? ReferenceQueue.NULL:queue;
+
+}
+</code></pre>
+<p>ReferenceQueue队列的作用就是Reference引用的对象被回收时，Reference对象能否进入到pending队列，最终由ReferenceHander线程处理后，Reference就被放到了这个队列里面（Cleaner对象除外），然后我们就可以在这个ReferenceQueue里拿到reference,执行我们自己的操作（至于什么操作就看你想怎么用了），所以这个队列起到一个对象被回收时通知的作用；</p>
+<p>如果不带ReferenceQueue的话,要想知道Reference持有的对象是否被回收，就只有不断地轮训reference对象,通过判断里面的get是否为null(phantomReference对象不能这样做,其get始终返回null,因此它只有带queue的构造函数).这两种方法均有相应的使用场景,取决于实际的应用.如weakHashMap中就选择去查询queue的数据,来判定是否有对象将被回收.而ThreadLocalMap,则采用判断get()是否为null来作处理;</p>
+<p>对于带ReferenceQueue参数的构造方法，如果传入的队列为null，那么就会给成员变量queue赋值为ReferenceQueue.NULL队列,这个NULL是ReferenceQueue对象的一个继承了ReferenceQueue的内部类，它重写了入队方法enqueue，这个方法只有一个操作，直接返回 false，也就是这个对列不会存取任何数据,它起到状态标识的作用；</p>
+<h3 id="Reference的重要成员变量"><a href="#Reference的重要成员变量" class="headerlink" title="Reference的重要成员变量"></a>Reference的重要成员变量</h3><pre><code class="java">//在构造方法传入java对象最后就赋值给了referent，也就是它引用到的对象
+
+private Treferent;        /* Treated specially by GC */
+
+// pending队列
+// pending成员变量与后面的discovered对象一起构成了一个pending单向链表
+// 注意这个成员变量是一个静态对象，所以是全局唯一的
+// pending为链表的头节点，discovered为链表当前Reference节点指向下一个节点的引用
+// 这个队列是由jvm的垃圾回收器构建的，当对象除了被reference引用之外没有其它强引用了，jvm的垃圾回收器就会将指向需要回收的对象的Reference都放入到这个队列里面
+//（好好理解一下这句话，注意是指向要回收的对象的Reference，要回收的对象就是Reference的成员变量refernt持有的对象，是refernt持有的对象要被回收，而不是Reference对象本身）
+// 这个队列会由ReferenceHander线程来处理
+// ReferenceHander线程是jvm的一个内部线程，它也是Reference的一个内部类，它的任务就是将pending队列中要被回收的Reference对象移除出来，
+// 如果Reference对象在初始化的时候传入了ReferenceQueue队列，那么就把从pending队列里面移除的Reference放到它自己的ReferenceQueue队列里
+//（为什么是它自己的？pending队列是全局唯一的队列，但是Reference的queue却不是，它是在构造方法里面指定的，前面说过这里Cleaner对象是个特例）
+// 如果没有ReferenceQueue队列，那么其关联的对象就不会进入到Pending队列中，会直接被回收掉，除此之外ReferenceHander线程还会做一些其它操作，后面会讲到
+
+/* List of References waiting to beenqueued.  The collector adds
+* References to this list, while theReference-handler thread removes
+* them. This list is protected by the above lock object. The
+* list uses the discovered field to linkits elements.
+*/
+privatestatic Reference&lt;Object&gt;pending =null;
+
+//与成员变量pending一起组成pending队列，指向链表当前节点的下一个节点
+/* When active:   next element in a discovered reference listmaintained by GC (or this if last)
+*    pending:   next element in thepending list (or null if last)
+*  otherwise:   NULL
+*/
+
+transientprivate Reference&lt;T&gt;discovered; /* used by VM */
+
+// ReferenceQueue队列，这就是我们前面提到的起到通知作用的ReferenceQueue，
+// 需要注意的是ReferenceQueue并不是一个链表数据结构，它只持有这个链表的表头对象header，
+// 这个链表是由Refence对象里面的next成员变量构建起来的，next也就是链表当前节点的下一个节点(只有next的引用，它是单向链表)，
+// 所以Reference对象本身就是一个链表的节点，
+// 这个链表数据来源前面讲pending队列的时候已经提到了，它是由ReferenceHander线程从pending队列中取的数据构建的
+//（需要注意的是，这个对象并不是一个全局的，它是在构造方法里面传入进来的，所以Reference对象需要进入那个队列是我们自己指定的，
+// 也有特例，如FinalReference，Cleaner就是一个内部全局唯一的，无法指定，后面有两篇专门讲他们俩的源码），
+// 一旦Reference对象放入了队列里面，那么queue就会被设置为ReferenceQueue.ENQUEUED，来标识当前Reference已经进入到队里里面了；
+volatileReferenceQueue&lt;?super T&gt;queue;
+
+//用来与queue成员变量一同组成ReferenceQueue队列，见上面queue的说明；
+/* When active:   NULL
+*     pending:  this
+*   Enqueued:   next reference inqueue (or this if last)
+*   Inactive:   this
+*/
+@SuppressWarnings(&quot;rawtypes&quot;)
+Reference next;
+
+// lock成员变量是pending队列的全局锁，
+// 如果你搜索这个lock变量会发现它只在ReferenceHander线程run方法里面用到了，不要忘了jvm垃圾回收器线程也会操作pending队列，往pending里面添加Reference对象，
+// 所以需要加锁；
+/* Object used to synchronize with thegarbage collector.  The collector
+* must acquire this lock at the beginningof each collection cycle.  It is
+* therefore critical that any code holdingthis lock complete as quickly
+* as possible, allocate no new objects,and avoid calling user code.
+*/
+staticprivateclass Lock { };
+
+privatestatic Locklock =new Lock();
+</code></pre>
+<p>这里一定要理解pending队列，什么样的Reference对象会进入这个队列。</p>
+<p>进入这个队列的Reference对象需要满足两个条件：</p>
+<ul>
+<li>Reference所引用的对象已经不存在其它强引用；</li>
+<li>Reference对象在创建的时候，指定了ReferenceQueue；</li>
+</ul>
+<h3 id="Reference状态及其转换"><a href="#Reference状态及其转换" class="headerlink" title="Reference状态及其转换"></a>Reference状态及其转换</h3><p>如果去查看Reference源码，会发现这个类的开头有一段很长的注释，说明了Reference对象的四种状态：</p>
+<pre><code class="java">/* A Reference instance is in one of four possible internal states:
+     *
+     *     Active: Subject to special treatment by the garbage collector.  Some
+     *     time after the collector detects that the reachability of the
+     *     referent has changed to the appropriate state, it changes the
+     *     instance&#39;s state to either Pending or Inactive, depending upon
+     *     whether or not the instance was registered with a queue when it was
+     *     created.  In the former case it also adds the instance to the
+     *     pending-Reference list.  Newly-created instances are Active.
+     *
+     *     Pending: An element of the pending-Reference list, waiting to be
+     *     enqueued by the Reference-handler thread.  Unregistered instances
+     *     are never in this state.
+     *
+     *     Enqueued: An element of the queue with which the instance was
+     *     registered when it was created.  When an instance is removed from
+     *     its ReferenceQueue, it is made Inactive.  Unregistered instances are
+     *     never in this state.
+     *
+     *     Inactive: Nothing more to do.  Once an instance becomes Inactive its
+     *     state will never change again.
+     *
+     * The state is encoded in the queue and next fields as follows:
+     *
+     *     Active: queue = ReferenceQueue with which instance is registered, or
+     *     ReferenceQueue.NULL if it was not registered with a queue; next =
+     *     null.
+     *
+     *     Pending: queue = ReferenceQueue with which instance is registered;
+     *     next = this
+     *
+     *     Enqueued: queue = ReferenceQueue.ENQUEUED; next = Following instance
+     *     in queue, or this if at end of list.
+     *
+     *     Inactive: queue = ReferenceQueue.NULL; next = this.
+     *
+     * With this scheme the collector need only examine the next field in order
+     * to determine whether a Reference instance requires special treatment: If
+     * the next field is null then the instance is active; if it is non-null,
+     * then the collector should treat the instance normally.
+     *
+     * To ensure that a concurrent collector can discover active Reference
+     * objects without interfering with application threads that may apply
+     * the enqueue() method to those objects, collectors should link
+     * discovered objects through the discovered field. The discovered
+     * field is also used for linking Reference objects in the pending list.
+     */
+</code></pre>
+<p>如果你没有耐心看完这段注释，请直接往后看：</p>
+<ul>
+<li>Active:活动状态,对象存在强引用状态,还没有被回收;</li>
+<li>Pending:垃圾回收器将没有强引用的Reference对象放入到pending队列中，等待ReferenceHander线程处理（前提是这个Reference对象创建的时候传入了ReferenceQueue，否则的话对象会直接进入Inactive状态）；</li>
+<li>Enqueued:ReferenceHander线程将pending队列中的对象取出来放到ReferenceQueue队列里；</li>
+<li>Inactive:处于此状态的Reference对象可以被回收,并且其内部封装的对象也可以被回收掉了，有两个路径可以进入此状态，</li>
+</ul>
+<p>路径一：在创建时没有传入ReferenceQueue的Reference对象，被Reference封装的对象在没有强引用时，指向它的Reference对象会直接进入此状态；<br>路径二、此Reference对象经过前面三个状态后，已经由外部从ReferenceQueue中获取到,并且已经处理掉了。</p>
+<p>Reference对象的状态只需要通过成员变量next和queue来判断：</p>
+<ul>
+<li>Active：   next=null</li>
+<li>Pending：  next = this ，queue = ReferenceQueue</li>
+<li>Enqueued:  queue =ReferenceQueue.ENQUEUED</li>
+<li>Inactive:    next = this  ,queue = ReferenceQueue.NULL; </li>
+</ul>
+<p>特例还是要拿出来单独说，上面的图不适用描述Cleaner对象，Cleaner对象是没有Enqueue状态的，它经过HandReference处理时执行其clean方法清理，然后就直接进入了inactive状态了；</p>
+<p>下面简单看一下他们的源码实现，如果你理解了上面所有内容，下面的源码理解起来非常简单，我只做简单的注释说明：</p>
+<h3 id="ReferenceHandler线程源码解析"><a href="#ReferenceHandler线程源码解析" class="headerlink" title="ReferenceHandler线程源码解析"></a>ReferenceHandler线程源码解析</h3><p>ReferenceHandler线程是一个拥有最高优先级的守护线程，它是Reference类的一个内部类，在Reference类加载执行cinit的时候被初始化并启动；它的任务就是当pending队列不为空的时候，循环将pending队列里面的头部的Reference移除出来，如果这个对象是个Cleaner实例，那么就直接执行它的clean方法来执行清理工作；否则放入到它自己的ReferenceQueue里面；</p>
+<p>所以这个线程是pending队列与ReferenceQueue的桥梁；</p>
+<pre><code class="java">/* High-priority thread to enqueue pending References*/
+private static class ReferenceHandler extends Thread {
+
+    ReferenceHandler(ThreadGroup g, String name) {
+        super(g, name);
+    }
+
+    public void run() {
+        for (;;) {
+            //从pending中移除的Reference对象
+            Reference&lt;Object&gt; r;
+            //此处需要加全局锁，因为除了当前线程，gc线程也会操作pending队列
+            synchronized (lock) {
+                //如果pending队列不为空，则将第一个Reference对象取出
+                if (pending != null) {
+                    //缓存pending队列头节点
+                    r = pending;
+                    //将头节点指向discovered，discovered为pending队列中当前节点的下一个节点，这样就把第一个头结点出队了
+                    pending = r.discovered;
+                    //将当前节点的discovered设置为null；当前节点出队，不需要组成链表了；
+                    r.discovered = null;
+                } else {//如果pending队列为空，则等待
+                    try {
+                        try {
+                            lock.wait();
+                        } catch(OutOfMemoryError x) { }
+                    } catch(InterruptedException x) { }
+                    continue;
+                }
+            }
+            // 如果从pending队列出队的r是一个Cleaner对象，那么直接执行其clean()方法执行清理操作；
+            if (r instanceof Cleaner) {
+                ((Cleaner)r).clean();
+                //注意这里，这里已经不往下执行了，所以Cleaner对象是不会进入到队列里面的，给它设置ReferenceQueue的作用是为了让它能进入Pending队列后被ReferenceHander线程处理；
+                continue;
+            }
+            //将对象放入到它自己的ReferenceQueue队列里
+            ReferenceQueue&lt;Object&gt; q = r.queue;
+            if (q != ReferenceQueue.NULL) q.enqueue(r);
+            return true;
+        }
+    }
+}
+
+//以下是ReferenceHander线程初始化并启动的操作
+static {
+    ThreadGroup tg =Thread.currentThread().getThreadGroup();
+    for (ThreadGroup tgn = tg;
+            tgn != null;
+            tg = tgn, tgn = tg.getParent());
+    //线程名称为Reference Handler
+    Thread handler = newReferenceHandler(tg, &quot;Reference Handler&quot;);
+    /* If there were a special system-onlypriority greater than
+        * MAX_PRIORITY, it would be used here
+        */
+    //线程有最高优先级
+    handler.setPriority(Thread.MAX_PRIORITY);
+    //设置线程为守护线程；
+    handler.setDaemon(true);
+    handler.start();
+}
+</code></pre>
+<h2 id="ReferenceQueue源码解析"><a href="#ReferenceQueue源码解析" class="headerlink" title="ReferenceQueue源码解析"></a>ReferenceQueue源码解析</h2><p>ReferenceQueue队列是一个单向链表，ReferenceQueue里面只有一个header成员变量持有队列的队头，Reference对象是从队头做出队入队操作，所以它是一个后进先出的队列</p>
+<pre><code class="java">public class ReferenceQueue&lt;T&gt; {
+
+    public ReferenceQueue() { }
+    //内部类，它是用来做状态识别的，重写了enqueue入队方法，永远返回false，所以它不会存储任何数据，见后面的NULL和ENQUEUED两个标识成员变量
+    private static class Null&lt;S&gt; extendsReferenceQueue&lt;S&gt; {
+        boolean enqueue(Reference&lt;? extends S&gt; r) {
+            return false;
+        }
+    }
+
+    //当Reference对象创建时没有指定queue或Reference对象已经处于inactive状态
+    staticReferenceQueue&lt;Object&gt; NULL = new Null&lt;&gt;();
+
+    //当Reference已经被ReferenceHander线程从pending队列移到queue里面时
+    static ReferenceQueue&lt;Object&gt; ENQUEUED = new Null&lt;&gt;();
+
+    staticprivate class Lock { };
+
+    //出队入队时对队列加锁
+    privateLock lock = new Lock();
+
+    //队列头
+    privatevolatile Reference&lt;? extends T&gt; head = null;
+
+    //队列长度
+    private long queueLength = 0;
+
+    //入队操作，ReferenceHander调用此方法将Reference放入到队列里
+    boolean enqueue(Reference&lt;? extends T&gt; r) { /* Called only byReference class */
+
+    //加锁操作队列
+    synchronized(lock) {
+        //如果Reference创建时没有指定队列或Reference对象已经在队列里面了，则直接返回
+        ReferenceQueue&lt;?&gt; queue = r.queue;
+        if ((queue == NULL) || (queue == ENQUEUED)) {
+            return false;
+        }
+        //只有r的队列是当前队列才允许入队
+        assert queue == this;
+        //将r的queue设置为ENQUEUED状态，标识Reference已经入队
+        r.queue = ENQUEUED;
+        //从队列头部入队
+        r.next = (head == null) ? r : head;
+        head = r;
+        //队列里面对象数量+1
+        queueLength++;
+        //如果r是一个FinalReference实例，那么将FinalReference数量也+1
+        if (r instanceof FinalReference) {
+            sun.misc.VM.addFinalRefCount(1);
+        }
+        //唤醒出队操作的等待线程
+        lock.notifyAll();
+        return true;
+       }
+    }
+
+    //Reference对象出队操作，将头部第一个对象移出队列，并将队列长度-1
+   @SuppressWarnings(&quot;unchecked&quot;)
+   private Reference&lt;? extends T&gt; reallyPoll() {       /* Must hold lock */
+       Reference&lt;? extends T&gt; r = head;
+       if (r != null) {
+           head = (r.next == r) ?
+               null :
+               r.next; // Unchecked due to the next field having a raw type inReference
+           r.queue = NULL;
+           r.next = r;
+           queueLength--;
+           if (r instanceof FinalReference) {
+               sun.misc.VM.addFinalRefCount(-1);
+           }
+           return r;
+       }
+       return null;
+    }
+
+    //将队列头部第一个对象从队列中移除出来，如果队列为空则直接返回null（此方法不会被阻塞）
+   public Reference&lt;? extends T&gt; poll() {
+       if (head == null)
+           return null;
+       synchronized (lock) {
+           return reallyPoll();
+       }
+    }
+
+
+   //将头部第一个对象移出队列并返回，如果队列为空，则等待timeout时间后，返回null，这个方法会阻塞线程
+   public Reference&lt;? extends T&gt; remove(long timeout)
+       throws IllegalArgumentException, InterruptedException
+    {
+       if (timeout &lt; 0) {
+           throw new IllegalArgumentException(&quot;Negative timeout value&quot;);
+       }
+       synchronized (lock) {
+           Reference&lt;? extends T&gt; r = reallyPoll();
+           if (r != null) return r;
+           for (;;) {
+               lock.wait(timeout);
+               r = reallyPoll();
+               if (r != null) return r;
+                if (timeout != 0) return null;
+           }
+       }
+    }
+
+   public Reference&lt;? extends T&gt; remove() throws InterruptedException{
+       return remove(0);
+    }
+}
+</code></pre>
+<p>最后来一张图：</p>
+<p><img src="https://i.loli.net/2020/12/11/MLrasIheZ1SUGRQ.png" alt="image.png"></p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/11/04/reference/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/11/04/reference/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/11/11/jvm-in-container/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/07/24/micro-service-authorization/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">12</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">44</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">31</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">23</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

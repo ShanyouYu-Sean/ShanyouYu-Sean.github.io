@@ -3,26 +3,381 @@
   
     
     <entry>
-      <title></title>
-      <url>/2020/12/09/mysql-8-distributed-tx/</url>
+      <title><![CDATA[分布式id算法]]></title>
+      <url>/2020/12/04/distributed-id/</url>
       <content type="html"></content>
       
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
         
     </entry>
     
     <entry>
-      <title></title>
-      <url>/2020/12/09/mysql-7-ha/</url>
-      <content type="html"></content>
+      <title><![CDATA[mysql之分布式事务]]></title>
+      <url>/2020/12/04/mysql-7-distributed-tx/</url>
+      <content type="html"><![CDATA[<p>参考 <a href="http://www.calvinneo.com/2017/09/20/distributed-system-consistency-and-consensus/" target="_blank" rel="noopener">http://www.calvinneo.com/2017/09/20/distributed-system-consistency-and-consensus/</a> <a href="http://www.calvinneo.com/2019/03/12/2pc-3pc/" target="_blank" rel="noopener">http://www.calvinneo.com/2019/03/12/2pc-3pc/</a> <a href="https://blog.csdn.net/bjweimengshu/article/details/86698036" target="_blank" rel="noopener">https://blog.csdn.net/bjweimengshu/article/details/86698036</a> <a href="https://matt33.com/2018/07/08/distribute-system-consistency-protocol/" target="_blank" rel="noopener">https://matt33.com/2018/07/08/distribute-system-consistency-protocol/</a> <a href="https://segmentfault.com/a/1190000022510975" target="_blank" rel="noopener">https://segmentfault.com/a/1190000022510975</a> <a href="https://cloud.tencent.com/developer/article/1379434" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1379434</a> <a href="http://arick.net/content/14" target="_blank" rel="noopener">http://arick.net/content/14</a></p>
+<h2 id="cap"><a href="#cap" class="headerlink" title="cap"></a>cap</h2><ul>
+<li>一致性 c</li>
+<li>可用性 a</li>
+<li>分区容错 p</li>
+</ul>
+<h2 id="base"><a href="#base" class="headerlink" title="base"></a>base</h2><ul>
+<li>BA：Basically Available 基本可用，分布式系统在出现故障的时候，允许损失部分可用性，即保证核心可用。</li>
+<li>S：Soft State 软状态，允许系统存在中间状态，而该中间状态不会影响系统整体可用性。</li>
+<li>E：Consistency 最终一致性，系统中的所有数据副本经过一定时间后，最终能够达到一致的状态。</li>
+</ul>
+<h2 id="两阶段提交协议Two-Phase-commit-2PC"><a href="#两阶段提交协议Two-Phase-commit-2PC" class="headerlink" title="两阶段提交协议Two-Phase commit(2PC)"></a>两阶段提交协议Two-Phase commit(2PC)</h2><p>二阶段提交协议（Two-phase Commit，即2PC）是常用的分布式事务解决方案，它可以保证在分布式事务中，要么所有参与进程都提交事务，要么都取消事务，即实现 ACID 的原子性（A）。在数据一致性中，它的含义是：要么所有副本（备份数据）同时修改某个数值，要么都不更改，以此来保证数据的强一致性。</p>
+<p>2PC 要解决的问题可以简单总结为：在分布式系统中，每个节点虽然可以知道自己的操作是成功还是失败，却是无法知道其他节点的操作状态。当一个事务需要跨越多个节点时，为了保持事务的 ACID 特性，需要引入一个作为协调者的组件来统一掌控所有节点（参与者）的操作结果，并最终指示这些节点是否要把操作结果进行真正的提交（比如将更新后的数据写入磁盘等等）。因此，二阶段提交的算法思路可以概括为： 参与者将操作结果通知协调者，再由协调者根据所有参与者的反馈情报决定各参与者是否要提交操作还是中止操作。</p>
+<h3 id="协议内容"><a href="#协议内容" class="headerlink" title="协议内容"></a>协议内容</h3><ul>
+<li>第一阶段（投票阶段）<br>首先协调者向所有的参与者发出提交请求VOTE_REQUEST，参与者按照事务的标准流程写UNDO和REDO等日志，并在本地执行事务。如果事务执行顺利，则不提交（尽管事务中的全部操作已经正确完成），返回一个VOTE_COMMIT给协调者，表示自己成功执行了事务。如果事务执行出现错误，则返回一个VOTE_ABORT。</li>
+<li>第二阶段（执行提交阶段）<br>假设协调者没有宕机，相应会出现两种状态：<ul>
+<li>成功，发生在所有的参与者节点都返回VOTE_COMMIT<br>此时协调者向所有参与者发送GLOBAL_COMMIT，参与者收到之后正式提交事务并释放资源，然后返回ACK确认。</li>
+<li>失败，发生在任意参与者节点返回VOTE_ABORT，或者有的参与者timeout<br>此时协调者向所有参与者发送GLOBAL_ROLLBACK，参与者收到之后UNDO回前像状态，然后返回ACK确认。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/11/WHozX2FEsGlAq7u.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2020/12/11/zf3LCqp16xjRUhE.png" alt="image.png"></p>
+<h3 id="协调者宕机-分区情况对一致性的影响"><a href="#协调者宕机-分区情况对一致性的影响" class="headerlink" title="协调者宕机/分区情况对一致性的影响"></a>协调者宕机/分区情况对一致性的影响</h3><p>OK，刚才协调者没有宕机，看起来很美好，可是如果协调者宕机了呢？</p>
+<p>我们考虑协调者将commit信息传递给了一部分参与者的情况，由于2PC是阻塞的，这意味着所有没有收到commit消息的节点都会阻塞在等到GLOBAL_COMMIT消息这里。如果协调者又重启或者从分区中恢复，那么参与者仍然有机会提交。<br>但是如果协调者永久地宕机了，此时整个事务就不在Safe了，因为并非所有的节点都能一致提交或者回滚。但仍然可以认为2PC是Safe的协议，因为它实际上是不假设永久宕机的情况的。</p>
+<h3 id="二阶段提交协议的不足"><a href="#二阶段提交协议的不足" class="headerlink" title="二阶段提交协议的不足"></a>二阶段提交协议的不足</h3><p>总而言之，2PC存在两个显著问题，阻塞和不能处理网络分区。</p>
+<ul>
+<li>性能问题。从流程上我们可以看得出，其最大缺点就在于它的执行过程中间，节点都处于阻塞状态。各个操作数据库的节点此时都占用着数据库资源，只有当所有节点准备完毕，事务协调者才会通知进行全局提交，参与者进行本地事务提交后才会释放资源。这样的过程会比较漫长，对性能影响比较大。</li>
+<li>协调者单点故障问题。事务协调者是整个XA模型的核心，一旦事务协调者节点挂掉，会导致参与者收不到提交或回滚的通知，从而导致参与者节点始终处于事务无法完成的中间状态。</li>
+<li>网络分区。丢失消息导致的数据不一致问题。在第二个阶段，如果发生局部网络问题，一部分事务参与者收到了提交消息，另一部分事务参与者没收到提交消息，那么就会导致节点间数据的不一致问题。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/11/ofEB482Vm1GgDqX.png" alt="image.png"></p>
+<h2 id="三阶段提交协议"><a href="#三阶段提交协议" class="headerlink" title="三阶段提交协议"></a>三阶段提交协议</h2><p>三阶段提交又称3PC，其在两阶段提交的基础上增加了CanCommit阶段，并引入了超时机制。一旦事务参与者迟迟没有收到协调者的Commit请求，就会自动进行本地commit，这样相对有效地解决了协调者单点故障的问题。</p>
+<p>但是性能问题和不一致问题仍然没有根本解决。下面我们还是一起看下三阶段流程的是什么样的？</p>
+<h3 id="协议内容-1"><a href="#协议内容-1" class="headerlink" title="协议内容"></a>协议内容</h3><ul>
+<li>CanCommit阶段<br>这个类似于2PC的投票阶段，协调者发出询问是否可以提交，Yes为可以提交，No相反。</li>
+<li>PreCommit阶段<br>需要分为三种情况讨论：<ul>
+<li>如果上阶段全部为Yes<br>协调者发送PreCommit请求并进入Prepared状态<br>参与者接受到PreCommit后确保事务操作全部执行并记录UNDO与REDO，返回ACK</li>
+<li>如果上阶段有No<br>协调者发送abort请求<br>参与者接受到abort后，REDO，中断事务，发送ACK</li>
+<li>例外情况：参与者未收到协调者的消息<br>这可以认为是协调者的timeout，此时中断事务<br>注意到这里参与者是可以处理协调者的timeout的</li>
+</ul>
+</li>
+<li>DoCommit阶段<br>这是真正的事务提交阶段，同样分为三种情况<ul>
+<li>协调者收全上阶段ACK<br>协调者发送DoCommit请求<br>参与者接受到DoCommit后提交事务，返回ACK</li>
+<li>协调者未收到上阶段ACK<br>这发生在协调者没有收到一些参与者的ACK（网络分区或该参与者abort）<br>协调者发送abort请求<br>参与者接受到abort，使用同上阶段的方式中断事务</li>
+<li>例外情况：参与者未收到协调者的消息<br>这又是一个协调者的timeout，此时提交事务<br>为什么选择提交事务而不是中断事务？因为此时提交事务成功的可能性非常非常大了，但仍有例外，例如：<br>进入PreCommit后，协调者发出的是abort请求，如果只有一个收到并进行了abort操作，而其他对于系统状态未知的节点会根据3PC选择继续Commit，这仍然会导致不一致，不过这个概率就显然非常小了</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/11/jRWkrUoIl3EYOg9.png" alt="image.png"></p>
+<p>换言之, 3PC在2PC的Commit阶段里增加了一个barrier(即相当于告诉其他所有voter, 我收到了Propose的结果啦). 在这个barrier之前coordinator掉线的话, 其他voter可以得出结论不是每个voter都收到Propose Phase的结果, 从而放弃或选出新的coordinator; 在这个barrier之后coordinator掉线的话, 每个voter会放心的commit, 因为他们知道其他voter也都做同样的计划.</p>
+<p>相比较2PC而言，3PC对于协调者（Coordinator）和参与者（Partcipant）都设置了超时时间，而2PC只有协调者才拥有超时机制。这解决了一个什么问题呢？这个优化点，主要是避免了参与者在长时间无法与协调者节点通讯（协调者挂掉了）的情况下，无法释放资源的问题，因为参与者自身拥有超时机制会在超时后，自动进行本地commit从而进行释放资源。而这种机制也侧面降低了整个事务的阻塞时间和范围。</p>
+<p>另外，通过CanCommit、PreCommit、DoCommit三个阶段的设计，相较于2PC而言，多设置了一个缓冲阶段保证了在最后提交阶段之前各参与节点的状态是一致的。</p>
+<p>以上就是3PC相对于2PC的一个提高（相对缓解了2PC中的前两个问题），但是3PC依然没有完全解决数据不一致的问题。</p>
+<h3 id="3PC的缺陷"><a href="#3PC的缺陷" class="headerlink" title="3PC的缺陷"></a>3PC的缺陷</h3><p>3PC可以有效的处理fail-stop的模式, 但不能处理网络划分(network partition)的情况—节点互相不能通信. 假设在PreCommit阶段所有节点被一分为二, 收到preCommit消息的voter在一边, 而没有收到这个消息的在另外一边. 在这种情况下, 两边就可能会选出新的协调者而做出不同的决定.</p>
+<p><img src="https://i.loli.net/2020/12/11/9JCOLDy4ANW3eU7.png" alt="image.png"></p>
+<p>除了网络划分以外, 3PC也不能处理fail-recover的错误情况. 简单说来当协调者收到preCommit的确认前crash, 于是其他某一个voter接替了原协调者的任务而开始组织所有voter commit. 而与此同时原协调者重启后又回到了网络中, 开始继续之前的回合—发送abort给各位voter因为它并没有收到preCommit. 此时有可能会出现原协调者和继任的协调者给不同节点发送相矛盾的commit和abort指令, 从而出现个节点的状态分歧.</p>
+<h2 id="xa事务"><a href="#xa事务" class="headerlink" title="xa事务"></a>xa事务</h2><p>XA事务中需要有一个事务协调器来保证所有的事务参与者都完成了准备工作（第一阶段）。如果协调器收到所有的参与者都准备好的消息，就会告诉所有的事务可以提交了，这是第二阶段。</p>
+<p>MySQL在这个XA事务过程中扮演一个参与者的角色，而不是协调者。</p>
+<p>实际上，在MySQL中有两种XA事务。一方面，MySQL可以参与到外部的分布式事务中；另一方面，还可以通过XA事务来协调存储引擎和二进制日志。</p>
+<h3 id="内部xa事务"><a href="#内部xa事务" class="headerlink" title="内部xa事务"></a>内部xa事务</h3><p>MySQL中各个存储引擎是完全独立的，彼此不知道对方的存在，所以一个跨存储引擎的事务就需要一个外部的协调者。如果不使用XA协议，例如，跨存储引擎的事务提交就只是顺序地要求每个存储引擎各自提交。如果在某个存储提交过程中发生系统崩溃，就会破坏事务的特性（要么就全部提交，要么就不做任何操作）。</p>
+<p>如果将MySQL记录的二进制日志操作看作一个独立的“存储引擎”，就不难理解为什么即使是一个存储引擎参与的事务仍然需要XA事务了。在存储引擎提交的同时，需要将“提交”的信息写入二进制日志，这就是一个分布式事务，只不过二进制日志的参与者是MySQL本身。</p>
+<p>XA事务为MySQL带来巨大的性能下降。从MySQL5.0开始，它破坏了MySQL内部的“批量提交”（一种通过单磁盘I/O操作完成多个事务提交的技术），使得MySQL不得不进行多次额外的fsync()调用。具体的，一个事务如果开启了二进制日志，则不仅需要对二进制日志进行持久化操作，InnoDB事务日志还需要两次日志持久化操作。换句话说，如果希望有二进制日志安全的事务实现，则至少需要做三次fsync()操作。</p>
+<h3 id="外部xa事务"><a href="#外部xa事务" class="headerlink" title="外部xa事务"></a>外部xa事务</h3><p>MySQL能够作为参与者完成一个外部的分布式事务。但它对XA协议支持并不完整，例如，XA协议要求在一个事务中的多个连接可以做关联，但目前的MySQL版本还不能支持。</p>
+<p>因为通信延迟和参与者本身可能失败，所以外部XA事务比内部消耗会更大。如果在广域网中使用XA事务，通常会因为不可预测的网络性能导致事务失败。如果有太多不可控因素，例如，不稳定的网络通信或者用户长时间地等待而不提交，则最好避免使用XA事务。任何可能让事务提交发生延迟的操作代价都很大，因为它影响的不仅仅是自己本身，它还会让所有参与者都在等待。</p>
+<p>通常，还可以使用别的方式实现高性能的分布式事务。例如，可以在本地写入数据，并将其放入队列，然后在一个更小、更快的事务中自动分发。还可以使用MySQL本身的复制机制来发送数据。我们看到很多应用程序都可以完全避免使用分布式事务。</p>
+<p>也就是说，XA事务是一种在多个服务器之间同步数据的方法。如果由于某些原因不能使用MySQL本身的复制，或者性能并不是瓶颈的时候，可以尝试使用。</p>
+<h3 id="xa事务具体步骤"><a href="#xa事务具体步骤" class="headerlink" title="xa事务具体步骤"></a>xa事务具体步骤</h3><p><img src="https://i.loli.net/2020/12/11/umaAgIJQRKxG1zN.png" alt="image.png"></p>
+<p>假设一个表test定义如下，Proxy根据主键”a”算Hash决定一条记录应该分布在哪个节点上：</p>
+<pre><code class="sql">create table test(a int primay key, b int) engine = innodb;
+</code></pre>
+<p>应用发到Proxy的一个事务如下：</p>
+<pre><code class="sql">begin;
+insert into test values (1, 1);
+update test set b = 1 where a = 10;
+commit;
+</code></pre>
+<p>Proxy收到这个事务需要将它转成XA事务发送到后端的数据库以保证这个事务能够安全的提交或回滚，一般的Proxy的处理步骤 如下：</p>
+<ul>
+<li>Proxy先收到begin，它只需要设置一下自己的状态不需要向后端数据库发送</li>
+<li>当收到 insert 语句时Proxy会解析语句，根据“a”的值计算出该条记录应该位于哪个节点上，这里假设是“分库1”</li>
+<li>Proxy就会向分库1上发送语句xa start ‘xid1’，开启一个XA事务，这里xid1是Proxy自动生成的一个全局事务ID；同时原来 的insert语句insert into values(1,1)也会一并发送到分库1上。</li>
+<li>这时Proxy遇到了update语句，Proxy会解析 where条件主键的值来决定该条语句会被发送到哪个节点上，这里假设是“分库2”</li>
+<li>Proxy就会向分库2上发送语句xa start ‘xid1’，开启一个XA事务，这里xid1是Proxy之前已经生成的一个全局事务ID；同时原来 的update语句update test set b = 1 where a = 10也会一并发送到分库2上。</li>
+<li>最后当Proxy解析到commit语句时，就知道一个用户事务已经结束了，就开启提交流程</li>
+<li>Proxy会向分库1和分库2发送 xa end ‘xid1’;xa prepare ‘xid1’语句，当收到执行都成功回复后，则继续进行到下一步，如果任何一个分 库返回失败，则向分库1和分库2 发送 xa rollback ‘xid1’，回滚整个事务</li>
+<li>当 xa prepare ‘xid1’都返回成功，那么 proxy会向分库1和分库2上发送 xa commit ‘xid1’，来最终提交事务。</li>
+</ul>
+<p>这里有一个可能的优化，即在步骤4时如果Proxy计算出update语句发送的节点仍然是“分库1”时，在遇到commit时，由于只涉 及到一个分库，它可以直接向“分库1”发送 xa end ‘xid1’; xa commit ‘xid1’ one phase来直接提交该事务，避免走 prepare阶段来提高效率。</p>
+<h2 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h2><p>TCC（Try-Confirm-Cancel）又称补偿事务。其核心思想是：”针对每个操作都要注册一个与其对应的确认和补偿（撤销操作）”。它分为三个操作：</p>
+<ul>
+<li>Try阶段：主要是对业务系统做检测及资源预留。</li>
+<li>Confirm阶段：确认执行业务操作。</li>
+<li>Cancel阶段：取消执行业务操作。</li>
+</ul>
+<p>TCC事务的处理流程与2PC两阶段提交类似，不过2PC通常都是在跨库的DB层面，而TCC本质上就是一个应用层面的2PC，需要通过业务逻辑来实现。这种分布式事务的实现方式的优势在于，可以让应用自己定义数据库操作的粒度，使得降低锁冲突、提高吞吐量成为可能。</p>
+<p>而不足之处则在于对应用的侵入性非常强，业务逻辑的每个分支都需要实现try、confirm、cancel三个操作。此外，其实现难度也比较大，需要按照网络状态、系统故障等不同的失败原因实现不同的回滚策略。<strong>为了满足一致性的要求，confirm和cancel接口还必须实现幂等。</strong></p>
+<p><img src="https://i.loli.net/2020/12/11/9gvUOnkaEheFXbz.png" alt="image.png"></p>
+<h3 id="tcc场景案例"><a href="#tcc场景案例" class="headerlink" title="tcc场景案例"></a>tcc场景案例</h3><p>有一次，笔者买彩票中奖了(纯属虚构)，准备从合肥出发，到云南大理去游玩，然后使用美团App(机票代理商)来订机票。发现没有从合肥直达大理的航班，需要到昆明进行中转。如下图： </p>
+<p><img src="https://i.loli.net/2020/12/11/bWAHxQfNjUihvlr.png" alt="image.png"></p>
+<p> 从图中我们可以看出来，从合肥到昆明乘坐的是四川航空，从昆明到大理乘坐的是东方航空。</p>
+<p>由于使用的是美团App预定，当我选择了这种航班预定方案后，美团App要去四川航空和东方航空各帮我购买一张票。如下图： </p>
+<p><img src="https://i.loli.net/2020/12/11/jd9SB87WmZflaOp.png" alt="image.png"></p>
+<p>考虑最简单的情况：美团先去川航帮我买票，如果买不到，那么东航也没必要买了。如果川航购买成功，再去东航购买另一张票。</p>
+<p>现在问题来了：假设美团先从川航成功买到了票，然后去东航买票的时候，因为天气问题，东航航班被取消了。那么此时，美团必须取消川航的票，因为只有一张票是没用的，不取消就是浪费我的钱。那么如果取消会怎样呢？如果读者有取消机票经历的话，非正常退票，肯定要扣手续费的。在这里，川航本来已经购买成功，现在因为东航的原因要退川航的票，川航应该是要扣代理商的钱的。</p>
+<p>那么美团就要保证，如果任一航班购买失败，都不能扣钱，怎么做呢？</p>
+<p>两个航空公司都为美团提供以下3个接口：机票预留接口、确认接口、取消接口。美团App分2个阶段进行调用，如下所示： </p>
+<p><img src="https://i.loli.net/2020/12/11/yJ91eYuHRVXd85F.png" alt="image.png"></p>
+<p>在第1阶段：</p>
+<p>美团分别请求两个航空公司预留机票，两个航空公司分别告诉美图预留成功还是失败。航空公司需要保证，机票预留成功的话，之后一定能购买到。</p>
+<p>在第2阶段：</p>
+<p>如果两个航空公司都预留成功，则分别向两个公司发送确认购买请求。</p>
+<p>如果两个航空公司任意一个预留失败，则对于预留成功的航空公司也要取消预留。这种情况下，对于之前预留成功机票的航班取消，也不会扣用户的钱，因为购买并没实际发生，之前只是请求预留机票而已。</p>
+<p>通过这种方案，可以保证两个航空公司购买机票的一致性，要不都成功，要不都失败，即使失败也不会扣用户的钱。如果在两个航班都已经已经确认购买后，再退票，那肯定还是要扣钱的。</p>
+<p>当然，实际情况肯定这里提到的肯定要复杂，通常航空公司在第一阶段，对于预留的机票，会要求在指定的时间必须确认购买(支付成功)，如果没有及时确认购买，会自动取消。假设川航要求10分钟内支付成功，东航要求30分钟内支付成功。以较短的时间算，如果用户在10分钟内支付成功的话，那么美团会向两个航空公司都发送确认购买的请求，如果超过10分钟(以较短的时间为准)，那么就不能进行支付。</p>
+<p>再次强调，这个案例，可以算是Composite Transactions for SOA中航班预定案例的汉化版。而实际美团App是如何实现这种需要中转的航班预定需求，笔者并不知情。</p>
+<p>另外，注意这只是一个案例场景，实际情况中，你是很难去驱动航空公司进行接口改造的。</p>
+<p>Whatever，这个方案提供给我们一种跨服务条用保证事务一致性的一种解决思路，可以把这种方案当做TCC的雏形。 </p>
+<h3 id="tcc与xa区别"><a href="#tcc与xa区别" class="headerlink" title="tcc与xa区别"></a>tcc与xa区别</h3><p>XA是资源层面的分布式事务，强一致性，在两阶段提交的整个过程中，一直会持有资源的锁。</p>
+<p>XA事务中的两阶段提交内部过程是对开发者屏蔽的，回顾我们之前讲解JTA规范时，通过UserTransaction的commit方法来提交全局事务，这只是一次方法调用，其内部会委派给TransactionManager进行真正的两阶段提交，因此开发者从代码层面是感知不到这个过程的。而事务管理器在两阶段提交过程中，从prepare到commit/rollback过程中，资源实际上一直都是被加锁的。如果有其他人需要更新这两条记录，那么就必须等待锁释放。</p>
+<p>TCC是业务层面的分布式事务，最终一致性，不会一直持有资源的锁。</p>
+<p>TCC中的两阶段提交并没有对开发者完全屏蔽，也就是说从代码层面，开发者是可以感受到两阶段提交的存在。如上述航班预定案例：在第一阶段，航空公司需要提供try接口(机票资源预留)。在第二阶段，航空公司提需要提供confirm/cancel接口(确认购买机票/取消预留)。开发者明显的感知到了两阶段提交过程的存在。try、confirm/cancel在执行过程中，一般都会开启各自的本地事务，来保证方法内部业务逻辑的ACID特性。其中：</p>
+<ul>
+<li>try过程的本地事务，是保证资源预留的业务逻辑的正确性。</li>
+<li>confirm/cancel执行的本地事务逻辑确认/取消预留资源，以保证最终一致性，也就是所谓的补偿型事务(Compensation-Based Transactions)。</li>
+</ul>
+<p>由于是多个独立的本地事务，因此不会对资源一直加锁。</p>
+<h2 id="基于消息MQ最终一致性方案"><a href="#基于消息MQ最终一致性方案" class="headerlink" title="基于消息MQ最终一致性方案"></a>基于消息MQ最终一致性方案</h2><p><img src="https://i.loli.net/2020/12/11/boDuM9PSQnqtYdX.png" alt="image.png"></p>
+<ul>
+<li>事务消息与普通消息的区别就在于消息生产环节，生产者首先预发送一条消息到MQ(这也被称为发送half消息)</li>
+<li>MQ接受到消息后，先进行持久化，则存储中会新增一条状态为待发送的消息</li>
+<li>然后返回ACK给消息生产者，此时MQ不会触发消息推送事件（延迟消费）</li>
+<li>生产者预发送消息成功后，执行本地事务</li>
+<li>执行本地事务，执行完成后，发送执行结果给MQ</li>
+<li>MQ会根据结果删除或者更新消息状态为可发送</li>
+<li>如果消息状态更新为可发送，则MQ会push消息给消费者，后面消息的消费和普通消息是一样的</li>
+</ul>
+<p>注意点：由于MQ通常都会保证消息能够投递成功，因此，如果业务没有及时返回ACK结果，那么就有可能造成MQ的重复消息投递问题。因此，对于消息最终一致性的方案，<strong>消息的消费者必须要对消息的消费支持幂等</strong>，不能造成同一条消息的重复消费的情况。</p>
+<h3 id="支持事务消息的MQ"><a href="#支持事务消息的MQ" class="headerlink" title="支持事务消息的MQ"></a>支持事务消息的MQ</h3><p>现在目前较为主流的MQ，比如ActiveMQ、RabbitMQ、Kafka、RocketMQ等，只有RocketMQ支持事务消息。对于RocketMQ而言，它的解决方案非常的简单，就是其内部实现会有一个定时任务，去轮训状态为待发送的消息，然后给producer发送check请求，而producer必须实现一个check监听器，监听器的内容通常就是去检查与之对应的本地事务是否成功(一般就是查询DB)，如果成功了，则MQ会将消息设置为可发送，否则就删除消息。</p>
+<p>RocketMQ官网上的图：<br><img src="https://i.loli.net/2020/12/11/8mKw6n1rHpOGZ9J.png" alt="image.png"></p>
+<h2 id="基于本地消息的最终一致性"><a href="#基于本地消息的最终一致性" class="headerlink" title="基于本地消息的最终一致性"></a>基于本地消息的最终一致性</h2><p><img src="https://i.loli.net/2020/12/11/m2r5LNOK6pYbnHE.png" alt="image.png"></p>
+<p>基于本地消息的最终一致性方案的最核心做法就是在执行业务操作的时候，记录一条消息数据到DB，并且<strong>消息数据的记录与业务数据的记录必须在同一个事务内完成</strong>，这是该方案的前提核心保障。在记录完成后消息数据后，后面我们就可以通过一个定时任务到DB中去轮训状态为待发送的消息，然后将消息投递给MQ。这个过程中可能存在消息投递失败的可能，此时就依靠重试机制来保证，直到成功收到MQ的ACK确认之后，再将消息状态更新或者消息清除；而后面消息的消费失败的话，则依赖MQ本身的重试来完成，其最后做到两边系统数据的最终一致性。基于本地消息服务的方案虽然可以做到消息的最终一致性，但是它有一个比较严重的弊端，每个业务系统在使用该方案时，都需要在对应的业务库创建一张消息表来存储消息。针对这个问题，我们可以将该功能单独提取出来，做成一个消息服务来统一处理，因而就衍生出了我们下面将要讨论的方案。</p>
+<p>自己理解下</p>
+<ul>
+<li>server a中，用同一个事务，分别执行业务a和插入消息表</li>
+<li>用一个定时任务来轮训消息表，发送到mq</li>
+<li>server b中，业务b消费消息，返回ack到mq</li>
+<li>server a消费ack mq，然后更新本地消息表</li>
+</ul>
+<p>其中重点是第一步必须在一个事务下，server b要保证幂等</p>
+<h2 id="独立消息服务的最终一致性"><a href="#独立消息服务的最终一致性" class="headerlink" title="独立消息服务的最终一致性"></a>独立消息服务的最终一致性</h2><p><img src="https://i.loli.net/2020/12/11/5LYtucf8wkxrVAD.png" alt="image.png"></p>
+<p>独立消息服务最终一致性与本地消息服务最终一致性最大的差异就在于将消息的存储单独地做成了一个RPC的服务，这个过程其实就是模拟了事务消息的消息预发送过程，如果预发送消息失败，那么生产者业务就不会去执行，因此对于生产者的业务而言，它是强依赖于该消息服务的。不过好在独立消息服务支持水平扩容，因此只要部署多台，做成HA的集群模式，就能够保证其可靠性。</p>
+<p>在消息服务中，还有一个单独地定时任务，它会定期轮训长时间处于待发送状态的消息，通过一个check补偿机制来确认该消息对应的业务是否成功，如果对应的业务处理成功，则将消息修改为可发送，然后将其投递给MQ；如果业务处理失败，则将对应的消息更新或者删除即可。因此在使用该方案时，消息生产者必须同时实现一个check服务，来供消息服务做消息的确认。对于消息的消费，该方案与上面的处理是一样，都是通过MQ自身的重发机制来保证消息被消费。</p>
+<p>自己理解下：</p>
+<ul>
+<li>server a发送 待确认消息 到 消息中间件的 待确认数据表中</li>
+<li>server a执行业务a</li>
+<li>消息中间件 轮训server a的check接口，根据业务a的结果，把 待确认消息 移到 可发送mq中</li>
+<li>server b消费 可发送mq 中的消息，执行业务b，返回ack到mq中间件</li>
+<li>中间件 根据ack来决定，是否删除待确认数据表，以及是否通知server a回滚业务a</li>
+<li>中间件要处理未收到ack的超时重发，server b要处理幂等</li>
+</ul>
+<p>其实就是本地存消息的改造，移到了中间件里去做。</p>
+<p>貌似所有基于消息中间件的实现，最大的问题就是，server a上的事务必须提交一次，然后再根据server b的ack决定是否撤销操作，其实不是一个事务。因此server b掉线了只能重试，失败了只能让a再撤销业务调教一次。</p>
+<h3 id="消息重复发送问题和业务接口幂等性设计"><a href="#消息重复发送问题和业务接口幂等性设计" class="headerlink" title="消息重复发送问题和业务接口幂等性设计"></a>消息重复发送问题和业务接口幂等性设计</h3><p><img src="https://i.loli.net/2020/12/11/S6GsOIq8ovleJMK.png" alt="image.png"></p>
+<h3 id="改进图"><a href="#改进图" class="headerlink" title="改进图"></a>改进图</h3><p><img src="https://i.loli.net/2020/12/11/FDotRgWNr458uJ9.png" alt="image.png"></p>
+<ul>
+<li>预发送消息：主动方应用系统预发送消息，由消息服务子系统存储消息，如果存储失败，那么也就无法进行业务操作。如果返回存储成功，然后执行业务操作。</li>
+<li>执行业务操作：执行业务操作如果成功的时候，将业务操作执行成功的状态发送到消息服务子系统。消息服务子系统修改消息的标识为“可发送”状态。</li>
+<li>发送消息到实时消息服务：当消息的状态发生改变的时候，立刻将消息发送到实时消息服务中。接下来，消息将会被消息业务的消费端监听到，然后被消费。</li>
+<li>消息状态子系统：相当于定时任务系统，在消息服务子系统中定时查找确认超时的消息，在主动方应用系统中也去定时查找没有处理成功的任务，进行相应的处理。</li>
+<li>消息消费：当消息被消费的时候，向实时消息服务发送ACK，然后实时消息服务删除消息。同时调用消息服务子系统修改消息为“被消费”状态。</li>
+<li>消息恢复子系统：当消费方返回消息的时候，由于网络中断等其他原因导致消息没有及时确认，那么需要消息恢复子系统定时查找出在消息服务子系统中没有确认的消息。将没有被确认的消息放到实时消息服务中，进行重做，因为被动方应用系统的接口是幂等的。</li>
+</ul>
+]]></content>
       
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
         
     </entry>
     
     <entry>
-      <title></title>
-      <url>/2020/12/09/mysql-6-copy/</url>
-      <content type="html"></content>
+      <title><![CDATA[mysql之复制]]></title>
+      <url>/2020/12/04/mysql-6-copy/</url>
+      <content type="html"><![CDATA[<p>复制解决的基本问题是让一台服务器的数据与其他服务器保持同步。一台主库的数据可以同步到多台备库上，备库本身也可以被配置成另外一台服务器的主库。主库和备库之间可以有多种不同的组合方式。</p>
+<p>MySQL支持两种复制方式：基于行的复制和基于语句的复制。在同一时间点备库上的数据可能与主库存在不一致，并且无法保证主备之间的延迟。一些大的语句可能导致备库产生几秒、几分钟甚至几个小时的延迟。</p>
+<p>复制通常不会增加主库的开销，主要是启用二进制日志带来的开销，但出于备份或及时从崩溃中恢复的目的，这点开销也是必要的。</p>
+<p>除此之外，每个备库也会对主库增加一些负载（例如网络I/O开销），尤其当备库请求从主库读取旧的二进制日志文件时，可能会造成更高的I/O开销。另外锁竞争也可能阻碍事务的提交。</p>
+<p>最后，如果是从一个高吞吐量（例如5000或更高的TPS）的主库上复制到多个备库，唤醒多个复制线程发送事件的开销将会累加。</p>
+<h2 id="复制解决的问题"><a href="#复制解决的问题" class="headerlink" title="复制解决的问题"></a>复制解决的问题</h2><ul>
+<li>数据分布</li>
+<li>负载均衡</li>
+<li>备份</li>
+<li>高可用和故障切换</li>
+</ul>
+<h2 id="复制如何工作"><a href="#复制如何工作" class="headerlink" title="复制如何工作"></a>复制如何工作</h2><h3 id="在主库上把数据更改记录到二进制日志（BinaryLog）中（这些记录被称为二进制日志事件）"><a href="#在主库上把数据更改记录到二进制日志（BinaryLog）中（这些记录被称为二进制日志事件）" class="headerlink" title="在主库上把数据更改记录到二进制日志（BinaryLog）中（这些记录被称为二进制日志事件）"></a>在主库上把数据更改记录到二进制日志（BinaryLog）中（这些记录被称为二进制日志事件）</h3><p>在每次准备提交事务完成数据更新前，主库将数据更新的事件记录到二进制日志中。MySQL会按事务提交的顺序而非每条语句的执行顺序来记录二进制日志。在记录二进制日志后，主库会告诉存储引擎可以提交事务了。</p>
+<h3 id="备库将主库上的日志复制到自己的中继日志（RelayLog）中"><a href="#备库将主库上的日志复制到自己的中继日志（RelayLog）中" class="headerlink" title="备库将主库上的日志复制到自己的中继日志（RelayLog）中"></a>备库将主库上的日志复制到自己的中继日志（RelayLog）中</h3><p>首先，备库会启动一个工作线程，称为I/O线程，I/O线程跟主库建立一个普通的客户端连接，然后在主库上启动一个特殊的二进制转储（binlogdump）线程（该线程没有对应的SQL命令），这个二进制转储线程会读取主库上二进制日志中的事件。它不会对事件进行轮询。如果该线程追赶上了主库，它将进入睡眠状态，直到主库发送信号量通知其有新的事件产生时才会被唤醒，备库I/O线程会将接收到的事件记录到中继日志中。</p>
+<h3 id="备库读取中继日志中的事件，将其重放到备库数据之上"><a href="#备库读取中继日志中的事件，将其重放到备库数据之上" class="headerlink" title="备库读取中继日志中的事件，将其重放到备库数据之上"></a>备库读取中继日志中的事件，将其重放到备库数据之上</h3><p>该线程从中继日志中读取事件并在备库执行，从而实现备库数据的更新。当SQL线程追赶上I/O线程时，中继日志通常已经在系统缓存中，所以中继日志的开销很低。SQL线程执行的事件也可以通过配置选项来决定是否写入其自己的二进制日志中，它对于我们稍后提到的场景非常有用。</p>
+<p><img src="https://i.loli.net/2020/12/10/HqhzVlAOIaWmifv.png" alt="image.png"></p>
+<p>这种复制架构实现了获取事件和重放事件的解耦，允许这两个过程异步进行。也就是说I/O线程能够独立于SQL线程之外工作。但这种架构也限制了复制的过程，其中最重要的一点是在主库上并发运行的查询在备库只能串行化执行，因为只有一个SQL线程来重放中继日志中的事件。后面我们将会看到，这是很多工作负载的性能瓶颈所在。虽然有一些针对该问题的解决方案，但大多数用户仍然受制于单线程。</p>
+<h2 id="复制的原理"><a href="#复制的原理" class="headerlink" title="复制的原理"></a>复制的原理</h2><h3 id="基于语句的复制"><a href="#基于语句的复制" class="headerlink" title="基于语句的复制"></a>基于语句的复制</h3><p>在MySQL5.0及之前的版本中只支持基于语句的复制（也称为逻辑复制），这在数据库领域是很少见的。</p>
+<p>基于语句的复制模式下，主库会记录那些造成数据更改的查询，当备库读取并重放这些事件时，实际上只是把主库上执行过的SQL再执行一遍。这种方式既有好处，也有缺点。</p>
+<p>最明显的好处是实现相当简单。理论上讲，简单地记录和执行这些语句，能够让主备保持同步。另一个好处是二进制日志里的事件更加紧凑，所以相对而言，基于语句的模式不会使用太多带宽。一条更新好几兆数据的语句在二进制日志里可能只占几十个字节。</p>
+<p>但事实上基于语句的方式可能并不如其看起来那么便利。因为主库上的数据更新除了执行的语句外，可能还依赖于其他因素。还存在着一些无法被正确复制的SQL。存储过程和触发器在使用基于语句的复制模式时也可能存在问题。</p>
+<p>另外一个问题是更新必须是串行的。这需要更多的锁。</p>
+<h3 id="基于行的复制"><a href="#基于行的复制" class="headerlink" title="基于行的复制"></a>基于行的复制</h3><p>MySQL5.1开始支持基于行的复制，这种方式会将实际数据记录在二进制日志中，跟其他数据库的实现比较相像。它有其自身的一些优点和缺点。最大的好处是可以正确地复制每一行。一些语句可以被更加有效地复制。</p>
+<p>由于无须重放更新主库数据的查询，使用基于行的复制模式能够更高效地复制数据。这主要语句取决于影响的行数。一条语句影响的行数越多，使用基于行的复制开销越大，因为每一行的数据都会被记录到二进制日志中，这使得二进制日志事件非常庞大。并且会给主库上记录日志和复制增加额外的负载，更慢的日志记录则会降低并发度。</p>
+<p>对于基于行的复制模式，很难进行时间点恢复。</p>
+<h3 id="选择哪种方式"><a href="#选择哪种方式" class="headerlink" title="选择哪种方式"></a>选择哪种方式</h3><h4 id="基于语句的复制模式的优点"><a href="#基于语句的复制模式的优点" class="headerlink" title="基于语句的复制模式的优点"></a>基于语句的复制模式的优点</h4><p>当主备的模式不同时，逻辑复制能够在多种情况下工作。例如，在主备上的表的定义不同但数据类型相兼容、列的顺序不同等情况。这样就很容易先在备库上修改schema，然后将其提升为主库，减少停机时间。基于语句的复制方式一般允许更灵活的操作。</p>
+<p>基于语句的方式执行复制的过程基本上就是执行SQL语句。这意味着所有在服务器上发生的变更都以一种容易理解的方式运行。这样当出现问题时可以很好地去定位。</p>
+<h4 id="基于语句的复制模式的缺点"><a href="#基于语句的复制模式的缺点" class="headerlink" title="基于语句的复制模式的缺点"></a>基于语句的复制模式的缺点</h4><p>很多情况下通过基于语句的模式无法正确复制，几乎每一个安装的备库都会至少碰到一次。简单地说：如果正在使用触发器或者存储过程，就不要使用基于语句的复制模式，除非能够清楚地确定不会碰到复制问题。</p>
+<h4 id="基于行的复制模式的优点"><a href="#基于行的复制模式的优点" class="headerlink" title="基于行的复制模式的优点"></a>基于行的复制模式的优点</h4><p>几乎没有基于行的复制模式无法处理的场景。对于所有的SQL构造、触发器、存储过程等都能正确执行。只是当你试图做一些诸如在备库修改表的schema这样的事情时才可能导致复制失败。</p>
+<p>这种方式同样可能减少锁的使用，因为它并不要求这种强串行化是可重复的。</p>
+<p>基于行的复制模式会记录数据变更，因此在二进制日志中记录的都是实际上在主库上发生了变化的数据。你不需要查看一条语句去猜测它到底修改了哪些数据。在某种程度上，该模式能够更加清楚地知道服务器上发生了哪些更改，并且有一个更好的数据变更记录。另外在一些情况下基于行的二进制日志还会记录发生改变之前的数据，因此这可能有利于某些数据恢复。</p>
+<p>在很多情况下，由于无须像基于语句的复制那样需要为查询建立执行计划并执行查询，因此基于行的复制占用更少的CPU。</p>
+<p>最后，在某些情况下，基于行的复制能够帮助更快地找到并解决数据不一致的情况。举个例子，如果是使用基于语句的复制模式，在备库更新一个不存在的记录时不会失败，但在基于行的复制模式下则会报错并停止复制。</p>
+<h4 id="基于行的复制模式的缺点"><a href="#基于行的复制模式的缺点" class="headerlink" title="基于行的复制模式的缺点"></a>基于行的复制模式的缺点</h4><p>由于语句并没有在日志里记录，因此无法判断执行了哪些SQL，除了需要知道行的变化外，这在很多情况下也很重要（这可能在未来的MySQL版本中被修复）。</p>
+<p>使用一种完全不同的方式在备库进行数据变更——而不是执行SQL。事实上，执行基于行的变化的过程就像一个黑盒子，定位问题困难。</p>
+<p>基于行的日志无法处理诸如在备库修改表的schema这样的情况，而基于语句的日志可以。</p>
+<p>在某些情况下，例如找不到要修改的行时，基于行的复制可能会导致复制停止，而基于语句的复制则不会。</p>
+<h3 id="发送复制事件到其他备库"><a href="#发送复制事件到其他备库" class="headerlink" title="发送复制事件到其他备库"></a>发送复制事件到其他备库</h3><p>log_slave_updates选项可以让备库变成其他服务器的主库。在设置该选项后，MySQL会将其执行过的事件记录到它自己的二进制日志中。这样它的备库就可以从其日志中检索并执行事件。</p>
+<p><img src="https://i.loli.net/2020/12/10/afLKdJHx8rTBgih.png" alt="image.png"></p>
+<h2 id="复制拓扑"><a href="#复制拓扑" class="headerlink" title="复制拓扑"></a>复制拓扑</h2><p>基本原则</p>
+<ul>
+<li>一个MySQL备库实例只能有一个主库。</li>
+<li>每个备库必须有一个唯一的服务器ID。</li>
+<li>一个主库可以有多个备库（或者相应的，一个备库可以有多个兄弟备库）。</li>
+<li>如果打开了log_slave_updates选项，一个备库可以把其主库上的数据变化传播到其他备库。</li>
+</ul>
+<h3 id="一主库多备库"><a href="#一主库多备库" class="headerlink" title="一主库多备库"></a>一主库多备库</h3><p>上一主多备的结构和基本配置差不多简单，因为备库之间根本没有交互</p>
+<p>在有少量写和大量读时，这种配置是非常有用的。可以把读分摊到多个备库上，直到备库给主库造成了太大的负担，或者主备之间的带宽成为瓶颈为止。它非常灵活，能满足多种需求。下面是它的一些用途：</p>
+<ul>
+<li>为不同的角色使用不同的备库（例如添加不同的索引或使用不同的存储引擎）。</li>
+<li>把一台备库当作待用的主库，除了复制没有其他数据传输。</li>
+<li>将一台备库放到远程数据中心，用作灾难恢复。</li>
+<li>延迟一个或多个备库，以备灾难恢复。</li>
+<li>使用其中一个备库，作为备份、培训、开发或者测试使用服务器。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/10/NnK1kJMYw4zU8vS.png" alt="image.png"></p>
+<h3 id="主动主动模式下的主主复制"><a href="#主动主动模式下的主主复制" class="headerlink" title="主动主动模式下的主主复制"></a>主动主动模式下的主主复制</h3><p>主主复制（也叫双主复制或双向复制）包含两台服务器，每一个都被配置成对方的主库和备库，换句话说，它们是一对主库。</p>
+<p>主动主动模式下主主复制有一些应用场景，但通常用于特殊的目的。一个可能的应用场景是两个处于不同地理位置的办公室，并且都需要一份可写的数据拷贝。这种配置最大的问题是如何解决冲突，两个可写的互主服务器导致的问题非常多。</p>
+<p><img src="https://i.loli.net/2020/12/10/jWrZNuvl4hDxHfb.png" alt="image.png"></p>
+<h3 id="主动被动模式下的主主复制"><a href="#主动被动模式下的主主复制" class="headerlink" title="主动被动模式下的主主复制"></a>主动被动模式下的主主复制</h3><p>主要区别在于其中的一台服务器是只读的被动服务器</p>
+<p>这种方式使得反复切换主动和被动服务器非常方便，因为服务器的配置是对称的。这使得故障转移和故障恢复很容易。它也可以让你在不关闭服务器的情况下执行维护、优化表、升级操作系统（或者应用程序、硬件等）或其他任务。</p>
+<p><img src="https://i.loli.net/2020/12/10/mZRrWy2wPH5giUv.png" alt="image.png"></p>
+<ul>
+<li>确保两台服务器上有相同的数据。</li>
+<li>启用二进制日志，选择唯一的服务器ID，并创建复制账号。</li>
+<li>启用备库更新的日志记录，后面将会看到，这是故障转移和故障恢复的关键。</li>
+<li>把被动服务器配置成只读，防止可能与主动服务器上的更新产生冲突，这一点是可选的。</li>
+<li>启动每个服务器的MySQL实例。将每个主库设置为对方的备库，使用新创建的二进制日志开始工作。</li>
+</ul>
+<p>设置主动被动的主主拓扑结构在某种意义上类似于创建一个热备份，但是可以使用这个“备份”来提高性能，例如，用它来执行读操作、备份、“离线”维护以及升级等。真正的热备份做不了这些事情。然而，你不会获得比单台服务器更好的写性能（稍后会提到）。</p>
+<h3 id="拥有备库的主主结构"><a href="#拥有备库的主主结构" class="headerlink" title="拥有备库的主主结构"></a>拥有备库的主主结构</h3><p>这种配置的优点是增加了冗余，对于不同地理位置的复制拓扑，能够消除站点单点失效的问题。你也可以像平常一样，将读查询分配到备库上。</p>
+<p><img src="https://i.loli.net/2020/12/10/5KQLu8m9fnoziyO.png" alt="image.png"></p>
+<h3 id="环形复制"><a href="#环形复制" class="headerlink" title="环形复制"></a>环形复制</h3><p>环形结构可以有三个或更多的主库。每个服务器都是在它之前的服务器的备库，是在它之后的服务器的主库。这种结构也称为环形复制（circularreplication）。如果从环中移除一个节点，这个节点发起的事件就会陷入无限循环：它们将永远绕着服务器链循环。因为唯一可以根据服务器ID将其过滤的服务器是创建这个事件的服务器。总地来说，环形结构非常脆弱，应该尽量避免。</p>
+<p><img src="https://i.loli.net/2020/12/10/6AzfO5TQ1rtv2XR.png" alt="image.png"></p>
+<h2 id="复制和容量规划"><a href="#复制和容量规划" class="headerlink" title="复制和容量规划"></a>复制和容量规划</h2><p>例如，假设工作负载为20%的写以及80%的读。为了计算简单，假设有以下前提：</p>
+<ul>
+<li>读和写查询包含同样的工作量。</li>
+<li>所有的服务器是等同的，每秒能进行1000次查询。</li>
+<li>备库和主库有同样的性能特征。</li>
+<li>可以把所有的读操作转移到备库。</li>
+</ul>
+<p>如果当前有一个服务器能支持每秒1000次查询，那么应该增加多少备库才能处理当前两倍的负载，并将所有的读查询分配给备库？</p>
+<p>看上去应该增加两个备库并将1600次读操作平分给它们。但是不要忘记，写入负载同样增加到了400次每秒，并且无法在主备服务器之间进行分摊。每个备库每秒必须处理400次写入，这意味着每个备库写入占了40%，只能每秒为600次查询提供服务。因此，需要三台而不是两台备库来处理双倍负载。</p>
+<p>如果负载再增加一倍呢？将有每秒800次写入，这时候主库还能处理，但备库的写入同样也提升到80%</p>
+<p>这远远不是线性扩展，查询数量增加4倍，却需要增加17倍的服务器。这说明当为单台主库增加备库时，将很快达到投入远高于回报的地步。这仅仅是基于上面的假设，还忽略了一些事情，例如，单线程的基于语句的复制常常导致备库容量小于主库。真实的复制配置比我们的理论计算还要更差。</p>
+<ul>
+<li>复制无法扩展写操作，对数据进行分区是唯一可以扩展写入的方法</li>
+<li>备库会有复制延迟</li>
+<li>分配给每台机器的读负载应该低于50％，否则，如果某台服务器失效，就没有足够的容量了。</li>
+</ul>
+<h2 id="复制管理和维护"><a href="#复制管理和维护" class="headerlink" title="复制管理和维护"></a>复制管理和维护</h2><ul>
+<li>监控复制：使用SHOW MASTER STATUS命令来查看当前主库的二进制日志位置和配置</li>
+<li>测量备库延迟：忽略Seconds_behind_master的值，并使用一些可以直接观察和衡量的方式来监控备库延迟。最好的解决办法是使用heartbeat record，这是一个在主库上会每秒更新一次的时间戳。为了计算延时，可以直接用备库当前的时间戳减去心跳记录的值。这个方法能够解决刚刚我们提到的所有问题，另外一个额外的好处是我们还可以通过时间戳知道备库当前的复制状况。</li>
+<li>确定主备是否一致</li>
+<li>从主库重新同步备库：使用mysqldump转储受影响的数据并重新导入</li>
+<li>改变主库：<ul>
+<li>计划内提升：<ul>
+<li>停止向老的主库写入。</li>
+<li>让备库追赶上主库（可选的，会简化下面的步骤）。</li>
+<li>将一台备库配置为新的主库。</li>
+<li>将备库和写操作指向新的主库，然后开启主库的写入。</li>
+</ul>
+</li>
+<li>计划外的提升<ul>
+<li>确定哪台备库的数据最新。</li>
+<li>让所有备库执行完所有其从崩溃前的旧主库那获得的中继日志。如果在未完成前修改备库的主库，它会抛弃剩下的日志事件，从而无法获知该备库在什么地方停止。</li>
+<li>停止向老的主库写入。</li>
+<li>比较每台备库和新主库上的Master_Log_File/Read_Master_Log_Pos的值。</li>
+<li>将备库和写操作指向新的主库，然后开启主库的写入。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="复制的问题和解决方案"><a href="#复制的问题和解决方案" class="headerlink" title="复制的问题和解决方案"></a>复制的问题和解决方案</h2><h3 id="数据损坏或丢失的错误"><a href="#数据损坏或丢失的错误" class="headerlink" title="数据损坏或丢失的错误"></a>数据损坏或丢失的错误</h3><ul>
+<li>主库意外关闭：指定备库从下一个二进制日志的开头读日志。</li>
+<li>备库意外关闭：在重启后观察MySQL错误日志。InnoDB在恢复过程中会打印出它的恢复点的二进制日志坐标。可以使用这个值来决定备库指向主库的偏移量。</li>
+<li>主库上的二进制日志损坏：除了忽略损坏的位置外你别无选择</li>
+<li>备库上的中继日志损坏：以通过CHANGEMASTERTO命令丢弃并重新获取损坏的事件。只需要将备库指向它当前正在复制的位置</li>
+<li>二进制日志与InnoDB事务日志不同步：当主库崩溃时，InnoDB可能将一个事务标记为已提交，此时该事务可能还没有记录到二进制日志中。除非是某个备库的中继日志已经保存，否则没有任何办法恢复丢失的事务。</li>
+</ul>
+<h3 id="对未复制数据的依赖性"><a href="#对未复制数据的依赖性" class="headerlink" title="对未复制数据的依赖性"></a>对未复制数据的依赖性</h3><p>如果在主库上有备库不存在的数据库或表，复制会很容易意外中断，反之亦然。假设主库上有一个备库不存在的数据库，命名为scratch。如果在主库上发生对该数据库中表的更新，备库会在尝试重放这些更新时中断。同样的，如果在主库上创建一个备库上已存在的表，复制也可能中断。没有什么好的解决办法，唯一的办法就是避免在主库上创建备库上没有的表。</p>
+<h3 id="丢失的临时表"><a href="#丢失的临时表" class="headerlink" title="丢失的临时表"></a>丢失的临时表</h3><p>临时表在某些时候比较有用，但不幸的是，它与基于语句的复制方式是不相容的。如果备库崩溃或者正常关闭，任何复制线程拥有的临时表都会丢失。重启备库后，所有依赖于该临时表的语句都会失败。</p>
+<p>如果备库重启后复制因找不到临时表而停止，可能需要做以下一些事情：可以直接跳过错误，或者手动地创建一个名字和结构相同的表来代替消失的临时表。不管用什么办法，如果写入查询依赖于临时表，都可能造成数据不一致。</p>
+<p>避免使用临时表没有看起来那么难，临时表主要有两个比较有用的特性：</p>
+<ul>
+<li>只对创建临时表的连接可见。所以不会和其他拥有相同名字临时表的连接起冲突。</li>
+<li>随着连接关闭而消失，所以无须显式地移除它们。</li>
+</ul>
+<p>可以保留一个专用的数据库，在其中创建持久表，把它们作为伪临时表，以模拟这些特性。</p>
+<h3 id="InnoDB加锁读引起的锁争用"><a href="#InnoDB加锁读引起的锁争用" class="headerlink" title="InnoDB加锁读引起的锁争用"></a>InnoDB加锁读引起的锁争用</h3><p>正常情况下，InnoDB的读操作是非阻塞的，但在某些情况下需要加锁。特别是在使用基于语句的复制方式时，执行INSERT…SELECT操作会锁定源表上的所有行。MySQL需要加锁以确保该语句的执行结果在主库和备库上是一致的。实际上，加锁导致主库上的语句串行化，以确保和备库上执行的方式相符。这种设计可能导致锁竞争、阻塞，以及锁等待超时等情况。</p>
+<ul>
+<li>一种缓解的办法就是避免让事务开启太久以减少阻塞。可以在主库上尽快地提交事务以释放锁。</li>
+<li>把大命令拆分成小命令，使其尽可能简短。这也是一种减少锁竞争的有效方法。</li>
+<li>另一种方法是替换掉INSERT…SELECT语句，在主库上先执行SELECTINTOOUTFILE，再执行LOADDATAINFILE。这种方法更快，并且不需要加锁。</li>
+</ul>
+<h3 id="过大的复制延迟"><a href="#过大的复制延迟" class="headerlink" title="过大的复制延迟"></a>过大的复制延迟</h3><p>MySQL单线程复制的设计导致备库的效率相当低下。即使备库有很多磁盘、CPU或者内存，也会很容易落后于主库。因为备库的单线程通常只会有效地使用一个CPU和磁盘。而事实上，备库通常都会和主库使用相同配置的机器。</p>
+<p>备库上的锁同样也是问题。其他在备库运行的查询可能会阻塞住复制线程。因为复制是单线程的，复制线程在等待时将无法做别的事情。</p>
+<p>最好的分析办法是暂时在备库上打开慢查询日志记录，然后使用第3章讨论的ptquerydigest工具来分析。如果打开了log_slow_slave_statements选项，在标准的MySQL慢查询日志能够记录MySQL5.1及更新的版本中复制线程执行的语句，这样就可以找到在复制时哪些语句执行慢了。PerconaServer和MariaDB允许开启或禁止该选项而无须重启服务器。</p>
+<ul>
+<li>一个简单的办法是配置InnoDB，使其不要那么频繁地刷新磁盘，这样事务会提交得更快些</li>
+<li>还可以在备库上禁止二进制日志记录</li>
+<li>不要重复写操作中代价较高的部分</li>
+<li>在复制之外并行写入</li>
+<li>为复制线程预取缓存</li>
+</ul>
+]]></content>
       
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
         
     </entry>
     
@@ -181,7 +536,7 @@ CREATE TABLE tm1 (
 PARTITION BY KEY(s1)
 PARTITIONS 10;
 </code></pre>
-<h3 id="如何使用分区表"><a href="#如何使用分区表" class="headerlink" title="如何使用分区表"></a>如何使用分区表</h3><p>这里需要再陈述一遍：在数据量超大的时候，BTree索引就无法起作用了。除非是索引覆盖查询，否则数据库服务器需要根据索引扫描的结果回表，查询所有符合条件的记录，如果数据量巨大，这将产生大量随机I/O，随之，数据库的响应时间将大到不可接受的程度。另外，索引维护（磁盘空间、I/O操作）的代价也非常高。</p>
+<h3 id="如何使用分区表"><a href="#如何使用分区表" class="headerlink" title="如何使用分区表"></a>如何使用分区表</h3><p>这里需要再陈述一遍：在数据量超大的时候，B+Tree索引就无法起作用了。除非是索引覆盖查询，否则数据库服务器需要根据索引扫描的结果回表，查询所有符合条件的记录，如果数据量巨大，这将产生大量随机I/O，随之，数据库的响应时间将大到不可接受的程度。另外，索引维护（磁盘空间、I/O操作）的代价也非常高。</p>
 <p>这正是分区要做的事情。理解分区时还可以将其当作索引的最初形态，以代价非常小的方式定位到需要的数据在哪一片“区域”。</p>
 <p>为了保证大数据量的可扩展性，一般有下面两个策略：</p>
 <ul>
@@ -194,6 +549,7 @@ PARTITIONS 10;
 <li>选择分区的成本可能很高</li>
 <li>打开并锁住所有底层表的成本可能很高</li>
 <li>维护分区的成本可能很高</li>
+<li>查询参数最好带上分区列。否则就得扫全表</li>
 </ul>
 <h2 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h2><p>因为垂直切分没啥好讲的，这里我们主要说水平切分的分库分表，多库多表的场景：</p>
 <h3 id="切分规则"><a href="#切分规则" class="headerlink" title="切分规则"></a>切分规则</h3><p>参考<a href="https://zhuanlan.zhihu.com/p/88896222" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/88896222</a> <a href="https://tech.meituan.com/2016/11/18/dianping-order-db-sharding.html" target="_blank" rel="noopener">https://tech.meituan.com/2016/11/18/dianping-order-db-sharding.html</a></p>
@@ -220,6 +576,39 @@ PARTITIONS 10;
 <h4 id="代理分片"><a href="#代理分片" class="headerlink" title="代理分片"></a>代理分片</h4><p>添加代理服务器去专门做分片</p>
 <p>优点：无入侵代码，代理还可以通过心跳包等形式，保证节点的可用性<br>缺点：需要独立的代理，增加了一层网络开销</p>
 <h4 id="支持事务的分布式数据库"><a href="#支持事务的分布式数据库" class="headerlink" title="支持事务的分布式数据库"></a>支持事务的分布式数据库</h4><p>比如tidb</p>
+<h3 id="选择sharding-key"><a href="#选择sharding-key" class="headerlink" title="选择sharding key"></a>选择sharding key</h3><p>尽量选择查询的列，且唯一，例如user_id，order_id等。</p>
+<h3 id="分库分表带来的问题"><a href="#分库分表带来的问题" class="headerlink" title="分库分表带来的问题"></a>分库分表带来的问题</h3><ul>
+<li>分布式id（snowflake）</li>
+<li>分布式事务（tcc）</li>
+<li>跨区join<ul>
+<li>全局表，每个 DataNode 上都有一份全量数据，例如一些数据字典表，数据很少修改，可以避免跨库 Join 的性能问题。</li>
+<li>数据同步，通过数据同步工具将 需要连表的数据同步到对应库中，比较依赖于同步工具的稳定性，如果同步有延迟，就会导致数据不一致，产生脏数据。</li>
+</ul>
+</li>
+<li>跨库排序分页<ul>
+<li>把范围扩大，分表sql上的limit x,y 变成 limit 0, x+y ，这样改写后，相当于分表中把”每页最后一条数据”之前的所有数据全都取出来了（当然：这里面可能会有不需要的多余数据)，然后内存中合并在一起，再取x偏移量后的y条数据。这样取数据太多，效率低</li>
+<li>在某1页的数据均摊到各分表的前提下<ul>
+<li>原sql中的limit offset,pagesize 改写成 limit offset/n ,pagesize (注：n为分表个数，如果offset/n除不尽，向下取整，避免最后的结果丢数据）– 这个的意思，其实就是假设原表这一页的数据，会均分到各个分表(所以，我一再强调，前提是数据是均摊的，如果某个分表的记录很少，极端情况下，甚至是空的，这个就不对了，最终结果会少数据)</li>
+<li>分表上，执行改写后的sql，得到一堆结果集，然后找出这堆结果中的最小id (假设id是关键的排序字段)，记为min_id – 这一步的目的，是为了找出最小的起始点，保证第1页数据起点正确。</li>
+<li>各分表上的sql，where条件部分改写成 id between min_id and origin_max_id (注：origin_max_id为上一步，每个分表查询结果集中的最大值，显然min_id=自身最小id的那张分表，不用再重复查询) – 这一步的目的在于，因为 步骤1）查出来的结果，通常会比原表上该页的数据少，所以这里重新将起始点设置到正确的位置，即：min_id，再查1次，相当于范围扩大了，以保证数据不会丢。不过，这里有一个可优化的地方，仔细想想，这1次查询出来的结果，跟步骤1）中的查出来的结果，必然有一部分是重复的，因此改写部分，只需要 id between min_id and origin_min_id就可以了(origin_min_id 即为原来分表结果上的最小id)</li>
+<li>将上一步查询出来的结果，在内存中合并排序去重（注：如果上一步采用了优化方案，就应该是把1）与3）这二次查询的结果全取出来合并排序去重），然后从开始连续取pagesize条数据即可（注：offset/n除不尽的话，向下取整了，也就是起始点可能向前多移了，所以有可能开始的第1条记录，其实是上1页的最后1条记录，要追求精确的话，可以在应用层记录上一页最后1条记录的id，然后跟本次查询结果前1条记录对比，如果发现是一样的，开始取数据的位置，就要向后移1位，如果考虑id有重复的话，就要根据情况多移几位）</li>
+</ul>
+</li>
+<li>避免使用 LIMIT 进行分页<ul>
+<li>构建行记录数量与行偏移量的二级索引</li>
+<li>使用上次分页数据结尾 ID 作为下次查询条件的分页方式</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>查询sql时，没有sharding key<ul>
+<li>双写，用查询的条件在sharding一份，做数据冗余</li>
+<li>写一份查询条件和sharding key的映射，作为全局表，在进行二次查询</li>
+</ul>
+</li>
+</ul>
+<p>题外话，我以前一直觉得分库后，对limit，group by，join 都有影响，就希望能找到一个能不用多数据集归并，只利用索引操作的方式，但找了半天也找不到。<br>实际上这个方向就是错的，有取必有舍，高性能mysql上介绍，在巨大的数据量下，b+tree的索引基本上就是无效的，选择了分库缓解查询压力，就必须执行多步sql，并进行归并。<br>这里放一个sharding-jdbc的图，来帮助更好的理解分库分表的执行过程。</p>
+<p><img src="https://i.loli.net/2020/12/10/HklRBAKTqxjQp5M.png" alt="image.png"></p>
 ]]></content>
       
         <categories>
@@ -611,7 +1000,7 @@ end
 <p><code>WHERE 姓=&#39;张&#39; AND like &#39;三%&#39;</code></p>
 <p>在上面的情况除了按值查找能用到索引，<strong>ORDER BY 操作也能用到索引</strong>。</p>
 <p>最左前缀匹配也就是匹配需要从最左边开始，无论 key 取多少位，一位，一位半，两位都行。上面的索引不能用到查找生日为某一天的人，因为没有用到前面的姓和名，也就是没有从最左边开始，直接从第三列开始了。</p>
-<p>B-Tree 索引有如下几个限制</p>
+<p>B+Tree 索引有如下几个限制</p>
 <p><strong>只能从索引的最左列开始查找</strong></p>
 <p>比如说上面的例子无法查找特定名的人，也不能查找特定生日的人</p>
 <p><strong>不能跳过前缀</strong></p>
@@ -2198,6 +2587,7 @@ public class PersonApp {
 <h2 id="raft算法在网络分区中保持一致"><a href="#raft算法在网络分区中保持一致" class="headerlink" title="raft算法在网络分区中保持一致"></a>raft算法在网络分区中保持一致</h2><p>当出现网络故障，节点可能会出现网络分区，假设我们有两个节点在一个网络中，三个节点在另一个网络中。</p>
 <p>此时便会出现多个leader，但两个节点的所在的分区，由于无法得到大多数节点的响应，因此不能将作出改变的日志进行提交。</p>
 <p>而当网络分区修复时，为提交日志记录的节点在收到新的同步日志请求时，就会回滚之前的未提交记录，而去同步新主的日志，从而修复节点的不一致性。</p>
+<h2 id="如何确定节点下线（redis的实现）"><a href="#如何确定节点下线（redis的实现）" class="headerlink" title="如何确定节点下线（redis的实现）"></a>如何确定节点下线（redis的实现）</h2><p>follower在心跳超时后，不会立即晋升为candidate，只标记成leader主管下线，在等待超过半数的节点都认为leader主观下线后，才会确认客观下线，同时根据自己log和主节点的偏移量去sleep相应的时间后再晋升为candidate去发起投票。</p>
 ]]></content>
       
         <categories>
@@ -2281,178 +2671,6 @@ end
 <p>说一下redisson中的延时队列，除了sort set以外，还有有一个destination queue，redisson保证sort set中的延时操作，确定到延时时间了会自动放进destination queue中供消费者使用。</p>
 <p>实际上我们常用的数据结构，队列，分布式锁，在Java的redis client redisson中都有相应的实现，这里不做具体讨论，详情请看redisson源码。</p>
 <p>jvm中的数据模型还是要比redis操作快很多的，现实中需要合理结合业务使用redisson中的数据结构。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> redis </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> redis </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[redis进阶之分布式锁]]></title>
-      <url>/2020/11/28/redis-7/</url>
-      <content type="html"><![CDATA[<hr>
-<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
-<hr>
-<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
-<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
-<p>这里给出java版本的代码</p>
-<pre><code class="java">    // 加锁
-    @Override
-    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
-        try {
-            return lockRedisTemplate.execute(
-                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
-                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
-                    )
-            );
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 解锁
-    @Override
-    public boolean del(String key, String value) {
-        try {
-            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
-                    + &quot; return true; &quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end; &quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 锁续约
-    @Override
-    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
-        try {
-            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
-                    + &quot; return true;&quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end;&quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
-        } catch (Exception e){
-            if (!(e.getCause().getCause() instanceof InterruptedException)){
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }
-</code></pre>
-<p>需要注意的几点：</p>
-<ul>
-<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
-<li>锁有过期时间，为了防止死锁</li>
-<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
-<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
-          boolean failed = true;
-          try {
-              boolean interrupted = false;
-              for (;;) {
-                  final Node p = node.predecessor();
-                  if (p == head &amp;&amp; tryAcquire(arg)) {
-                      setHead(node);
-                      p.next = null;
-                      failed = false;
-                      return interrupted;
-                  }
-                  // 就是这一行
-                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
-                      interrupted = true;
-                  }
-              }
-          } finally {
-              if (failed) {
-                  cancelAcquire(node);
-              }
-          }
-      }
-</code></pre>
-</li>
-</ul>
-<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
-<ul>
-<li>客户端A获取 master 中的锁。</li>
-<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
-<li>slave 晋升为 master。</li>
-<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
-</ul>
-<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
-<ul>
-<li>它以毫秒为单位获取当前时间。</li>
-<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
-<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
-<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
-<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
-</ul>
-<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
-<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
-<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
-<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
-<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
-</li>
-<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
-</li>
-<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
-</li>
-</ol>
-<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
-<li><p>能够自动释放锁</p>
-</li>
-<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
-</li>
-<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
-</li>
-<li><p>重试获取锁要有一定次数限制</p>
-</li>
-</ol>
-<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
-<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
-</li>
-<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
-</li>
-<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
-</li>
-</ol>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
-<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
-</li>
-<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
-</li>
-<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
-</li>
-<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
-</li>
-<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
-</li>
-<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
-</li>
-</ol>
 ]]></content>
       
         <categories>
@@ -2768,6 +2986,178 @@ es1:19000&gt; get bitmap_cat
     </entry>
     
     <entry>
+      <title><![CDATA[redis进阶之分布式锁]]></title>
+      <url>/2020/11/28/redis-7/</url>
+      <content type="html"><![CDATA[<hr>
+<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<hr>
+<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
+<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
+<p>这里给出java版本的代码</p>
+<pre><code class="java">    // 加锁
+    @Override
+    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
+        try {
+            return lockRedisTemplate.execute(
+                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
+                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
+                    )
+            );
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 解锁
+    @Override
+    public boolean del(String key, String value) {
+        try {
+            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
+                    + &quot; return true; &quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end; &quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 锁续约
+    @Override
+    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
+        try {
+            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
+                    + &quot; return true;&quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end;&quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
+        } catch (Exception e){
+            if (!(e.getCause().getCause() instanceof InterruptedException)){
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+</code></pre>
+<p>需要注意的几点：</p>
+<ul>
+<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
+<li>锁有过期时间，为了防止死锁</li>
+<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
+<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
+          boolean failed = true;
+          try {
+              boolean interrupted = false;
+              for (;;) {
+                  final Node p = node.predecessor();
+                  if (p == head &amp;&amp; tryAcquire(arg)) {
+                      setHead(node);
+                      p.next = null;
+                      failed = false;
+                      return interrupted;
+                  }
+                  // 就是这一行
+                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                      interrupted = true;
+                  }
+              }
+          } finally {
+              if (failed) {
+                  cancelAcquire(node);
+              }
+          }
+      }
+</code></pre>
+</li>
+</ul>
+<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
+<ul>
+<li>客户端A获取 master 中的锁。</li>
+<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
+<li>slave 晋升为 master。</li>
+<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
+</ul>
+<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
+<ul>
+<li>它以毫秒为单位获取当前时间。</li>
+<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
+<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
+<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
+<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
+</ul>
+<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
+<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
+<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
+<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
+<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
+</li>
+<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
+</li>
+<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
+</li>
+</ol>
+<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
+<li><p>能够自动释放锁</p>
+</li>
+<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
+</li>
+<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
+</li>
+<li><p>重试获取锁要有一定次数限制</p>
+</li>
+</ol>
+<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
+<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
+</li>
+<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
+</li>
+<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
+</li>
+</ol>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
+<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
+</li>
+<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
+</li>
+<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
+</li>
+<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
+</li>
+<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
+</li>
+<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
+</li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[redis进阶之集群]]></title>
       <url>/2020/11/28/redis-5/</url>
       <content type="html"><![CDATA[<h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><p>Redis Cluster是Redis的分布式解决方案，在3.0版本正式推出，有效地解决了Redis分布式方面的需求。当遇到单机内存、并发、流量等瓶颈时，可以采用Cluster架构方案达到负载均衡的目的。</p>
@@ -2987,7 +3377,7 @@ cluster-config-file &quot;nodes-6379.conf&quot;
 <h4 id="Pub-Sub广播问题"><a href="#Pub-Sub广播问题" class="headerlink" title="Pub/Sub广播问题"></a>Pub/Sub广播问题</h4><p>集群模式下内部实现对所有的publish命令都会向 所有的节点进行广播，造成每条publish数据都会在集群内所有节点传播一 次，加重带宽负担</p>
 <p><img src="https://i.loli.net/2020/11/30/GrnoR9DSHvaLCbE.png" alt="image.png"></p>
 <p>当频繁应用 Pub/Sub功能时应该避免在大量节点的集群内使用，否则会严重消耗集群内 网络带宽。针对这种情况建议使用sentinel结构专门用于Pub/Sub功能，从而 规避这一问题。</p>
-<h4 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h4><p>不建议集群模式下做读写分离</p>
+<h4 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h4><p>不建议集群模式下做读写分离（指的是单个分区不做读写分离，从节点只做故障转移功能）</p>
 <h4 id="集群倾斜"><a href="#集群倾斜" class="headerlink" title="集群倾斜"></a>集群倾斜</h4><p>合理设计键，热点大集合对象做拆分或使用hmget替代hgetall避免整体读取。避免映射到同一槽。</p>
 ]]></content>
       
@@ -15799,19 +16189,14 @@ static {
     }
 </code></pre>
 <p>因此DirectByteBuffer对象实际上只包含了堆外内存的引用指针，在任何gc的情况下，只要确定可以被gc，他都是可以被回收的。</p>
-<p>但是Cleaner对象不会，因为他是一个虚引用，还保存着自己双向链表中的引用，只有当jvm开始full gc时，虚引用对象才会被加入ReferenceQueue当中去。</p>
+<p>但是Cleaner对象不会，因为他是一个虚引用，还保存着自己双向链表中的引用，只有当jvm开始下一次gc时，虚引用对象才会被回收。</p>
 <p>通常情况下，虚引用不会被gc回收，因为与软引用和弱引用不同，加入ReferenceQueue中的虚引用对象并不会被gc，因为其get方法永远返回null，只有在虚引用被清除或者自身变得不可访问时（手动置为null），才会被gc。</p>
-<p>但是Cleaner对象作为一种特殊的虚引用对象，会在入队后主动调用自身的clean方法，因此，我们关心的堆外内存就会在这个时候被回收。</p>
-<p>所以，所谓堆外内存的自动回收，其实就是等着full gc发生的时候进行回收。因此，我们要尽量的在使用完对外内存后，手动的调用cleaner的clean方法对其进行手动回收，来避免full gc一直没有发生所造成的堆外内存溢出。</p>
-<p>下面我们来walk through一下这个过程：</p>
-<p>当初始化一块堆外内存时，对象的引用关系如下：</p>
-<p><img src="https://i.loli.net/2020/12/06/uF5AHmejw1UxXJQ.png" alt="image.png"></p>
-<p>其中first是Cleaner类的静态变量，Cleaner对象在初始化时会被添加到Cleaner链表中，和first形成引用关系，ReferenceQueue是用来保存需要回收的Cleaner对象。</p>
-<p>如果该DirectByteBuffer对象在一次GC中被回收了</p>
-<p><img src="https://i.loli.net/2020/12/06/DXCcBwg1UKT8kmy.png" alt="image.png"></p>
-<p>此时，只有Cleaner对象唯一保存了堆外内存的数据（开始地址、大小和容量），在下一次FGC时，把该Cleaner对象放入到ReferenceQueue中，并触发clean方法。</p>
-<p>Cleaner对象的clean方法主要有两个作用：<br>1、把自身从Clener链表删除，从而在下次GC时能够被回收<br>2、释放堆外内存</p>
+<p>但是Cleaner对象作为一种特殊的虚引用对象，会在从pending队列移出后，主动调用自身的clean方法，将自己标记为不可达状态，并主动回收其监控的堆外内存。因此，我们关心的堆外内存就会在这个时候被回收。</p>
+<p>所以，什么是对外内存的自动回收呢？实际上HotSpot VM只会在old gen GC（full GC/major GC或者concurrent GC都算）的时候才会对old gen中的对象做reference processing，而在young GC/minor GC时只会对young gen里的对象做reference processing。</p>
+<p>也就是说，做full GC的话会对old gen做reference processing，进而能触发Cleaner对已死的DirectByteBuffer对象做清理工作。而如果很长一段时间里没做过GC或者只做了young GC的话则不会在old gen触发Cleaner的工作，那么就可能让本来已经死了的、但已经晋升到old gen的DirectByteBuffer关联的native memory得不到及时释放。</p>
+<p>因此，我们要尽量的在使用完对外内存后，手动的调用cleaner的clean方法对其进行手动回收，来避免full gc一直没有发生所造成的堆外内存溢出。</p>
 <p>此外，其实在初始化DirectByteBuffer对象时，如果当前堆外内存的条件很苛刻时，会主动调用System.gc()强制执行FGC，不过很多线上环境的JVM参数有-XX:+DisableExplicitGC，导致了System.gc()等于一个空函数，根本不会触发FGC，这一点也需要注意。</p>
+<p>参考：<a href="https://hllvm-group.iteye.com/group/topic/27945" target="_blank" rel="noopener">https://hllvm-group.iteye.com/group/topic/27945</a></p>
 <h2 id="回收算法"><a href="#回收算法" class="headerlink" title="回收算法"></a>回收算法</h2><h3 id="分带与跨带"><a href="#分带与跨带" class="headerlink" title="分带与跨带"></a>分带与跨带</h3><p>设计者一般至少会把Java堆划分为新生代(Young Generation)和老年代(Old Generation)两个区域。顾名思义，在新生代中，对象是朝生夕灭的，每次垃圾收集时都发现有大批对象死去，而每次回收后存活的少量对象，将会逐步晋升到老年代中存放。</p>
 <p>但是，对象不是孤立的，对象之间会存在跨代引用。如果老年代中引用了新生代的对象，在新生代中做可达性分析时就会带上老年代，反而降低效率。</p>
 <p>所以有了 跨代引用假说(Intergenerational Reference Hypothesis):跨代引用相对于同代引用来说仅占极少数。</p>
@@ -15984,6 +16369,466 @@ static {
 <p>一个小细节，我一直认为java -XX:+PrintFlagsFinal打印出的内容就是实际应用所在jvm进程的环境变量，但事实上，java -XX:+PrintFlagsFinal会单独建立一个进程，你打印出的东西都是这个命令所在进程的变量，而不是应用所在进程的变量。正确排查应用所在的jvm的进程的jvm变量还得用jinfo。</p>
 <p>此外，我们安装了阿里的Arthas来进行jvm故障的排查，很有用。但考虑到有的时候我们也想在生产环境安装Arthas，但是不希望为生产环境的应用安装完整的jdk，怎么办？可以使用sidecar的方式来安装Arthas，然后通过shareProcessNamespace: true参数来在pod中share不同容器里的进程，这样sidecar里的Arthas就可以attach到你应用的pid了。详见：<a href="https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。" target="_blank" rel="noopener">https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/。</a></p>
 <p>先说到这，下回总结下gc的问题。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> jvm </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> jvm </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[强软弱虚引用及其回收]]></title>
+      <url>/2020/11/04/reference/</url>
+      <content type="html"><![CDATA[<p>之前总结对外内存回收感觉总结的不太好，把这个话题单拎出来，我们再说一次</p>
+<h2 id="四种引用"><a href="#四种引用" class="headerlink" title="四种引用"></a>四种引用</h2><ul>
+<li>强引用：代码中普遍存在的类似<code>object obj = new object()</code>的引用，只要强引用存在，垃圾处理器就不会回收。</li>
+<li>软引用：描述有些还有用但非必须的对象。在系统将要发生内存溢出时，会将这些对象列为回收范围进行二次回收，如果这次回收后还没有足够的内存，才会oom。Java中SoftReference类表示软引用。</li>
+<li>弱引用：描述非必须对象，被弱引用关联的对象只能生存到下一次回收之前，垃圾收集器工作之后，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。Java中WeakReference类表示弱引用。</li>
+<li>虚引用：这个引用存在的唯一目的，就是在这个对象被收集器回收时得到一个系统通知，被虚引用关联的对象，和其生存时间完全没有关系。Java中PhantomReference类表示虚引用。</li>
+</ul>
+<h3 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h3><p>首先, 弱引用(weak reference) 是可以被GC强制回收的。当垃圾收集器发现一个弱可达对象(weakly reachable,即指向该对象的引用只剩下弱引用) 时, 就会将其置入相应的ReferenceQueue 中, 变成可终结的对象. 之后可能会遍历这个 reference queue, 并执行相应的清理。典型的示例是weakhashmap中不再引用的KEY。</p>
+<p>当然, 在这个时候, 我们还可以将该对象赋值给新的强引用, 在最后终结和回收前, GC会再次确认该对象是否可以安全回收。因此, 弱引用对象的回收过程是横跨多个GC周期（至少两个，一次标记为引用对象不可达，自己入队，第二次再由gc回收）的。</p>
+<p>当你在构造WeakReference时传入一个ReferenceQueue对象，当该引用指向的对象被标记为垃圾的时候，这个引用对象会自动地加入到引用队列里面。接下来，你就可以在固定的周期，处理传入的引用队列，比如做一些清理工作来处理这些没有用的引用对象。</p>
+<h3 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h3><p>软引用基本上和弱引用差不多，只是相比弱引用，它阻止垃圾回收期回收其指向的对象的能力强一些。如果一个对象是弱引用可到达，那么这个对象会被垃圾回收器接下来的回收周期销毁。但是如果是软引用可以到达，那么这个对象会停留在内存更时间上长一些。当内存不足时垃圾回收器才会回收这些软引用可到达的对象。</p>
+<p>软引用比弱引用更难被垃圾收集器回收. 回收软引用没有确切的时间点, 由JVM自己决定. 一般只会在即将耗尽可用内存时, 才会回收软引用,以作最后手段。这意味着, 可能会有更频繁的 full GC, 暂停时间也比预期更长, 因为老年代中的存活对象会很多。</p>
+<h3 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h3><p>与软引用，弱引用不同，虚引用指向的对象十分脆弱，我们不可以通过get方法来得到其指向的对象。它的唯一作用就是当其指向的对象被回收之后，自己被加入到引用队列，用作记录该引用指向的对象已被销毁。</p>
+<p>使用虚引用时, 必须手动进行内存管理, 以标识这些对象是否可以安全地回收。表面上看起来很正常, 但实际上并不是这样。 javadoc 中写道:</p>
+<p>为了防止可回收对象的残留, 虚引用对象不应该被获取: phantom reference 的 get 方法返回值永远是 null。</p>
+<p>令人惊讶的是, 很多开发者忽略了下一段内容(这才是重点):</p>
+<p>与软引用和弱引用不同, 虚引用不会被 GC 自动清除, 因为他们被存放到队列中. 通过虚引用可达的对象会继续留在内存中, 直到引用自身变为不可达。（如果虚引用为clearer对象，会主动调用其clean方法进行引用自身变为不可达的操作）</p>
+<p>也就是说,我们必须手动使虚引用变为不可达状态（把引用置为null）, 否则可能会造成 OutOfMemoryError 而导致 JVM 挂掉. 使用虚引用的理由是, 对于用编程手段来跟踪某个对象何时变为不可达对象, 这是唯一的常规手段。 和软引用/弱引用不同的是, 我们不能复活虚可达(phantom-reachable)对象。</p>
+<h2 id="四种引用的例子"><a href="#四种引用的例子" class="headerlink" title="四种引用的例子"></a>四种引用的例子</h2><h3 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h3><pre><code class="java">public class Student {
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println(&quot;Student 被回收了&quot;);
+    }
+}
+
+public class Strong {
+    public static void main(String[] args) {
+        Student student = new Student();
+        // help gc
+        student = null;
+        System.gc();
+    }
+}
+</code></pre>
+<p>结果： </p>
+<pre><code>&gt; Task :Strong.main()
+Student 被回收了
+</code></pre><h3 id="软引用-1"><a href="#软引用-1" class="headerlink" title="软引用"></a>软引用</h3><pre><code class="java">public class Soft {
+    public static void main(String[] args) {
+        SoftReference&lt;byte[]&gt; softReference = new SoftReference&lt;byte[]&gt;(new byte[1024*1024*10]);
+        System.out.println(softReference.get());
+        System.gc();
+        System.out.println(softReference.get());
+        byte[] bytes = new byte[1024 * 1024 * 10];
+        System.out.println(softReference.get());
+    }
+}
+</code></pre>
+<p>-Xmx20M 运行结果：</p>
+<pre><code>&gt; Task :Soft.main()
+[B@7852e922
+[B@7852e922
+null
+</code></pre><p>设置reference queue的软引用：</p>
+<pre><code class="java">public class Soft {
+    public static void main(String[] args) throws InterruptedException {
+        ReferenceQueue&lt;Object&gt; queue = new ReferenceQueue&lt;&gt;();
+        Object obj = new Object();
+        SoftReference softRef = new SoftReference&lt;Object&gt;(obj,queue);
+        //删除强引用
+        obj = null;
+        //调用gc
+        System.gc();
+        System.out.println(&quot;gc之后的值: &quot; + softRef.get()); // 对象依然存在
+        //申请较大内存使内存空间使用率达到阈值，强迫gc
+        byte[] bytes = new byte[100 * 1024 * 1024];
+        //如果obj被回收，则软引用会进入引用队列
+        Reference&lt;?&gt; reference = queue.remove();
+        if (reference != null){
+            System.out.println(&quot;对象已被回收: &quot;+ reference.get());  // 对象为null
+        }
+    }
+}
+</code></pre>
+<h3 id="弱引用-1"><a href="#弱引用-1" class="headerlink" title="弱引用"></a>弱引用</h3><pre><code class="java">public class Weak {
+    public static void main(String[] args) {
+        WeakReference&lt;byte[]&gt; weakReference = new WeakReference&lt;byte[]&gt;(new byte[1]);
+        System.out.println(weakReference.get());
+        System.gc();
+        System.out.println(weakReference.get());
+    }
+}
+</code></pre>
+<p>运行结果：</p>
+<pre><code>&gt; Task :Weak.main()
+[B@7852e922
+null
+</code></pre><p>设置reference queue的弱引用：</p>
+<pre><code class="java">public class Weak {
+    public static void main(String[] args) throws InterruptedException {
+        ReferenceQueue&lt;Object&gt; queue = new ReferenceQueue&lt;&gt;();
+        Object obj = new Object();
+        WeakReference weakRef = new WeakReference&lt;Object&gt;(obj,queue);
+        //删除强引用
+        obj = null;
+        System.out.println(&quot;gc之后的值: &quot; + weakRef.get()); // 对象依然存在
+        //调用gc
+        System.gc();
+        //如果obj被回收，则软引用会进入引用队列
+        Reference&lt;?&gt; reference = queue.remove();
+        if (reference != null){
+            System.out.println(&quot;对象已被回收: &quot;+ reference.get());  // 对象为null
+        }
+    }
+}
+</code></pre>
+<p>运行结果：</p>
+<pre><code>&gt; Task :Weak.main()
+gc之后的值: java.lang.Object@7852e922
+对象已被回收: null
+</code></pre><h3 id="虚引用-1"><a href="#虚引用-1" class="headerlink" title="虚引用"></a>虚引用</h3><p>参考  <a href="https://blog.csdn.net/shijiujiu33/article/details/104547837" target="_blank" rel="noopener">https://blog.csdn.net/shijiujiu33/article/details/104547837</a></p>
+<h2 id="reference源码"><a href="#reference源码" class="headerlink" title="reference源码"></a>reference源码</h2><p>参考 <a href="https://blog.csdn.net/zqz_zqz/article/details/79474314" target="_blank" rel="noopener">https://blog.csdn.net/zqz_zqz/article/details/79474314</a></p>
+<h3 id="Reference构造方法"><a href="#Reference构造方法" class="headerlink" title="Reference构造方法"></a>Reference构造方法</h3><p>我们先来看看这些引用类型的父类都给我们提供了什么？</p>
+<p>其内部提供2个构造函数,除了传入referent对象外，区别就是要不要传入一个ReferenceQueue队列</p>
+<pre><code class="java">Reference(Treferent) {
+
+    this(referent,null);
+
+}
+Reference(T referent,ReferenceQueue&lt;?super T&gt;queue){
+
+    this.referent =referent;
+
+    this.queue = (queue==null)? ReferenceQueue.NULL:queue;
+
+}
+</code></pre>
+<p>ReferenceQueue队列的作用就是Reference引用的对象被回收时，Reference对象能否进入到pending队列，最终由ReferenceHander线程处理后，Reference就被放到了这个队列里面（Cleaner对象除外），然后我们就可以在这个ReferenceQueue里拿到reference,执行我们自己的操作（至于什么操作就看你想怎么用了），所以这个队列起到一个对象被回收时通知的作用；</p>
+<p>如果不带ReferenceQueue的话,要想知道Reference持有的对象是否被回收，就只有不断地轮训reference对象,通过判断里面的get是否为null(phantomReference对象不能这样做,其get始终返回null,因此它只有带queue的构造函数).这两种方法均有相应的使用场景,取决于实际的应用.如weakHashMap中就选择去查询queue的数据,来判定是否有对象将被回收.而ThreadLocalMap,则采用判断get()是否为null来作处理;</p>
+<p>对于带ReferenceQueue参数的构造方法，如果传入的队列为null，那么就会给成员变量queue赋值为ReferenceQueue.NULL队列,这个NULL是ReferenceQueue对象的一个继承了ReferenceQueue的内部类，它重写了入队方法enqueue，这个方法只有一个操作，直接返回 false，也就是这个对列不会存取任何数据,它起到状态标识的作用；</p>
+<h3 id="Reference的重要成员变量"><a href="#Reference的重要成员变量" class="headerlink" title="Reference的重要成员变量"></a>Reference的重要成员变量</h3><pre><code class="java">//在构造方法传入java对象最后就赋值给了referent，也就是它引用到的对象
+
+private Treferent;        /* Treated specially by GC */
+
+// pending队列
+// pending成员变量与后面的discovered对象一起构成了一个pending单向链表
+// 注意这个成员变量是一个静态对象，所以是全局唯一的
+// pending为链表的头节点，discovered为链表当前Reference节点指向下一个节点的引用
+// 这个队列是由jvm的垃圾回收器构建的，当对象除了被reference引用之外没有其它强引用了，jvm的垃圾回收器就会将指向需要回收的对象的Reference都放入到这个队列里面
+//（好好理解一下这句话，注意是指向要回收的对象的Reference，要回收的对象就是Reference的成员变量refernt持有的对象，是refernt持有的对象要被回收，而不是Reference对象本身）
+// 这个队列会由ReferenceHander线程来处理
+// ReferenceHander线程是jvm的一个内部线程，它也是Reference的一个内部类，它的任务就是将pending队列中要被回收的Reference对象移除出来，
+// 如果Reference对象在初始化的时候传入了ReferenceQueue队列，那么就把从pending队列里面移除的Reference放到它自己的ReferenceQueue队列里
+//（为什么是它自己的？pending队列是全局唯一的队列，但是Reference的queue却不是，它是在构造方法里面指定的，前面说过这里Cleaner对象是个特例）
+// 如果没有ReferenceQueue队列，那么其关联的对象就不会进入到Pending队列中，会直接被回收掉，除此之外ReferenceHander线程还会做一些其它操作，后面会讲到
+
+/* List of References waiting to beenqueued.  The collector adds
+* References to this list, while theReference-handler thread removes
+* them. This list is protected by the above lock object. The
+* list uses the discovered field to linkits elements.
+*/
+privatestatic Reference&lt;Object&gt;pending =null;
+
+//与成员变量pending一起组成pending队列，指向链表当前节点的下一个节点
+/* When active:   next element in a discovered reference listmaintained by GC (or this if last)
+*    pending:   next element in thepending list (or null if last)
+*  otherwise:   NULL
+*/
+
+transientprivate Reference&lt;T&gt;discovered; /* used by VM */
+
+// ReferenceQueue队列，这就是我们前面提到的起到通知作用的ReferenceQueue，
+// 需要注意的是ReferenceQueue并不是一个链表数据结构，它只持有这个链表的表头对象header，
+// 这个链表是由Refence对象里面的next成员变量构建起来的，next也就是链表当前节点的下一个节点(只有next的引用，它是单向链表)，
+// 所以Reference对象本身就是一个链表的节点，
+// 这个链表数据来源前面讲pending队列的时候已经提到了，它是由ReferenceHander线程从pending队列中取的数据构建的
+//（需要注意的是，这个对象并不是一个全局的，它是在构造方法里面传入进来的，所以Reference对象需要进入那个队列是我们自己指定的，
+// 也有特例，如FinalReference，Cleaner就是一个内部全局唯一的，无法指定，后面有两篇专门讲他们俩的源码），
+// 一旦Reference对象放入了队列里面，那么queue就会被设置为ReferenceQueue.ENQUEUED，来标识当前Reference已经进入到队里里面了；
+volatileReferenceQueue&lt;?super T&gt;queue;
+
+//用来与queue成员变量一同组成ReferenceQueue队列，见上面queue的说明；
+/* When active:   NULL
+*     pending:  this
+*   Enqueued:   next reference inqueue (or this if last)
+*   Inactive:   this
+*/
+@SuppressWarnings(&quot;rawtypes&quot;)
+Reference next;
+
+// lock成员变量是pending队列的全局锁，
+// 如果你搜索这个lock变量会发现它只在ReferenceHander线程run方法里面用到了，不要忘了jvm垃圾回收器线程也会操作pending队列，往pending里面添加Reference对象，
+// 所以需要加锁；
+/* Object used to synchronize with thegarbage collector.  The collector
+* must acquire this lock at the beginningof each collection cycle.  It is
+* therefore critical that any code holdingthis lock complete as quickly
+* as possible, allocate no new objects,and avoid calling user code.
+*/
+staticprivateclass Lock { };
+
+privatestatic Locklock =new Lock();
+</code></pre>
+<p>这里一定要理解pending队列，什么样的Reference对象会进入这个队列。</p>
+<p>进入这个队列的Reference对象需要满足两个条件：</p>
+<ul>
+<li>Reference所引用的对象已经不存在其它强引用；</li>
+<li>Reference对象在创建的时候，指定了ReferenceQueue；</li>
+</ul>
+<h3 id="Reference状态及其转换"><a href="#Reference状态及其转换" class="headerlink" title="Reference状态及其转换"></a>Reference状态及其转换</h3><p>如果去查看Reference源码，会发现这个类的开头有一段很长的注释，说明了Reference对象的四种状态：</p>
+<pre><code class="java">/* A Reference instance is in one of four possible internal states:
+     *
+     *     Active: Subject to special treatment by the garbage collector.  Some
+     *     time after the collector detects that the reachability of the
+     *     referent has changed to the appropriate state, it changes the
+     *     instance&#39;s state to either Pending or Inactive, depending upon
+     *     whether or not the instance was registered with a queue when it was
+     *     created.  In the former case it also adds the instance to the
+     *     pending-Reference list.  Newly-created instances are Active.
+     *
+     *     Pending: An element of the pending-Reference list, waiting to be
+     *     enqueued by the Reference-handler thread.  Unregistered instances
+     *     are never in this state.
+     *
+     *     Enqueued: An element of the queue with which the instance was
+     *     registered when it was created.  When an instance is removed from
+     *     its ReferenceQueue, it is made Inactive.  Unregistered instances are
+     *     never in this state.
+     *
+     *     Inactive: Nothing more to do.  Once an instance becomes Inactive its
+     *     state will never change again.
+     *
+     * The state is encoded in the queue and next fields as follows:
+     *
+     *     Active: queue = ReferenceQueue with which instance is registered, or
+     *     ReferenceQueue.NULL if it was not registered with a queue; next =
+     *     null.
+     *
+     *     Pending: queue = ReferenceQueue with which instance is registered;
+     *     next = this
+     *
+     *     Enqueued: queue = ReferenceQueue.ENQUEUED; next = Following instance
+     *     in queue, or this if at end of list.
+     *
+     *     Inactive: queue = ReferenceQueue.NULL; next = this.
+     *
+     * With this scheme the collector need only examine the next field in order
+     * to determine whether a Reference instance requires special treatment: If
+     * the next field is null then the instance is active; if it is non-null,
+     * then the collector should treat the instance normally.
+     *
+     * To ensure that a concurrent collector can discover active Reference
+     * objects without interfering with application threads that may apply
+     * the enqueue() method to those objects, collectors should link
+     * discovered objects through the discovered field. The discovered
+     * field is also used for linking Reference objects in the pending list.
+     */
+</code></pre>
+<p>如果你没有耐心看完这段注释，请直接往后看：</p>
+<ul>
+<li>Active:活动状态,对象存在强引用状态,还没有被回收;</li>
+<li>Pending:垃圾回收器将没有强引用的Reference对象放入到pending队列中，等待ReferenceHander线程处理（前提是这个Reference对象创建的时候传入了ReferenceQueue，否则的话对象会直接进入Inactive状态）；</li>
+<li>Enqueued:ReferenceHander线程将pending队列中的对象取出来放到ReferenceQueue队列里；</li>
+<li>Inactive:处于此状态的Reference对象可以被回收,并且其内部封装的对象也可以被回收掉了，有两个路径可以进入此状态，</li>
+</ul>
+<p>路径一：在创建时没有传入ReferenceQueue的Reference对象，被Reference封装的对象在没有强引用时，指向它的Reference对象会直接进入此状态；<br>路径二、此Reference对象经过前面三个状态后，已经由外部从ReferenceQueue中获取到,并且已经处理掉了。</p>
+<p>Reference对象的状态只需要通过成员变量next和queue来判断：</p>
+<ul>
+<li>Active：   next=null</li>
+<li>Pending：  next = this ，queue = ReferenceQueue</li>
+<li>Enqueued:  queue =ReferenceQueue.ENQUEUED</li>
+<li>Inactive:    next = this  ,queue = ReferenceQueue.NULL; </li>
+</ul>
+<p>特例还是要拿出来单独说，上面的图不适用描述Cleaner对象，Cleaner对象是没有Enqueue状态的，它经过HandReference处理时执行其clean方法清理，然后就直接进入了inactive状态了；</p>
+<p>下面简单看一下他们的源码实现，如果你理解了上面所有内容，下面的源码理解起来非常简单，我只做简单的注释说明：</p>
+<h3 id="ReferenceHandler线程源码解析"><a href="#ReferenceHandler线程源码解析" class="headerlink" title="ReferenceHandler线程源码解析"></a>ReferenceHandler线程源码解析</h3><p>ReferenceHandler线程是一个拥有最高优先级的守护线程，它是Reference类的一个内部类，在Reference类加载执行cinit的时候被初始化并启动；它的任务就是当pending队列不为空的时候，循环将pending队列里面的头部的Reference移除出来，如果这个对象是个Cleaner实例，那么就直接执行它的clean方法来执行清理工作；否则放入到它自己的ReferenceQueue里面；</p>
+<p>所以这个线程是pending队列与ReferenceQueue的桥梁；</p>
+<pre><code class="java">/* High-priority thread to enqueue pending References*/
+private static class ReferenceHandler extends Thread {
+
+    ReferenceHandler(ThreadGroup g, String name) {
+        super(g, name);
+    }
+
+    public void run() {
+        for (;;) {
+            //从pending中移除的Reference对象
+            Reference&lt;Object&gt; r;
+            //此处需要加全局锁，因为除了当前线程，gc线程也会操作pending队列
+            synchronized (lock) {
+                //如果pending队列不为空，则将第一个Reference对象取出
+                if (pending != null) {
+                    //缓存pending队列头节点
+                    r = pending;
+                    //将头节点指向discovered，discovered为pending队列中当前节点的下一个节点，这样就把第一个头结点出队了
+                    pending = r.discovered;
+                    //将当前节点的discovered设置为null；当前节点出队，不需要组成链表了；
+                    r.discovered = null;
+                } else {//如果pending队列为空，则等待
+                    try {
+                        try {
+                            lock.wait();
+                        } catch(OutOfMemoryError x) { }
+                    } catch(InterruptedException x) { }
+                    continue;
+                }
+            }
+            // 如果从pending队列出队的r是一个Cleaner对象，那么直接执行其clean()方法执行清理操作；
+            if (r instanceof Cleaner) {
+                ((Cleaner)r).clean();
+                //注意这里，这里已经不往下执行了，所以Cleaner对象是不会进入到队列里面的，给它设置ReferenceQueue的作用是为了让它能进入Pending队列后被ReferenceHander线程处理；
+                continue;
+            }
+            //将对象放入到它自己的ReferenceQueue队列里
+            ReferenceQueue&lt;Object&gt; q = r.queue;
+            if (q != ReferenceQueue.NULL) q.enqueue(r);
+            return true;
+        }
+    }
+}
+
+//以下是ReferenceHander线程初始化并启动的操作
+static {
+    ThreadGroup tg =Thread.currentThread().getThreadGroup();
+    for (ThreadGroup tgn = tg;
+            tgn != null;
+            tg = tgn, tgn = tg.getParent());
+    //线程名称为Reference Handler
+    Thread handler = newReferenceHandler(tg, &quot;Reference Handler&quot;);
+    /* If there were a special system-onlypriority greater than
+        * MAX_PRIORITY, it would be used here
+        */
+    //线程有最高优先级
+    handler.setPriority(Thread.MAX_PRIORITY);
+    //设置线程为守护线程；
+    handler.setDaemon(true);
+    handler.start();
+}
+</code></pre>
+<h2 id="ReferenceQueue源码解析"><a href="#ReferenceQueue源码解析" class="headerlink" title="ReferenceQueue源码解析"></a>ReferenceQueue源码解析</h2><p>ReferenceQueue队列是一个单向链表，ReferenceQueue里面只有一个header成员变量持有队列的队头，Reference对象是从队头做出队入队操作，所以它是一个后进先出的队列</p>
+<pre><code class="java">public class ReferenceQueue&lt;T&gt; {
+
+    public ReferenceQueue() { }
+    //内部类，它是用来做状态识别的，重写了enqueue入队方法，永远返回false，所以它不会存储任何数据，见后面的NULL和ENQUEUED两个标识成员变量
+    private static class Null&lt;S&gt; extendsReferenceQueue&lt;S&gt; {
+        boolean enqueue(Reference&lt;? extends S&gt; r) {
+            return false;
+        }
+    }
+
+    //当Reference对象创建时没有指定queue或Reference对象已经处于inactive状态
+    staticReferenceQueue&lt;Object&gt; NULL = new Null&lt;&gt;();
+
+    //当Reference已经被ReferenceHander线程从pending队列移到queue里面时
+    static ReferenceQueue&lt;Object&gt; ENQUEUED = new Null&lt;&gt;();
+
+    staticprivate class Lock { };
+
+    //出队入队时对队列加锁
+    privateLock lock = new Lock();
+
+    //队列头
+    privatevolatile Reference&lt;? extends T&gt; head = null;
+
+    //队列长度
+    private long queueLength = 0;
+
+    //入队操作，ReferenceHander调用此方法将Reference放入到队列里
+    boolean enqueue(Reference&lt;? extends T&gt; r) { /* Called only byReference class */
+
+    //加锁操作队列
+    synchronized(lock) {
+        //如果Reference创建时没有指定队列或Reference对象已经在队列里面了，则直接返回
+        ReferenceQueue&lt;?&gt; queue = r.queue;
+        if ((queue == NULL) || (queue == ENQUEUED)) {
+            return false;
+        }
+        //只有r的队列是当前队列才允许入队
+        assert queue == this;
+        //将r的queue设置为ENQUEUED状态，标识Reference已经入队
+        r.queue = ENQUEUED;
+        //从队列头部入队
+        r.next = (head == null) ? r : head;
+        head = r;
+        //队列里面对象数量+1
+        queueLength++;
+        //如果r是一个FinalReference实例，那么将FinalReference数量也+1
+        if (r instanceof FinalReference) {
+            sun.misc.VM.addFinalRefCount(1);
+        }
+        //唤醒出队操作的等待线程
+        lock.notifyAll();
+        return true;
+       }
+    }
+
+    //Reference对象出队操作，将头部第一个对象移出队列，并将队列长度-1
+   @SuppressWarnings(&quot;unchecked&quot;)
+   private Reference&lt;? extends T&gt; reallyPoll() {       /* Must hold lock */
+       Reference&lt;? extends T&gt; r = head;
+       if (r != null) {
+           head = (r.next == r) ?
+               null :
+               r.next; // Unchecked due to the next field having a raw type inReference
+           r.queue = NULL;
+           r.next = r;
+           queueLength--;
+           if (r instanceof FinalReference) {
+               sun.misc.VM.addFinalRefCount(-1);
+           }
+           return r;
+       }
+       return null;
+    }
+
+    //将队列头部第一个对象从队列中移除出来，如果队列为空则直接返回null（此方法不会被阻塞）
+   public Reference&lt;? extends T&gt; poll() {
+       if (head == null)
+           return null;
+       synchronized (lock) {
+           return reallyPoll();
+       }
+    }
+
+
+   //将头部第一个对象移出队列并返回，如果队列为空，则等待timeout时间后，返回null，这个方法会阻塞线程
+   public Reference&lt;? extends T&gt; remove(long timeout)
+       throws IllegalArgumentException, InterruptedException
+    {
+       if (timeout &lt; 0) {
+           throw new IllegalArgumentException(&quot;Negative timeout value&quot;);
+       }
+       synchronized (lock) {
+           Reference&lt;? extends T&gt; r = reallyPoll();
+           if (r != null) return r;
+           for (;;) {
+               lock.wait(timeout);
+               r = reallyPoll();
+               if (r != null) return r;
+                if (timeout != 0) return null;
+           }
+       }
+    }
+
+   public Reference&lt;? extends T&gt; remove() throws InterruptedException{
+       return remove(0);
+    }
+}
+</code></pre>
+<p>最后来一张图：</p>
+<p><img src="https://i.loli.net/2020/12/11/MLrasIheZ1SUGRQ.png" alt="image.png"></p>
 ]]></content>
       
         <categories>

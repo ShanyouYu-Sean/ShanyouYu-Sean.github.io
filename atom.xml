@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-09T09:34:26.245Z</updated>
+  <updated>2020-12-11T14:13:14.023Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,44 +17,73 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
-    <link href="http://seanthefish.com/2020/12/09/mysql-8-distributed-tx/"/>
-    <id>http://seanthefish.com/2020/12/09/mysql-8-distributed-tx/</id>
-    <published>2020-12-09T09:33:41.377Z</published>
-    <updated>2020-12-09T09:34:26.245Z</updated>
+    <title>分布式id算法</title>
+    <link href="http://seanthefish.com/2020/12/04/distributed-id/"/>
+    <id>http://seanthefish.com/2020/12/04/distributed-id/</id>
+    <published>2020-12-04T05:00:00.000Z</published>
+    <updated>2020-12-11T14:13:14.023Z</updated>
     
     <summary type="html">
     
     </summary>
     
+      <category term="mysql" scheme="http://seanthefish.com/categories/mysql/"/>
+    
+    
+      <category term="mysql" scheme="http://seanthefish.com/tags/mysql/"/>
     
   </entry>
   
   <entry>
-    <title></title>
-    <link href="http://seanthefish.com/2020/12/09/mysql-7-ha/"/>
-    <id>http://seanthefish.com/2020/12/09/mysql-7-ha/</id>
-    <published>2020-12-09T09:33:16.720Z</published>
-    <updated>2020-12-09T09:33:16.720Z</updated>
+    <title>mysql之分布式事务</title>
+    <link href="http://seanthefish.com/2020/12/04/mysql-7-distributed-tx/"/>
+    <id>http://seanthefish.com/2020/12/04/mysql-7-distributed-tx/</id>
+    <published>2020-12-04T04:00:00.000Z</published>
+    <updated>2020-12-11T14:21:17.208Z</updated>
     
     <summary type="html">
     
+      
+      
+        
+        
+          &lt;p&gt;参考 &lt;a href=&quot;http://www.calvinneo.com/2017/09/20/distributed-system-consistency-and-consensus/&quot; target=&quot;_blank&quot;
+        
+      
+    
     </summary>
     
+      <category term="mysql" scheme="http://seanthefish.com/categories/mysql/"/>
+    
+    
+      <category term="mysql" scheme="http://seanthefish.com/tags/mysql/"/>
     
   </entry>
   
   <entry>
-    <title></title>
-    <link href="http://seanthefish.com/2020/12/09/mysql-6-copy/"/>
-    <id>http://seanthefish.com/2020/12/09/mysql-6-copy/</id>
-    <published>2020-12-09T09:30:57.554Z</published>
-    <updated>2020-12-09T09:35:10.627Z</updated>
+    <title>mysql之复制</title>
+    <link href="http://seanthefish.com/2020/12/04/mysql-6-copy/"/>
+    <id>http://seanthefish.com/2020/12/04/mysql-6-copy/</id>
+    <published>2020-12-04T02:00:00.000Z</published>
+    <updated>2020-12-11T10:46:53.246Z</updated>
     
     <summary type="html">
     
+      
+      
+        
+        
+          &lt;p&gt;复制解决的基本问题是让一台服务器的数据与其他服务器保持同步。一台主库的数据可以同步到多台备库上，备库本身也可以被配置成另外一台服务器的主库。主库和备库之间可以有多种不同的组合方式。&lt;/p&gt;
+&lt;p&gt;MySQL支持两种复制方式：基于行的复制和基于语句的复制。在同一时间点备库上的
+        
+      
+    
     </summary>
     
+      <category term="mysql" scheme="http://seanthefish.com/categories/mysql/"/>
+    
+    
+      <category term="mysql" scheme="http://seanthefish.com/tags/mysql/"/>
     
   </entry>
   
@@ -63,7 +92,7 @@
     <link href="http://seanthefish.com/2020/12/03/mysql-5-scale/"/>
     <id>http://seanthefish.com/2020/12/03/mysql-5-scale/</id>
     <published>2020-12-03T03:00:00.000Z</published>
-    <updated>2020-12-09T13:39:14.520Z</updated>
+    <updated>2020-12-11T10:02:20.357Z</updated>
     
     <summary type="html">
     
@@ -145,7 +174,7 @@
     <link href="http://seanthefish.com/2020/12/02/mysql-2-index/"/>
     <id>http://seanthefish.com/2020/12/02/mysql-2-index/</id>
     <published>2020-12-02T03:00:00.000Z</published>
-    <updated>2020-12-09T09:31:31.250Z</updated>
+    <updated>2020-12-10T08:45:30.492Z</updated>
     
     <summary type="html">
     
@@ -329,7 +358,7 @@
     <link href="http://seanthefish.com/2020/11/29/raft/"/>
     <id>http://seanthefish.com/2020/11/29/raft/</id>
     <published>2020-11-29T02:00:00.000Z</published>
-    <updated>2020-11-30T07:07:07.843Z</updated>
+    <updated>2020-12-11T08:56:00.824Z</updated>
     
     <summary type="html">
     
@@ -378,33 +407,6 @@
   </entry>
   
   <entry>
-    <title>redis进阶之分布式锁</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
-    <published>2020-11-28T12:00:00.000Z</published>
-    <updated>2020-12-01T08:34:30.542Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;hr&gt;
-&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
     <title>redis进阶之缓存</title>
     <link href="http://seanthefish.com/2020/11/28/redis-6/"/>
     <id>http://seanthefish.com/2020/11/28/redis-6/</id>
@@ -433,11 +435,38 @@
   </entry>
   
   <entry>
+    <title>redis进阶之分布式锁</title>
+    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
+    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
+    <published>2020-11-28T12:00:00.000Z</published>
+    <updated>2020-12-01T08:34:30.542Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;hr&gt;
+&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>redis进阶之集群</title>
     <link href="http://seanthefish.com/2020/11/28/redis-5/"/>
     <id>http://seanthefish.com/2020/11/28/redis-5/</id>
     <published>2020-11-28T11:00:00.000Z</published>
-    <updated>2020-11-30T11:02:42.623Z</updated>
+    <updated>2020-12-11T08:22:54.560Z</updated>
     
     <summary type="html">
     
