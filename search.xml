@@ -101,7 +101,7 @@ Commit
     </entry>
     
     <entry>
-      <title><![CDATA[mysql之分布式事务]]></title>
+      <title><![CDATA[mysql之高可用]]></title>
       <url>/2020/12/04/mysql-8-ha/</url>
       <content type="html"><![CDATA[<p>参考 <a href="http://mysql.taobao.org/monthly/2018/12/04/" target="_blank" rel="noopener">http://mysql.taobao.org/monthly/2018/12/04/</a>  <a href="https://zhuanlan.zhihu.com/p/25960208" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/25960208</a>  <a href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/" target="_blank" rel="noopener">https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/</a></p>
 <h2 id="故障恢复"><a href="#故障恢复" class="headerlink" title="故障恢复"></a>故障恢复</h2><h3 id="MySQL的事务处理—两阶段事务提交2PC"><a href="#MySQL的事务处理—两阶段事务提交2PC" class="headerlink" title="MySQL的事务处理—两阶段事务提交2PC"></a>MySQL的事务处理—两阶段事务提交2PC</h3><p>MySQL数据库的INNODB是一款支持OLTP的存储引擎，为支持MySQL的高可用，支持跨机搭建高可用数据库集群。</p>
