@@ -1106,7 +1106,7 @@ end
     <entry>
       <title><![CDATA[mysql之锁和mvcc]]></title>
       <url>/2020/12/02/mysql-3-lock/</url>
-      <content type="html"><![CDATA[<p>参考 <a href="https://draveness.me/database-concurrency-control/" target="_blank" rel="noopener">https://draveness.me/database-concurrency-control/</a>  <a href="https://segmentfault.com/a/1190000016956088" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016956088</a>  <a href="https://yq.aliyun.com/aracles/626848" target="_blank" rel="noopener">https://yq.aliyun.com/aracles/626848</a>  <a href="https://zhuanlan.zhihu.com/p/73078137" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/73078137</a> <a href="https://tech.meituan.com/2014/08/20/innodb-lock.html" target="_blank" rel="noopener">https://tech.meituan.com/2014/08/20/innodb-lock.html</a> <a href="https://www.cnblogs.com/crazylqy/p/7611069.html" target="_blank" rel="noopener">https://www.cnblogs.com/crazylqy/p/7611069.html</a> <a href="https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/" target="_blank" rel="noopener">https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/</a></p>
+      <content type="html"><![CDATA[<p>参考 <a href="https://draveness.me/database-concurrency-control/" target="_blank" rel="noopener">https://draveness.me/database-concurrency-control/</a>  <a href="https://segmentfault.com/a/1190000016956088" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016956088</a>  <a href="https://yq.aliyun.com/aracles/626848" target="_blank" rel="noopener">https://yq.aliyun.com/aracles/626848</a>  <a href="https://zhuanlan.zhihu.com/p/73078137" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/73078137</a> <a href="https://tech.meituan.com/2014/08/20/innodb-lock.html" target="_blank" rel="noopener">https://tech.meituan.com/2014/08/20/innodb-lock.html</a> <a href="https://www.cnblogs.com/crazylqy/p/7611069.html" target="_blank" rel="noopener">https://www.cnblogs.com/crazylqy/p/7611069.html</a> <a href="https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/" target="_blank" rel="noopener">https://chenjiayang.me/2019/06/22/mysql-innodb-mvcc/</a> <a href="https://draveness.me/mysql-transaction/" target="_blank" rel="noopener">https://draveness.me/mysql-transaction/</a></p>
 <h2 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h2><p>先说乐观锁吧，因为比较好解释，而且乐观锁不属于mysql的一部分。</p>
 <p>其实很简单，就是用版本号来实现，新加一列，用来记录版本号，我们将对数据库的操作分为三个阶段，读和修改阶段，验证阶段，提交阶段。</p>
 <p>在读和修改阶段，数据库会执行事务中的全部读操作和写操作，并将所有写后的值存入临时变量中，并不会真正更新数据库中的内容；在这时候会进入下一个阶段，数据库程序会检查当前的改动是否合法，也就是是否有其他事务在 读和修改阶段 期间更新了数据，如果通过测试那么直接就进入 提交阶段 将所有存在临时变量中的改动全部写入数据库，没有通过测试的事务会直接被回滚。</p>
@@ -1117,6 +1117,27 @@ end
 <p>Read Committed (RC)<br>不能读取未提交记录。避免了脏读，但是可能会造成不可重复读。（在一个事务中，重新读取同一条记录时，会读到别的事物提交的修改，两次读不一致）</p>
 <p>Repeatable Read (RR)<br>可以避免不可重复读。即现有事务开始时，其他的事务就不允许对这个事务拿到的数据做修改。但会出现幻读，即此时有新的数据插入并提交，被当前事务读取到。（新版本的mysql因为实现了mvcc和gap锁，而在rr级别解决了幻读问题，mvcc在快照读中解决，gap锁在当前读中解决，除非你用快照读和当前读的结果做比对，从这个角度说的话，rr解决不了幻读，但是如果同为当前读，或者同为快照读，是可以解决的）</p>
 <p>Serializable<br>Serializable 是最高的事务隔离级别，同时代价也花费最高，性能很低，一般很少使用，在该级别下，事务顺序执行，不仅可以避免脏读、不可重复读，还避免了幻像读。</p>
+<h2 id="事务的状态"><a href="#事务的状态" class="headerlink" title="事务的状态"></a>事务的状态</h2><p>因为事务具有原子性，所以从远处看的话，事务就是密不可分的一个整体，事务的状态也只有三种：Active、Commited 和 Failed，事务要不就在执行中，要不然就是成功或者失败的状态.</p>
+<p>但是如果放大来看，我们会发现事务不再是原子的，其中包括了很多中间状态，比如部分提交，事务的状态图也变得越来越复杂。</p>
+<ul>
+<li>Active：事务的初始状态，表示事务正在执行；</li>
+<li>Partially Commited：在最后一条语句执行之后；</li>
+<li>Failed：发现事务无法正常执行之后；</li>
+<li>Aborted：事务被回滚并且数据库恢复到了事务进行之前的状态之后；</li>
+<li>Commited：成功执行整个事务；</li>
+</ul>
+<h2 id="undo-log-和-redo-log"><a href="#undo-log-和-redo-log" class="headerlink" title="undo log 和 redo log"></a>undo log 和 redo log</h2><h3 id="undo-log"><a href="#undo-log" class="headerlink" title="undo log"></a>undo log</h3><p>想要保证事务的原子性，就需要在异常发生时，对已经执行的操作进行回滚，而在 MySQL 中，恢复机制是通过回滚日志（undo log）实现的，所有事务进行的修改都会先记录到这个回滚日志中，然后在对数据库中的对应行进行写入。</p>
+<p>回滚日志除了能够在发生错误或者用户执行 ROLLBACK 时提供回滚相关的信息，它还能够在整个系统发生崩溃、数据库进程直接被杀死后，当用户再次启动数据库进程时，还能够立刻通过查询回滚日志将之前未完成的事务进行回滚，这也就需要回滚日志必须先于数据持久化到磁盘上，是我们需要先写日志后写数据库的主要原因。</p>
+<p>回滚日志并不能将数据库物理地恢复到执行语句或者事务之前的样子；它是逻辑日志，当回滚日志被使用时，它只会按照日志逻辑地将数据库中的修改撤销掉看，可以理解为，我们在事务中使用的每一条 INSERT 都对应了一条 DELETE，每一条 UPDATE 也都对应一条相反的 UPDATE 语句。</p>
+<h3 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h3><p>与原子性一样，事务的持久性也是通过日志来实现的，MySQL 使用重做日志（redo log）实现事务的持久性，重做日志由两部分组成，一是内存中的重做日志缓冲区，因为重做日志缓冲区在内存中，所以它是易失的，另一个就是在磁盘上的重做日志文件，它是持久的。</p>
+<p>当我们在一个事务中尝试对数据进行修改时，它会先将数据从磁盘读入内存，并更新内存中缓存的数据，然后生成一条重做日志并写入重做日志缓存，当事务真正提交时，MySQL 会将重做日志缓存中的内容刷新到重做日志文件，再将内存中的数据更新到磁盘上.</p>
+<p>除了所有对数据库的修改会产生重做日志，因为回滚日志也是需要持久存储的，它们也会创建对应的重做日志，在发生错误后，数据库重启时会从重做日志中找出未被更新到数据库磁盘中的日志重新执行以满足事务的持久性。</p>
+<h3 id="回滚日志和重做日志"><a href="#回滚日志和重做日志" class="headerlink" title="回滚日志和重做日志"></a>回滚日志和重做日志</h3><p>到现在为止我们了解了 MySQL 中的两种日志，回滚日志（undo log）和重做日志（redo log）；在数据库系统中，事务的原子性和持久性是由事务日志（transaction log）保证的，在实现时也就是上面提到的两种日志，前者用于对事务的影响进行撤销，后者在错误处理时对已经提交的事务进行重做，它们能保证两点：</p>
+<ul>
+<li>发生错误或者需要回滚的事务能够成功回滚（原子性）；</li>
+<li>在事务提交后，数据没来得及写会磁盘就宕机时，在下次重新启动后能够成功恢复数据（持久性）；</li>
+</ul>
+<p>在数据库中，这两种日志经常都是一起工作的，我们可以将它们整体看做一条事务日志，其中包含了事务的 ID、修改的行元素以及修改前后的值。一条事务日志同时包含了修改前后的值，能够非常简单的进行回滚和重做两种操作.</p>
 <h2 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h2><p>接着说悲观锁，首先要清楚的是，悲观锁，mvcc，和数据库隔离级别实际上是分不开的。因此，我会先试图独立的解释数据库中实现的悲观锁，然后再说一下mvcc的实现，最后在说明不同隔离界别中，锁和mvcc是怎么样组合使用的。</p>
 <h3 id="表锁、行锁、意向锁"><a href="#表锁、行锁、意向锁" class="headerlink" title="表锁、行锁、意向锁"></a>表锁、行锁、意向锁</h3><p>首先是表锁，分为表读锁（s lock）和表写锁（x lock），myisam中只有表锁，s锁可以和s锁共享，x锁则跟s锁和x锁互斥。</p>
 <p>如果只有表锁，锁的执行效率会十分低下，并且会锁到一些无用的行，因此便产生了行锁，innodb实现了行锁。行锁的定义跟表锁是一致的，只是一个操作在行上，一个操作在表上。</p>
@@ -1381,6 +1402,18 @@ FROM song;
 <p>可以用 Percona Toolkit 来查看索引情况和查询索引的日志来找出重复和多余的索引。</p>
 <p>接下来讨论一下冗余索引，冗余索引一般是增加索引（A,B）的时候，而不是去扩展已有的索引（A）。</p>
 <p>大多数情况下都不需要冗余索引。除非当需要额外增加一个非常长的 VARCHAR 索引的时候，增加这个列会导致性能急剧下降，这时候就需要冗余索引。</p>
+<h2 id="三星索引"><a href="#三星索引" class="headerlink" title="三星索引"></a>三星索引</h2><ul>
+<li>第一颗星需要取出所有等值谓词中的列，作为索引开头的最开始的列（任意顺序）；</li>
+<li>第二颗星需要将 ORDER BY 列加入索引中；</li>
+<li><p>第三颗星需要将查询语句剩余的列全部加入到索引中；</p>
+</li>
+<li><p>第一颗星不只是将等值谓词的列加入索引，它的作用是减少索引片的大小以减少需要扫描的数据行；</p>
+</li>
+<li>第二颗星用于避免排序，减少磁盘 IO 和内存的使用；</li>
+<li>第三颗星用于避免每一个索引对应的数据行都需要进行一次随机 IO 从聚集索引中读取剩余的数据；</li>
+</ul>
+<p>当一个 SQL 查询中同时拥有范围谓词和 ORDER BY 时，无论如何我们都是没有办法获得一个三星索引的，我们能够做的就是在这两者之间做出选择，是牺牲第一颗星还是第二颗星。实际上大多数时候，我们更偏爱第一颗星。我们希望减少需要扫描的数据行。</p>
+<h2 id="过滤因子"><a href="#过滤因子" class="headerlink" title="过滤因子"></a>过滤因子</h2><p>非唯一索引要考虑过滤因子，过滤因子大的过滤条件通常放在最前面。</p>
 ]]></content>
       
         <categories>
@@ -2472,14 +2505,53 @@ void initInterrupt(int fd0, int fd1) {
 <li>某个报文段丢失的情况。接收主机如果收到一个自己应该接收的序列号以外的数据时，会针对当前为止收到数据返回确认应答。如下图所示，当某一报文段丢失后，发送端会一直收到序号为1001的确认应答，因此，在窗口比较大，又出现报文段丢失的情况下，同一个序列号的确认应答将会被重复不断地返回。而发送端主机如果连续3次收到同一个确认应答，就会将其对应的数据进行重发。这种机制比之前提到的超时管理更加高效，因此也被称为高速重发控制。</li>
 </ul>
 <p><img src="https://i.loli.net/2020/12/04/5hxEg8CbeIPy1Jt.png" alt="image.png"></p>
+<h5 id="tcp拆包"><a href="#tcp拆包" class="headerlink" title="tcp拆包"></a>tcp拆包</h5><p>当应用层协议使用 TCP/IP 协议传输数据时，TCP/IP 协议簇可能会将应用层发送的数据分成多个包依次发送，而数据的接收方收到的数据可能是分段的或者拼接的，所以它需要对接收的数据进行拆分或者重组。</p>
+<ul>
+<li>IP 协议会分片传输过大的数据包（Packet）避免物理设备的限制；</li>
+<li>TCP 协议会分段传输过大的数据段（Segment）保证传输的性能；</li>
+</ul>
+<p>需要注意的是，IP 协议和 TCP 协议虽然都会对数据进行拆分，但是 IP 协议以数据包（Package）为单位组织数据，而 TCP 协议以数据段（Segment）为单位组织数据。</p>
+<p>TCP 协议是面向字节流的协议，应用层交给 TCP 协议的数据并不会以消息为单位向目的主机发送，应用层交给 TCP 协议发送的数据可能会被拆分到多个数据段中。</p>
+<p>TCP 协议拆分数据是为了保证传输的可靠性和顺序，作为可靠的传输协议，为了保证数据的传输顺序，它需要为每一个数据段增加包含序列号的 TCP 协议头，如果数据段大小超过了 IP 协议的 MTU （最大传输单元）限制， 就会带来更多额外的重传和重组开销，影响性能。</p>
+<h5 id="tcp粘包"><a href="#tcp粘包" class="headerlink" title="tcp粘包"></a>tcp粘包</h5><p>当应用层协议使用 TCP 协议传输数据时，TCP 协议可能会将应用层发送的数据分成多个包依次发送，而数据的接收方收到的数据段可能有多个『应用层数据包』组成，所以当应用层从 TCP 缓冲区中读取数据时发现粘连的数据包时，需要对收到的数据进行拆分。粘包并不是 TCP 协议造成的，它的出现是因为应用层协议设计者对 TCP 协议的错误理解，忽略了 TCP 协议的定义并且缺乏设计应用层协议的经验。</p>
+<ul>
+<li>TCP 协议是面向字节流的协议，它可能会组合或者拆分应用层协议的数据；</li>
+<li>应用层协议的没有定义消息的边界导致数据的接收方无法拼接数据；</li>
+</ul>
+<p>原因</p>
+<ul>
+<li>发送方原因<br>TCP默认使用Nagle算法（主要作用：减少网络中报文段的数量），而Nagle算法主要做两件事：<ul>
+<li>只有上一个分组得到确认，才会发送下一个分组</li>
+<li>收集多个小分组，在一个确认到来时一起发送<br>Nagle算法造成了发送方可能会出现粘包问题</li>
+</ul>
+</li>
+<li>接收方原因<br>TCP接收到数据包时，并不会马上交到应用层进行处理。实际上，TCP将接收到的数据包保存在接收缓存里，然后应用程序主动从缓存读取收到的分组。这样一来，如果TCP接收数据包到缓存的速度大于应用程序从缓存中读取数据包的速度，多个包就会被缓存，应用程序就有可能读取到多个首尾相接粘到一起的包。</li>
+</ul>
+<p>解决：</p>
+<ul>
+<li>发送方<br>对于发送方造成的粘包问题，可以通过关闭Nagle算法来解决，使用TCP_NODELAY选项来关闭算法。</li>
+<li>接收方<br>确立消息边界<ul>
+<li>每条数据有固定的格式（开始符，结束符）</li>
+<li>发送每条数据时，将数据的长度一并发送（类似http的Content-Length）</li>
+</ul>
+</li>
+</ul>
+<p>UDP会不会产生粘包问题呢？</p>
+<p>TCP为了保证可靠传输并减少额外的开销（每次发包都要验证），采用了基于流的传输，基于流的传输不认为消息是一条一条的，是无保护消息边界的（保护消息边界：指传输协议把数据当做一条独立的消息在网上传输，接收端一次只能接受一条独立的消息）。</p>
+<p>UDP则是面向消息传输的，是有保护消息边界的，接收方一次只接受一条独立的信息，所以不存在粘包问题。</p>
 <h4 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h4><p>无连接的UDP协议</p>
 <p>“无连接”就是在正式通信前不必与对方先建立连接，不管对方状态就直接发送。与手机短信非常相似：你在发短信的时候，只需要输入对方手机号就OK了。</p>
 <p>UDP传输协议是一种不可靠的、面向无连接、可以实现多对一、一对多和一对一连接的通信协议。UDP在传输数据前既不需要建立通道，在数据传输完毕后也不需要将通道关闭。只要客户端给服务端发送一个请求，服务端就会一次性地把所有数据发送完毕。</p>
 <p>UDP在传输数据时不会对数据的完整性进行验证，在数据丢失或数据出错时也不会要求重新传输，因此也节省了很多用于验证数据包的时间，所以以UDP建立的连接的延迟会比以TCP建立的连接的延迟更低。UDP不会根据当前的网络情况来控制数据的发送速度，因此无论网络情况是好是坏，服务端都会以恒定的速率发送数据。虽然这样有时会造成数据的丢失与损坏，但是这一点对于一些实时应用来说是十分重要的。基于以上三点，UDP在数据传输方面速度更快，延迟更低，实时性更好，因此被广泛地用于通信领域和视频网站当中。</p>
+<h5 id="udp丢包"><a href="#udp丢包" class="headerlink" title="udp丢包"></a>udp丢包</h5><p>udp不可靠，会丢包</p>
+<ul>
+<li>接收端处理时间过长导致丢包</li>
+<li>发送的包较大，超过接受者缓存导致丢包</li>
+<li>发送的包频率太快</li>
+</ul>
 <h4 id="协议差别"><a href="#协议差别" class="headerlink" title="协议差别"></a>协议差别</h4><table>
 <thead>
 <tr>
-<th></th>
 <th>TCP</th>
 <th>UDP</th>
 </tr>
@@ -2517,6 +2589,96 @@ void initInterrupt(int fd0, int fd1) {
 <p>下图以用户 a 向用户 b 发送邮件为例子：</p>
 <p><img src="https://i.loli.net/2020/12/04/EHmG2excC6V9niK.png" alt="image.png"></p>
 <p>① 应用程序处理<br>首先应用程序会进行编码处理，这些编码相当于 OSI 的表示层功能；<br>编码转化后，邮件不一定马上被发送出去，这种何时建立通信连接何时发送数据的管理功能，相当于 OSI 的会话层功能。<br>② TCP 模块的处理<br>TCP 根据应用的指示，负责建立连接、发送数据以及断开连接。TCP 提供将应用层发来的数据顺利发送至对端的可靠传输。为了实现这一功能，需要在应用层数据的前端附加一个 TCP 首部。<br>③ IP 模块的处理<br>IP 将 TCP 传过来的 TCP 首部和 TCP 数据合起来当做自己的数据，并在 TCP 首部的前端加上自己的 IP 首部。IP 包生成后，参考路由控制表决定接受此 IP 包的路由或主机。<br>④ 网络接口（以太网驱动）的处理<br>从 IP 传过来的 IP 包对于以太网来说就是数据。给这些数据附加上以太网首部并进行发送处理，生成的以太网数据包将通过物理层传输给接收端。<br>⑤ 网络接口（以太网驱动）的处理<br>主机收到以太网包后，首先从以太网包首部找到 MAC 地址判断是否为发送给自己的包，若不是则丢弃数据。<br>如果是发送给自己的包，则从以太网包首部中的类型确定数据类型，再传给相应的模块，如 IP、ARP 等。这里的例子则是 IP 。<br>⑥ IP 模块的处理<br>IP 模块接收到 数据后也做类似的处理。从包首部中判断此 IP 地址是否与自己的 IP 地址匹配，如果匹配则根据首部的协议类型将数据发送给对应的模块，如 TCP、UDP。这里的例子则是 TCP。<br>另外吗，对于有路由器的情况，接收端地址往往不是自己的地址，此时，需要借助路由控制表，在调查应该送往的主机或路由器之后再进行转发数据。<br>⑦ TCP 模块的处理<br>在 TCP 模块中，首先会计算一下校验和，判断数据是否被破坏。然后检查是否在按照序号接收数据。最后检查端口号，确定具体的应用程序。数据被完整地接收以后，会传给由端口号识别的应用程序。<br>⑧ 应用程序的处理<br>接收端应用程序会直接接收发送端发送的数据。通过解析数据，展示相应的内容。</p>
+<h2 id="https"><a href="#https" class="headerlink" title="https"></a>https</h2><ul>
+<li>tcp三次握手</li>
+<li>在通信双方建立可靠的 TCP 连接之后，我们就需要通过 TLS 握手交换双方的密钥了<ul>
+<li>客户端向服务端发送 Client Hello 消息，其中携带客户端支持的协议版本、加密算法、压缩算法以及客户端生成的随机数；</li>
+<li>服务端收到客户端支持的协议版本、加密算法等信息后；<ul>
+<li>向客户端发送 Server Hello 消息，并携带选择特定的协议版本、加密方法、会话 ID 以及服务端生成的随机数；</li>
+<li>向客户端发送 Certificate 消息，即服务端的证书链，其中包含证书支持的域名、发行方和有效期等信息；</li>
+<li>向客户端发送 Server Key Exchange 消息，传递公钥以及签名等信息；</li>
+<li>向客户端发送可选的消息 CertificateRequest，验证客户端的证书；</li>
+<li>向客户端发送 Server Hello Done 消息，通知服务端已经发送了全部的相关信息；</li>
+</ul>
+</li>
+<li>客户端收到服务端的协议版本、加密方法、会话 ID 以及证书等信息后，验证服务端的证书；<ul>
+<li>向服务端发送 Client Key Exchange 消息，包含使用服务端公钥加密后的随机字符串，即预主密钥（Pre Master Secret）；</li>
+<li>向服务端发送 Change Cipher Spec 消息，通知服务端后面的数据段会加密传输；</li>
+<li>向服务端发送 Finished 消息，其中包含加密后的握手信息；</li>
+</ul>
+</li>
+<li>服务端收到 Change Cipher Spec 和 Finished 消息后；<ul>
+<li>向客户端发送 Change Cipher Spec 消息，通知客户端后面的数据段会加密传输；</li>
+<li>向客户端发送 Finished 消息，验证客户端的 Finished 消息并完成 TLS 握手；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>http 开始 发送request和接收response</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/13/TLtb1e2HZBslrCo.png" alt="image.png"></p>
+<p>对密钥进行非堆成加密，之后就是对称加密了</p>
+<h2 id="http2"><a href="#http2" class="headerlink" title="http2"></a>http2</h2><p>http是基于文本的协议，http2是基于二进制的协议</p>
+<h3 id="二进制分帧层"><a href="#二进制分帧层" class="headerlink" title="二进制分帧层"></a>二进制分帧层</h3><p>HTTP/2 所有性能增强的核心在于新的二进制分帧层，它定义了如何封装 HTTP 消息并在客户端与服务器之间传输。</p>
+<p><img src="https://i.loli.net/2020/12/13/8XyzmARqlDFg4a6.png" alt="image.png"></p>
+<p>这里所谓的“层”，指的是位于套接字接口与应用可见的高级 HTTP API 之间一个经过优化的新编码机制：HTTP 的语义（包括各种动词、方法、标头）都不受影响，不同的是传输期间对它们的编码方式变了。 HTTP/1.x 协议以换行符作为纯文本的分隔符，而 HTTP/2 将所有传输的信息分割为更小的消息和帧，并采用二进制格式对它们编码。</p>
+<h3 id="数据流、消息和帧"><a href="#数据流、消息和帧" class="headerlink" title="数据流、消息和帧"></a>数据流、消息和帧</h3><p>新的二进制分帧机制改变了客户端与服务器之间交换数据的方式。 为了说明这个过程，我们需要了解 HTTP/2 的三个概念：</p>
+<ul>
+<li>数据流：已建立的连接内的双向字节流，可以承载一条或多条消息。</li>
+<li>消息：与逻辑请求或响应消息对应的完整的一系列帧。</li>
+<li>帧：HTTP/2 通信的最小单位，每个帧都包含帧头，至少也会标识出当前帧所属的数据流。</li>
+</ul>
+<p>这些概念的关系总结如下：</p>
+<ul>
+<li>所有通信都在一个 TCP 连接上完成，此连接可以承载任意数量的双向数据流。</li>
+<li>每个数据流都有一个唯一的标识符和可选的优先级信息，用于承载双向消息。</li>
+<li>每条消息都是一条逻辑 HTTP 消息（例如请求或响应），包含一个或多个帧。</li>
+<li>帧是最小的通信单位，承载着特定类型的数据，例如 HTTP 标头、消息负载等等。 来自不同数据流的帧可以交错发送，然后再根据每个帧头的数据流标识符重新组装。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/13/DLJVzfSAmtnPdRb.png" alt="image.png"></p>
+<p>简言之，HTTP/2 将 HTTP 协议通信分解为二进制编码帧的交换，这些帧对应着特定数据流中的消息。所有这些都在一个 TCP 连接内复用。 这是 HTTP/2 协议所有其他功能和性能优化的基础。</p>
+<h3 id="请求与响应复用"><a href="#请求与响应复用" class="headerlink" title="请求与响应复用"></a>请求与响应复用</h3><p>在 HTTP/1.x 中，如果客户端要想发起多个并行请求以提升性能，则必须使用多个 TCP 连接。 这是 HTTP/1.x 交付模型的直接结果，该模型可以保证每个连接每次只交付一个响应（响应排队）。 更糟糕的是，这种模型也会导致队首阻塞，从而造成底层 TCP 连接的效率低下。</p>
+<p>HTTP/2 中新的二进制分帧层突破了这些限制，实现了完整的请求和响应复用：客户端和服务器可以将 HTTP 消息分解为互不依赖的帧，然后交错发送，最后再在另一端把它们重新组装起来。</p>
+<p><img src="https://i.loli.net/2020/12/13/ZTShcei4V3wImk2.png" alt="image.png"></p>
+<p>快照捕捉了同一个连接内并行的多个数据流。 客户端正在向服务器传输一个 DATA 帧（数据流 5），与此同时，服务器正向客户端交错发送数据流 1 和数据流 3 的一系列帧。因此，一个连接上同时有三个并行数据流。</p>
+<p>将 HTTP 消息分解为独立的帧，交错发送，然后在另一端重新组装是 HTTP 2 最重要的一项增强。事实上，这个机制会在整个网络技术栈中引发一系列连锁反应，从而带来巨大的性能提升，让我们可以：</p>
+<ul>
+<li>并行交错地发送多个请求，请求之间互不影响。</li>
+<li>并行交错地发送多个响应，响应之间互不干扰。</li>
+<li>使用一个连接并行发送多个请求和响应。</li>
+<li>不必再为绕过 HTTP/1.x 限制而做很多工作（请参阅针对 HTTP/1.x 进行优化，例如级联文件、image sprites 和域名分片。</li>
+<li>消除不必要的延迟和提高现有网络容量的利用率，从而减少页面加载时间。</li>
+<li>等等…</li>
+</ul>
+<p>HTTP/2 中的新二进制分帧层解决了 HTTP/1.x 中存在的队首阻塞问题，也消除了并行处理和发送请求及响应时对多个连接的依赖。 结果，应用速度更快、开发更简单、部署成本更低。</p>
+<h3 id="数据流优先级"><a href="#数据流优先级" class="headerlink" title="数据流优先级"></a>数据流优先级</h3><p>将 HTTP 消息分解为很多独立的帧之后，我们就可以复用多个数据流中的帧，客户端和服务器交错发送和传输这些帧的顺序就成为关键的性能决定因素。 为了做到这一点，HTTP/2 标准允许每个数据流都有一个关联的权重和依赖关系：</p>
+<ul>
+<li>可以向每个数据流分配一个介于 1 至 256 之间的整数。</li>
+<li>每个数据流与其他数据流之间可以存在显式依赖关系。</li>
+</ul>
+<p>数据流依赖关系和权重的组合让客户端可以构建和传递“优先级树”，表明它倾向于如何接收响应。 反过来，服务器可以使用此信息通过控制 CPU、内存和其他资源的分配设定数据流处理的优先级，在资源数据可用之后，带宽分配可以确保将高优先级响应以最优方式传输至客户端。</p>
+<p>优先级和依赖都是可以动态调整的。动态调整在有些场景下很有用，假想用户在用你的app浏览商品的时候，快速的滑动到了商品列表的底部，但前面的请求先发出，如果不把后面的请求优先级设高，用户当前浏览的图片要到最后才能下载完成，显然体验没有设置优先级好。同理依赖在有些场景下也有妙用。</p>
+<h3 id="来自一个连接"><a href="#来自一个连接" class="headerlink" title="来自一个连接"></a>来自一个连接</h3><p>有了新的分帧机制后，HTTP/2 不再依赖多个 TCP 连接去并行复用数据流；每个数据流都拆分成很多帧，而这些帧可以交错，还可以分别设定优先级。 因此，所有 HTTP/2 连接都是永久的，而且仅需要每个来源一个连接，随之带来诸多性能优势。</p>
+<p><img src="https://i.loli.net/2020/12/13/8nhljvWLdI4sJXR.png" alt="image.png"></p>
+<h3 id="服务器推送"><a href="#服务器推送" class="headerlink" title="服务器推送"></a>服务器推送</h3><p>HTTP/2 新增的另一个强大的新功能是，服务器可以对一个客户端请求发送多个响应。 换句话说，除了对最初请求的响应外，服务器还可以向客户端推送额外资源（图 12-5），而无需客户端明确地请求。</p>
+<p><img src="https://i.loli.net/2020/12/13/gzKRMJnqf2iSVyB.png" alt="image.png"></p>
+<p>注：HTTP/2 打破了严格的请求-响应语义，支持一对多和服务器发起的推送工作流，在浏览器内外开启了全新的互动可能性。 这是一项使能功能，对我们思考协议、协议用途和使用方式具有重要的长期影响。</p>
+<p>为什么在浏览器中需要一种此类机制呢？一个典型的网络应用包含多种资源，客户端需要检查服务器提供的文档才能逐个找到它们。 那为什么不让服务器提前推送这些资源，从而减少额外的延迟时间呢？ 服务器已经知道客户端下一步要请求什么资源，这时候服务器推送即可派上用场。</p>
+<p>事实上，如果您在网页中内联过 CSS、JavaScript，或者通过数据 URI 内联过其他资产（请参阅资源内联），那么您就已经亲身体验过服务器推送了。 对于将资源手动内联到文档中的过程，我们实际上是在将资源推送给客户端，而不是等待客户端请求。 使用 HTTP/2，我们不仅可以实现相同结果，还会获得其他性能优势。 推送资源可以进行以下处理：</p>
+<ul>
+<li>由客户端缓存</li>
+<li>在不同页面之间重用</li>
+<li>与其他资源一起复用</li>
+<li>由服务器设定优先级</li>
+<li>被客户端拒绝</li>
+</ul>
+<h3 id="标头压缩"><a href="#标头压缩" class="headerlink" title="标头压缩"></a>标头压缩</h3><p>每个 HTTP 传输都承载一组标头，这些标头说明了传输的资源及其属性。 在 HTTP/1.x 中，此元数据始终以纯文本形式，通常会给每个传输增加 500–800 字节的开销。如果使用 HTTP Cookie，增加的开销有时会达到上千字节。 （请参阅测量和控制协议开销。） 为了减少此开销和提升性能，HTTP/2 使用 HPACK 压缩格式压缩请求和响应标头元数据，这种格式采用两种简单但是强大的技术：</p>
+<ul>
+<li>这种格式支持通过静态霍夫曼代码对传输的标头字段进行编码，从而减小了各个传输的大小。</li>
+<li>这种格式要求客户端和服务器同时维护和更新一个包含之前见过的标头字段的索引列表（换句话说，它可以建立一个共享的压缩上下文），此列表随后会用作参考，对之前传输的值进行有效编码。</li>
+</ul>
+<p>利用霍夫曼编码，可以在传输时对各个值进行压缩，而利用之前传输值的索引列表，我们可以通过传输索引值的方式对重复值进行编码，索引值可用于有效查询和重构完整的标头键值对。</p>
+<p><img src="https://i.loli.net/2020/12/13/rXD5Y4zMFKLGi7B.png" alt="image.png"></p>
 ]]></content>
       
         <categories>
@@ -2869,6 +3031,7 @@ public class PersonApp {
 <p>此时便会出现多个leader，但两个节点的所在的分区，由于无法得到大多数节点的响应，因此不能将作出改变的日志进行提交。</p>
 <p>而当网络分区修复时，为提交日志记录的节点在收到新的同步日志请求时，就会回滚之前的未提交记录，而去同步新主的日志，从而修复节点的不一致性。</p>
 <h2 id="如何确定节点下线（redis的实现）"><a href="#如何确定节点下线（redis的实现）" class="headerlink" title="如何确定节点下线（redis的实现）"></a>如何确定节点下线（redis的实现）</h2><p>follower在心跳超时后，不会立即晋升为candidate，只标记成leader主管下线，在等待超过半数的节点都认为leader主观下线后，才会确认客观下线，同时根据自己log和主节点的偏移量去sleep相应的时间后再晋升为candidate去发起投票。</p>
+<h2 id="raft-和-redis-的异同"><a href="#raft-和-redis-的异同" class="headerlink" title="raft 和 redis 的异同"></a>raft 和 redis 的异同</h2><p><a href="https://zhuanlan.zhihu.com/p/112651338" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/112651338</a></p>
 ]]></content>
       
         <categories>
@@ -4451,6 +4614,67 @@ RDB: 0 MB of memory used by copy-on-write Background saving terminated with succ
         <tags>
             
             <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[spring 事务]]></title>
+      <url>/2020/11/27/spring-4/</url>
+      <content type="html"><![CDATA[<p>源码直接看 <a href="https://segmentfault.com/a/1190000018001752" target="_blank" rel="noopener">https://segmentfault.com/a/1190000018001752</a></p>
+<h2 id="Spring事务源码梳理"><a href="#Spring事务源码梳理" class="headerlink" title="Spring事务源码梳理"></a>Spring事务源码梳理</h2><ul>
+<li>通过注解@EnableTransactionManagement中的@Import(TransactionManagementConfigurationSelector.class)给容器中导入了两个组件，分别是：AutoProxyRegistrar和ProxyTransactionManagementConfiguration</li>
+<li>AutoProxyRegistrar：它是一个后置处理器，给容器中注册一个InfrastructureAdvisorAutoProxyCreator，InfrastructureAdvisorAutoProxyCreator利用后置处理器机制在对象创建以后，对对象进行包装，返回一个代理对象(增强器)，代理对象执行方法，利用拦截器链进行调用。</li>
+<li>ProxyTransactionManagementConfiguration：给容器中注册事务增强器</li>
+<li>事务增强器要用事务注解信息：AnnotationTransactionAttributeSource来解析事务注解</li>
+<li>事务拦截器中：transactionInterceptor()，它是一个TransactionInterceptor(保存了事务属性信息和事务管理器)，而TransactionInterceptor是一个MethodInterceptor，在目标方法执行的时候，执行拦截器链，事务拦截器(首先获取事务相关的属性，再获取PlatformTransactionManager，如果没有指定任何transactionManager，最终会从容器中按照类型获取一个PlatformTransactionManager，最后执行目标方法，如果异常，便获取到事务管理器进行回滚，如果正常，同样拿到事务管理器提交事务。</li>
+</ul>
+<h2 id="传播机制类型"><a href="#传播机制类型" class="headerlink" title="传播机制类型"></a>传播机制类型</h2><p>下面的类型都是针对于被调用方法来说的，理解起来要想象成两个 service 方法的调用才可以。</p>
+<ul>
+<li>PROPAGATION_REQUIRED (默认)<br>支持当前事务，如果当前没有事务，则新建事务<br>如果当前存在事务，则加入当前事务，合并成一个事务</li>
+<li>REQUIRES_NEW<br>新建事务，如果当前存在事务，则把当前事务挂起<br>这个方法会独立提交事务，不受调用者的事务影响，父级异常，它也是正常提交</li>
+<li>NESTED<br>如果当前存在事务，它将会成为父级事务的一个子事务，方法结束后并没有提交，只有等父事务结束才提交<br>如果当前没有事务，则新建事务<br>如果它异常，父级可以捕获它的异常而不进行回滚，正常提交<br>但如果父级异常，它必然回滚，这就是和 REQUIRES_NEW 的区别</li>
+<li>SUPPORTS<br>如果当前存在事务，则加入事务<br>如果当前不存在事务，则以非事务方式运行，这个和不写没区别</li>
+<li>NOT_SUPPORTED<br>以非事务方式运行<br>如果当前存在事务，则把当前事务挂起</li>
+<li>MANDATORY<br>如果当前存在事务，则运行在当前事务中<br>如果当前无事务，则抛出异常，也即父级方法必须有事务</li>
+<li>NEVER<br>以非事务方式运行，如果当前存在事务，则抛出异常，即父级方法必须无事务</li>
+</ul>
+<p>一点小说明<br>一般用得比较多的是 PROPAGATION_REQUIRED ， REQUIRES_NEW；REQUIRES_NEW 一般用在子方法需要单独事务，</p>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[spring mvc源码解析]]></title>
+      <url>/2020/11/27/spring-3/</url>
+      <content type="html"><![CDATA[<p>直接看 <a href="https://blog.csdn.net/win7system/article/details/90674757" target="_blank" rel="noopener">https://blog.csdn.net/win7system/article/details/90674757</a></p>
+<p><img src="https://i.loli.net/2020/12/13/vNwknSxDIWdLJfA.png" alt="image.png"></p>
+]]></content>
+      
+        <categories>
+            
+            <category> spring </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spring </tag>
             
         </tags>
         
