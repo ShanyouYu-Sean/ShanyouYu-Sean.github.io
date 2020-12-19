@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            服务治理 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,微服务">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/05/service-manage/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/12/05/service-manage/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="服务治理 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="微服务"> 
+
+    
+        <meta property="article:published_time" content="Sat Dec 05 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Dec 16 2020 17:52:38 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/12/05/service-manage/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/05/service-manage/index.html",
+    "headline": "服务治理",
+    "datePublished": "Sat Dec 05 2020 10:00:00 GMT+0800",
+    "dateModified": "Wed Dec 16 2020 17:52:38 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",微服务小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#服务发现"><span class="post-toc-number">1.</span> <span class="post-toc-text">服务发现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于消息总线的最终一致性的注册中心"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">基于消息总线的最终一致性的注册中心</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#健康检测"><span class="post-toc-number">2.</span> <span class="post-toc-text">健康检测</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#路由策略"><span class="post-toc-number">3.</span> <span class="post-toc-text">路由策略</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#负载均衡"><span class="post-toc-number">4.</span> <span class="post-toc-text">负载均衡</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#负载均衡算法"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">负载均衡算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#轮询法（Round-Robin）"><span class="post-toc-number">4.1.1.</span> <span class="post-toc-text">轮询法（Round Robin）</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#加权轮询法（Weight-Round-Robin）"><span class="post-toc-number">4.1.2.</span> <span class="post-toc-text">加权轮询法（Weight Round Robin）</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#随机法（Random）"><span class="post-toc-number">4.1.3.</span> <span class="post-toc-text">随机法（Random）</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#加权随机法（Weight-Random）"><span class="post-toc-number">4.1.4.</span> <span class="post-toc-text">加权随机法（Weight Random）</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#源地址哈希法（Hash）"><span class="post-toc-number">4.1.5.</span> <span class="post-toc-text">源地址哈希法（Hash）</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#自适应的负载均衡"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">自适应的负载均衡</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#异常重试"><span class="post-toc-number">5.</span> <span class="post-toc-text">异常重试</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#优雅关闭"><span class="post-toc-number">6.</span> <span class="post-toc-text">优雅关闭</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#优雅启动"><span class="post-toc-number">7.</span> <span class="post-toc-text">优雅启动</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#启动预热"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">启动预热</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#延迟暴露"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">延迟暴露</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#熔断限流"><span class="post-toc-number">8.</span> <span class="post-toc-text">熔断限流</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#限流"><span class="post-toc-number">8.1.</span> <span class="post-toc-text">限流</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#RateLimiter"><span class="post-toc-number">8.1.1.</span> <span class="post-toc-text">RateLimiter</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#熔断"><span class="post-toc-number">8.2.</span> <span class="post-toc-text">熔断</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#业务分组"><span class="post-toc-number">8.3.</span> <span class="post-toc-text">业务分组</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#问题定位"><span class="post-toc-number">9.</span> <span class="post-toc-text">问题定位</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#借助合理封装的异常信息"><span class="post-toc-number">9.1.</span> <span class="post-toc-text">借助合理封装的异常信息</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#借助分布式链路跟踪"><span class="post-toc-number">9.2.</span> <span class="post-toc-text">借助分布式链路跟踪</span></a></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                服务治理
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>12月 05, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACYklEQVR42u3aS5LDIAwFwNz/0jMXiD1PEhBPqr1K5WPTLEB54vXz1dcLDw8PDw8PDw/vYbxXfL250cWnyfeTX/XGhoeHh3eG98dSezvc+18lv01e52PDw8PDO8m7WnCTR17dZ7I9VMeGh4eH92ReVNrGE9R7Lh4eHt7/4vVChPJA8fDw8B7PS/7w5xFD1Kwa3w0PDw/vU7y8yXT+9dH+Hh4eHl7Aq155ads7RlDdWt7cGQ8PD28zrxfRVhtak2ME5fHg4eHhbeblg5jHCtVi/X6yojACDw8PbwMvX7irx60mgOrhAzw8PLyTvF5xXGhH3ZISZDJxeHh4eCd5eYhQHcp8a2kGx3h4eHhHeJOitlpA946rFopyPDw8vM28vJjOYeX4oNVgK/xjwMPDw1vKmzy4WhzPg+PRyQg8PDy8bbwkGli1uCdPKUcheHh4eB/ijVpQ8ZQlYUR+NAEPDw/vDC9v1U8ihvk3R4eu8PDw8DbweoPobQ95M6z6RDw8PLyTvLyp31vi89J5EuDi4eHhneHli3UeE/S2k+SdaLLw8PDwjvCSxlW+xOebTQ7YeOgKDw8PbylvHs5WW1xJOT7q7+Hh4eEt5SU3Xbs95GV9ISzGw8PD28yrXr2otzdxzVADDw8PbzNvsihXQ9hq66vZhMPDw8M7wqsGENUIY3JoYMHGgIeHh7eNN1mgly3rgyOteHh4eE/m9UKE5A7J+9s3Bjw8PLxtvOoGMIlr84IeDw8P7ySvF9HeDzRf4ieHD/Dw8PDO83oRwCRW6G0G0bTi4eHhbeZ934WHh4eHh4eHh/eA6xdzOVPvk+SdlAAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/微服务/">微服务</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=服务治理&url=http://seanthefish.com/2020/12/05/service-manage/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/05/service-manage/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=服务治理&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/05/service-manage/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>本文部分内容转自何小锋老师的极客时间专栏</p>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p>为什么zookeeper不适合做注册中心？ <a href="https://zhuanlan.zhihu.com/p/98591694" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/98591694</a></p>
+<p>zookeeper为了一致性而牺牲可用性，导致网络分区时注册中心不可用，这时很难被接受的。</p>
+<h3 id="基于消息总线的最终一致性的注册中心"><a href="#基于消息总线的最终一致性的注册中心" class="headerlink" title="基于消息总线的最终一致性的注册中心"></a>基于消息总线的最终一致性的注册中心</h3><p>使用最终一致性，而非强一致性。</p>
+<p>我们可以考虑采用消息总线机制。注册数据可以全量缓存在每个注册中心内存中，通过消息总线来同步数据。<br>当有一个注册中心节点，接收到服务节点注册时，会产生一个消息推送给消息总线，再通过消息总线通知给其它注册中心节点更新数据并进行服务下发，从而达到注册中心间数据最终一致性，具体流程如下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/16/AVxYzdsv5BXyEl9.png" alt="image.png"></p>
+<ul>
+<li>当有服务上线，注册中心节点收到注册请求，服务列表数据发生变化，会生成一个消息，推送给消息总线，每个消息都有整体递增的版本。</li>
+<li>消息总线会主动推送消息到各个注册中心，同时注册中心也会定时拉取消息。对于获取到消息的在消息回放模块里面回放，只接受大于本地版本号的消息，小于本地版本号的消息直接丢弃，从而实现最终一致性。</li>
+<li>消费者订阅可以从注册中心拿到指定接口的全部服务实例，并缓存到消费者的内存里面。</li>
+<li>采用推拉模式，消费者可以及时地拿到服务实例增量变化情况，并和内存中的缓存数据进行合并。</li>
+</ul>
+<p>为了性能，这里采用了两级缓存，注册中心和消费者的内存缓存，通过异步推拉模式来确保最终一致性。</p>
+<h2 id="健康检测"><a href="#健康检测" class="headerlink" title="健康检测"></a>健康检测</h2><p>向注册中心发送心跳包，使用可用率作为健康检测的标准。</p>
+<p>可用率的计算方式是某一个时间窗口内接口调用成功次数的百分比（成功次数 / 总调用次数）。</p>
+<h2 id="路由策略"><a href="#路由策略" class="headerlink" title="路由策略"></a>路由策略</h2><p>节点上线灰度发布，比如我们可以先发布少量实例观察是否有异常，后续再根据观察的情况，选择发布更多实例还是回滚已经上线的实例。</p>
+<p>注册中心只会把刚上线的服务 IP 地址推送到选择指定的调用方，而其他调用方是不能通过服务发现拿到这个 IP 地址的。</p>
+<p>或者通过负载均衡策略，注册中心把负载均衡规则下发到服务调用方。</p>
+<p>在流量切换的过程中，为了保证整个流程的完整性，我们必须保证某个主题对象的所有请求都使用同一种应用（老应用/新应用）来承接。给所有的服务提供方节点都打上标签，用来区分新老应用节点。在服务调用方发生请求的时候，我们可以很容易地拿到请求参数。通过参数来决定调用老应用or新应用。</p>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>为什么不采用添加负载均衡设备或者 TCP/IP 四层代理，域名绑定负载均衡设备的 IP 或者四层代理 IP 的方式？</p>
+<ul>
+<li>搭建负载均衡设备或 TCP/IP 四层代理，需要额外成本；</li>
+<li>请求流量都经过负载均衡设备，多经过一次网络传输，会额外浪费一些性能；</li>
+<li>负载均衡添加节点和摘除节点，一般都要手动添加，当大批量扩容和下线时，会有大量的人工操作，“服务发现”在操作上是个问题；</li>
+<li>我们在服务治理的时候，针对不同接口服务、服务的不同分组，我们的负载均衡策略是需要可配的，如果大家都经过这一个负载均衡设备，就不容易根据不同的场景来配置不同的负载均衡策略了。</li>
+</ul>
+<p>RPC 的负载均衡完全由 RPC 框架自身实现，RPC 的服务调用者会与“注册中心”下发的所有服务节点建立长连接，在每次发起 RPC 调用时，服务调用者都会通过配置的负载均衡插件，自主选择一个服务节点，发起 RPC 调用请求。</p>
+<p><img src="https://i.loli.net/2020/12/16/XTvVe2nkl15jtuC.png" alt="image.png"></p>
+<h3 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h3><p>转自 <a href="https://zhibo.blog.csdn.net/article/details/90265243" target="_blank" rel="noopener">https://zhibo.blog.csdn.net/article/details/90265243</a></p>
+<h4 id="轮询法（Round-Robin）"><a href="#轮询法（Round-Robin）" class="headerlink" title="轮询法（Round Robin）"></a>轮询法（Round Robin）</h4><p>算法描述</p>
+<p>假设有 N 台服务器 S = {S0, S1, S2, …, Sn}，算法可以描述为：<br>1、从 S0 开始依次调度 S1, S2, …, Sn；<br>2、若所有服务器都已被调度过，则从头开始调度；</p>
+<p>轮训算法与服务器权重没有关系，每个服务器有序的会被轮训到。</p>
+<p>代码实现</p>
+<pre><code class="java">public class ServerManager {
+    public static Map&lt;String, Integer&gt; serverMap = new TreeMap&lt;&gt;();
+
+    static {
+        serverMap.put(&quot;192.168.1.1&quot;, 1);
+        serverMap.put(&quot;192.168.1.2&quot;, 2);
+        serverMap.put(&quot;192.168.1.3&quot;, 3);
+        serverMap.put(&quot;192.168.1.4&quot;, 4);
+    }
+}
+
+
+public class RoundRobin {
+    private static AtomicInteger indexAtomic = new AtomicInteger(0);
+
+    public static String getServer() {
+        Set&lt;String&gt; serverSet = ServerManager.serverMap.keySet();
+        ArrayList&lt;String&gt; serverList = new ArrayList&lt;&gt;(serverSet);
+
+        if (indexAtomic.get() &gt;= serverList.size()) {
+            indexAtomic.set(0);
+        }
+        String server = serverList.get(indexAtomic.getAndIncrement());
+        return server;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 10; i++) {
+            String server = getServer();
+            System.out.println(server);
+        }
+    }
+}
+</code></pre>
+<h4 id="加权轮询法（Weight-Round-Robin）"><a href="#加权轮询法（Weight-Round-Robin）" class="headerlink" title="加权轮询法（Weight Round Robin）"></a>加权轮询法（Weight Round Robin）</h4><p>算法描述</p>
+<p>假设有 N 台服务器 S = {S0, S1, S2, …, Sn}，默认权重为 W = {W0, W1, W2, …, Wn}，服务器列表为 serverList，算法可以描述为：</p>
+<p>1、初始化 serverList，将 W0 个 S0 加入至serverList，将 W1 个 S1 加入至serverList，依据此规则将所有的服务器加入至 serverList 中；<br>2、从 serverList 的从 S0 开始依序调度；<br>3、若所有服务器都已被调度过，则从头开始调度；</p>
+<p>加权轮训算法通过在服务器列表中增加相应的权重个数的服务器来达到加权的效果，每个服务器会依序被轮训到。</p>
+<p>代码实现</p>
+<pre><code class="java">public class ServerManager {
+    public volatile static Map&lt;String, Integer&gt; serverMap = new TreeMap&lt;&gt;();
+
+    static {
+        serverMap.put(&quot;192.168.1.1&quot;, 1);
+        serverMap.put(&quot;192.168.1.2&quot;, 2);
+        serverMap.put(&quot;192.168.1.3&quot;, 3);
+        serverMap.put(&quot;192.168.1.4&quot;, 4);
+    }
+}
+
+public class WeightRoundRobin {
+    private static AtomicInteger indexAtomic = new AtomicInteger(0);
+
+    public static String getServer() {
+        ArrayList&lt;String&gt; serverList = new ArrayList&lt;&gt;();
+        Set&lt;String&gt; serverSet = ServerManager.serverMap.keySet();
+        Iterator&lt;String&gt; iterator = serverSet.iterator();
+        while(iterator.hasNext()){
+            String server = iterator.next();
+            Integer weight = ServerManager.serverMap.get(server);
+            for (int i = 0; i &lt; weight; i++) {
+                serverList.add(server);
+            }
+        }
+
+        if (indexAtomic.get() &gt;= serverList.size()) {
+            indexAtomic.set(0);
+        }
+        String server = serverList.get(indexAtomic.getAndIncrement());
+        return server;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 20; i++) {
+            String server = getServer();
+            System.out.println(server);
+        }
+    }
+}
+</code></pre>
+<h4 id="随机法（Random）"><a href="#随机法（Random）" class="headerlink" title="随机法（Random）"></a>随机法（Random）</h4><p>算法描述</p>
+<p>假设有 N 台服务器 S = {S0, S1, S2, …, Sn}，算法可以描述为：<br>1、通过随机函数生成 0 到 N 之间的任意整理，将该数字作为索引，从 S 中获取对应的服务器；</p>
+<p>随机算法与服务器权重没有关系，每个服务器会被随机的访问到，由概率论可以得知，当样本量足够大时，每台服务器被访问到的几率近似是相等的，随机算法的效果就越趋近于轮询算法。</p>
+<pre><code class="java">public class ServerManager {
+    public volatile static Map&lt;String, Integer&gt; serverMap = new TreeMap&lt;&gt;();
+
+    static {
+        serverMap.put(&quot;192.168.1.1&quot;, 1);
+        serverMap.put(&quot;192.168.1.2&quot;, 2);
+        serverMap.put(&quot;192.168.1.3&quot;, 3);
+        serverMap.put(&quot;192.168.1.4&quot;, 4);
+    }
+}
+
+public class RandomBalance {
+
+    public static String getServer() {
+        Set&lt;String&gt; serverSet = ServerManager.serverMap.keySet();
+        ArrayList&lt;String&gt; serverList = new ArrayList&lt;&gt;(serverSet);
+
+        Random random = new Random();
+        String server = serverList.get(random.nextInt(serverList.size()));
+        return server;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 10; i++) {
+            String server = getServer();
+            System.out.println(server);
+        }
+    }
+}
+</code></pre>
+<h4 id="加权随机法（Weight-Random）"><a href="#加权随机法（Weight-Random）" class="headerlink" title="加权随机法（Weight Random）"></a>加权随机法（Weight Random）</h4><p>算法描述</p>
+<p>假设有 N 台服务器 S = {S0, S1, S2, …, Sn}，默认权重为 W = {W0, W1, W2, …, Wn}，权重之和为 weightSum， 服务器列表为 serverList，算法可以描述为：<br>1、初始化 serverList，将 W0 个 S0 加入至serverList，将 W1 个 S1 加入至serverList，依据此规则将所有的服务器加入至 serverList 中；<br>2、通过随机函数生成 0 到 weightSum 之间的任意整理，将该数字作为索引，从 serverList 中获取对应的服务器；</p>
+<p>与加权轮询算法类似，根据权重的不同向 serverList 添加相应的服务器，只不过服务器是通过随机算法获取的。</p>
+<pre><code class="java">public class ServerManager {
+    public volatile static Map&lt;String, Integer&gt; serverMap = new TreeMap&lt;&gt;();
+
+    static {
+        serverMap.put(&quot;192.168.1.1&quot;, 1);
+        serverMap.put(&quot;192.168.1.2&quot;, 2);
+        serverMap.put(&quot;192.168.1.3&quot;, 3);
+        serverMap.put(&quot;192.168.1.4&quot;, 4);
+    }
+}
+
+public class WeightRandom {
+
+    public static String getServer() {
+        ArrayList&lt;String&gt; serverList = new ArrayList&lt;&gt;();
+        Set&lt;String&gt; serverSet = ServerManager.serverMap.keySet();
+        Iterator&lt;String&gt; iterator = serverSet.iterator();
+
+        Integer weightSum = 0;
+        while(iterator.hasNext()){
+            String server = iterator.next();
+            Integer weight = ServerManager.serverMap.get(server);
+            weightSum += weight;
+            for (int i = 0; i &lt; weight; i++) {
+                serverList.add(server);
+            }
+        }
+
+        Random random = new Random();
+        String server = serverList.get(random.nextInt(weightSum));
+        return server;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 20; i++) {
+            String server = getServer();
+            System.out.println(server);
+        }
+    }
+}
+</code></pre>
+<h4 id="源地址哈希法（Hash）"><a href="#源地址哈希法（Hash）" class="headerlink" title="源地址哈希法（Hash）"></a>源地址哈希法（Hash）</h4><p>算法描述</p>
+<p>假设有 N 台服务器 S = {S0, S1, S2, …, Sn-1}，算法可以描述为：<br>1、通过指定的哈希函数，计算请求来源的地址的哈希值<br>2、对哈希值进行求余，底数为 N<br>3、将余数作为索引值，从 S 中获取对应的服务器；</p>
+<pre><code class="java">public class ServerManager {
+    public volatile static Map&lt;String, Integer&gt; serverMap = new TreeMap&lt;&gt;();
+
+    static {
+        serverMap.put(&quot;192.168.1.1&quot;, 1);
+        serverMap.put(&quot;192.168.1.2&quot;, 2);
+        serverMap.put(&quot;192.168.1.3&quot;, 3);
+        serverMap.put(&quot;192.168.1.4&quot;, 4);
+    }
+}
+
+public class HashBalance {
+
+    public static String getServer(String sourceIp) {
+        if(sourceIp == null){
+            return &quot;&quot;;
+        }
+        Set&lt;String&gt; serverSet = ServerManager.serverMap.keySet();
+        ArrayList&lt;String&gt; serverList = new ArrayList&lt;&gt;(serverSet);
+
+        Integer index = sourceIp.hashCode() % serverList.size();
+        return serverList.get(index);
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 10; i++) {
+            String server = getServer(&quot;ip&quot; + new Random().nextInt(1000));
+            System.out.println(server);
+        }
+    }
+}
+</code></pre>
+<h3 id="自适应的负载均衡"><a href="#自适应的负载均衡" class="headerlink" title="自适应的负载均衡"></a>自适应的负载均衡</h3><p>采用一种打分的策略，服务调用者收集与之建立长连接的每个服务节点的指标数据，如服务节点的负载指标、CPU 核数、内存大小、请求处理的耗时指标（如请求平均耗时、TP99、TP999）、服务节点的状态指标（如正常、亚健康）。通过这些指标，计算出一个分数，比如总分 10 分，如果 CPU 负载达到 70%，就减它 3 分，当然了，减 3 分只是个类比，需要减多少分是需要一个计算策略的。我们可以配合随机权重的负载均衡策略去控制，通过最终的指标分数修改服务节点最终的权重。</p>
+<p><img src="https://i.loli.net/2020/12/16/8MAc4Oj2q59WzUR.png" alt="image.png"></p>
+<h2 id="异常重试"><a href="#异常重试" class="headerlink" title="异常重试"></a>异常重试</h2><p>要确保被调用的服务的业务逻辑是幂等的，才能考虑根据事件情况开启 RPC 框架的异常重试功能。</p>
+<p>连续的异常重试可能会出现一种不可靠的情况，那就是连续的异常重试并且每次处理的请求时间比较长，最终会导致请求处理的时间过长，超出用户设置的超时时间。</p>
+<p>因此，如果发送请求发生异常并触发了异常重试，我们可以先判定下这个请求是否已经超时，如果已经超时了就直接返回超时异常，否则就先重置下这个请求的超时时间，之后再发起重试。</p>
+<p>我们还需要在所有发起重试、负载均衡选择节点的时候，去掉重试之前出现过问题的那个节点，以保证重试的成功率。</p>
+<p>我们还需要加个重试异常的白名单，用户可以将允许重试的异常加入到这个白名单中。</p>
+<p><img src="https://i.loli.net/2020/12/16/8MAc4Oj2q59WzUR.png" alt="image.png"></p>
+<h2 id="优雅关闭"><a href="#优雅关闭" class="headerlink" title="优雅关闭"></a>优雅关闭</h2><p>先要简述下上线的大概流程：当服务提供方要上线的时候，一般是通过部署系统完成实例重启。在这个过程中，服务提供方的团队并不会事先告诉调用方他们需要操作哪些机器，从而让调用方去事先切走流量。而对调用方来说，它也无法预测到服务提供方要对哪些机器重启上线，因此负载均衡就有可能把要正在重启的机器选出来，这样就会导致把请求发送到正在重启中的机器里面，从而导致调用方不能拿到正确的响应结果。</p>
+<p>在服务重启的时候，对于调用方来说，这时候可能会存在以下几种情况：</p>
+<ul>
+<li>调用方发请求前，目标服务已经下线。对于调用方来说，跟目标节点的连接会断开，这时候调用方可以立马感知到，并且在其健康列表里面会把这个节点挪掉，自然也就不会被负载均衡选中。</li>
+<li>调用方发请求的时候，目标服务正在关闭，但调用方并不知道它正在关闭，而且两者之间的连接也没断开，所以这个节点还会存在健康列表里面，因此该节点就有一定概率会被负载均衡选中。</li>
+</ul>
+<p>我们可以这么处理：</p>
+<p>当服务提供方正在关闭，如果这之后还收到了新的业务请求，服务提供方直接返回一个特定的异常给调用方（比如 ShutdownException）。这个异常就是告诉调用方“我已经收到这个请求了，但是我正在关闭，并没有处理这个请求”，然后调用方收到这个异常响应后，RPC 框架把这个节点从健康列表挪出，并把请求自动重试到其他节点，因为这个请求是没有被服务提供方处理过，所以可以安全地重试到其他节点，这样就可以实现对业务无损。</p>
+<p>但如果只是靠等待被动调用，就会让这个关闭过程整体有点漫长。因为有的调用方那个时刻没有业务请求，就不能及时地通知调用方了，所以我们可以加上主动通知流程（通过注册中心），这样既可以保证实时性，也可以避免通知失败的情况。</p>
+<p>在 Java 语言里面，对应的是 Runtime.addShutdownHook 方法，可以注册关闭的钩子。</p>
+<p><img src="https://i.loli.net/2020/12/16/Yoj2y1NzsqpD4mS.png" alt="image.png"></p>
+<p>感觉有点像四次挥手。</p>
+<h2 id="优雅启动"><a href="#优雅启动" class="headerlink" title="优雅启动"></a>优雅启动</h2><p>在 Java 里面，在运行过程中，JVM 虚拟机会把高频的代码编译成机器码，被加载过的类也会被缓存到 JVM 缓存中，再次使用的时候不会触发临时加载，这样就使得“热点”代码的执行不用每次都通过解释，从而提升执行速度。但是这些“临时数据”，都在我们应用重启后就消失了。</p>
+<h3 id="启动预热"><a href="#启动预热" class="headerlink" title="启动预热"></a>启动预热</h3><p>就是让刚启动的服务提供方应用不承担全部的流量，而是让它被调用的次数随着时间的移动慢慢增加，最终让流量缓和地增加到跟已经运行一段时间后的水平一样。</p>
+<p>首先对于调用方来说，我们要知道服务提供方启动的时间，我们需要把这个时间作用在负载均衡上，我们要让负载均衡权重变成动态的，并且是随着时间的推移慢慢增加到服务提供方设定的固定值。</p>
+<p><img src="https://i.loli.net/2020/12/16/8Ps1QgVb6CR4eXh.png" alt="image.png"></p>
+<h3 id="延迟暴露"><a href="#延迟暴露" class="headerlink" title="延迟暴露"></a>延迟暴露</h3><p>利用服务提供方把接口注册到注册中心的那段时间。我们可以在服务提供方应用启动后，接口注册到注册中心前，预留一个 Hook 过程，让用户可以实现可扩展的 Hook 逻辑。用户可以在 Hook 里面模拟调用逻辑，从而使 JVM 指令能够预热起来，并且用户也可以在 Hook 里面事先预加载一些资源，只有等所有的资源都加载完成后，最后才把接口注册到注册中心。</p>
+<p><img src="https://i.loli.net/2020/12/16/liEI8KgzwYZjvnf.png" alt="image.png"></p>
+<p>如果是大批量重启，可以通过：</p>
+<p>1、分时分批启动，就和灰度发布一样；<br>2、在请求低峰，在热点的应用肯定是有使用低峰的；<br>3、如果必须同时大批量重启，为了保证服务的可用性，可以在低峰时期，限流，为PLUS服务，非PLUS的就提醒暂时不可用之类的友好提示。</p>
+<h2 id="熔断限流"><a href="#熔断限流" class="headerlink" title="熔断限流"></a>熔断限流</h2><h3 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h3><p>限流就是服务端的自我保护</p>
+<p>这里只说一下ratelimiter</p>
+<h4 id="RateLimiter"><a href="#RateLimiter" class="headerlink" title="RateLimiter"></a>RateLimiter</h4><p>令牌桶算法</p>
+<p>令牌桶算法的原理是系统会以一个恒定的速度往桶里放入令牌，而如果请求需要被处理，则需要先从桶里获取一个令牌，当桶里没有令牌可取时，则拒绝服务。</p>
+<p><img src="https://i.loli.net/2020/12/16/cvNp42eEkMSGXY1.png" alt="image.png"></p>
+<p>实现原理</p>
+<p>RateLimiter有两种限流模式，一种为稳定模式(SmoothBursty:令牌生成速度恒定)，一种为渐进模式(SmoothWarmingUp:令牌生成速度缓慢提升直到维持在一个稳定值)。</p>
+<p>集体实现参照 <a href="https://mp.weixin.qq.com/s/zGSvz6LyoenQw1TeWFLpuQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/zGSvz6LyoenQw1TeWFLpuQ</a></p>
+<h3 id="熔断"><a href="#熔断" class="headerlink" title="熔断"></a>熔断</h3><p>熔断就是调用端的自我保护</p>
+<p>熔断器的工作机制主要是关闭、打开和半打开这三个状态之间的切换。在正常情况下，熔断器是关闭的；当调用端调用下游服务出现异常时，熔断器会收集异常指标信息进行计算，当达到熔断条件时熔断器打开，这时调用端再发起请求是会直接被熔断器拦截，并快速地执行失败逻辑；当熔断器打开一段时间后，会转为半打开状态，这时熔断器允许调用端发送一个请求给服务端，如果这次请求能够正常地得到服务端的响应，则将状态置为关闭状态，否则设置为打开。</p>
+<h3 id="业务分组"><a href="#业务分组" class="headerlink" title="业务分组"></a>业务分组</h3><p>我们可以尝试把应用提供方这个大池子划分出不同规格的小池子，再分配给不同的调用方，而不同小池子之间的隔离带，就是我们在 RPC 里面所说的分组，它可以实现流量隔离。</p>
+<p>为了实现分组隔离逻辑，我们需要重新改造下服务发现的逻辑，调用方去获取服务节点的时候除了要带着接口名，还需要另外加一个分组参数，相应的服务提供方在注册的时候也要带上分组参数。</p>
+<h2 id="问题定位"><a href="#问题定位" class="headerlink" title="问题定位"></a>问题定位</h2><h3 id="借助合理封装的异常信息"><a href="#借助合理封装的异常信息" class="headerlink" title="借助合理封装的异常信息"></a>借助合理封装的异常信息</h3><p><img src="https://i.loli.net/2020/12/16/vEJ98wihZqNWtzR.png" alt="image.png"></p>
+<h3 id="借助分布式链路跟踪"><a href="#借助分布式链路跟踪" class="headerlink" title="借助分布式链路跟踪"></a>借助分布式链路跟踪</h3><p>在整合分布式链路跟踪需要做的最核心的两件事就是“埋点”和“传递”。</p>
+<p>所谓“埋点”就是说，分布式链路跟踪系统要想获得一次分布式调用的完整的链路信息，就必须对这次分布式调用进行数据采集，而采集这些数据的方法就是通过 RPC 框架对分布式链路跟踪进行埋点。</p>
+<p>RPC 调用端在访问服务端时，在发送请求消息前会触发分布式跟踪埋点，在接收到服务端响应时，也会触发分布式跟踪埋点，并且在服务端也会有类似的埋点。这些埋点最终可以记录一个完整的 Span，而这个链路的源头会记录一个完整的 Trace，最终 Trace 信息会被上报给分布式链路跟踪系统。</p>
+<p>那所谓“传递”就是指，上游调用端将 Trace 信息与父 Span 信息传递给下游服务的服务端，由下游触发埋点，对这些信息进行处理，在分布式链路跟踪系统中，每个子 Span 都存有父 Span 的相关信息以及 Trace 的相关信息。</p>
+<p><img src="https://i.loli.net/2020/12/16/6CUyRvwzVbpJlNt.png" alt="image.png"></p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/12/05/service-manage/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/05/service-manage/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/12/16/k8s-1/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/12/04/distributed-id/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">46</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">31</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">23</span></a></li><li><a class="sidebar_archives-link" href="/categories/微服务/">微服务<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

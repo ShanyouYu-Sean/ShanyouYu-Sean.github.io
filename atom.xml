@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-11T15:57:17.996Z</updated>
+  <updated>2020-12-19T14:10:27.942Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,86 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s网络</title>
+    <link href="http://seanthefish.com/2020/12/16/k8s-2/"/>
+    <id>http://seanthefish.com/2020/12/16/k8s-2/</id>
+    <published>2020-12-16T03:00:00.000Z</published>
+    <updated>2020-12-19T14:10:27.942Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;k8s网络模型&quot;&gt;&lt;a href=&quot;#k8s网络模型&quot; class=&quot;headerlink&quot; title=&quot;k8s网络模型&quot;&gt;&lt;/a&gt;k8s网络模型&lt;/h2&gt;&lt;p&gt;Kubernetes网络模型设计的一个基础原则是: 每个Pod都拥有一个独
+        
+      
+    
+    </summary>
+    
+      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
+    
+    
+      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>k8s拾遗</title>
+    <link href="http://seanthefish.com/2020/12/16/k8s-1/"/>
+    <id>http://seanthefish.com/2020/12/16/k8s-1/</id>
+    <published>2020-12-16T02:00:00.000Z</published>
+    <updated>2020-12-19T14:36:52.862Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;接触k8s这么久，相对来说对于k8s的各种实用算是比较熟悉了，这里重读了一次《k8s权威指南》，查漏补缺，记录一下。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2020/12/18/BwVUHKoGv13j4gk.png&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
+    
+    
+      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>服务治理</title>
+    <link href="http://seanthefish.com/2020/12/05/service-manage/"/>
+    <id>http://seanthefish.com/2020/12/05/service-manage/</id>
+    <published>2020-12-05T02:00:00.000Z</published>
+    <updated>2020-12-16T09:52:38.706Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;本文部分内容转自何小锋老师的极客时间专栏&lt;/p&gt;
+&lt;h2 id=&quot;服务发现&quot;&gt;&lt;a href=&quot;#服务发现&quot; class=&quot;headerlink&quot; title=&quot;服务发现&quot;&gt;&lt;/a&gt;服务发现&lt;/h2&gt;&lt;p&gt;为什么zookeeper不适合做注册中心？ &lt;a
+        
+      
+    
+    </summary>
+    
+      <category term="微服务" scheme="http://seanthefish.com/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    
+      <category term="微服务" scheme="http://seanthefish.com/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>分布式id算法</title>
@@ -339,7 +419,7 @@
     <link href="http://seanthefish.com/2020/12/01/network-1/"/>
     <id>http://seanthefish.com/2020/12/01/network-1/</id>
     <published>2020-12-01T02:00:00.000Z</published>
-    <updated>2020-12-13T14:17:24.043Z</updated>
+    <updated>2020-12-19T11:13:41.772Z</updated>
     
     <summary type="html">
     
@@ -455,86 +535,6 @@
         
           &lt;hr&gt;
 &lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之缓存</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-6/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-6/</id>
-    <published>2020-11-28T12:00:00.000Z</published>
-    <updated>2020-12-04T11:56:24.852Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;缓存的收益和成本&quot;&gt;&lt;a href=&quot;#缓存的收益和成本&quot; class=&quot;headerlink&quot; title=&quot;缓存的收益和成本&quot;&gt;&lt;/a&gt;缓存的收益和成本&lt;/h2&gt;&lt;p&gt;收益:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;加速读写:
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之集群</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-5/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-5/</id>
-    <published>2020-11-28T11:00:00.000Z</published>
-    <updated>2020-12-11T08:22:54.560Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;集群&quot;&gt;&lt;a href=&quot;#集群&quot; class=&quot;headerlink&quot; title=&quot;集群&quot;&gt;&lt;/a&gt;集群&lt;/h2&gt;&lt;p&gt;Redis
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之哨兵</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-4/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-4/</id>
-    <published>2020-11-28T10:00:00.000Z</published>
-    <updated>2020-11-30T09:06:51.967Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;哨兵&quot;&gt;&lt;a href=&quot;#哨兵&quot; class=&quot;headerlink&quot; title=&quot;哨兵&quot;&gt;&lt;/a&gt;哨兵&lt;/h2&gt;&lt;p&gt;Redis的主从复制模式下，一旦主节点由于故障不能提供服务，需要人 工将从节点晋升为主节点，同时还要通知应用方更新主节点地址，对于很多
         
       
     

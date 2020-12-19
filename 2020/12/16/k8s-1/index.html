@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            k8s拾遗 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,k8s">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/16/k8s-1/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/12/16/k8s-1/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="k8s拾遗 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="k8s"> 
+
+    
+        <meta property="article:published_time" content="Wed Dec 16 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Sat Dec 19 2020 22:36:52 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/12/16/k8s-1/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/16/k8s-1/index.html",
+    "headline": "k8s拾遗",
+    "datePublished": "Wed Dec 16 2020 10:00:00 GMT+0800",
+    "dateModified": "Sat Dec 19 2020 22:36:52 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",k8s小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Kubernetes的服务发现机制"><span class="post-toc-number">1.</span> <span class="post-toc-text">Kubernetes的服务发现机制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Kubernetes里的3种IP"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Kubernetes里的3种IP</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#volume-与-pv"><span class="post-toc-number">2.</span> <span class="post-toc-text">volume 与 pv</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#configmap"><span class="post-toc-number">3.</span> <span class="post-toc-text">configmap</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#pod"><span class="post-toc-number">4.</span> <span class="post-toc-text">pod</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Pod的状态"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">Pod的状态</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#healthy-check"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">healthy check</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#为什么pod会被驱逐？"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">为什么pod会被驱逐？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#什么时候pod被oomkilled？"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">什么时候pod被oomkilled？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#升级和回滚–rolling-update"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">升级和回滚–rolling update</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#hpa"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">hpa</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Kubernetes-API-Server"><span class="post-toc-number">5.</span> <span class="post-toc-text">Kubernetes API Server</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#架构"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">架构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#List-Watch机制"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">List-Watch机制</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#crd"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">crd</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#创建CRD的定义"><span class="post-toc-number">5.3.1.</span> <span class="post-toc-text">创建CRD的定义</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#基于CRD的定义创建自定义资源对象"><span class="post-toc-number">5.3.2.</span> <span class="post-toc-text">基于CRD的定义创建自定义资源对象</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#CRD的高级特性"><span class="post-toc-number">5.3.3.</span> <span class="post-toc-text">CRD的高级特性</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Kubernetes-Proxy-API"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">Kubernetes Proxy API</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#集群功能模块之间的通信"><span class="post-toc-number">5.5.</span> <span class="post-toc-text">集群功能模块之间的通信</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Controller-Manager"><span class="post-toc-number">6.</span> <span class="post-toc-text">Controller Manager</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Replication-Controller"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">Replication Controller</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Node-Controller"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">Node Controller</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ResourceQuota-Controller"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">ResourceQuota Controller</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Namespace-Controller"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">Namespace Controller</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Service-Controller与Endpoints-Controller"><span class="post-toc-number">6.5.</span> <span class="post-toc-text">Service Controller与Endpoints Controller</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Scheduler"><span class="post-toc-number">6.6.</span> <span class="post-toc-text">Scheduler</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#kubelet"><span class="post-toc-number">7.</span> <span class="post-toc-text">kubelet</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#节点管理"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">节点管理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Pod管理"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">Pod管理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#cAdvisor"><span class="post-toc-number">7.3.</span> <span class="post-toc-text">cAdvisor</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#kube-proxy"><span class="post-toc-number">8.</span> <span class="post-toc-text">kube-proxy</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                k8s拾遗
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>12月 16, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACZklEQVR42u3aUW6DQAwFwNz/0u0B2tJne3FpNHxFCpAdIq2Xt359vPXxwsPDw8PDw8PDexjvFR9fr/rm1pfnV+/ZHBseHh7eCu+XqfZyKJMHlNy5PDY8PDy8Rd5PA8o/J9/m5aE6Njw8PLzn8/KlcLUk4OHh4b0fL1n4Xl9VfXB4eHh4z+QlL/zVBXcS+CYPaClrwcPDw4t5eQi7/3l1fw8PDw8v4JVbmoIfqE7ryZnNpis8PDy8G3i9bap8qd27T288eHh4eJu8+dZXtQzkoe11IWm+MeDh4eGNedWtrGTpPA8yeo8SDw8Pb5OXBwS9ltMe5nDrAB4eHt6Yl0cM13FDHgH3Jv1CsxceHh7eA3h5UJsHuNEUX2ycxcPDw9vn5RtR1cJwKg4eFQY8PDy8Q7xyM+igpTUJMqpFCA8PD2+fV711LwLOY9986TyKcfHw8PDGvHzTq1okCiFCHEb88lt4eHh4N/MmjQJJyHtHi0DzjQEPDw/vEK8XMfTC2WqEUS0JeHh4eDu8vK0qCSnmS+dJgIuHh4e3ycsDiLNxbX63QkSCh4eHt8hLIoO8GFTj3Sq1sKTGw8PDW+FNtrIm8UQv5sDDw8P7W968FaBXHvKjGUbg4eHhHeJVj0lwUF2g538DHh4e3iZvMh3nC9/J1lcemuDh4eFt8npTeb7F1SsSxwoDHh4e3m28+QSdfNuLd5OWLzw8PLwn8/L4IG/MKjPw8PDw/hWvGhDk51fbF0b7e3h4eHhjXjKsSTyRX1VtZcDDw8Pb51UjgLxdYNJ0lZcrPDw8vE3e+x14eHh4eHh4eHgPOD4BEJKlgW0/tf8AAAAASUVORK5CYII=">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/k8s/">k8s</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=k8s拾遗&url=http://seanthefish.com/2020/12/16/k8s-1/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/16/k8s-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=k8s拾遗&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/16/k8s-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>接触k8s这么久，相对来说对于k8s的各种实用算是比较熟悉了，这里重读了一次《k8s权威指南》，查漏补缺，记录一下。</p>
+<p><img src="https://i.loli.net/2020/12/18/BwVUHKoGv13j4gk.png" alt="image.png"></p>
+<h2 id="Kubernetes的服务发现机制"><a href="#Kubernetes的服务发现机制" class="headerlink" title="Kubernetes的服务发现机制"></a>Kubernetes的服务发现机制</h2><p>首先，每个Kubernetes中的Service都有唯一的Cluster IP及唯一的名称，而名称是由开发者自己定义的，部署时也没必要改变，所以完全可 以被固定在配置中。接下来的问题就是如何通过Service的名称找到对应的Cluster IP。</p>
+<h3 id="Kubernetes里的3种IP"><a href="#Kubernetes里的3种IP" class="headerlink" title="Kubernetes里的3种IP"></a>Kubernetes里的3种IP</h3><ul>
+<li>Node IP: Node的IP地址。<br>Node IP是Kubernetes集群中每个节点的物理网卡的IP地址， 是一个真实存在的物理网络，所有属于这个网络的服务器都能通过这个 网络直接通信，不管其中是否有部分节点不属于这个Kubernetes集群。 这也表明在Kubernetes集群之外的节点访问Kubernetes集群之内的某个节 点或者TCP/IP服务时，都必须通过Node IP通信。</li>
+<li>Pod IP: Pod的IP地址。<br>Pod IP是每个Pod的IP地址，它是Docker Engine根据docker0 网桥的IP地址段进行分配的，通常是一个虚拟的二层网络，前面说过， Kubernetes要求位于不同Node上的Pod都能够彼此直接通信，所以 Kubernetes里一个Pod里的容器访问另外一个Pod里的容器时，就是通过 Pod IP所在的虚拟二层网络进行通信的，而真实的TCP/IP流量是通过 Node IP所在的物理网卡流出的。（StatefulSet的pod ip可以保持重启不改变）</li>
+<li>Cluster IP: Service的IP地址。<br>Cluster IP，它也是一种虚拟的IP，但更像一 个“伪造”的IP网络，原因有以下几点。<ul>
+<li>Cluster IP仅仅作用于Kubernetes Service这个对象，并由 Kubernetes管理和分配IP地址(来源于Cluster IP地址池)。</li>
+<li>Cluster IP无法被Ping，因为没有一个“实体网络对象”来响应。</li>
+<li>Cluster IP只能结合Service Port组成一个具体的通信端口，单独 的Cluster IP不具备TCP/IP通信的基础，并且它们属于Kubernetes集群这 样一个封闭的空间，集群外的节点如果要访问这个通信端口，则需要做 一些额外的工作。</li>
+<li>在Kubernetes集群内，Node IP网、Pod IP网与Cluster IP网之间 的通信，采用的是Kubernetes自己设计的一种编程方式的特殊路由规 则，与我们熟知的IP路由有很大的不同。</li>
+</ul>
+</li>
+</ul>
+<h2 id="volume-与-pv"><a href="#volume-与-pv" class="headerlink" title="volume 与 pv"></a>volume 与 pv</h2><p>Volume是被定义在Pod上的</p>
+<p>PV可以被理解成Kubernetes集群中的某个网络存储对应的一块存储，它与Volume类似，但有以下区别。</p>
+<ul>
+<li>PV只能是网络存储，不属于任何Node，但可以在每个Node上 访问。</li>
+<li>PV并不是被定义在Pod上的，而是独立于Pod之外定义的。</li>
+</ul>
+<p>如果某个Pod想申请某种类型的PV，则首先需要定义一个 PersistentVolumeClaim对象:</p>
+<p>然后，在Pod的Volume定义中引用上述PVC即可</p>
+<h2 id="configmap"><a href="#configmap" class="headerlink" title="configmap"></a>configmap</h2><p>我们不可能在启动Docker容器后再修改容器里的配置文件，然后用新的配置文件重启容器里的用户主进程。为了解决这个问题，Docker提供了两种方式:</p>
+<ul>
+<li>在运行时通过容器的环境变量来传递参数;</li>
+<li>通过Docker Volume将容器外的配置文件映射到容器内。</li>
+</ul>
+<p>首先，把所有的配置项都当作key-value字符串，当然value可以来自 某个文本文件，比如配置项password=123456、user=root、 host=192.168.8.4用于表示连接FTP服务器的配置参数。这些配置项可以 作为Map表中的一个项，整个Map的数据可以被持久化存储在 Kubernetes的Etcd数据库中，然后提供API以方便Kubernetes相关组件或 客户应用CRUD操作这些数据，上述专门用来保存配置参数的Map就是 Kubernetes ConfigMap资源对象。</p>
+<p>接下来，Kubernetes提供了一种内建机制，将存储在etcd中的 ConfigMap通过Volume映射的方式变成目标Pod内的配置文件，不管目标Pod被调度到哪台服务器上，都会完成自动映射。进一步地，如果 ConfigMap中的key-value数据被修改，则映射到Pod中的“配置文件”也会随之自动更新。于是，Kubernetes ConfigMap就成了分布式系统中最为简单(使用方法简单，但背后实现比较复杂)且对应用无侵入的配置中心。</p>
+<h2 id="pod"><a href="#pod" class="headerlink" title="pod"></a>pod</h2><h3 id="Pod的状态"><a href="#Pod的状态" class="headerlink" title="Pod的状态"></a>Pod的状态</h3><p><img src="https://i.loli.net/2020/12/18/nxMUPAYkDBCQmJ4.png" alt="image.png"></p>
+<p>重启策略包括Always、OnFailure和Never，默认值为Always。</p>
+<ul>
+<li>Always: 当容器失效时，由kubelet自动重启该容器。</li>
+<li>OnFailure: 当容器终止运行且退出码不为0时，由kubelet自动 重启该容器。</li>
+<li>Never: 不论容器运行状态如何，kubelet都不会重启该容器。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/18/6Fjz2ckvwnQAPsC.png" alt="image.png"></p>
+<h3 id="healthy-check"><a href="#healthy-check" class="headerlink" title="healthy check"></a>healthy check</h3><ul>
+<li>LivenessProbe探针:用于判断容器是否存活(Running状态)</li>
+<li>ReadinessProbe探针:用于判断容器服务是否可用(Ready状态)</li>
+</ul>
+<h3 id="为什么pod会被驱逐？"><a href="#为什么pod会被驱逐？" class="headerlink" title="为什么pod会被驱逐？"></a>为什么pod会被驱逐？</h3><p>k8s根据qos（服务质量）决定是否要驱逐一个pod，根据实际经验来看，通常一个node上资源不足的时候，就会选择占用资源多的pod驱逐</p>
+<p>qos有三种级别：</p>
+<ul>
+<li>Best Effort<br>Pod中所有容器都未定义资源配置(Requests和Limits都未定义)</li>
+<li>Guaranteed<br>Pod中的所有容器对所有资源类型都定义了Limits和Requests，并且所有容器的Limits值都和Requests值全部相等(且都不为0)</li>
+<li>Burstable<br>当一个Pod既不为Guaranteed级别，也不为BestEffort级别时，该Pod 的QoS级别就是Burstable</li>
+</ul>
+<p>Best Effort 会最先被驱逐,  Burstable 其次， Guaranteed 最后。</p>
+<h3 id="什么时候pod被oomkilled？"><a href="#什么时候pod被oomkilled？" class="headerlink" title="什么时候pod被oomkilled？"></a>什么时候pod被oomkilled？</h3><p>在可共享的资源耗尽时，pod被驱逐，不可被共享的资源耗尽时，pod被oomkilled（pod的资源大于limit）</p>
+<h3 id="升级和回滚–rolling-update"><a href="#升级和回滚–rolling-update" class="headerlink" title="升级和回滚–rolling update"></a>升级和回滚–rolling update</h3><p><img src="https://i.loli.net/2020/12/18/1KAEJd8uhxRjafr.png" alt="image.png"></p>
+<h3 id="hpa"><a href="#hpa" class="headerlink" title="hpa"></a>hpa</h3><p>k8s可以基于cpu和内存进行hpa，但是套用到jvm上可能不是很合适，可以通过普罗米修斯来检测指标，控制hpa</p>
+<p><img src="https://i.loli.net/2020/12/18/XaTd6wUhLMGZHub.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2020/12/18/3iY2uWob6IpDdXB.png" alt="image.png"></p>
+<h2 id="Kubernetes-API-Server"><a href="#Kubernetes-API-Server" class="headerlink" title="Kubernetes API Server"></a>Kubernetes API Server</h2><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><ul>
+<li>API层: 主要以REST方式提供各种API接口</li>
+<li>访问控制层: 当客户端访问API接口时，访问控制层负责对用 户身份鉴权，验明用户身份</li>
+<li>注册表层: Kubernetes把所有资源对象都保存在注册表 (Registry)中。</li>
+<li>etcd数据库:用于持久化存储Kubernetes资源对象的KV数据库。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/12/18/WsXDrKPqwyIblZJ.png" alt="image.png"></p>
+<h3 id="List-Watch机制"><a href="#List-Watch机制" class="headerlink" title="List-Watch机制"></a>List-Watch机制</h3><p>以一个完整的Pod调度过程为 例，对API Server的<strong>List-Watch机制</strong>进行说明。</p>
+<p><img src="https://i.loli.net/2020/12/18/bZRwLufieGz46sm.png" alt="image.png"></p>
+<h3 id="crd"><a href="#crd" class="headerlink" title="crd"></a>crd</h3><p>Kubernetes中的CRD在API Server中的设计和实现机制。根据Kubernetes的设计，每种官方内建的资源对象如Node、 Pod、Service等的实现都包含以下主要功能。</p>
+<ul>
+<li>资源对象的元数据(Schema)的定义: 可以将其理解为数据库Table的定义，定义了对应资源对象的数据结构，官方内建资源对象 的元数据定义是固化在源码中的。</li>
+<li>资源对象的校验逻辑: 确保用户提交的资源对象的属性的合法性。</li>
+<li>资源对象的CRUD操作代码: 可以将其理解为数据库表的CRUD代码，但比后者更难，因为API Server对资源对象的CRUD操作都会保存到etcd数据库中，对处理性能的要求也更高，还要考虑版本兼容性和版本转换等复杂问题。</li>
+<li>资源对象相关的“自动控制器”(如RC、Deployment等资源对 象背后的控制器): 这是很重要的一个功能。因为Kubernetes是一个以自动化为核心目标的平台，用户给出期望的资源对象声明，运行过程中则由资源背后的“自动控制器”负责，确保对应资源对象的数量、状态、 行为都始终符合用户的预期</li>
+</ul>
+<p>类似地，每个自定义CRD的开发人员都需要实现上面这些功能。为了减小编程的难度与工作量，API Server的设计者们做出了大量的努 力，使得上面前3个功能无须编程实现，直接编写YAML定义文件即可 实现。对于唯一需要编程的第4个功能来说，由于API Server提供了大量 的基础API库，特别是易用的List-Watch的编程框架，也使得CRD自动控 制器的编程难度大大减小。</p>
+<p>CRD本身只是一段声明，用于定义用户自定义的资源对象。但仅有 CRD的定义并没有实际作用，用户还需要提供管理CRD对象的CRD控制 器(CRD Controller)，才能实现对CRD对象的管理。CRD控制器通常 可以通过Go语言进行开发，并需要遵循Kubernetes的控制器开发规范， 基于客户端库client-go进行开发，需要实现Informer、 ResourceEventHandler、Workqueue等组件具体的功能处理逻辑。</p>
+<h4 id="创建CRD的定义"><a href="#创建CRD的定义" class="headerlink" title="创建CRD的定义"></a>创建CRD的定义</h4><p>与其他资源对象一样，对CRD的定义也使用YAML配置进行声明。</p>
+<p>CRD定义中的关键字段如下。</p>
+<ul>
+<li>group: 设置API所属的组，将其映射为API URL中“/apis/”的 下一级目录，设置networking.</li>
+<li>scope: 该API的生效范围，可选项为Namespaced(由 Namespace限定)和Cluster(在集群范围全局生效，不局限于任何 Namespace)，默认值为Namespaced。</li>
+<li>versions: 设置此CRD支持的版本，可以设置多个版本，用列表形式表示。</li>
+<li>names: CRD的名称，包括单数、复数、kind、所属组等名称 的定义，可以设置如下参数。</li>
+</ul>
+<h4 id="基于CRD的定义创建自定义资源对象"><a href="#基于CRD的定义创建自定义资源对象" class="headerlink" title="基于CRD的定义创建自定义资源对象"></a>基于CRD的定义创建自定义资源对象</h4><p>基于CRD的定义，用户可以像创建Kubernetes系统内置的资源对象 (如Pod)一样创建CRD资源对象。</p>
+<p>除了需要设置该CRD资源对象的名称，还需要在spec段设置相应的 参数。在spec中可以设置的字段是由CRD开发者自定义的，需要根据 CRD开发者提供的手册进行配置。这些参数通常包含特定的业务含义， 由CRD控制器进行处理。</p>
+<p>然后，用户就可以像操作Kubernetes内置的资源对象(如Pod、 RC、Service)一样去操作CRD资源对象了，包括查看、更新、删除和 watch等操作。</p>
+<h4 id="CRD的高级特性"><a href="#CRD的高级特性" class="headerlink" title="CRD的高级特性"></a>CRD的高级特性</h4><p>随着Kubernetes的演进，CRD也在逐步添加一些高级特性和功能， 包括subresources子资源、校验(Validation)机制、自定义查看CRD时需要显示的列，以及finalizer预删除钩子。</p>
+<h3 id="Kubernetes-Proxy-API"><a href="#Kubernetes-Proxy-API" class="headerlink" title="Kubernetes Proxy API"></a>Kubernetes Proxy API</h3><p>Kubernetes Proxy API接口，这类接口的作用是代理REST请求，即 Kubernetes API Server把收到的REST请求转发到某个Node上的kubelet守 护进程的REST端口，由该kubelet进程负责响应。</p>
+<h3 id="集群功能模块之间的通信"><a href="#集群功能模块之间的通信" class="headerlink" title="集群功能模块之间的通信"></a>集群功能模块之间的通信</h3><p>Kubernetes API Server作为集群的核心，负责 集群各功能模块之间的通信。集群内的各个功能模块通过API Server将 信息存入etcd，当需要获取和操作这些数据时，则通过API Server提供的 REST接口(用GET、LIST或W A TCH方法)来实现，从而实现各模块之 间的信息交互。</p>
+<p>常见的一个交互场景是kubelet进程与API Server的交互。每个Node 上的kubelet每隔一个时间周期，就会调用一次API Server的REST接口报 告自身状态，API Server在接收到这些信息后，会将节点状态信息更新 到etcd中。此外，kubelet也通过API Server的Watch接口监听Pod信息， 如果监听到新的Pod副本被调度绑定到本节点，则执行Pod对应的容器创 建和启动逻辑;如果监听到Pod对象被删除，则删除本节点上相应的Pod 容器;如果监听到修改Pod的信息，kubelet就会相应地修改本节点的Pod 容器。</p>
+<p><img src="https://i.loli.net/2020/12/19/TLRei1yqtEXaFwp.png" alt="image.png"></p>
+<p>另一个交互场景是kube-controller-manager进程与API Server的交互。kube-controller-manager中的Node Controller模块通过API Server提供 的Watch接口实时监控Node的信息，并做相应处理。</p>
+<p>还有一个比较重要的交互场景是kube-scheduler与API Server的交互。Scheduler通过API Server的Watch接口监听到新建Pod副本的信息后，会检索所有符合该Pod要求的Node列表，开始执行Pod调度逻辑， 在调度成功后将Pod绑定到目标节点上。</p>
+<p>为了缓解集群各模块对API Server的访问压力，各功能模块都采用 缓存机制来缓存数据。各功能模块定时从API Server获取指定的资源对 象信息(通过List-Watch方法)，然后将这些信息保存到本地缓存中， 功能模块在某些情况下不直接访问API Server，而是通过访问缓存数据 来间接访问API Server。</p>
+<h2 id="Controller-Manager"><a href="#Controller-Manager" class="headerlink" title="Controller Manager"></a>Controller Manager</h2><p>每个Controller通过API Server提供的(List-Watch)接口实时监控集群中特定资源的状态变化，当发生各种故障导致某资源对象的状态发生变化时，Controller会尝试将其状态调整为期望的状态。比如当某个 Node意外宕机时，Node Controller会及时发现此故障并执行自动化修复 流程，确保集群始终处于预期的工作状态。</p>
+<p><img src="https://i.loli.net/2020/12/19/utsMv6xbFSTfVeq.png" alt="image.png"></p>
+<h3 id="Replication-Controller"><a href="#Replication-Controller" class="headerlink" title="Replication Controller"></a>Replication Controller</h3><p>不是我们日常创建pod所指的rc，Replication Controller是指“副本控制器”。</p>
+<p>Replication Controller的核心作用是确保在任何时候集群中某个RC 关联的Pod副本数量都保持预设值。如果发现Pod的副本数量超过预期 值，则Replication Controller会销毁一些Pod副本;反之，Replication Controller会自动创建新的Pod副本，直到符合条件的Pod副本数量达到 预设值。需要注意:只有当Pod的重启策略是Always时 (RestartPolicy=Always)，Replication Controller才会管理该Pod的操作(例如创建、销毁、重启等)。</p>
+<p>总结一下Replication Controller的职责，如下所述。 </p>
+<ul>
+<li>确保在当前集群中有且仅有N个Pod实例，N是在RC中定义的Pod副本数量。</li>
+<li>通过调整RC的spec.replicas属性值来实现系统扩容或者缩容。</li>
+<li>通过改变RC中的Pod模板(主要是镜像版本)来实现系统的滚动升级。</li>
+</ul>
+<h3 id="Node-Controller"><a href="#Node-Controller" class="headerlink" title="Node Controller"></a>Node Controller</h3><p>kubelet进程在启动时通过API Server注册自身的节点信息，并定时 向API Server汇报状态信息，API Server在接收到这些信息后，会将这些 信息更新到etcd中。在etcd中存储的节点信息包括节点健康状况、节点 资源、节点名称、节点地址信息、操作系统版本、Docker版本、kubelet 版本等。节点健康状况包含“就绪”(True)“未就绪”(False)和“未 知”(Unknown)三种。</p>
+<p>Node Controller通过API Server实时获取Node的相关信息，实现管理 和监控集群中的各个Node的相关控制功能，Node Controller的核心工作 流程如图5.8所示。</p>
+<p><img src="https://i.loli.net/2020/12/19/TyhgbFDA9vp8Hat.png" alt="image.png"></p>
+<h3 id="ResourceQuota-Controller"><a href="#ResourceQuota-Controller" class="headerlink" title="ResourceQuota Controller"></a>ResourceQuota Controller</h3><p>ResourceQuota Controller(资源配额管理)，确保了指定的资源对象在任何时候都不会超量占用系统物理资源，避 免了由于某些业务进程的设计或实现的缺陷导致整个系统运行紊乱甚至 意外宕机，对整个集群的平稳运行和稳定性有非常重要的作用。</p>
+<p>目前Kubernetes支持如下三个层次的资源配额管理。 </p>
+<ul>
+<li>容器级别，可以对CPU和Memory进行限制。 </li>
+<li>Pod级别，可以对一个Pod内所有容器的可用资源进行限制。</li>
+<li>Namespace级别，为Namespace(多租户)级别的资源限制， 包括:<ul>
+<li>Pod数量;</li>
+<li>RC数量; </li>
+<li>Service数量; </li>
+<li>ResourceQuota数量; </li>
+<li>Secret数量; </li>
+<li>可持有的PV数量。</li>
+</ul>
+</li>
+</ul>
+<p>Kubernetes的配额管理是通过Admission Control(准入控制)来控制 的，Admission Control当前提供了两种方式的配额约束，分别是 LimitRanger与ResourceQuota。其中LimitRanger作用于Pod和Container， ResourceQuota则作用于Namespace，限定一个Namespace里的各类资源的使用总额。</p>
+<h3 id="Namespace-Controller"><a href="#Namespace-Controller" class="headerlink" title="Namespace Controller"></a>Namespace Controller</h3><p>用户通过API Server可以创建新的Namespace并将其保存在etcd中， Namespace Controller定时通过API Server读取这些Namespace的信息。</p>
+<p>如果Namespace被API标识为优雅删除(通过设置删除期限实现，即设置 DeletionTimestamp属性)，则将该NameSpace的状态设置成Terminating 并保存到etcd中。同时Namespace Controller删除该Namespace下的 ServiceAccount、RC、Pod、Secret、PersistentVolume、ListRange、 ResourceQuota和Event等资源对象。</p>
+<h3 id="Service-Controller与Endpoints-Controller"><a href="#Service-Controller与Endpoints-Controller" class="headerlink" title="Service Controller与Endpoints Controller"></a>Service Controller与Endpoints Controller</h3><p>本节讲解Endpoints Controller，在这之前，让我们先看看Service、 Endpoints与Pod的关系。如图5.10所示，Endpoints表示一个Service对应 的所有Pod副本的访问地址，Endpoints Controller就是负责生成和维护所 有Endpoints对象的控制器。</p>
+<p><img src="https://i.loli.net/2020/12/19/IRgmLljVn89wMWS.png" alt="image.png"></p>
+<p>它负责监听Service和对应的Pod副本的变化，</p>
+<ul>
+<li>如果监测到Service被 删除，则删除和该Service同名的Endpoints对象。</li>
+<li>如果监测到新的Service 被创建或者修改，则根据该Service信息获得相关的Pod列表，然后创建 或者更新Service对应的Endpoints对象。</li>
+<li>如果监测到Pod的事件，则更新 它所对应的Service的Endpoints对象(增加、删除或者修改对应的 Endpoint条目)。</li>
+</ul>
+<p>那么，Endpoints对象是在哪里被使用的呢? 答案是每个Node上的 kube-proxy进程，kube-proxy进程获取每个Service的Endpoints，实现了 Service的负载均衡功能。</p>
+<p>Service Controller其实是属于Kubernetes集群与外部的云平台之间的一个接口控制器。Service Controller监听Service 的变化，如果该Service是一个LoadBalancer类型的 Service(externalLoadBalancers=true)，则Service Controller确保在外部 的云平台上该Service对应的LoadBalancer实例被相应地创建、删除及更 新路由转发表。</p>
+<h3 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h3><p>Scheduler在整个系统中承担了“承上启下”的重要功 能，“承上”是指它负责接收Controller Manager创建的新Pod，为其安排 一个落脚的“家”—目标Node;“启下”是指安置工作完成后，目标Node上 的kubelet服务进程接管后继工作，负责Pod生命周期中的“下半生”。</p>
+<p>Scheduler的作用是将待调度的Pod(API新创 建的Pod、Controller Manager为补足副本而创建的Pod等)按照特定的调 度算法和调度策略绑定(Binding)到集群中某个合适的Node上，并将 绑定信息写入etcd中。在整个调度过程中涉及三个对象，分别是待调度 Pod列表、可用Node列表，以及调度算法和策略。简单地说，就是通过 调度算法调度为待调度Pod列表中的每个Pod从Node列表中选择一个最 适合的Node。</p>
+<p>随后，目标节点上的kubelet通过API Server监听到Kubernetes Scheduler产生的Pod绑定事件，然后获取对应的Pod清单，下载Image镜像并启动容器。</p>
+<p><img src="https://i.loli.net/2020/12/19/sXAGOT1IQegbDcq.png" alt="image.png"></p>
+<h2 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h2><p>kubelet服务进程。该进程用于处理Master下发到本节点的任务，管理 Pod及Pod中的容器。每个kubelet进程都会在API Server上注册节点自身 的信息，定期向Master汇报节点资源的使用情况，并通过cAdvisor监控 容器和节点资源。</p>
+<h3 id="节点管理"><a href="#节点管理" class="headerlink" title="节点管理"></a>节点管理</h3><p>kubelet在启动时通过API Server注册节点信息，并定时向API Server 发送节点的新消息，API Server在接收到这些信息后，将这些信息写入 etcd。</p>
+<h3 id="Pod管理"><a href="#Pod管理" class="headerlink" title="Pod管理"></a>Pod管理</h3><p>kubelet通过以下几种方式获取自身Node上要运行的Pod清单。</p>
+<ul>
+<li>文件: kubelet启动参数“–config”指定的配置文件目录下的文 件(默认目录为“/etc/ kubernetes/manifests/”)。通过–file-check- frequency设置检查该文件目录的时间间隔，默认为20s。</li>
+<li>HTTP端点(URL): 通过“–manifest-url”参数设置。通过– http-check-frequency设置检查该HTTP端点数据的时间间隔，默认为 20s。</li>
+<li>API Server: kubelet通过API Server监听etcd目录，同步Pod列表。</li>
+</ul>
+<p>所有以非API Server方式创建的Pod都叫作Static Pod。kubelet将 Static Pod的状态汇报给API Server，API Server为该Static Pod创建一个 Mirror Pod和其相匹配。Mirror Pod的状态将真实反映Static Pod的状态。 当Static Pod被删除时，与之相对应的Mirror Pod也会被删除。在本章中 只讨论通过API Server获得Pod清单的方式。</p>
+<p>kubelet通过API Server Client 使用Watch加List的方式监听“/registry/nodes/$”当前节点的名称和“/registry/pods”目录，将获取的信息同步到本地缓存中。</p>
+<p>kubelet监听etcd，所有针对Pod的操作都会被kubelet监听。如果发现<br>有新的绑定到本节点的Pod，则按照Pod清单的要求创建该Pod。</p>
+<p>如果发现本地的Pod被修改，则kubelet会做出相应的修改，比如在<br>删除Pod中的某个容器时，会通过Docker Client删除该容器。</p>
+<p>如果发现删除本节点的Pod，则删除相应的Pod，并通过Docker<br>Client删除Pod中的容器。</p>
+<p>kubelet读取监听到的信息，如果是创建和修改Pod任务，则做如下<br>处理。</p>
+<ul>
+<li>为该Pod创建一个数据目录。</li>
+<li>从API Server读取该Pod清单。 </li>
+<li>为该Pod挂载外部卷(External Volume)。 </li>
+<li>下载Pod用到的Secret。</li>
+<li>检查已经运行在节点上的Pod，如果该Pod没有容器或Pause容 器(“kubernetes/pause”镜像创建的容器)没有启动，则先停止Pod里所 有容器的进程。如果在Pod中有需要删除的容器，则删除这些容器。</li>
+<li>用“kubernetes/pause”镜像为每个Pod都创建一个容器。该Pause 容器用于接管Pod中所有其他容器的网络。每创建一个新的Pod，kubelet 都会先创建一个Pause容器，然后创建其他容器。“kubernetes/pause”镜像 大概有200KB，是个非常小的容器镜像。</li>
+<li>为Pod中的每个容器做如下处理。<ul>
+<li>为容器计算一个Hash值，然后用容器的名称去查询对应 Docker 容器的Hash值。若查找到容器，且二者的Hash值不同，则停止Docker中 容器的进程，并停止与之关联的Pause容器的进程;若二者相同，则不做任何处理。</li>
+<li>如果容器被终止了，且容器没有指定的restartPolicy(重启策略)，则不做任何处理。</li>
+<li>调用Docker Client下载容器镜像，调用Docker Client运行容器。</li>
+</ul>
+</li>
+</ul>
+<p>创建pod的全过程：</p>
+<p><img src="https://i.loli.net/2020/12/19/4w1psYSiXh8PIdz.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2020/12/19/jqsRAn17lYT2CcV.png" alt="image.png"></p>
+<h3 id="cAdvisor"><a href="#cAdvisor" class="headerlink" title="cAdvisor"></a>cAdvisor</h3><p>kubelet作为连接Kubernetes Master和各Node之间的桥梁，管理运行在Node上的Pod和容器。kubelet将每个Pod都转换成它的成员容器，同时从cAdvisor获取单独的容器使用统计信息，然后通过该REST API暴露 这些聚合后的Pod资源使用的统计信息。</p>
+<p>在新的Kubernetes监控体系中，Metrics Server用于提供Core Metrics(核心指标)，包括Node和Pod的CPU和内存使用数据。其他 Custom Metrics(自定义指标)则由第三方组件(如Prometheus)采集和 存储。</p>
+<h2 id="kube-proxy"><a href="#kube-proxy" class="headerlink" title="kube-proxy"></a>kube-proxy</h2><p>在很多情况下，Service只是一个概念，而真正将Service的作用落实的是它背后的kube-proxy服务进程。</p>
+<p>在Kubernetes集群的每个Node上都会运行一个kube-proxy服务进程，我们可以把这个进程看作Service的透明代理兼负载均衡器，其核心功能是将到某个Service的访问请求转发到后端的多个Pod实例上。</p>
+<p>Service的Cluster IP与NodePort等概念是kube-proxy服务通过iptables的NA T转换实现的，kube-proxy在运行过程中动态创建与Service相关的iptables规则，这些规则实现了将访问服务(Cluster IP或NodePort)的请求负载分发到后端Pod的功能。由于iptables机制针对的是本地的kube-proxy端口，所以在每个Node上都要运行kube-proxy组件，这样一来，在Kubernetes集群内部，我们可以在任意Node上发起对Service的访问请求。综上所述，由于kube-proxy的作用，在Service的调用过程中客户端无须关心后端有几个Pod，中间过程的通信、负载均衡及故障恢复都是透明的。</p>
+<p><img src="https://i.loli.net/2020/12/19/ahCWOsrto3ugA2f.png" alt="image.png"></p>
+<p>iptables模式虽然实现起来简单，但存在无法避免的缺陷: 在集群中 的Service和Pod大量增加以后，iptables中的规则会急速膨胀，导致性能 显著下降，在某些极端情况下甚至会出现规则丢失的情况，并且这种故 障难以重现与排查，于是Kubernetes从1.8版本开始引入第3代的 IPVS(IP Virtual Server)模式。IPVS专门用于高性能负载均衡，并使用更高效的数据结构(Hash表)，允许几乎无限的 规模扩张。</p>
+<p>在IPVS模式下，kube-proxy又做了重要的升级，即使用 iptables的扩展ipset，而不是直接调用iptables来生成规则链。</p>
+<p>关于 iptables： <a href="https://luffyao.com/2019/12/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3iptables%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener">https://luffyao.com/2019/12/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3iptables%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</a></p>
+<p>iptables规则链是一个线性的数据结构，ipset则引入了带索引的数据 结构，因此当规则很多时，也可以很高效地查找和匹配。我们可以将 ipset简单理解为一个IP(段)的集合，这个集合的内容可以是IP地址、 IP网段、端口等，iptables可以直接添加规则对这个“可变的集合”进行操 作，这样做的好处在于可以大大减少iptables规则的数量，从而减少性能损耗。</p>
+<p>假设要禁止上万个IP访问我们的服务器，则用iptables的话，就需要 一条一条地添加规则，会在iptables中生成大量的规则;但是用ipset的 话，只需将相关的IP地址(网段)加入ipset集合中即可，这样只需设置 少量的iptables规则即可实现目标。</p>
+<p>关于service的工作原理详解，看这里：<a href="https://xigang.github.io/2019/07/21/kubernetes-service/" target="_blank" rel="noopener">https://xigang.github.io/2019/07/21/kubernetes-service/</a></p>
+<p>简单来说就是etcd中维护了service的selector关系，port与target port映射，以及对应的pod ip，kube proxy会根据这些去改写iptables，外部流量会通过service的node port，进入iptables，开始流量的规则路由。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/12/16/k8s-1/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/16/k8s-1/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/12/16/k8s-2/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/12/05/service-manage/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">46</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">31</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">23</span></a></li><li><a class="sidebar_archives-link" href="/categories/微服务/">微服务<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
