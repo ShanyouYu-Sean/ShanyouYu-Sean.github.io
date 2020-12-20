@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-19T14:10:27.942Z</updated>
+  <updated>2020-12-20T14:25:24.992Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,65 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>kafka</title>
+    <link href="http://seanthefish.com/2020/12/17/kafka/"/>
+    <id>http://seanthefish.com/2020/12/17/kafka/</id>
+    <published>2020-12-17T03:00:00.000Z</published>
+    <updated>2020-12-20T14:25:24.992Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;转自 &lt;a href=&quot;https://www.orchome.com/5&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://www.orchome.com/5&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;基本概念&quot;&gt;&lt;a href=&quot;#基本概念&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="mq" scheme="http://seanthefish.com/categories/mq/"/>
+    
+    
+      <category term="mq" scheme="http://seanthefish.com/tags/mq/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>rabbit-mq</title>
+    <link href="http://seanthefish.com/2020/12/17/rabbit/"/>
+    <id>http://seanthefish.com/2020/12/17/rabbit/</id>
+    <published>2020-12-17T02:00:00.000Z</published>
+    <updated>2020-12-20T14:21:23.917Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;关于消息队列&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://tech.meituan.com/2016/07/01/mq-design.html&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="mq" scheme="http://seanthefish.com/categories/mq/"/>
+    
+    
+      <category term="mq" scheme="http://seanthefish.com/tags/mq/"/>
+    
+  </entry>
+  
+  <entry>
     <title>k8s网络</title>
     <link href="http://seanthefish.com/2020/12/16/k8s-2/"/>
     <id>http://seanthefish.com/2020/12/16/k8s-2/</id>
     <published>2020-12-16T03:00:00.000Z</published>
-    <updated>2020-12-19T14:10:27.942Z</updated>
+    <updated>2020-12-20T08:13:59.647Z</updated>
     
     <summary type="html">
     
@@ -491,59 +545,6 @@
     
     
       <category term="raft" scheme="http://seanthefish.com/tags/raft/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之消息队列</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-8/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-8/</id>
-    <published>2020-11-28T13:00:00.000Z</published>
-    <updated>2020-12-01T09:01:45.404Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;文章转载自 &lt;a href=&quot;https://medium.com/@cheukfung/redis%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97-f4f75404647f&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis进阶之分布式锁</title>
-    <link href="http://seanthefish.com/2020/11/28/redis-7/"/>
-    <id>http://seanthefish.com/2020/11/28/redis-7/</id>
-    <published>2020-11-28T12:00:00.000Z</published>
-    <updated>2020-12-01T08:34:30.542Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;hr&gt;
-&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
-    
-    
-      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
