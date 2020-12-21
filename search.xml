@@ -3,6 +3,459 @@
   
     
     <entry>
+      <title><![CDATA[CompletableFuture]]></title>
+      <url>/2020/12/18/completable-future/</url>
+      <content type="html"><![CDATA[<p>转自 <a href="https://hhbbz.github.io/2018/08/04/CompletableFuture%E7%BB%88%E6%9E%81%E6%8C%87%E5%8D%97/" target="_blank" rel="noopener">https://hhbbz.github.io/2018/08/04/CompletableFuture%E7%BB%88%E6%9E%81%E6%8C%87%E5%8D%97/</a></p>
+<h2 id="CompletableFuture主要Api详述"><a href="#CompletableFuture主要Api详述" class="headerlink" title="CompletableFuture主要Api详述"></a>CompletableFuture主要Api详述</h2><h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><p>如果CompletableFuture的方法没有参数Executor并且以…Async结尾，它将会使用 ForkJoinPool.commonPool() (在JDK8中的通用线程池，基于Fork/join线程池和任务窃取实现），这适用于CompletableFuture类中的大多数的方法。所以下面分析的时候可能会直接跳过命名为…Async的方法。</p>
+<h3 id="创建和获取CompletableFuture"><a href="#创建和获取CompletableFuture" class="headerlink" title="创建和获取CompletableFuture"></a>创建和获取CompletableFuture</h3><p>使用 new 关键字新建CompletableFuture实例并不是唯一的选择，CompletableFuture提供了静态工厂方法用于创建自身的实例：</p>
+<pre><code class="java">static &lt;U&gt; CompletableFuture&lt;U&gt; supplyAsync(Supplier&lt;U&gt; supplier);
+static &lt;U&gt; CompletableFuture&lt;U&gt; supplyAsync(Supplier&lt;U&gt; supplier, Executor executor);
+static CompletableFuture&lt;Void&gt; runAsync(Runnable runnable);
+static CompletableFuture&lt;Void&gt; runAsync(Runnable runnable, Executor executor);
+</code></pre>
+<p>runAsync()易于理解，注意它需要Runnable，因此它返回<code>CompletableFuture&lt;Void&gt;</code>作为Runnable不返回任何值。如果你需要处理异步操作并返回结果，使用<code>Supplier&lt;U&gt;</code>，它是一个函数式接口, 可以这样使用<code>Supplier&lt;U&gt;</code>：</p>
+<pre><code class="java">final CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(new Supplier&lt;String&gt;() {
+    @Override
+    public String get() {
+        //...long running...
+        return &quot;42&quot;;
+    }
+}, executor);
+</code></pre>
+<h3 id="转换–CompletableFuture-thenApply"><a href="#转换–CompletableFuture-thenApply" class="headerlink" title="转换–CompletableFuture.thenApply()"></a>转换–CompletableFuture.thenApply()</h3><p>方法不以Async结尾，意味着Action使用相同的线程执行，而Async可能会使用其它的线程去执行(如果使用相同的线程池，也可能会被同一个线程选中执行)。</p>
+<p>apply一般翻译为’作用于’，但是在CompletableFuture中，<code>***thenApply()***</code>起到转换结果的作用，总结来说就是叠加多个CompletableFuture的功能，把多个CompletableFuture组合在一起，跨线程池进行异步调用，调用的过程就是结果转换的过程。先看下这些方法：</p>
+<pre><code class="java">&lt;U&gt; CompletableFuture&lt;U&gt; thenApply(Function&lt;? super T,? extends U&gt; fn);
+&lt;U&gt; CompletableFuture&lt;U&gt; thenApplyAsync(Function&lt;? super T,? extends U&gt; fn);
+&lt;U&gt; CompletableFuture&lt;U&gt; thenApplyAsync(Function&lt;? super T,? extends U&gt; fn, Executor executor);
+</code></pre>
+<p>使用例子：</p>
+<pre><code class="java">CompletableFuture&lt;String&gt; f1 =  = CompletableFuture.supplyAsync(() -&gt; {
+    return &quot;42&quot;;
+}, executor)；
+CompletableFuture&lt;Integer&gt; f2 = f1.thenApply(Integer::parseInt);
+CompletableFuture&lt;Double&gt; f3 = f2.thenApply(r -&gt; r * r * Math.PI);
+</code></pre>
+<p>或者直接使用流式编程：</p>
+<pre><code class="java">CompletableFuture&lt;Double&gt; f3 = CompletableFuture.supplyAsync(() -&gt; {
+    return &quot;42&quot;;
+}, executor).thenApply(Integer::parseInt).thenApply(r -&gt; r * r * Math.PI);
+</code></pre>
+<h3 id="终端运行-消费-–CompletableFuture-thenRun-CompletableFuture-thenAccept"><a href="#终端运行-消费-–CompletableFuture-thenRun-CompletableFuture-thenAccept" class="headerlink" title="终端运行(消费)–CompletableFuture.thenRun()/CompletableFuture.thenAccept()"></a>终端运行(消费)–CompletableFuture.thenRun()/CompletableFuture.thenAccept()</h3><p>CompletableFuture有两种典型的”最终”阶段方法，其实就是Lambda的终端方法，使用的是Consumer接口(消费操作的接口)。当CompletableFuture的结果已经准备好，thenAccept()执行最终消费操作，thenRun()执行Runnable，没有返回值（或者说返回结果为Void）。</p>
+<pre><code class="java">CompletableFuture&lt;Void&gt; thenAccept(Consumer&lt;? super T&gt; block);
+CompletableFuture&lt;Void&gt; thenAcceptAsync(Consumer&lt;? super T&gt; block);
+CompletableFuture&lt;Void&gt; thenAcceptAsync(Consumer&lt;? super T&gt; block,Executor executor);
+CompletableFuture&lt;Void&gt; thenRun(Runnable action);
+CompletionStage&lt;Void&gt; thenRunAsync(Runnable action);
+CompletionStage&lt;Void&gt; thenRunAsync(Runnable action,Executor executor);
+</code></pre>
+<p>下面是一个例子：</p>
+<pre><code class="java">future.thenAcceptAsync(dbl -&gt; log.debug(&quot;Result: {}&quot;, dbl), executor);
+log.debug(&quot;Continuing&quot;);
+</code></pre>
+<p>thenAccept( )/thenRun( )方法并没有发生阻塞（即使没有明确的executor)。它们像事件侦听器。上例中”Continuing”消息将立即出现，但是这个时候thenAcceptAsync()有可能尚未执行完。thenAccept()和thenRun()的区别是：thenAccept()是针对结果进行消费，因为入参是Consumer函数式接口，有入参无返回值，而thenRun()它的入参是一个Runnable的实例，表示当得到上一步的结果时的操作，也就是当得到上一步的结果则异步执行Runnable。</p>
+<h3 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h3><pre><code class="java">CompletableFuture&lt;String&gt; future = new CompletableFuture&lt;&gt;();
+        try {
+            throw new RuntimeException(&quot;test exception&quot;);
+        }catch (Exception e){
+            future.completeExceptionally(e);
+            future.complete(&quot;test success&quot;);
+        }
+System.out.println(future.get());
+//结果（触发了completeExceptionally后，complete将会失效）：
+Exception in thread &quot;main&quot; java.util.concurrent.ExecutionException: java.lang.RuntimeException: test exception
+    at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+    at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+    at org.throwable.TestGitA.main(TestGitA.java:22)
+Caused by: java.lang.RuntimeException: test exception
+    at org.throwable.TestGitA.main(TestGitA.java:17)
+...
+</code></pre>
+<p>补偿型的例子：</p>
+<pre><code class="java">String result = CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         if (1 == 1) {
+             throw new RuntimeException(&quot;测试一下异常情况&quot;);
+         }
+         return &quot;s1&quot;;
+     }).exceptionally(e -&gt; {
+         System.out.println(e.getMessage());
+         return &quot;hello world&quot;;
+     }).join();
+System.out.println(result);
+//结果
+java.lang.RuntimeException: 测试一下异常情况
+hello world
+</code></pre>
+<p>全方位型的例子：</p>
+<pre><code class="java">//注意这里OK为String类型
+CompletableFuture&lt;Integer&gt; safe = future.handle((ok, ex) -&gt; {
+    if (ok != null) {
+        return Integer.parseInt(ok);
+    } else {
+        log.warn(&quot;Problem&quot;, ex);
+        return -1;
+    }
+});
+</code></pre>
+<h3 id="CompletableFuture的”串联”–CompletableFuture-thenCompose"><a href="#CompletableFuture的”串联”–CompletableFuture-thenCompose" class="headerlink" title="CompletableFuture的”串联”–CompletableFuture.thenCompose()"></a>CompletableFuture的”串联”–CompletableFuture.thenCompose()</h3><p>thenCompose()方法允许你对两个异步操作进行流水线，第一个操作完成时，将其结果作为参数传递给第二个操作。你可以创建两个CompletableFuture对象，对第一个CompletableFuture对象调用thenCompose() ，并向其传递一个函数。当第一个CompletableFuture执行完毕后，它的结果将作为该函数的参数，这个函数的返回值是以第一个CompletableFuture的返回做输入计算出的第二个CompletableFuture对象。</p>
+<pre><code class="java">&lt;U&gt; CompletableFuture&lt;U&gt; thenCompose(Function&lt;? super T,CompletableFuture&lt;U&gt;&gt; fn);
+&lt;U&gt; CompletableFuture&lt;U&gt; thenComposeAsync(Function&lt;? super T,CompletableFuture&lt;U&gt;&gt; fn);
+&lt;U&gt; CompletableFuture&lt;U&gt; thenComposeAsync(Function&lt;? super T,CompletableFuture&lt;U&gt;&gt; fn,Executor executor);
+</code></pre>
+<p>thenCompose()是一个重要的方法，它允许构建健壮的和异步的管道，没有阻塞和等待的中间步骤。在下面的事例中，仔细观察thenApply()(map)和thenCompose()（flatMap）的类型和差异，calculateRelevance()方法返回CompletableFuture实例：</p>
+<pre><code class="java">CompletableFuture&lt;Document&gt; docFuture = //...
+CompletableFuture&lt;CompletableFuture&lt;Double&gt;&gt; f =  docFuture.thenApply(this::calculateRelevance);
+CompletableFuture&lt;Double&gt; relevanceFuture = docFuture.thenCompose(this::calculateRelevance);
+//...
+private CompletableFuture&lt;Double&gt; calculateRelevance(Document doc)  //...
+</code></pre>
+<p>thenapply（）是接受一个<code>Function&lt;? super T,? extends U&gt;</code>参数用来转换CompletableFuture，相当于流的map操作，返回的是非CompletableFuture类型，它的功能相当于将<code>CompletableFuture&lt;T&gt;</code>转换成<code>CompletableFuture&lt;U&gt;</code>。</p>
+<p>thenCompose（）在异步操作完成的时候对异步操作的结果进行一些操作，并且仍然返回CompletableFuture类型，相当于flatMap，用来连接两个CompletableFuture。</p>
+<pre><code class="java">// thenapply（）
+CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; {
+      return 100;
+});
+CompletableFuture&lt;String&gt; f = future.thenApplyAsync(i -&gt; i * 10).thenApply(i -&gt; i.toString());
+System.out.println(f.get()); //&quot;1000&quot;
+
+// thenCompose（）
+CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; {
+    return 100;
+});
+CompletableFuture&lt;String&gt; f = future.thenCompose( i -&gt; {
+    return CompletableFuture.supplyAsync(() -&gt; {
+        return (i * 10) + &quot;&quot;;
+    });
+});
+System.out.println(f.get()); //1000
+</code></pre>
+<h3 id="CompletableFuture的”并联”–CompletableFuture-thenCombine"><a href="#CompletableFuture的”并联”–CompletableFuture-thenCombine" class="headerlink" title="CompletableFuture的”并联”–CompletableFuture.thenCombine()"></a>CompletableFuture的”并联”–CompletableFuture.thenCombine()</h3><p>thenCombine()用于连接两个独立的CompletableFuture，它接收名为 BiFunction 的第二参数，这个参数定义了当两个CompletableFuture 对象完成计算后结果如何合并，返回携带计算合并结果的一个新的CompletableFuture。</p>
+<pre><code class="java">&lt;U,V&gt; CompletableFuture&lt;V&gt; thenCombine(CompletableFuture&lt;? extends U&gt; other, BiFunction&lt;? super T,? super U,? extends V&gt; fn);
+&lt;U,V&gt; CompletableFuture&lt;V&gt; thenCombineAsync(CompletableFuture&lt;? extends U&gt; other, BiFunction&lt;? super T,? super U,? extends V&gt; fn);
+&lt;U,V&gt; CompletableFuture&lt;V&gt; thenCombineAsync(CompletableFuture&lt;? extends U&gt; other, BiFunction&lt;? super T,? super U,? extends V&gt; fn,Executor executor);
+</code></pre>
+<p>假设你有两个CompletableFuture，一个加载Customer另一个加载最近的Shop。他们彼此完全独立，但是当他们完成时，您想要使用它们的值来计算Route。下面是一个例子：</p>
+<pre><code class="java">CompletableFuture&lt;Customer&gt; customerFuture = loadCustomerDetails(123);  //省略loadCustomerDetails方法代码
+CompletableFuture&lt;Shop&gt; shopFuture = closestShop();  //省略closestShop方法代码
+CompletableFuture&lt;Route&gt; routeFuture = customerFuture.thenCombine(shopFuture, (cust, shop) -&gt; findRoute(cust, shop));
+
+//...
+private Route findRoute(Customer customer, Shop shop) //...
+</code></pre>
+<p>新建customerFuture和shopFuture。那么routeFuture包装它们然后“等待”它们完成。当它们的结果准备好了，它会运行我们提供的函数来结合所有的结果(findRoute())。当两个基本的CompletableFuture实例完成并且findRoute()也完成时，这样routeFuture将会完成。</p>
+<p>另一个例子</p>
+<pre><code class="java">CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; {
+    return 100;
+});
+CompletableFuture&lt;String&gt; future2 = CompletableFuture.supplyAsync(() -&gt; {
+    return &quot;abc&quot;;
+});
+CompletableFuture&lt;String&gt; f =  future.thenCombine(future2, (x,y) -&gt; y + &quot;-&quot; + x);
+System.out.println(f.get()); //abc-100
+</code></pre>
+<h3 id="结果记录–CompletableFuture-whenComplete"><a href="#结果记录–CompletableFuture-whenComplete" class="headerlink" title="结果记录–CompletableFuture.whenComplete()"></a>结果记录–CompletableFuture.whenComplete()</h3><p><code>***CompletableFuture.whenComplete()***</code>的作用是CompletableFuture运行完成时，对结果的记录操作，记录的操作由函数 <code>BiConsumer&lt;? super T, ? super Throwable&gt;</code>完成，一般BiConsumer这种消费操作应该是终端操作，但是whenComplete返回的是CompletableFuture的接口的实例，这个实例就是调用whenComplete的原始CompletableFuture对象。</p>
+<pre><code class="java">CompletionStage&lt;T&gt; whenComplete(BiConsumer&lt;? super T, ? super Throwable&gt; action);
+CompletionStage&lt;T&gt; whenCompleteAsync(BiConsumer&lt;? super T, ? super Throwable&gt; action);
+CompletionStage&lt;T&gt; whenCompleteAsync(BiConsumer&lt;? super T, ? super Throwable&gt; action,Executor executor);
+</code></pre>
+<p>一个使用例子如下：</p>
+<pre><code class="java">String result = CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         if (1 == 1) {
+             throw new RuntimeException(&quot;测试一下异常情况&quot;);
+         }
+         return &quot;s1&quot;;
+     }).whenComplete((s, t) -&gt; {
+         System.out.println(s);
+         System.out.println(t.getMessage());
+     }).exceptionally(e -&gt; {
+         System.out.println(e.getMessage());
+         return &quot;hello world&quot;;
+     }).join();
+System.out.println(result);
+//控制台输出
+null
+java.lang.RuntimeException: 测试一下异常情况
+java.lang.RuntimeException: 测试一下异常情况
+hello world
+</code></pre>
+<p>这里也可以看出，如果使用了exceptionally，就会对最终的结果产生影响，也就证明了whenComplete返回的是原始的CompletableFuture对象。</p>
+<h3 id="结果处理–CompletableFuture-handle"><a href="#结果处理–CompletableFuture-handle" class="headerlink" title="结果处理–CompletableFuture.handle()"></a>结果处理–CompletableFuture.handle()</h3><p>CompletableFuture.handle() 的作用是CompletableFuture运行完成时，对结果的处理。这里的完成时有两种情况，一种是正常执行，返回预期的值。另外一种是遇到异常抛出造成程序的中断。</p>
+<pre><code class="java">&lt;U&gt; CompletionStage&lt;U&gt; handle(BiFunction&lt;? super T, Throwable, ? extends U&gt; fn);
+&lt;U&gt; CompletionStage&lt;U&gt; handleAsync(BiFunction&lt;? super T, Throwable, ? extends U&gt; fn);
+&lt;U&gt; CompletionStage&lt;U&gt; handleAsync(BiFunction&lt;? super T, Throwable, ? extends U&gt; fn,Executor executor);
+</code></pre>
+<p>一个出现异常时的例子：</p>
+<pre><code class="java">String result = CompletableFuture.supplyAsync(() -&gt; {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //出现异常
+        if (1 == 1) {
+            throw new RuntimeException(&quot;测试一下异常情况&quot;);
+        }
+        return &quot;s1&quot;;
+    }).handle((s, t) -&gt; {   //这里t的参数类型为Throwable。
+        if (t != null) {
+            return &quot;hello world&quot;; //这里是异常不为null时候的逻辑，可以选择补偿，也可以直接抛出异常t，一旦抛出异常，调用join（）的时候异常会外抛。
+        }
+        return s;
+    }).join();
+System.out.println(result);
+//控制台输出
+hello world
+</code></pre>
+<p>一个未出现异常时的例子：</p>
+<pre><code class="java">String result = CompletableFuture.supplyAsync(() -&gt; {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return &quot;s1&quot;;
+    }).handle((s, t) -&gt; {
+        if (t != null) {
+            return &quot;hello world&quot;;  
+        }
+        return s;   //未出现异常，实际上走到这一步
+    }).join();
+System.out.println(result);
+//控制台输出
+s1
+</code></pre>
+<h3 id="合并消费–CompletableFuture-thenAcceptBoth"><a href="#合并消费–CompletableFuture-thenAcceptBoth" class="headerlink" title="合并消费–CompletableFuture.thenAcceptBoth()"></a>合并消费–CompletableFuture.thenAcceptBoth()</h3><p>CompletableFuture.thenAcceptBoth() 用于连接两个独立的CompletableFuture，它接收名为BiConsumer的第二参数，这个参数定义了当两个CompletableFuture对象完成计算后，结果如何消费，有点像thenCombine，但是对于两个CompletableFuture的计算操作是终端操作，没有返回值(或者说返回结果为Void类型)。</p>
+<pre><code class="java">&lt;U&gt; CompletionStage&lt;Void&gt; thenAcceptBoth(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? super T, ? super U&gt; action);
+&lt;U&gt; CompletionStage&lt;Void&gt; thenAcceptBothAsync(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? super T, ? super U&gt; action);
+&lt;U&gt; CompletionStage&lt;Void&gt; thenAcceptBothAsync(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? super T, ? super U&gt; action, Executor executor);
+</code></pre>
+<p>一个例子如下，5000毫秒后控制台输出”hello world”：</p>
+<pre><code class="java">CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;hello&quot;;
+     }).thenAcceptBoth(CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;world&quot;;
+     }), (s1, s2) -&gt; System.out.println(s1 + &quot; &quot; + s2));
+</code></pre>
+<h3 id="合并执行–CompletableFuture-runAfterBoth"><a href="#合并执行–CompletableFuture-runAfterBoth" class="headerlink" title="合并执行–CompletableFuture.runAfterBoth()"></a>合并执行–CompletableFuture.runAfterBoth()</h3><p>CompletableFuture.runAfterBoth() 用于连接两个独立的CompletableFuture，不关心两个CompletableFuture的计算结果，当两个CompletableFuture执行完成后，执行Runnable。</p>
+<pre><code class="java">CompletionStage&lt;Void&gt; runAfterBoth(CompletionStage&lt;?&gt; other,Runnable action);
+CompletionStage&lt;Void&gt; runAfterBothAsync(CompletionStage&lt;?&gt; other,Runnable action);
+CompletionStage&lt;Void&gt; runAfterBothAsync(CompletionStage&lt;?&gt; other,Runnable action,Executor executor);
+</code></pre>
+<p>一个例子如下，5000毫秒后控制台输出”hello world”：</p>
+<pre><code class="java">CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s1&quot;;
+     }).runAfterBothAsync(CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s2&quot;;
+     }), () -&gt; System.out.println(&quot;hello world&quot;));
+</code></pre>
+<h3 id="时间优先转换–CompletableFuture-applyToEither"><a href="#时间优先转换–CompletableFuture-applyToEither" class="headerlink" title="时间优先转换–CompletableFuture.applyToEither()"></a>时间优先转换–CompletableFuture.applyToEither()</h3><p>CompletableFuture.applyToEither() 用于连接两个独立的CompletableFuture，选择计算（返回结果）最快的一个CompletableFuture，进行转换计算操作(<code>Function&lt;? super T, U&gt;</code>)并返回结果。</p>
+<pre><code class="java">&lt;U&gt; CompletionStage&lt;U&gt; applyToEither(CompletionStage&lt;? extends T&gt; other,Function&lt;? super T, U&gt; fn);
+&lt;U&gt; CompletionStage&lt;U&gt; applyToEitherAsync(CompletionStage&lt;? extends T&gt; other,Function&lt;? super T, U&gt; fn);
+&lt;U&gt; CompletionStage&lt;U&gt; applyToEitherAsync(CompletionStage&lt;? extends T&gt; other,Function&lt;? super T, U&gt; fn,Executor executor);
+</code></pre>
+<p>我们现实开发场景中，总会碰到有两种渠道完成同一个事情，所以就可以调用这个方法，找一个最快的结果进行处理。一个例子如下：</p>
+<pre><code class="java">String result = CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s1&quot;;
+     }).applyToEither(CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;hello world&quot;;
+     }), s -&gt; s).join();  //2000毫秒后返回&quot;hello world&quot;
+</code></pre>
+<h3 id="时间优先消费–CompletableFuture-acceptEither"><a href="#时间优先消费–CompletableFuture-acceptEither" class="headerlink" title="时间优先消费–CompletableFuture.acceptEither()"></a>时间优先消费–CompletableFuture.acceptEither()</h3><p>CompletableFuture.acceptEither() 用于连接两个独立的CompletableFuture，选择计算（返回结果）最快的一个CompletableFuture，进行消费操作(Consumer&lt;? super T&gt; action)，无返回值。</p>
+<pre><code class="java">public CompletionStage&lt;Void&gt; acceptEither(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? super T&gt; action);
+public CompletionStage&lt;Void&gt; acceptEitherAsync(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? super T&gt; action);
+public CompletionStage&lt;Void&gt; acceptEitherAsync(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? super T&gt; action,Executor executor);
+</code></pre>
+<p>一个例子如下：</p>
+<pre><code class="java">CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s1&quot;;
+     }).acceptEither(CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;hello world&quot;;
+     }), System.out::println); //2000毫秒后控制台打印 &quot;hello world&quot;
+</code></pre>
+<h3 id="时间优先执行–CompletableFuture-runAfterEither"><a href="#时间优先执行–CompletableFuture-runAfterEither" class="headerlink" title="时间优先执行–CompletableFuture.runAfterEither()"></a>时间优先执行–CompletableFuture.runAfterEither()</h3><p>CompletableFuture.runAfterEither() 用于连接两个独立的CompletableFuture，不关心任何CompletableFuture的返回值，任何一个CompletableFuture执行完毕得到了结果后会马上执行Runable。</p>
+<pre><code class="java">CompletionStage&lt;Void&gt; runAfterEither(CompletionStage&lt;?&gt; other,Runnable action);
+CompletionStage&lt;Void&gt; runAfterEitherAsync(CompletionStage&lt;?&gt; other,Runnable action);
+CompletionStage&lt;Void&gt; runAfterEitherAsync(CompletionStage&lt;?&gt; other,Runnable action,Executor executor);
+</code></pre>
+<p>一个例子如下：</p>
+<pre><code class="java">CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(3000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s1&quot;;
+     }).runAfterEither(CompletableFuture.supplyAsync(() -&gt; {
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return &quot;s2&quot;;
+     }), () -&gt; System.out.println(&quot;hello world&quot;)); //() -&gt; System.out.println(&quot;hello world&quot;)是Runable的Lambda实现。 2000毫秒后控制台打印 &quot;hello world&quot;
+</code></pre>
+<h3 id="结果赋值"><a href="#结果赋值" class="headerlink" title="结果赋值"></a>结果赋值</h3><p>CompletableFuture的完计算结果直接赋值方法主要有以下几个：</p>
+<ul>
+<li>boolean complete(T value)，通过CAS赋值计算结果，内部会发送完成状态，再次调用无效。</li>
+<li>boolean completeExceptionally(Throwable ex)，通过CAS赋值计算异常，内部会发送完成状态，再次调用无效。</li>
+<li>void obtrudeValue(T value)，直接赋值计算结果，内部会发送完成状态，再次调用无效。</li>
+<li>obtrudeException(Throwable ex)，直接赋值计算异常，内部会发送完成状态，再次调用无效。</li>
+</ul>
+<p>只要上面四个方法之一被调用，CompletableFuture就会标记为’完结状态’，再次调用其他方法将不会起效，另外，obtrudeXXX方法属于强制赋值，不建议使用，因为它们会直接覆盖当前的值。</p>
+<p>一个例子如下：</p>
+<pre><code class="java">CompletableFuture&lt;String&gt; future = new CompletableFuture&lt;&gt;();
+        try {
+            future.complete(&quot;test success&quot;);
+        }catch (Exception e){
+            future.completeExceptionally(e);
+        }
+System.out.println(future.get());
+
+//输出 test success
+</code></pre>
+<h3 id="结果获取"><a href="#结果获取" class="headerlink" title="结果获取"></a>结果获取</h3><ul>
+<li><code>T get() throws InterruptedException, ExecutionException</code> ，永久阻塞，直到返回结果值，允许中断，计算过程中所有的异常会包裹为新的ExecutionException实例再抛出。</li>
+<li><code>T get(long timeout, TimeUnit unit)throws InterruptedException, ExecutionException, TimeoutException</code> ，添加超时时间设定，如果超时会抛出TimeoutException，如果获取到结果则释放并返回，允许中断，计算过程中所有的异常会包裹为新的ExecutionException实例再抛出。</li>
+<li><code>T join()</code> ，永久阻塞，直到返回结果值，不允许中断，计算过程中所有的异常会直接抛出。</li>
+<li><code>T getNow(T valueIfAbsent)</code> ，如果当前的计算结果为null，马上返回valueIfAbsent，否则调用join()的逻辑。 </li>
+</ul>
+<p>结果的获取不做举例，因为这个实在太常用，强烈建议使用<code>T get(long timeout, TimeUnit unit)</code>，其他三个方法看场景选择使用。</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><h4 id="取消–cancel"><a href="#取消–cancel" class="headerlink" title="取消–cancel()"></a>取消–cancel()</h4><p>调用CompletableFuture实例的 cancel() 方法可以取消当前的CompletableFuture，此时该CompletableFuture实例会进入’完结状态’，其结果会传入一个新的CancellationException实例，此时通过上一节的’结果获取’中的Api调用就会按各自的处理模式抛出异常。</p>
+<h4 id="所有完成"><a href="#所有完成" class="headerlink" title="所有完成"></a>所有完成</h4><p>调用CompletableFuture的静态方法 <code>CompletableFuture&lt;Void&gt; allOf(CompletableFuture&lt;?&gt;... cfs)</code> ，当所有的传入的CompletableFuture实例都完成的时候，会返回一个新建的CompletableFuture，也就是程序将会阻塞在此方法调用，直到所有传入CompletableFuture都完成，这个时候返回值CompletableFuture实例也完成。举个例子：<code>CompletableFuture.allOf(cf1,cf2).join() ;</code>，其中cf1、cf2是两个独立的CompletableFuture实例。如果你的程序有这么一段代码，那么执行的时候会阻塞在此，直到cf1和cf2都完成了，才会释放。</p>
+<h4 id="任一完成"><a href="#任一完成" class="headerlink" title="任一完成"></a>任一完成</h4><p>调用CompletableFuture的静态方法 <code>CompletableFuture&lt;Object&gt; anyOf(CompletableFuture&lt;?&gt;... cfs)</code>， 这个方法和上面的’所有完成’是相对的。当所有的传入的CompletableFuture实例中只要有一个实例完成的时候，会返回一个新建的CompletableFuture，也就是程序将会阻塞在此方法调用，直到有一个传入的CompletableFuture完成，这个时候返回值CompletableFuture实例也完成。举个例子： <code>CompletableFuture.anyOf(cf1,cf2).join();</code> ，其中cf1、cf2是两个独立的CompletableFuture实例。如果你的程序有这么一段代码，那么执行的时候会阻塞在此，直到cf1或cf2其中一个完成了，才会释放。</p>
+<h2 id="实战例子"><a href="#实战例子" class="headerlink" title="实战例子"></a>实战例子</h2><p>现在假设有一个API网关，在调用查询用户某个订单详情的时候，需要分别从订单服务的订单信息接口、用户服务的用户信息接口两个接口拉取数据，一般来说，低效的伪代码大概如下：</p>
+<pre><code class="java">//这两个参数从外部获得
+Long userId = 10006L;
+String orderId = &quot;XXXXXXXXXXXXXXXXXXXXXX&quot;;
+//从用户服务获取用户信息
+UserInfo userInfo = userService.getUserInfo(userId);
+//从用订单务获取订单信息
+OrderInfo orderInfo = orderService.getOrderInfo(orderId);
+//返回两者的聚合DTO
+return new OrderDetailDTO(userInfo,orderInfo);
+</code></pre>
+<p>其实如果微服务设计得足够好，下面三个外部接口的信息一定是不相关联的，也就是可以并行获取，三个接口的结果都获取完毕之后做一次数据聚合到DTO即可，也就是聚合的耗时大致是这三个接口中耗时最长的接口的响应时间。修改后的代码如下：</p>
+<pre><code class="java">@Service
+public class OrderDetailService {
+    /**
+     * 建立一个线程池专门交给CompletableFuture使用
+     */
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 20, 0, TimeUnit.SECONDS,
+            new ArrayBlockingQueue&lt;&gt;(100));
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private OrderService orderService;
+    public OrderDetailDTO getOrderDetail(Long userId, String orderId) throws Exception {
+        CompletableFuture&lt;UserInfo&gt; userInfoCompletableFuture = CompletableFuture.supplyAsync(() -&gt; userService.getUserInfo(userId), executor);
+        CompletableFuture&lt;OrderInfo&gt; orderInfoCompletableFuture = CompletableFuture.supplyAsync(() -&gt; orderService.getOrderInfo(orderId), executor);
+        CompletableFuture&lt;OrderDetailDTO&gt; result
+                = userInfoCompletableFuture.thenCombineAsync(orderInfoCompletableFuture, OrderDetailDTO::new, executor);
+        return result.get();
+    }
+}
+</code></pre>
+<p>上面的代码还没有考虑到外部的微服务异常的情况，但是相对串行的拉取外部信息的接口的操作方式，这种并行的方式显然是更加高效的，而且CompletableFuture的supplyAsync方法可以传入Supplier接口实例，也就是允许任何参数类型的表达式。当然，其实用ExecutorService的invokeAll方法也可以达到相同的效果.</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 并发 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[关于pgsql的索引]]></title>
+      <url>/2020/12/18/pgsql-1/</url>
+      <content type="html"><![CDATA[<p>主要注意一般jsonb的索引都是gin索引，gin是倒排索引的实现: <a href="https://www.cnblogs.com/flying-tiger/p/6704931.html" target="_blank" rel="noopener">https://www.cnblogs.com/flying-tiger/p/6704931.html</a></p>
+<p>当然我们也可以为jsonb的某一列建立btree索引：</p>
+<pre><code class="sql">--btree--
+create index if not exists idx_customers on danube.config_data ((config_info -&gt; &#39;customers&#39;::text));
+--gin--
+create index if not exists idx_customers on danube.config_data using gin (config_info, (config_info-&gt;&#39;customers&#39;));
+</code></pre>
+<p>PostgreSQL 9种索引的原理和应用场景: <a href="http://mysql.taobao.org/monthly/2019/04/08/" target="_blank" rel="noopener">http://mysql.taobao.org/monthly/2019/04/08/</a></p>
+<p>关于pgsql的文章 <a href="https://github.com/digoal/blog/blob/master/README.md" target="_blank" rel="noopener">https://github.com/digoal/blog/blob/master/README.md</a></p>
+<p>总体感觉pgsql的实现要比mysql复杂得多，功能也更强大，比如json的支持（直接代替文档数据库），gin索引的支持，物化视图的支持（多表查询的利器），还有fdw功能（把别的库的表当成自己的用，直接解决跨库join的问题），主从物理复制（流复制，实例复制，基于wal日志，一致性强于mysql的binlog逻辑复制）。</p>
+<p>mysql也就胜在简单，以及做分库分表和ha的这些中间件的生态更齐全吧。性能看网上说都估计都差不多。</p>
+<p>感觉pgsql有个大问题就是学习资料还是太少了，公司生产中用pgsql碰到过几次死锁，后来都是找dba搞定的，自己搞不定。</p>
+<p>有时间我会再仔细整理这部分。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> pgsql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> pgsql </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[kafka]]></title>
       <url>/2020/12/17/kafka/</url>
       <content type="html"><![CDATA[<p>转自 <a href="https://www.orchome.com/5" target="_blank" rel="noopener">https://www.orchome.com/5</a></p>
@@ -4054,6 +4507,178 @@ end
     </entry>
     
     <entry>
+      <title><![CDATA[redis进阶之分布式锁]]></title>
+      <url>/2020/11/28/redis-7/</url>
+      <content type="html"><![CDATA[<hr>
+<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
+<hr>
+<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
+<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
+<p>这里给出java版本的代码</p>
+<pre><code class="java">    // 加锁
+    @Override
+    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
+        try {
+            return lockRedisTemplate.execute(
+                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
+                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
+                    )
+            );
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 解锁
+    @Override
+    public boolean del(String key, String value) {
+        try {
+            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
+                    + &quot; return true; &quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end; &quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 锁续约
+    @Override
+    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
+        try {
+            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
+                    + &quot; then &quot;
+                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
+                    + &quot; return true;&quot;
+                    + &quot; else &quot;
+                    + &quot; return false; &quot;
+                    + &quot; end;&quot;;
+            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
+            redisScript.setResultType(Boolean.class);
+            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
+        } catch (Exception e){
+            if (!(e.getCause().getCause() instanceof InterruptedException)){
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+</code></pre>
+<p>需要注意的几点：</p>
+<ul>
+<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
+<li>锁有过期时间，为了防止死锁</li>
+<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
+<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
+          boolean failed = true;
+          try {
+              boolean interrupted = false;
+              for (;;) {
+                  final Node p = node.predecessor();
+                  if (p == head &amp;&amp; tryAcquire(arg)) {
+                      setHead(node);
+                      p.next = null;
+                      failed = false;
+                      return interrupted;
+                  }
+                  // 就是这一行
+                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
+                      interrupted = true;
+                  }
+              }
+          } finally {
+              if (failed) {
+                  cancelAcquire(node);
+              }
+          }
+      }
+</code></pre>
+</li>
+</ul>
+<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
+<ul>
+<li>客户端A获取 master 中的锁。</li>
+<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
+<li>slave 晋升为 master。</li>
+<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
+</ul>
+<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
+<ul>
+<li>它以毫秒为单位获取当前时间。</li>
+<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
+<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
+<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
+<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
+</ul>
+<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
+<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
+<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
+<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
+<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
+</li>
+<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
+</li>
+<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
+</li>
+</ol>
+<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
+<li><p>能够自动释放锁</p>
+</li>
+<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
+</li>
+<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
+</li>
+<li><p>重试获取锁要有一定次数限制</p>
+</li>
+</ol>
+<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
+<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
+</li>
+<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
+</li>
+<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
+</li>
+</ol>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
+<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
+</li>
+<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
+</li>
+<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
+</li>
+<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
+</li>
+<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
+</li>
+<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
+</li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> redis </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> redis </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[redis进阶之缓存]]></title>
       <url>/2020/11/28/redis-6/</url>
       <content type="html"><![CDATA[<h2 id="缓存的收益和成本"><a href="#缓存的收益和成本" class="headerlink" title="缓存的收益和成本"></a>缓存的收益和成本</h2><p>收益:</p>
@@ -4333,178 +4958,6 @@ es1:19000&gt; get bitmap_cat
 <p>（5）尝试删除缓存操作，发现删除失败；</p>
 <p>（6）将这些信息发送至消息队列；</p>
 <p>（7）重新从消息队列中获得该数据，重试操作。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> redis </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> redis </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[redis进阶之分布式锁]]></title>
-      <url>/2020/11/28/redis-7/</url>
-      <content type="html"><![CDATA[<hr>
-<p>写过一个单节点版的redis分布式锁，源码在这里 <a href="https://github.com/IBM/distributed-lock-spring-boot-starter" target="_blank" rel="noopener">https://github.com/IBM/distributed-lock-spring-boot-starter</a></p>
-<hr>
-<p>官方文档直接给了答案 <a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">https://redis.io/topics/distlock</a></p>
-<h2 id="单节点redis上实现分布式锁"><a href="#单节点redis上实现分布式锁" class="headerlink" title="单节点redis上实现分布式锁"></a>单节点redis上实现分布式锁</h2><p>其实很简单，上锁就是<code>set nx px</code>, 解锁就是get+del现在一个lua脚本里就行。</p>
-<p>这里给出java版本的代码</p>
-<pre><code class="java">    // 加锁
-    @Override
-    public boolean initValWithTtl(String key, String value, long ttl, TimeUnit timeUnit) {
-        try {
-            return lockRedisTemplate.execute(
-                    (RedisCallback&lt;Boolean&gt;) connection -&gt; (
-                            (StringRedisConnection) connection).set(key, value, Expiration.from(ttl, timeUnit), RedisStringCommands.SetOption.SET_IF_ABSENT
-                    )
-            );
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 解锁
-    @Override
-    public boolean del(String key, String value) {
-        try {
-            String del = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;del&#39;, KEYS[1]) &quot;
-                    + &quot; return true; &quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end; &quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(del);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value);
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 锁续约
-    @Override
-    public boolean extendTtl(String key, String value, long ttl, TimeUnit timeUnit){
-        try {
-            String extendTtl = &quot;if (redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1]) &quot;
-                    + &quot; then &quot;
-                    + &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); &quot;
-                    + &quot; return true;&quot;
-                    + &quot; else &quot;
-                    + &quot; return false; &quot;
-                    + &quot; end;&quot;;
-            DefaultRedisScript&lt;Boolean&gt; redisScript = new DefaultRedisScript&lt;&gt;(extendTtl);
-            redisScript.setResultType(Boolean.class);
-            return lockRedisTemplate.execute(redisScript, Collections.singletonList(key), value, String.valueOf(timeUnit.toMillis(ttl)));
-        } catch (Exception e){
-            if (!(e.getCause().getCause() instanceof InterruptedException)){
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }
-</code></pre>
-<p>需要注意的几点：</p>
-<ul>
-<li>上锁的key必须是全局唯一的，value也一样，而且value必须是线程独有的： key可以锁名称，value可以ip加线程id加时间戳（其实value设一个随机值也可以，但你得在threadlocal里保存这个随机值）</li>
-<li>锁有过期时间，为了防止死锁</li>
-<li>过期时间到了但是需要上锁的业务代码还没跑完怎么办，加一个租约机制，用一个守护线程去不断的续约（ScheduledThreadPoolExecutor）</li>
-<li>代码可以直接套用Java的aqs，但注意：<br>单实例的aqs，头节点永远是占有锁的节点，所以它的后驱节点永远在自旋。其他节点都可以放心休息。而多实例aqs，肯定会有实例的等待队列的头节点得不到锁，从而错误的进入了休息，这样这个队列就永远不会被唤醒。因此，要解决问题，只需要保持每个实例的队列的头节点即使不是占有锁的节点，也得保证其后驱节点永远在自旋即可。<br>简单改一下aqs中的一行就能实现：<pre><code class="java">  final boolean acquireQueued(final Node node, int arg) {
-          boolean failed = true;
-          try {
-              boolean interrupted = false;
-              for (;;) {
-                  final Node p = node.predecessor();
-                  if (p == head &amp;&amp; tryAcquire(arg)) {
-                      setHead(node);
-                      p.next = null;
-                      failed = false;
-                      return interrupted;
-                  }
-                  // 就是这一行
-                  if (p != head &amp;&amp; shouldParkAfterFailedAcquire(p, node) &amp;&amp; parkAndCheckInterrupt()) {
-                      interrupted = true;
-                  }
-              }
-          } finally {
-              if (failed) {
-                  cancelAcquire(node);
-              }
-          }
-      }
-</code></pre>
-</li>
-</ul>
-<h2 id="分布式redis环境的分布式锁"><a href="#分布式redis环境的分布式锁" class="headerlink" title="分布式redis环境的分布式锁"></a>分布式redis环境的分布式锁</h2><h3 id="为什么基于主从复制的分布式锁是无效的"><a href="#为什么基于主从复制的分布式锁是无效的" class="headerlink" title="为什么基于主从复制的分布式锁是无效的"></a>为什么基于主从复制的分布式锁是无效的</h3><p>redis的主从复制是异步的，会产生竞态条件：</p>
-<ul>
-<li>客户端A获取 master 中的锁。</li>
-<li>在将锁（一个redis的key）写入传输到 slave 之前，master 崩溃。</li>
-<li>slave 晋升为 master。</li>
-<li>客户端B希望获取对相同资源A的锁定，尽管该资源A已经持有了锁，但这个锁资源并没有被复制到 slave（new master）上，出现了多个线程拿锁的情况，不互斥了！</li>
-</ul>
-<h3 id="解决方案redlock"><a href="#解决方案redlock" class="headerlink" title="解决方案redlock"></a>解决方案redlock</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><p>假设我们用 5 个 master 节点，分布在不同的机房尽量保证可用性。为了获得锁，客户端会进行如下操作：</p>
-<ul>
-<li>它以毫秒为单位获取当前时间。</li>
-<li>尝试顺序地在 5 个实例上申请锁，当然需要使用相同的 key 和 random value，这里客户端需要合理锁的 ttl 大小 以及 获得一个节点上的锁的等待时间，避免长时间和一个 fail 了的节点浪费时间，比如：TTL为5s,设置获取锁最多用1s，所以如果一秒内无法获取锁，就放弃获取这个锁，从而尝试获取下个锁</li>
-<li>当客户端在大于等于 3 个 master 上成功申请到锁的时候，且它会计算申请锁消耗了多少时间，这部分消耗的时间，采用获得锁的当下时间减去第一步获得的时间戳得到，如果这个时间小于锁的ttl，那么锁就真正获取到了。</li>
-<li>如果锁申请到了，则锁的真正有效时间是 TTL减去第三步的时间差 的时间</li>
-<li>如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</li>
-</ul>
-<h4 id="RedLock算法是否是异步算法？"><a href="#RedLock算法是否是异步算法？" class="headerlink" title="RedLock算法是否是异步算法？"></a>RedLock算法是否是异步算法？</h4><p>可以看成是同步算法；因为 即使进程间（多个电脑间）没有同步时钟，但是每个进程时间流速大致相同；并且时钟漂移相对于TTL叫小，可以忽略，所以可以看成同步算法；（不够严谨，算法上要算上时钟漂移，因为如果两个电脑在地球两端，则时钟漂移非常大）</p>
-<h4 id="RedLock失败重试"><a href="#RedLock失败重试" class="headerlink" title="RedLock失败重试"></a>RedLock失败重试</h4><p>当客户端不能获取锁时，应该在随机时间后重试获取锁；并且最好在同一时刻并发的把set命令发送给所有redis实例；而且对于已经获取锁的客户端在完成任务后要及时释放锁，这是为了节省时间；</p>
-<h4 id="RedLock释放锁"><a href="#RedLock释放锁" class="headerlink" title="RedLock释放锁"></a>RedLock释放锁</h4><p>由于释放锁时会判断这个锁的value是不是自己设置的，如果是才删除；所以在释放锁时非常简单，只要向所有实例都发出释放锁的命令，不用考虑能否成功释放锁；</p>
-<h4 id="RedLock注意点（Safety-arguments）"><a href="#RedLock注意点（Safety-arguments）" class="headerlink" title="RedLock注意点（Safety arguments）"></a>RedLock注意点（Safety arguments）</h4><ol>
-<li><p>先假设客户端获取所有实例，所有实例包含相同的key和过期时间(TTL) ,但每个实例set命令时间不同导致不能同时过期，第一个set命令之前是T1,最后一个set命令后为T2, 则此client有效获取锁的最小时间为TTL-(T2-T1)-时钟漂移;</p>
-</li>
-<li><p>对于以N/2+ 1(也就是一半以 上)的方式判断获取锁成功，是因为如果小于一半判断为成功的话，有可能出现多个client都成功获取锁的情况， 从而使锁失效</p>
-</li>
-<li><p>一个客户端锁定一个实例耗费的时间大于或接近锁的过期时间，就认为锁无效，并且解锁这个redis实例(不执行业务) ; 只要在TTL时间内成功获取一半以上的锁便是有效锁;否则无效</p>
-</li>
-</ol>
-<h4 id="系统有活性的三个特征"><a href="#系统有活性的三个特征" class="headerlink" title="系统有活性的三个特征"></a>系统有活性的三个特征</h4><ol>
-<li><p>能够自动释放锁</p>
-</li>
-<li><p>在获取锁失败（不到一半以上），或任务完成后 能够自动释放锁，不用等到其自动过期</p>
-</li>
-<li><p>在客户端重试获取锁前（第一次失败到第二次重试时间间隔）大于第一次获取锁消耗的时间；</p>
-</li>
-<li><p>重试获取锁要有一定次数限制</p>
-</li>
-</ol>
-<h4 id="RedLock性能及崩溃恢复的相关解决方法"><a href="#RedLock性能及崩溃恢复的相关解决方法" class="headerlink" title="RedLock性能及崩溃恢复的相关解决方法"></a>RedLock性能及崩溃恢复的相关解决方法</h4><ol>
-<li><p>如果redis没有持久化功能，在客户端A获取锁成功后，所有redis重启，客户端B能够再次获取到锁，这样违法了锁的排他互斥性;</p>
-</li>
-<li><p>如果启动AOF永久化存储，事情会好些， 举例:当我们重启redis后，由于redis过期机制是按照unix时间戳走的，所以在重启后，然后会按照规定的时间过期，不影响业务;但是由于AOF同步到磁盘的方式默认是每秒-次，如果在一秒内断电，会导致数据丢失，立即重启会造成锁互斥性失效; 但如果同步磁盘方式使用Always(每一个写命令都同步到硬盘)造成性能急剧下降; 所以在锁完全有效性和性能方面要有所取舍; </p>
-</li>
-<li><p>既保证锁完全有效性，又性能高效，即使断电情况也有效 的方法是redis同步到磁盘方式保持 默认的每秒，在redis无论因为什么原因停掉后要等待TTL时间后再重启(延迟重启); 缺点是 在TTL时间内服务相当于暂停状态;</p>
-</li>
-</ol>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ol>
-<li><p>TTL时长 要大于正常业务执行的时间+获取所有redis服务消耗时间+时钟漂移</p>
-</li>
-<li><p>获取redis所有服务消耗时间要 远小于TTL时间，并且获取成功的锁个数要 在总数的一般以上:N/2+1</p>
-</li>
-<li><p>尝试获取每个redis实例锁时的时间要 远小于TTL时间</p>
-</li>
-<li><p>尝试获取所有锁失败后 重新尝试一定要有一定次数限制</p>
-</li>
-<li><p>在redis崩溃后（无论一个还是所有），要延迟TTL时间重启redis</p>
-</li>
-<li><p>在实现多redis节点时要结合单节点分布式锁算法 共同实现</p>
-</li>
-</ol>
 ]]></content>
       
         <categories>
@@ -23540,7 +23993,7 @@ java --patch-module java.base=mypatches/java.base ...
 <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=4882391&auto=0&height=66"></iframe>
 
 <p>Java码农，目前供职于IBM。</p>
-<p>博客刚刚建立，希望自己能坚持写下去。</p>
+<p>文章内容源自读书笔记、网络摘抄、以及自己的实战经验和归纳总结。所有参考与转载均已注明出处，如有侵权请联系我删除。</p>
 <p>Email：a728976009@hotmail.com</p>
 <hr>
 <p>想在天井里盛一只玻璃杯</p>
