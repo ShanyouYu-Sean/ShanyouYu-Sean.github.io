@@ -707,31 +707,364 @@ create index if not exists idx_customers on danube.config_data using gin (config
     </entry>
     
     <entry>
-      <title><![CDATA[kafka]]></title>
-      <url>/2020/12/17/kafka/</url>
-      <content type="html"><![CDATA[<p>转自 <a href="https://www.orchome.com/5" target="_blank" rel="noopener">https://www.orchome.com/5</a></p>
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ul>
-<li>Topic<br>Kafka将消息分门别类，每一类的消息称之为一个主题（Topic）。</li>
-<li>Producer<br>发布消息的对象称之为主题生产者（Kafka topic producer）</li>
-<li>Consumer<br>订阅消息并处理发布的消息的对象称之为主题消费者（consumers）</li>
-<li>Broker<br>已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理（Broker）。 消费者可以订阅一个或多个主题（topic），并从Broker拉数据，从而消费这些已发布的消息。</li>
+      <title><![CDATA[kafka 进阶]]></title>
+      <url>/2020/12/17/kafka-2/</url>
+      <content type="html"><![CDATA[<h2 id="日志存储"><a href="#日志存储" class="headerlink" title="日志存储"></a>日志存储</h2><p>Kafka中的消息是以主题为基本单位进行归类的，各个主题在逻辑上相互独立。每个主题又可以分为一个或多个分区，分区的数量可以在主题创建的时候指定，也可以在之后修改。每条消息在发送的时候会根据分区规则被追加到指定的分区中，分区中的每条消息都会被分配一个唯一的序列号，也就是通常所说的偏移量（offset）</p>
+<p>如果分区规则设置得合理，那么所有的消息可以均匀地分布到不同的分区中，这样就可以实现水平扩展。不考虑多副本的情况，一个分区对应一个日志（Log）。为了防止Log过大，Kafka又引入了日志分段（LogSegment）的概念，将Log切分为多个LogSegment，相当于一个巨型文件被平均分配为多个相对较小的文件，这样也便于消息的维护和清理。事实上，Log和LogSegment也不是纯粹物理意义上的概念，Log在物理上只以文件夹的形式存储，而每个LogSegment对应于磁盘上的一个日志文件和两个索引文件，以及可能的其他文件（比如以“.txnindex”为后缀的事务索引文件）。在图51中又补充了Log和LogSegment的关系。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6mRFU.png" alt="r6mRFU.png"></p>
+<p>Log对应了一个命名形式为＜topic＞＜partition＞的文件夹。举个例子，假设有一个名为“topiclog”的主题，此主题中具有4个分区，那么在实际物理存储上表现为“topiclog0”“topiclog1”“topiclog2”“topiclog3”这4个文件夹：</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6nPTf.png" alt="r6nPTf.png"></p>
+<p>向Log中追加消息时是顺序写入的，只有最后一个LogSegment才能执行写入操作，在此之前所有的LogSegment都不能写入数据。为了方便描述，我们将最后一个LogSegment称为“activeSegment”，即表示当前活跃的日志分段。随着消息的不断写入，当activeSegment满足一定的条件时，就需要创建新的activeSegment，之后追加的消息将写入新的activeSegment。</p>
+<p>为了便于消息的检索，每个LogSegment中的日志文件（以“.log”为文件后缀）都有对应的两个索引文件：偏移量索引文件（以“.index”为文件后缀）和时间戳索引文件（以“.timeindex”为文件后缀）。每个LogSegment都有一个基准偏移量baseOffset，用来表示当前LogSegment中第一条消息的offset。偏移量是一个64位的长整型数，日志文件和两个索引文件都是根据基准偏移量（baseOffset）命名的，名称固定为20位数字，没有达到的位数则用0填充。比如第一个LogSegment的基准偏移量为0，对应的日志文件为00000000000000000000.log。</p>
+<p>举例说明，向主题topiclog中发送一定量的消息，某一时刻topiclog0目录中的布局如下所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6nJ1J.png" alt="r6nJ1J.png"></p>
+<p>示例中第2个LogSegment对应的基准位移是133，也说明了该LogSegment中的第一条消息的偏移量为133，同时可以反映出第一个LogSegment中共有133条消息（偏移量从0至132的消息）。</p>
+<h3 id="日志索引"><a href="#日志索引" class="headerlink" title="日志索引"></a>日志索引</h3><p>本章开头就提及了每个日志分段文件对应了两个索引文件，主要用来提高查找消息的效率。偏移量索引文件用来建立消息偏移量（offset）到物理地址之间的映射关系，方便快速定位消息所在的物理文件位置；时间戳索引文件则根据指定的时间戳（timestamp）来查找对应的偏移量信息。</p>
+<p>Kafka中的索引文件以稀疏索引（sparseindex）的方式构造消息的索引，它并不保证每个消息在索引文件中都有对应的索引项。每当写入一定量（由broker端参数log.index.interval.bytes指定，默认值为4096，即4KB）的消息时，偏移量索引文件和时间戳索引文件分别增加一个偏移量索引项和时间戳索引项，增大或减小log.index.interval.bytes的值，对应地可以增加或缩小索引项的密度。</p>
+<p>稀疏索引通过MappedByteBuffer将索引文件映射到内存中，以加快索引的查询速度。偏移量索引文件中的偏移量是单调递增的，查询指定偏移量时，使用二分查找法来快速定位偏移量的位置，如果指定的偏移量不在索引文件中，则会返回小于指定偏移量的最大偏移量。时间戳索引文件中的时间戳也保持严格的单调递增，查询指定时间戳时，也根据二分查找法来查找不大于该时间戳的最大偏移量，至于要找到对应的物理文件位置还需要根据偏移量索引文件来进行再次定位。稀疏索引的方式是在磁盘空间、内存空间、查找时间等多方面之间的一个折中。</p>
+<h4 id="偏移量索引"><a href="#偏移量索引" class="headerlink" title="偏移量索引"></a>偏移量索引</h4><p>偏移量索引项的格式如图58所示。每个索引项占用8个字节，分为两个部分。（</p>
+<ul>
+<li>relativeOffset：相对偏移量，表示消息相对于baseOffset的偏移量，占用4个字节，当前索引文件的文件名即为baseOffset的值。</li>
+<li>position：物理地址，也就是消息在日志分段文件中对应的物理位置，占用4个字节。</li>
 </ul>
-<p>在 Kafka 中，Topic 是一个存储消息的逻辑概念，可以认为是一个消息集合。每条消息发送到 Kafka 集群的消息都有一个类别。物理上来说，不同的 Topic 的消息是分开存储的，每个 Topic 可以有多个生产者向它发送消息，也可以有多个消费者去消费其中的消息。</p>
-<p><img src="https://s3.ax1x.com/2020/12/20/rdeWEn.png" alt="rdeWEn.png"></p>
-<p>每个 Topic 可以划分多个分区（每个 Topic 至少有一个分区），同一 Topic 下的不同分区包含的消息是不同的。每个消息在被添加到分区时，都会被分配一个 offset，它是消息在此分区中的唯一编号，Kafka 通过 offset 保证消息在分区内的顺序，offset 的顺序不跨分区，即 Kafka 只保证在同一个分区内的消息是有序的。</p>
-<p>消息是每次追加到对应的 Partition 的后面：</p>
-<p><img src="https://s3.ax1x.com/2020/12/20/rdefNq.png" alt="rdefNq.png"></p>
-<p>1个partition只能被同组的一个consumer消费，同组的consumer则起到均衡效果</p>
-<h3 id="消费者多于partition"><a href="#消费者多于partition" class="headerlink" title="消费者多于partition"></a>消费者多于partition</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdmibd.png" alt="rdmibd.png"></p>
-<p>如上图，向test发送消息：1，2， 3，4，5，6，7，8，9</p>
-<p>只有C1能接收到消息，C2则不能接收到消息，即同一个partition内的消息只能被同一个组中的一个consumer消费。当消费者数量多于partition的数量时，多余的消费者空闲。</p>
-<p>也就是说如果只有一个partition你在同一组启动多少个consumer都没用，partition的数量决定了此topic在同一组中被可被均衡的程度，例如partition=4，则可在同一组中被最多4个consumer均衡消费。</p>
-<h3 id="消费者少于和等于partition"><a href="#消费者少于和等于partition" class="headerlink" title="消费者少于和等于partition"></a>消费者少于和等于partition</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdmnxS.png" alt="rdmnxS.png"></p>
-<p>消费者数量2小于partition的数量3，此时，向test2发送消息1，2，3，4，5，6，7，8，9<br>C1接收到1，3，4，6，7，9<br>C2接收到2，5，8<br>此时P1、P2对对应C1，即多个partition对应一个消费者，C1接收到消息量是C2的两倍</p>
-<p>然后，在g3组中再启动一个消费者，使得消费者数量为3等于topic2中partition的数量</p>
-<p>此时，partition和消费者是一对一关系，向test2发送消息1，2，3，4，5，6，7，8，9<br>C1接收到了：2，5，8<br>C2接收到了：3，6，9<br>C3接收到了：1，4，7<br>C1，C2，C3均分了test2的所有消息，即消息在同一个组之间的消费者之间均分了!</p>
-<h3 id="多个消费者组"><a href="#多个消费者组" class="headerlink" title="多个消费者组"></a>多个消费者组</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdnKW6.png" alt="rdnKW6.png"></p>
-<p>如上图，向test2发送消息1，2，3，4，5，6，7，8，9<br>消息被g3组的消费者均分，g4组的消费者在接收到了所有的消息。<br>g3组：<br>C1接收到了：2，5，8<br>C2接收到了：3，6，9<br>C3接收到了：1，4，7<br>g4组：<br>C1接收到了：1，2，3，4，5，6，7，8，9<br>启动多个组，则会使同一个消息被消费多次</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r63IZd.png" alt="r63IZd.png"></p>
+<p>消息的偏移量（offset）占用8个字节，也可以称为绝对偏移量。索引项中没有直接使用绝对偏移量而改为只占用4个字节的相对偏移量（relativeOffset=offsetbaseOffset），这样可以减小索引文件占用的空间。举个例子，一个日志分段的baseOffset为32，那么其文件名就是00000000000000000032.log，offset为35的消息在索引文件中的relativeOffset的值为3532=3。</p>
+<p>我们以本章开头topiclog0目录下的00000000000000000000.index为例来进行具体分析，截取00000000000000000000.index部分内容如下：</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6Y8yT.png" alt="r6Y8yT.png"></p>
+<p>我们这里给出00000000000000000000.index和00000000000000000000.log的对照图来做进一步的陈述，如图59所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6tAhR.png" alt="r6tAhR.png"></p>
+<p>如果我们要查找偏移量为23的消息，那么应该怎么做呢？首先通过二分法在偏移量索引文件中找到不大于23的最大索引项，即[22，656]，然后从日志分段文件中的物理位置656开始顺序查找偏移量为23的消息。</p>
+<p>以上是最简单的一种情况。参考图510，如果要查找偏移量为268的消息，那么应该怎么办呢？首先肯定是定位到baseOffset为251的日志分段，然后计算相对偏移量relativeOffset=268251=17，之后再在对应的索引文件中找到不大于17的索引项，最后根据索引项中的position定位到具体的日志分段文件位置开始查找目标消息。那么又是如何查找baseOffset为251的日志分段的呢？这里并不是顺序查找，而是用了跳跃表的结构。Kafka的每个日志对象中使用了ConcurrentSkipListMap来保存各个日志分段，每个日志分段的baseOffset作为key，这样可以根据指定偏移量来快速定位到消息所在的日志分段。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6NkqS.png" alt="r6NkqS.png"></p>
+<p>还需要注意的是，Kafka强制要求索引文件大小必须是索引项大小的整数倍，对偏移量索引文件而言，必须为8的整数倍。如果broker端参数log.index.size.max.bytes配置为67，那么Kafka在内部会将其转换为64，即不大于67，并且满足为8的整数倍的条件。</p>
+<h4 id="时间戳索引"><a href="#时间戳索引" class="headerlink" title="时间戳索引"></a>时间戳索引</h4><p><img src="https://s3.ax1x.com/2020/12/23/r6NgJA.png" alt="r6NgJA.png"></p>
+<p>每个索引项占用12个字节，分为两个部分。</p>
+<ul>
+<li>timestamp：当前日志分段最大的时间戳。</li>
+<li>relativeOffset：时间戳所对应的消息的相对偏移量。</li>
+</ul>
+<p>时间戳索引文件中包含若干时间戳索引项，每个追加的时间戳索引项中的timestamp必须大于之前追加的索引项的timestamp，否则不予追加。如果broker端参数log.message.timestamp.type设置为LogAppendTime，那么消息的时间戳必定能够保持单调递增；相反，如果是CreateTime类型则无法保证。生产者可以使用类似ProducerRecord（Stringtopic，Integerpartition，Longtimestamp，Kkey，Vvalue）的方法来指定时间戳的值。即使生产者客户端采用自动插入的时间戳也无法保证时间戳能够单调递增，如果两个不同时钟的生产者同时往一个分区中插入消息，那么也会造成当前分区的时间戳乱序。</p>
+<p>我们已经知道每当写入一定量的消息时，就会在偏移量索引文件和时间戳索引文件中分别增加一个偏移量索引项和时间戳索引项。两个文件增加索引项的操作是同时进行的，但并不意味着偏移量索引中的relativeOffset和时间戳索引项中的relativeOffset是同一个值。</p>
+<p>我们画出00000000000000000000.timeindex的具体结构，详细参考图512左上角。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6USwF.png" alt="r6USwF.png"></p>
+<p>如果要查找指定时间戳targetTimeStamp=1526384718288开始的消息，首先是找到不小于指定时间戳的日志分段。这里就无法使用跳跃表来快速定位到相应的日志分段了，需要分以下几个步骤来完成。</p>
+<ul>
+<li>将targetTimeStamp和每个日志分段中的最大时间戳largestTimeStamp逐一对比，直到找到不小于targetTimeStamp的largestTimeStamp所对应的日志分段。日志分段中的largestTimeStamp的计算是先查询该日志分段所对应的时间戳索引文件，找到最后一条索引项，若最后一条索引项的时间戳字段值大于0，则取其值，否则取该日志分段的最近修改时间。</li>
+<li>找到相应的日志分段之后，在时间戳索引文件中使用二分查找算法查找到不大于targetTimeStamp的最大索引项，即[1526384718283，28]，如此便找到了一个相对偏移量28。</li>
+<li>在偏移量索引文件中使用二分算法查找到不大于28的最大索引项，即[26，838]。</li>
+<li>从步骤1中找到日志分段文件中的838的物理位置开始查找不小于targetTimeStamp的消息。</li>
+</ul>
+<h3 id="日志清理"><a href="#日志清理" class="headerlink" title="日志清理"></a>日志清理</h3><p>Kafka将消息存储在磁盘中，为了控制磁盘占用空间的不断增加就需要对消息做一定的清理操作。Kafka中每一个分区副本都对应一个Log，而Log又可以分为多个日志分段，这样也便于日志的清理操作。Kafka提供了两种日志清理策略。</p>
+<ul>
+<li>日志删除（LogRetention）：按照一定的保留策略直接删除不符合条件的日志分段。</li>
+<li>日志压缩（LogCompaction）：针对每个消息的key进行整合，对于有相同key的不同value值，只保留最后一个版本。</li>
+</ul>
+<h3 id="磁盘存储（回答kafka为什么快）"><a href="#磁盘存储（回答kafka为什么快）" class="headerlink" title="磁盘存储（回答kafka为什么快）"></a>磁盘存储（回答kafka为什么快）</h3><h4 id="页缓存"><a href="#页缓存" class="headerlink" title="页缓存"></a>页缓存</h4><p>页缓存是操作系统实现的一种主要的磁盘缓存，以此用来减少对磁盘I/O的操作。具体来说，就是把磁盘中的数据缓存到内存中，把对磁盘的访问变为对内存的访问。</p>
+<p>当一个进程准备读取磁盘上的文件内容时，操作系统会先查看待读取的数据所在的页（page）是否在页缓存（pagecache）中，如果存在（命中）则直接返回数据，从而避免了对物理磁盘的I/O操作；如果没有命中，则操作系统会向磁盘发起读取请求并将读取的数据页存入页缓存，之后再将数据返回给进程。同样，如果一个进程需要将数据写入磁盘，那么操作系统也会检测数据对应的页是否在页缓存中，如果不存在，则会先在页缓存中添加相应的页，最后将数据写入对应的页。被修改过后的页也就变成了脏页，操作系统会在合适的时间把脏页中的数据写入磁盘，以保持数据的一致性。</p>
+<p>Kafka中大量使用了页缓存，这是Kafka实现高吞吐的重要因素之一。</p>
+<p>虽然消息都是先被写入页缓存，然后由操作系统负责具体的刷盘任务的，但在Kafka中同样提供了同步刷盘及间断性强制刷盘（fsync）的功能。同步刷盘可以提高消息的可靠性，防止由于机器掉电等异常造成处于页缓存而没有及时写入磁盘的消息丢失。不过笔者并不建议这么做，刷盘任务就应交由操作系统去调配，消息的可靠性应该由多副本机制来保障，而不是由同步刷盘这种严重影响性能的行为来保障。</p>
+<h4 id="磁盘I-O流程"><a href="#磁盘I-O流程" class="headerlink" title="磁盘I/O流程"></a>磁盘I/O流程</h4><p>一张磁盘I/O的流程图</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6UOtH.png" alt="r6UOtH.png"></p>
+<p>一般磁盘I/O的场景有以下四种。</p>
+<ul>
+<li>用户调用标准C库进行I/O操作，数据流为：应用程序buffer→C库标准IObuffer→文件系统页缓存→通过具体文件系统到磁盘。</li>
+<li>用户调用文件I/O，数据流为：应用程序buffer→文件系统页缓存→通过具体文件系统到磁盘。</li>
+<li>用户打开文件时使用O_DIRECT，绕过页缓存直接读写磁盘。</li>
+<li>用户使用类似dd工具，并使用direct参数，绕过系统cache与文件系统直接写磁盘。</li>
+</ul>
+<p>发起I/O请求的步骤可以表述为如下的内容</p>
+<ul>
+<li>写操作：用户调用fwrite把数据写入C库标准IObuffer后就返回，即写操作通常是异步操作；数据写入C库标准IObuffer后，不会立即刷新到磁盘，会将多次小数据量相邻写操作先缓存起来合并，最终调用write函数一次性写入（或者将大块数据分解多次write调用）页缓存；数据到达页缓存后也不会立即刷新到磁盘，内核有pdflush线程在不停地检测脏页，判断是否要写回到磁盘，如果是则发起磁盘I/O请求。</li>
+<li>读操作：用户调用fread到C库标准IObuffer中读取数据，如果成功则返回，否则继续；到页缓存中读取数据，如果成功则返回，否则继续；发起I/O请求，读取数据后缓存buffer和C库标准IObuffer并返回。可以看出，读操作是同步请求。</li>
+<li>I/O请求处理：通用块层根据I/O请求构造一个或多个bio结构并提交给调度层；调度器将bio结构进行排序和合并组织成队列且确保读写操作尽可能理想：将一个或多个进程的读操作合并到一起读，将一个或多个进程的写操作合并到一起写，尽可能变随机为顺序（因为随机读写比顺序读写要慢），读必须优先满足，而写也不能等太久。</li>
+</ul>
+<p>kafka是消息顺序追加，可是实现顺序io</p>
+<h4 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h4><p>除了消息顺序追加、页缓存等技术，Kafka还使用零拷贝（ZeroCopy）技术来进一步提升性能。所谓的零拷贝是指将数据直接从磁盘文件复制到网卡设备中，而不需要经由应用程序之手。零拷贝大大提高了应用程序的性能，减少了内核和用户模式之间的上下文切换。对Linux操作系统而言，零拷贝技术依赖于底层的sendfile（）方法实现。对应于Java语言，FileChannal.transferTo（）方法的底层实现就是sendfile（）方法。</p>
+<p>单纯从概念上理解“零拷贝”比较抽象，这里简单地介绍一下它。考虑这样一种常用的情形：你需要将静态内容（类似图片、文件）展示给用户。这个情形就意味着需要先将静态内容从磁盘中复制出来放到一个内存buf中，然后将这个buf通过套接字（Socket）传输给用户，进而用户获得静态内容。这看起来再正常不过了，但实际上这是很低效的流程，我们把上面的这种情形抽象成下面的过程：</p>
+<p>首先调用read（）将静态内容（这里假设为文件A）读取到tmp_buf，然后调用write（）将tmp_buf写入Socket，如图523所示。在这个过程中，文件A经历了4次复制的过程：</p>
+<ul>
+<li>调用read（）时，文件A中的内容被复制到了内核模式下的ReadBuffer中。</li>
+<li>CPU控制将内核模式数据复制到用户模式下。</li>
+<li>调用write（）时，将用户模式下的内容复制到内核模式下的SocketBuffer中。- 将内核模式下的SocketBuffer的数据复制到网卡设备中传送。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6dOSA.png" alt="r6dOSA.png"></p>
+<p>从上面的过程可以看出，数据平白无故地从内核模式到用户模式“走了一圈”，浪费了2次复制过程：第一次是从内核模式复制到用户模式；第二次是从用户模式再复制回内核模式，即上面4次过程中的第2步和第3步。而且在上面的过程中，内核和用户模式的上下文的切换也是4次。</p>
+<p>如果采用了零拷贝技术，那么应用程序可以直接请求内核把磁盘中的数据传输给Socket，如图524所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6dvOP.png" alt="r6dvOP.png"></p>
+<p>零拷贝技术通过DMA（DirectMemoryAccess）技术将文件内容复制到内核模式下的ReadBuffer中。不过没有数据被复制到SocketBuffer，相反只有包含数据的位置和长度的信息的文件描述符被加到SocketBuffer中。DMA引擎直接将数据从内核模式中传递到网卡设备（协议引擎）。这里数据只经历了2次复制就从磁盘中传送出去了，并且上下文切换也变成了2次。零拷贝是针对内核模式而言的，数据在内核模式下实现了零拷贝。</p>
+<p>Kafka 速度的秘诀在于，它把所有的消息都变成一个批量的文件，并且进行合理的批量压缩，减少网络 IO 损耗，通过 mmap 提高 I/O 速度，写入数据的时候由于单个 Partion 是末尾添加所以速度最优；读取数据的时候配合 sendfile 直接暴力输出。</p>
+<h2 id="副本分析"><a href="#副本分析" class="headerlink" title="副本分析"></a>副本分析</h2><h3 id="LEO与HW"><a href="#LEO与HW" class="headerlink" title="LEO与HW"></a>LEO与HW</h3><p>LEO 标识每个分区中最后一条消息的下一个位置，分区的每个副本都有自己的 LEO，ISR 中最小的 LEO 即为 HW，俗称高水位，消费者只能拉取到 HW 之前的消息。</p>
+<p>消息追加过程：</p>
+<ul>
+<li>生产者客户端发送消息至 leader 副本（副本1）中。</li>
+<li>消息被追加到 leader 副本的本地日志，并且会更新日志的偏移量。</li>
+<li>follower 副本（副本2和副本3）向 leader 副本请求同步数据。</li>
+<li>leader 副本所在的服务器读取本地日志，并更新对应拉取的 follower 副本的信息。</li>
+<li>leader 副本所在的服务器将拉取结果返回给 follower 副本。</li>
+<li>follower 副本收到 leader 副本返回的拉取结果，将消息追加到本地日志中，并更新日志的偏移量信息。</li>
+</ul>
+<p>我们再来分析在这个过程中各个副本 LEO 和 HW 的变化情况。下面的示例采用同上图中相同的环境背景，如下图（左）所示，生产者一直在往 leader 副本（带阴影的方框）中写入消息。某一时刻，leader 副本的 LEO 增加至5，并且所有副本的 HW 还都为0。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6zkCV.png" alt="r6zkCV.png"></p>
+<p>之后 follower 副本（不带阴影的方框）向 leader 副本拉取消息，在拉取的请求中会带有自身的 LEO 信息。leader 副本返回给 follower 副本相应的消息，并且还带有自身的 HW 信息。</p>
+<p>此时两个 follower 副本各自拉取到了消息，并更新各自的 LEO 为3和4。与此同时，follower 副本还会更新自己的 HW，更新 HW 的算法是比较当前 LEO 和 leader 副本中传送过来的HW的值，取较小值作为自己的 HW 值。当前两个 follower 副本的 HW 都等于0（min(0,0) = 0）。</p>
+<p>接下来 follower 副本再次请求拉取 leader 副本中的消息，如下图（左）所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6zdUI.png" alt="r6zdUI.png"></p>
+<p>此时 leader 副本收到来自 follower 副本的 FetchRequest 请求，其中带有 LEO 的相关信息，选取其中的最小值作为新的 HW，即 min(15,3,4)=3。然后连同消息和 HW 一起返回 FetchResponse 给 follower 副本，如上图（右）所示。注意 leader 副本的 HW 是一个很重要的东西，因为它直接影响了分区数据对消费者的可见性。</p>
+<p>两个 follower 副本在收到新的消息之后更新 LEO 并且更新自己的 HW 为3（min(LEO,3)=3）。</p>
+<p>在一个分区中，leader 副本所在的节点会记录所有副本的 LEO，而 follower 副本所在的节点只会记录自身的 LEO，而不会记录其他副本的 LEO。对 HW 而言，各个副本所在的节点都只记录它自身的 HW。</p>
+<h3 id="为什么不支持读写分离"><a href="#为什么不支持读写分离" class="headerlink" title="为什么不支持读写分离"></a>为什么不支持读写分离</h3><p>在 Kafka 中，生产者写入消息、消费者读取消息的操作都是与 leader 副本进行交互的，从而实现的是一种主写主读的生产消费模型。Kafka 并不支持主写从读，这是为什么呢？</p>
+<p>这块原作者写的不太好，我的理解是基于pull模式维护副本的kafka，数据不一致的问题会更加明显。此外kafka本身就是分布式结构了，做读写分离意义不大。</p>
+<h2 id="日志同步"><a href="#日志同步" class="headerlink" title="日志同步"></a>日志同步</h2><p>在 Kafka 中动态维护着一个 ISR 集合，处于 ISR 集合内的节点保持与 leader 相同的高水位（HW），只有位列其中的副本（unclean.leader.election.enable 配置为 false）才有资格被选为新的 leader。写入消息时只有等到所有ISR集合中的副本都确认收到之后才能被认为已经提交。位于 ISR 中的任何副本节点都有资格成为 leader，选举过程简单、开销低，这也是 Kafka 选用此模型的重要因素。Kafka 中包含大量的分区，leader 副本的均衡保障了整体负载的均衡，所以这一因素也极大地影响 Kafka 的性能指标。在采用 ISR 模型和（f+1）个副本数的配置下，一个 Kafka 分区能够容忍最大f个节点失败。</p>
+<h2 id="自定义ttl"><a href="#自定义ttl" class="headerlink" title="自定义ttl"></a>自定义ttl</h2><p>通过消息的 timestamp 字段和 ConsumerInterceptor 接口的 onConsume() 方法来实现消息的 TTL 功能，还需要消息中的 headers 字段来做配合。将消息的 TTL 的设定值以键值对的形式保存在消息的 headers 字段中，这样消费者消费到这条消息的时候可以在拦截器中根据 headers 字段设定的超时时间来判断此条消息是否超时。</p>
+<p>headers 字段涉及 Headers 和 Header 两个接口，Headers 是对多个 Header 的封装，Header 接口表示的是一个键值对，具体实现如下：</p>
+<pre><code class="java">package org.apache.kafka.common.header;
+
+public interface Header {
+    String key();
+    byte[] value();
+}
+</code></pre>
+<p>可以直接使用 Kafka 提供的实现类 org.apache.kafka.common.header.internals.RecordHeaders 和 org.apache.kafka.common.header.internals.RecordHeader。这里只需使用一个 Header，key 可以固定为“ttl”，而 value 用来表示超时的秒数，超时时间一般用 Long 类型表示，但是 RecordHeader 中的构造方法 RecordHeader(String key, byte[] value) 和 value() 方法的返回值对应的 value 都是 byte[] 类型，这里还需要一个小工具实现long与 byte[] 的互转</p>
+<p>下面我们向 Kafka 中发送3条 TTL 分别为20秒、5秒和30秒的3条消息，主要代码如代码清单18-1所示。</p>
+<pre><code class="java">// 代码清单18-1 发送自定义TTL消息的主要代码
+ProducerRecord&lt;String, String&gt; record1 =
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis(),
+                null, &quot;msg_ttl_1&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(20))));
+ProducerRecord&lt;String, String&gt; record2 = //超时的消息
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis()-5*1000,
+                null, &quot;msg_ttl_2&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(5))));
+ProducerRecord&lt;String, String&gt; record3 =
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis(),
+                null, &quot;msg_ttl_3&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(30))));
+producer.send(record1).get();
+producer.send(record2).get();
+producer.send(record3).get();
+</code></pre>
+<p>ProducerRecord 中包含 Headers 字段的构造方法只有2个，具体如下：</p>
+<pre><code class="java">public ProducerRecord(String topic, Integer partition, Long timestamp, K key, V value, Iterable&lt;Header&gt; headers)
+public ProducerRecord(String topic, Integer partition, K key, V value, Iterable&lt;Header&gt; headers)
+</code></pre>
+<p>代码清单18-1中指定了分区编号为0和消息 key 的值为 null，其实这个示例中我们并不需要指定这2个值，但是碍于 ProducerRecord 中只有2种与 Headers 字段有关的构造方法。其实完全可以扩展 ProducerRecord 中的构造方法.</p>
+<p>很显然代码清单18-1中的第2条消息 record2 是故意被设定为超时的，因为这条消息的创建时间为 System.currentTimeMillis()-5×1000，往前推进了5秒，而这条消息的超时时间也为5秒。如果在发送这3条消息的时候也开启了消费者，那么经过拦截器处理后应该只会收到“msg_ttl_1”和“msg_ttl_3”这两条消息。</p>
+<pre><code class="java">// 代码清单18-2 自定义TTL的拦截器关键代码实现
+@Override
+public ConsumerRecords&lt;String, String&gt; onConsume(
+        ConsumerRecords&lt;String, String&gt; records) {
+    long now = System.currentTimeMillis();
+    Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;String, String&gt;&gt;&gt; newRecords
+            = new HashMap&lt;&gt;();
+    for (TopicPartition tp : records.partitions()) {
+        List&lt;ConsumerRecord&lt;String, String&gt;&gt; tpRecords = records.records(tp);
+        List&lt;ConsumerRecord&lt;String, String&gt;&gt; newTpRecords = new ArrayList&lt;&gt;();
+        for (ConsumerRecord&lt;String, String&gt; record : tpRecords) {
+            Headers headers = record.headers();
+            long ttl = -1;
+            for (Header header : headers) {//判断headers中是否有key为“ttl”的Header
+                if (header.key().equalsIgnoreCase(&quot;ttl&quot;)) {
+                    ttl = BytesUtils.bytesToLong(header.value());
+                }
+            }
+            //消息超时判定
+            if (ttl &gt; 0 &amp;&amp; now - record.timestamp() &lt; ttl * 1000) {
+                newTpRecords.add(record); 
+            } else {//没有设置TTL，不需要超时判定
+                newTpRecords.add(record);
+            }
+        }
+        if (!newTpRecords.isEmpty()) {
+            newRecords.put(tp, newTpRecords);
+        }
+    }
+    return new ConsumerRecords&lt;&gt;(newRecords);
+}
+</code></pre>
+<p>代码清单18-2中判断每条消息的 headers 字段中是否包含 key 为“ttl”的 Header，如果包含则对其进行超时判定；如果不包含，则不需要超时判定，即无须拦截处理。</p>
+<p>使用这种方式实现自定义消息 TTL 时同样需要注意的是：使用类似中这种带参数的位移提交的方式，有可能会提交错误的位移信息。在一次消息拉取的批次中，可能含有最大偏移量的消息会被消费者拦截器过滤。不过这个也很好解决，比如在过滤之后的消息集中的头部或尾部设置一个状态消息，专门用来存放这一批消息的最大偏移量。</p>
+<h2 id="kafka中的延时操作"><a href="#kafka中的延时操作" class="headerlink" title="kafka中的延时操作"></a>kafka中的延时操作</h2><p>两个follower副本都已经拉取到了leader副本的最新位置，此时又向leader副本发送拉取请求，而leader副本并没有新的消息写入，那么此时leader副本该如何处理呢？可以直接返回空的拉取结果给follower副本，不过在leader副本一直没有新消息写入的情况下，follower副本会一直发送拉取请求，并且总收到空的拉取结果，这样徒耗资源，显然不太合理。</p>
+<p>这里就涉及到了Kafka延迟操作的概念。Kafka在处理拉取请求时，会先读取一次日志文件，如果收集不到足够多（fetchMinBytes，由参数fetch.min.bytes配置，默认值为1）的消息，那么就会创建一个延时拉取操作（DelayedFetch）以等待拉取到足够数量的消息。当延时拉取操作执行时，会再读取一次日志文件，然后将拉取结果返回给follower副本。</p>
+<p>延迟操作不只是拉取消息时的特有操作，在Kafka中有多种延时操作，比如延时数据删除、延时生产等。</p>
+<h3 id="时间轮"><a href="#时间轮" class="headerlink" title="时间轮"></a>时间轮</h3><p>JDK 中 Timer 和 DelayQueue 的插入和删除操作的平均时间复杂度为 O(nlogn) 并不能满足 Kafka 的高性能要求，而基于时间轮可以将插入和删除操作的时间复杂度都降为 O(1)。时间轮的应用并非 Kafka 独有，其应用场景还有很多，在 Netty、Akka、Quartz、ZooKeeper 等组件中都存在时间轮的踪影。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcVU4e.png" alt="rcVU4e.png"></p>
+<p>如上图所示，Kafka 中的时间轮（TimingWheel）是一个存储定时任务的环形队列，底层采用数组实现，数组中的每个元素可以存放一个定时任务列表（TimerTaskList）。TimerTaskList 是一个环形的双向链表，链表中的每一项表示的都是定时任务项（TimerTaskEntry），其中封装了真正的定时任务（TimerTask）。</p>
+<p>时间轮由多个时间格组成，每个时间格代表当前时间轮的基本时间跨度（tickMs）。时间轮的时间格个数是固定的，可用 wheelSize 来表示，那么整个时间轮的总体时间跨度（interval）可以通过公式 tickMs×wheelSize 计算得出。</p>
+<p>时间轮还有一个表盘指针（currentTime），用来表示时间轮当前所处的时间，currentTime 是 tickMs 的整数倍。currentTime 可以将整个时间轮划分为到期部分和未到期部分，currentTime 当前指向的时间格也属于到期部分，表示刚好到期，需要处理此时间格所对应的 TimerTaskList 中的所有任务。</p>
+<p>若时间轮的 tickMs 为 1ms 且 wheelSize 等于20，那么可以计算得出总体时间跨度 interval 为20ms。</p>
+<p>初始情况下表盘指针 currentTime 指向时间格0，此时有一个定时为2ms的任务插进来会存放到时间格为2的 TimerTaskList 中。随着时间的不断推移，指针 currentTime 不断向前推进，过了2ms之后，当到达时间格2时，就需要将时间格2对应的 TimeTaskList 中的任务进行相应的到期操作。此时若又有一个定时为8ms的任务插进来，则会存放到时间格10中，currentTime 再过8ms后会指向时间格10。</p>
+<p>如果同时有一个定时为19ms的任务插进来怎么办？新来的 TimerTaskEntry 会复用原来的 TimerTaskList，所以它会插入原本已经到期的时间格1。总之，整个时间轮的总体跨度是不变的，随着指针 currentTime 的不断推进，当前时间轮所能处理的时间段也在不断后移，总体时间范围在 currentTime 和 currentTime+interval 之间。</p>
+<p>如果此时有一个定时为 350ms 的任务该如何处理？直接扩充 wheelSize 的大小？Kafka 中不乏几万甚至几十万毫秒的定时任务，这个 wheelSize 的扩充没有底线，就算将所有的定时任务的到期时间都设定一个上限，比如100万毫秒，那么这个 wheelSize 为100万毫秒的时间轮不仅占用很大的内存空间，而且也会拉低效率。Kafka 为此引入了层级时间轮的概念，当任务的到期时间超过了当前时间轮所表示的时间范围时，就会尝试添加到上层时间轮中。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcZA8H.png" alt="rcZA8H.png"></p>
+<p>如上图所示，复用之前的案例，第一层的时间轮 tickMs=1ms、wheelSize=20、interval=20ms。第二层的时间轮的 tickMs 为第一层时间轮的 interval，即20ms。每一层时间轮的 wheelSize 是固定的，都是20，那么第二层的时间轮的总体时间跨度 interval 为400ms。以此类推，这个400ms也是第三层的 tickMs 的大小，第三层的时间轮的总体时间跨度为8000ms。</p>
+<p>对于之前所说的 350ms 的定时任务，显然第一层时间轮不能满足条件，所以就升级到第二层时间轮中，最终被插入第二层时间轮中时间格17所对应的 TimerTaskList。如果此时又有一个定时为 450ms 的任务，那么显然第二层时间轮也无法满足条件，所以又升级到第三层时间轮中，最终被插入第三层时间轮中时间格1的 TimerTaskList。注意到在到期时间为 [400ms,800ms) 区间内的多个任务（比如 446ms、455ms 和 473ms 的定时任务）都会被放入第三层时间轮的时间格1，时间格1对应的 TimerTaskList 的超时时间为 400ms。</p>
+<p>随着时间的流逝，当此 TimerTaskList 到期之时，原本定时为 450ms 的任务还剩下 50ms 的时间，还不能执行这个任务的到期操作。这里就有一个时间轮降级的操作，会将这个剩余时间为 50ms 的定时任务重新提交到层级时间轮中，此时第一层时间轮的总体时间跨度不够，而第二层足够，所以该任务被放到第二层时间轮到期时间为 [40ms,60ms) 的时间格中。再经历 40ms 之后，此时这个任务又被“察觉”，不过还剩余 10ms，还是不能立即执行到期操作。所以还要再有一次时间轮的降级，此任务被添加到第一层时间轮到期时间为 [10ms,11ms) 的时间格中，之后再经历 10ms 后，此任务真正到期，最终执行相应的到期操作。</p>
+<p>设计源于生活。我们常见的钟表就是一种具有三层结构的时间轮，第一层时间轮 tickMs=1s、wheelSize=60、interval=1min，此为秒钟；第二层 tickMs=1min、wheelSize=60、interval=1hour，此为分钟；第三层 tickMs=1hour、wheelSize=12、interval=12hours，此为时钟。</p>
+<p>在 Kafka 中，第一层时间轮的参数同上面的案例一样：tickMs=1ms、wheelSize=20、interval=20ms，各个层级的 wheelSize 也固定为20，所以各个层级的 tickMs 和 interval 也可以相应地推算出来。Kafka 在具体实现时间轮 TimingWheel 时还有一些小细节：</p>
+<ul>
+<li>TimingWheel 在创建的时候以当前系统时间为第一层时间轮的起始时间（startMs），这里的当前系统时间并没有简单地调用 System.currentTimeMillis()，而是调用了 Time.SYSTEM.hiResClockMs，这是因为 currentTimeMillis() 方法的时间精度依赖于操作系统的具体实现，有些操作系统下并不能达到毫秒级的精度，而 Time.SYSTEM.hiResClockMs 实质上采用了 System.nanoTime()/1_000_000 来将精度调整到毫秒级。</li>
+<li>TimingWheel 中的每个双向环形链表 TimerTaskList 都会有一个哨兵节点（sentinel），引入哨兵节点可以简化边界条件。哨兵节点也称为哑元节点（dummy node），它是一个附加的链表节点，该节点作为第一个节点，它的值域中并不存储任何东西，只是为了操作的方便而引入的。如果一个链表有哨兵节点，那么线性表的第一个元素应该是链表的第二个节点。</li>
+<li>除了第一层时间轮，其余高层时间轮的起始时间（startMs）都设置为创建此层时间轮时前面第一轮的 currentTime。每一层的 currentTime 都必须是 tickMs 的整数倍，如果不满足则会将 currentTime 修剪为 tickMs 的整数倍，以此与时间轮中的时间格的到期时间范围对应起来。修剪方法为：currentTime = startMs - (startMs % tickMs)。currentTime 会随着时间推移而推进，但不会改变为 tickMs 的整数倍的既定事实。若某一时刻的时间为 timeMs，那么此时时间轮的 currentTime = timeMs - (timeMs % tickMs)，时间每推进一次，每个层级的时间轮的 currentTime 都会依据此公式执行推进。</li>
+<li>Kafka 中的定时器只需持有 TimingWheel 的第一层时间轮的引用，并不会直接持有其他高层的时间轮，但每一层时间轮都会有一个引用（overflowWheel）指向更高一层的应用，以此层级调用可以实现定时器间接持有各个层级时间轮的引用。</li>
+</ul>
+<p>Kafka 中的定时器借了 JDK 中的 DelayQueue 来协助推进时间轮。具体做法是对于每个使用到的 TimerTaskList 都加入 DelayQueue，“每个用到的 TimerTaskList”特指非哨兵节点的定时任务项 TimerTaskEntry 对应的 TimerTaskList。DelayQueue 会根据 TimerTaskList 对应的超时时间 expiration 来排序，最短 expiration 的 TimerTaskList 会被排在 DelayQueue 的队头。</p>
+<p>Kafka 中会有一个线程来获取 DelayQueue 中到期的任务列表，有意思的是这个线程所对应的名称叫作“ExpiredOperationReaper”，可以直译为“过期操作收割机”。当“收割机”线程获取 DelayQueue 中超时的任务列表 TimerTaskList 之后，既可以根据 TimerTaskList 的 expiration 来推进时间轮的时间，也可以就获取的 TimerTaskList 执行相应的操作，对里面的 TimerTaskEntry 该执行过期操作的就执行过期操作，该降级时间轮的就降级时间轮。</p>
+<p>注意对定时任务项 TimerTaskEntry 的插入和删除操作而言，TimingWheel时间复杂度为 O(1)，性能高出 DelayQueue 很多，如果直接将 TimerTaskEntry 插入 DelayQueue，那么性能显然难以支撑。就算我们根据一定的规则将若干 TimerTaskEntry 划分到 TimerTaskList 这个组中，然后将 TimerTaskList 插入 DelayQueue，如果在 TimerTaskList 中又要多添加一个 TimerTaskEntry 时该如何处理呢？对 DelayQueue 而言，这类操作显然变得力不从心。</p>
+<p>分析到这里可以发现，Kafka 中的 TimingWheel 专门用来执行插入和删除 TimerTaskEntry 的操作，而 DelayQueue 专门负责时间推进的任务。试想一下，DelayQueue 中的第一个超时任务列表的 expiration 为 200ms，第二个超时任务为 840ms，这里获取 DelayQueue 的队头只需要 O(1) 的时间复杂度（获取之后 DelayQueue 内部才会再次切换出新的队头）。如果采用每秒定时推进，那么获取第一个超时的任务列表时执行的200次推进中有199次属于“空推进”，而获取第二个超时任务时又需要执行639次“空推进”，这样会无故空耗机器的性能资源，这里采用 DelayQueue 来辅助以少量空间换时间，从而做到了“精准推进”。Kafka 中的定时器真可谓“知人善用”，用 TimingWheel 做最擅长的任务添加和删除操作，而用 DelayQueue 做最擅长的时间推进工作，两者相辅相成。</p>
+<h3 id="延时操作"><a href="#延时操作" class="headerlink" title="延时操作"></a>延时操作</h3><p>如果在使用生产者客户端发送消息的时候将 acks 参数设置为-1，那么就意味着需要等待 ISR 集合中的所有副本都确认收到消息之后才能正确地收到响应的结果，或者捕获超时异常。</p>
+<p>如下面3张图所示，假设某个分区有3个副本：leader、follower1 和 follower2，它们都在分区的 ISR 集合中。为了简化说明，这里我们不考虑 ISR 集合伸缩的情况。Kafka 在收到客户端的生产请求（ProduceRequest）后，将消息3和消息4写入 leader 副本的本地日志文件。由于客户端设置了 acks 为-1，那么需要等到 follower1 和 follower2 两个副本都收到消息3和消息4后才能告知客户端正确地接收了所发送的消息。如果在一定的时间内，follower1 副本或 follower2 副本没能够完全拉取到消息3和消息4，那么就需要返回超时异常给客户端。生产请求的超时时间由参数 request.timeout.ms 配置，默认值为30000，即30s。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcVEn0.png" alt="rcVEn0.png"></p>
+<p>那么这里等待消息3和消息4写入 follower1 副本和 follower2 副本，并返回相应的响应结果给客户端的动作是由谁来执行的呢？在将消息写入 leader 副本的本地日志文件之后，Kafka 会创建一个延时的生产操作（DelayedProduce），用来处理消息正常写入所有副本或超时的情况，以返回相应的响应结果给客户端。</p>
+<p>延时操作需要延时返回响应的结果，首先它必须有一个超时时间（delayMs），如果在这个超时时间内没有完成既定的任务，那么就需要强制完成以返回响应结果给客户端。其次，延时操作不同于定时操作，定时操作是指在特定时间之后执行的操作，而延时操作可以在所设定的超时时间之前完成，所以延时操作能够支持外部事件的触发。</p>
+<p>就延时生产操作而言，它的外部事件是所要写入消息的某个分区的 HW（高水位）发生增长。也就是说，随着 follower 副本不断地与 leader 副本进行消息同步，进而促使HW进一步增长，HW 每增长一次都会检测是否能够完成此次延时生产操作，如果可以就执行以此返回响应结果给客户端；如果在超时时间内始终无法完成，则强制执行。</p>
+<p>延时操作创建之后会被加入延时操作管理器（DelayedOperationPurgatory）来做专门的处理。延时操作有可能会超时，每个延时操作管理器都会配备一个定时器（SystemTimer）来做超时管理，定时器的底层就是采用时间轮（TimingWheel）实现的。在第7节中提及时间轮的轮转是靠“收割机”线程 ExpiredOperationReaper 来驱动的，这里的“收割机”线程就是由延时操作管理器启动的。也就是说，定时器、“收割机”线程和延时操作管理器都是一一对应的。延时操作需要支持外部事件的触发，所以还要配备一个监听池来负责监听每个分区的外部事件—查看是否有分区的HW发生了增长。另外需要补充的是，ExpiredOperationReaper 不仅可以推进时间轮，还会定期清理监听池中已完成的延时操作。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rceR6s.png" alt="rceR6s.png"></p>
+<p>上图描绘了客户端在请求写入消息到收到响应结果的过程中与延时生产操作相关的细节，在了解相关的概念之后应该比较容易理解：如果客户端设置的 acks 参数不为-1，或者没有成功的消息写入，那么就直接返回结果给客户端，否则就需要创建延时生产操作并存入延时操作管理器，最终要么由外部事件触发，要么由超时触发而执行。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rceokT.png" alt="rceokT.png"></p>
+<h2 id="延时队列"><a href="#延时队列" class="headerlink" title="延时队列"></a>延时队列</h2><p>在发送延时消息的时候并不是先投递到要发送的真实主题（real_topic）中，而是先投递到一些 Kafka 内部的主题（delay_topic）中，这些内部主题对用户不可见，然后通过一个自定义的服务拉取这些内部主题中的消息，并将满足条件的消息再投递到要发送的真实的主题中，消费者所订阅的还是真实的主题。</p>
+<p>如果采用这种方案，那么一般是按照不同的延时等级来划分的，比如设定5s、10s、30s、1min、2min、5min、10min、20min、30min、45min、1hour、2hour这些按延时时间递增的延时等级，延时的消息按照延时时间投递到不同等级的主题中，投递到同一主题中的消息的延时时间会被强转为与此主题延时等级一致的延时时间，这样延时误差控制在两个延时等级的时间差范围之内（比如延时时间为17s的消息投递到30s的延时主题中，之后按照延时时间为30s进行计算，延时误差为13s）。虽然有一定的延时误差，但是误差可控，并且这样只需增加少许的主题就能实现延时队列的功能。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rciBPs.png" alt="rciBPs.png"></p>
+<p>如上图所示，生产者 Producer 发送若干延时时间不同的消息到主题 real_topic_A 和 real_topic_B 中，消费者 Consumer 订阅并消费主题 real_topic_A 和 real_topic_B 中的消息，对用户而言，他看到的就是这样一个流程。但是在内部，Producer 会根据不同的延时时间将消息划分为不同的延时等级，然后根据所划分的延时等级再将消息发送到对应的内部主题中，比如5s内的消息发送到 delay_topic_1，6s至10s的消息划分到 delay_topic_2 中。这段内部的转发逻辑需要开发人员对生产者客户端做一些改造封装，可以根据消息的 timestamp 字段、headers 字段（设置延时时间），以及生产者拦截器来实现具体的代码。</p>
+<p>发送到内部主题（delay<em>topic</em>*）中的消息会被一个独立的 DelayService 进程消费，这个 DelayService 进程和 Kafka broker 进程以一对一的配比进行同机部署（参考下图），以保证服务的可用性。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcicrT.png" alt="rcicrT.png"></p>
+<p>针对不同延时级别的主题，在 DelayService 的内部都会有单独的线程来进行消息的拉取，以及单独的 DelayQueue（这里用的是 JUC 中 DelayQueue）进行消息的暂存。与此同时，在 DelayService 内部还会有专门的消息发送线程来获取 DelayQueue 的消息并转发到真实的主题中。从消费、暂存再到转发，线程之间都是一一对应的关系。如下图所示，DelayService 的设计应当尽量保持简单，避免锁机制产生的隐患。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rci4i9.png" alt="rci4i9.png"></p>
+<p>为了保障内部 DelayQueue 不会因为未处理的消息过多而导致内存的占用过大，DelayService 会对主题中的每个分区进行计数，当达到一定的阈值之后，就会暂停拉取该分区中的消息。</p>
+<p>同一分区中的消息的延时级别一样，也就意味着延时时间一样，那么对同一个分区中的消息而言，也就自然而然地按照投递时间进行有序排列，那么为何还需要 DelayQueue 的存在呢？因为一个主题中一般不止一个分区，分区之间的消息并不会按照投递时间进行排序，那么可否将这些主题都设置为一个分区呢？这样虽然可以简化设计，但同时却丢弃了动态扩展性，原本针对某个主题的发送或消费性能不足时，可以通过增加分区数进行一定程度上的性能提升。</p>
+<p>前面我们也提到了，这种延时队列的实现方案会有一定的延时误差，无法做到秒级别的精确延时，不过一般应用对于延时的精度要求不会那么高，只要延时等级设定得合理，这个实现方案还是能够具备很大的应用价值。 </p>
+<p>那么有没有延时精度较高的实现方案？</p>
+<p>第一种思路，在生产者这一层面我们采取延时操作来发送消息，这样原本立刻发送出去的消息被缓存在了客户端中以等待延时条件的满足。这种思路有明显的弊端：如果生产者中缓存的消息过多，则必然引起内存的暴涨；消息可靠性也很差，如果生产者发生了异常，那么这部分消息也就丢失了，除非配套相应的重发机制。</p>
+<p>第二种思路，在 Kafka 服务中增加一个前置缓存，生产者还是正常将消息发往 Kafka 中，Kafka 在判定消息是延时消息时（可以增加一个自定义协议，与发送普通消息的 PRODUCE 协议分开，比如 DELAY_PRODUCE，作为发送延时消息的专用协议）就将消息封装成延时操作并暂存至缓存中，待延时操作触发时就会将消息发送到真实的主题中，整体架构上与上图中所描述的类似。这种思路也有消息可靠性的问题，如果缓存延时操作的那台服务器宕机，那么消息也会随之丢失，为此我们可以引入缓存多副本的机制，如下图所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcFL60.png" alt="rcFL60.png"></p>
+<p>生产者发送的消息不单单发往一个缓存中，而是发往多个缓存，待所有缓存都收到消息之后才算发送成功，这一点和 Kafka 生产者客户端参数 acks = -1 的机理相通。每个 broker 中都会有一个延时操作的清理服务，彼此之间有主从的关系，任意时刻只有一个清理服务在工作，其余的清理服务都处于冷备状态。当某个延迟操作触发时会通知清理服务去清理其他延时操作缓存中对应的延时操作。这种架构虽然可以弥补消息可靠性的缺陷，但对于分布式架构中一些老生常谈的问题（比如缓存一致性、主备切换等）需要格外注意。</p>
+<p>第二种思路还需要修改 Kafka 内核的代码，对开发人员源码的掌握能力及编程能力也是一个不小的挑战，后期系统的维护成本及 Kafka 社区的福利也是不得不考虑的问题。与此同时，这种思路和第一种思路一样会有内存暴涨的问题，单凭这个问题也可以判断出此种思路并不适合实际应用。</p>
+<p>退一步思考，我们并不需要复用 Kafka 中的延时操作的模块，而是可以选择自己开发一个精度较高的延时模块，这里就用到了第7节中提及的时间轮的概念，所不同的是，这里需要的是单层时间轮。而且延时消息也不再是缓存在内存中，而是暂存至文件中。时间轮中每个时间格代表一个延时时间，并且每个时间格也对应一个文件，整体上可以看作单层文件时间轮，如下图所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcev0x.png" alt="rcev0x.png"></p>
+<p>每个时间格代表1秒，若要支持2小时（也就是 2×60×60 = 7200）之内的延时时间的消息，那么整个单层时间轮的时间格数就需要7200个，与此对应的也就需要7200个文件，听上去似乎需要庞大的系统开销，就单单文件句柄的使用也会耗费很多的系统资源。</p>
+<p>其实不然，我们并不需要维持所有文件的文件句柄，只需要加载距离时间轮表盘指针（currentTime）相近位置的部分文件即可，其余都可以用类似“懒加载”的机制来维持：若与时间格对应的文件不存在则可以新建，若与时间格对应的文件未加载则可以重新加载，整体上造成的时延相比于延时等级方案而言微乎其微。随着表盘指针的转动，其相邻的文件也会变得不同，整体上在内存中只需要维持少量的文件句柄就可以让系统运转起来。</p>
+<p>这里为什么强调的是单层时间轮。试想一下，如果这里采用的是多层时间轮，那么必然会有时间轮降级的动作，那就需要将高层时间轮中时间格对应文件中的内容写入低层时间轮，高层时间格中伴随的是读取文件内容、写入低层时间轮、删除已写入的内容的操作，与此同时，高层时间格中也会有新的内容写入。</p>
+<p>如果要用多层时间轮来实现，不得不增加繁重的元数据控制信息和繁杂的锁机制。对单层时间轮中的时间格而言，其对应的要么是追加文件内容，要么是删除整个文件（到达延时时间，就可以读取整个文件中的内容做转发，并删除整个文件）。采用单层时间轮可以简化工程实践，减少出错的可能，性能上也并不会比多层时间轮差。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcm1js.png" alt="rcm1js.png"></p>
+<p>采用时间轮可以解决延时精度的问题，采用文件可以解决内存暴涨的问题，那么剩下的还有一个可靠性的问题，这里就借鉴了前面的多副本机制，如上图所示。生产者同样将消息写入多个备份（单层文件时间轮），待时间轮转动而触发某些时间格过期时就可以将时间格对应的文件内容（也就是延时消息）转发到真实主题中，并且删除相应的文件。与此同时，还会有一个后台服务专门用来清理其他时间轮中相应的时间格。</p>
+<p>单层文件时间轮的方案不需要修改 Kafka 内核的源码，与前面第二种思路相比实现较为简单。单层文件时间轮的方案与延时级别的实现方案一样可以将延时服务（上图中单层时间轮与后台服务的整合体）与Kafka进程进行一对一配比的同机部署，以保证整体服务的可用性。</p>
+<h2 id="死信队列和重试队列"><a href="#死信队列和重试队列" class="headerlink" title="死信队列和重试队列"></a>死信队列和重试队列</h2><p>由于某些原因消息无法被正确地投递，为了确保消息不会被无故地丢弃，一般将其置于一个特殊角色的队列，这个队列一般称为死信队列。后续分析程序可以通过消费这个死信队列中的内容来分析当时遇到的异常情况，进而可以改善和优化系统。</p>
+<p>与死信队列对应的还有一个“回退队列”的概念，如果消费者在消费时发生了异常，那么就不会对这一次消费进行确认，进而发生回滚消息的操作之后，消息始终会放在队列的顶部，然后不断被处理和回滚，导致队列陷入死循环。为了解决这个问题，可以为每个队列设置一个回退队列，它和死信队列都是为异常处理提供的一种机制保障。实际情况下，回退队列的角色可以由死信队列和重试队列来扮演。</p>
+<p>无论 RabbitMQ 中的队列，还是 Kafka 中的主题，其实质上都是消息的载体，换种角度看待问题可以让我们找到彼此的共通性。我们依然可以把 Kafka 中的主题看作“队列”，那么重试队列、死信队列的称谓就可以同延时队列一样沿用下来。 理解死信队列，关键是要理解死信。死信可以看作消费者不能处理收到的消息，也可以看作消费者不想处理收到的消息，还可以看作不符合处理要求的消息。比如消息内包含的消息内容无法被消费者解析，为了确保消息的可靠性而不被随意丢弃，故将其投递到死信队列中，这里的死信就可以看作消费者不能处理的消息。再比如超过既定的重试次数之后将消息投入死信队列，这里就可以将死信看作不符合处理要求的消息。</p>
+<p>至于死信队列到底怎么用，是从 broker 端存入死信队列，还是从消费端存入死信队列，需要先思考两个问题：死信有什么用？为什么用？从而引发怎么用。在 RabbitMQ 中，死信一般通过 broker 端存入，而在 Kafka 中原本并无死信的概念，所以当需要封装这一层概念的时候，就可以脱离既定思维的束缚，根据应用情况选择合适的实现方式，理解死信的本质进而懂得如何去实现死信队列的功能。</p>
+<p>重试队列其实可以看作一种回退队列，具体指消费端消费消息失败时，为了防止消息无故丢失而重新将消息回滚到 broker 中。与回退队列不同的是，重试队列一般分成多个重试等级，每个重试等级一般也会设置重新投递延时，重试次数越多投递延时就越大。举个例子：消息第一次消费失败入重试队列 Q1，Q1 的重新投递延时为5s，5s过后重新投递该消息；如果消息再次消费失败则入重试队列 Q2，Q2 的重新投递延时为10s，10s过后再次投递该消息。以此类推，重试越多次重新投递的时间就越久，为此还需要设置一个上限，超过投递次数就进入死信队列。重试队列与延时队列有相同的地方，都需要设置延时级别。它们的区别是：延时队列动作由内部触发，重试队列动作由外部消费端触发；延时队列作用一次，而重试队列的作用范围会向后传递。</p>
+<h2 id="消息路由"><a href="#消息路由" class="headerlink" title="消息路由"></a>消息路由</h2><p>Kafka 默认按照主题进行路由，也就是说，消息发往主题之后会被订阅的消费者全盘接收，这里没有类似消息路由的功能来将消息进行二级路由，这一点从逻辑概念上来说并无任何问题。从业务应用上而言，如果不同的业务流程复用相同的主题，就会出现消息接收时的混乱，这种问题可以从设计上进行屏蔽，如果需要消息路由，那么完全可以通过细粒度化切分主题来实现。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcmOPS.png" alt="rcmOPS.png"></p>
+<h2 id="kafka-rabbitmq对比"><a href="#kafka-rabbitmq对比" class="headerlink" title="kafka rabbitmq对比"></a>kafka rabbitmq对比</h2><table>
+<thead>
+<tr>
+<th>功 能 项</th>
+<th>Kafka（2.0.0版本）</th>
+<th>RabbitMQ（3.6.10版本）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>优先级队列</td>
+<td>不支持。不过可以改造支持，难度不大</td>
+<td>支持。建议优先级大小设置在0～10之间</td>
+</tr>
+<tr>
+<td>延时队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>死信队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>重试队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>不支持。RabbitMQ中可以参考延时队列实现一个重试队列，二次封装比较简单。如果要在Kafka中实现重试队列，则得先实现延时队列的功能，相对比较复杂</td>
+</tr>
+<tr>
+<td>消费模式</td>
+<td>拉模式</td>
+<td>推模式+拉模式</td>
+</tr>
+<tr>
+<td>广播消费</td>
+<td>支持。Kafka对于广播消费的支持相对而言更加正统</td>
+<td>支持，但力度较Kafka弱</td>
+</tr>
+<tr>
+<td>回溯消费</td>
+<td>支持。Kafka支持按照offset和timestamp两种维度进行回溯消费</td>
+<td>不支持。RabbitMQ中消息一旦被确认消费就会被标记删除</td>
+</tr>
+<tr>
+<td>消息堆积</td>
+<td>支持</td>
+<td>支持。一般情况下，内存堆积达到特定阈值时会影响其性能，但这不是绝对的。如果考虑到吞吐量这个因素，Kafka的堆积效率比RabbitMQ总体上要高得多</td>
+</tr>
+<tr>
+<td>持久化</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>消息轨迹</td>
+<td>不支持，可以改造支持</td>
+<td>支持。RabbitMQ中可以采用Firehose或rabbitmq_tracing插件实现。不过开启rabbitmq_tracing插件件会大幅影响性能，不建议在生产环境中开启，反倒是可以使用Firehose与外部链路系统结合以提供高细腻度的消息轨迹支持</td>
+</tr>
+<tr>
+<td>消息审计</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>消息过滤</td>
+<td>客户端级别的支持</td>
+<td>不支持。不过可以改造支持，难度不大</td>
+</tr>
+<tr>
+<td>多租户</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>多协议支持</td>
+<td>只支持自定义协议</td>
+<td>RabbitMQ本身就是AMQP协议的实现，同时支持MQTT、STOMP等协议</td>
+</tr>
+<tr>
+<td>跨语言支持</td>
+<td>采用Scala和Java编写，支持多种语言的客户端</td>
+<td>采用Erlang编写，支持多种语言的客户端</td>
+</tr>
+<tr>
+<td>流量控制</td>
+<td>支持</td>
+<td>RabbitMQ的流控基于Credit-Based算法，是内部被动触发的保护机制，作用于生产者层面</td>
+</tr>
+<tr>
+<td>消息顺序性</td>
+<td>支持单分区级别的顺序性</td>
+<td>顺序性的条件比较苛刻，需要单线程发送、单线程消费，并且不采用延迟队列、优先级队列等一些高级功能，从某种意义上来说不算支持顺序性</td>
+</tr>
+<tr>
+<td>安全机制</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>幂等性</td>
+<td>支持单个生产者单分区单会话的幂等性</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>事务性消息</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody>
+</table>
 ]]></content>
       
         <categories>
@@ -750,7 +1083,659 @@ create index if not exists idx_customers on danube.config_data using gin (config
     </entry>
     
     <entry>
-      <title><![CDATA[rabbit-mq]]></title>
+      <title><![CDATA[kafka 基础]]></title>
+      <url>/2020/12/17/kafka/</url>
+      <content type="html"><![CDATA[<p><img src="https://s3.ax1x.com/2020/12/21/rB2kLt.png" alt="rB2kLt.png"></p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ul>
+<li>Topic<br>Kafka将消息分门别类，每一类的消息称之为一个主题（Topic）。</li>
+<li>Producer<br>发布消息的对象称之为主题生产者（Kafka topic producer）</li>
+<li>Consumer<br>订阅消息并处理发布的消息的对象称之为主题消费者（consumers）</li>
+<li>Broker<br>已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理（Broker）。 消费者可以订阅一个或多个主题（topic），并从Broker拉数据，从而消费这些已发布的消息。</li>
+</ul>
+<p>在 Kafka 中，Topic 是一个存储消息的逻辑概念，可以认为是一个消息集合。每条消息发送到 Kafka 集群的消息都有一个类别。物理上来说，不同的 Topic 的消息是分开存储的，每个 Topic 可以有多个生产者向它发送消息，也可以有多个消费者去消费其中的消息。</p>
+<p><img src="https://s3.ax1x.com/2020/12/20/rdeWEn.png" alt="rdeWEn.png"></p>
+<p>每个 Topic 可以划分多个分区（每个 Topic 至少有一个分区），同一 Topic 下的不同分区包含的消息是不同的。分区在存储层面可以看作一个可追加的日志（Log）文件，消息在被追加到分区日志文件的时候都会分配一个特定的偏移量（offset），它是消息在此分区中的唯一编号，Kafka 通过 offset 保证消息在分区内的顺序，offset 的顺序不跨分区，即 Kafka 只保证在同一个分区内的消息是有序的。</p>
+<p>消息是每次追加到对应的 Partition 的后面：</p>
+<p><img src="https://s3.ax1x.com/2020/12/20/rdefNq.png" alt="rdefNq.png"></p>
+<p>Kafka中的分区可以分布在不同的服务器（broker）上，也就是说，一个主题可以横跨多个broker，以此来提供比单个broker更强大的性能。</p>
+<p>每一条消息被发送到broker之前，会根据分区规则选择存储到哪个具体的分区。如果分区规则设定得合理，所有的消息都可以均匀地分配到不同的分区中。如果一个主题只对应一个文件，那么这个文件所在的机器I/O将会成为这个主题的性能瓶颈，而分区解决了这个问题。在创建主题的时候可以通过指定的参数来设置分区的个数，当然也可以在主题创建完成之后去修改分区的数量，通过增加分区的数量可以实现水平扩展。</p>
+<p>Kafka为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。同一分区的不同副本中保存的是相同的消息（在同一时刻，副本之间并非完全一样），副本之间是“一主多从”的关系，其中leader副本负责处理读写请求，follower副本只负责与leader副本的消息同步。副本处于不同的broker中，当leader副本出现故障时，从follower副本中重新选举新的leader副本对外提供服务。Kafka通过多副本机制实现了故障的自动转移，当Kafka集群中某个broker失效时仍然能保证服务可用。</p>
+<p>如图13所示，Kafka集群中有4个broker，某个主题中有3个分区，且副本因子（即副本个数）也为3，如此每个分区便有1个leader副本和2个follower副本。生产者和消费者只与leader副本进行交互，而follower副本只负责消息的同步，很多时候follower副本中的消息相对leader副本而言会有一定的滞后。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrA85n.png" alt="rrA85n.png"></p>
+<p>Kafka消费端也具备一定的容灾能力。Consumer使用拉（Pull）模式从服务端拉取消息，并且保存消费的具体位置，当消费者宕机后恢复上线时可以根据之前保存的消费位置重新拉取需要的消息进行消费，这样就不会造成消息丢失。</p>
+<p>分区中的所有副本统称为AR（AssignedReplicas）。所有与leader副本保持一定程度同步的副本（包括leader副本在内）组成ISR（InSyncReplicas），ISR集合是AR集合中的一个子集。消息会先发送到leader副本，然后follower副本才能从leader副本中拉取消息进行同步，同步期间内follower副本相对于leader副本而言会有一定程度的滞后。前面所说的“一定程度的同步”是指可忍受的滞后范围，这个范围可以通过参数进行配置。与leader副本同步滞后过多的副本（不包括leader副本）组成OSR（OutofSyncReplicas），由此可见，AR=ISR+OSR。在正常情况下，所有的follower副本都应该与leader副本保持一定程度的同步，即AR=ISR，OSR集合为空。</p>
+<p>leader副本负责维护和跟踪ISR集合中所有follower副本的滞后状态，当follower副本落后太多或失效时，leader副本会把它从ISR集合中剔除。如果OSR集合中有follower副本“追上”了leader副本，那么leader副本会把它从OSR集合转移至ISR集合。默认情况下，当leader副本发生故障时，只有在ISR集合中的副本才有资格被选举为新的leader，而在OSR集合中的副本则没有任何机会（不过这个原则也可以通过修改相应的参数配置来改变）。</p>
+<p>ISR与HW和LEO也有紧密的关系。HW是HighWatermark的缩写，俗称高水位，它标识了一个特定的消息偏移量（offset），消费者只能拉取到这个offset之前的消息。</p>
+<p>如图14所示，它代表一个日志文件，这个日志文件中有9条消息，第一条消息的offset（LogStartOffset）为0，最后一条消息的offset为8，offset为9的消息用虚线框表示，代表下一条待写入的消息。日志文件的HW为6，表示消费者只能拉取到offset在0至5之间的消息，而offset为6的消息对消费者而言是不可见的。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrmV6x.png" alt="rrmV6x.png"></p>
+<p>LEO是LogEndOffset的缩写，它标识当前日志文件中下一条待写入消息的offset，图14中offset为9的位置即为当前日志文件的LEO，LEO的大小相当于当前日志分区中最后一条消息的offset值加1。分区ISR集合中的每个副本都会维护自身的LEO，而ISR集合中最小的LEO即为分区的HW，对消费者而言只能消费HW之前的消息。</p>
+<p>注意要点：很多资料中误将图14中的offset为5的位置看作HW，而把offset为8的位置看作LEO，这显然是不对的。</p>
+<p>为了让读者更好地理解ISR集合，以及HW和LEO之间的关系，下面通过一个简单的示例来进行相关的说明。如图15所示，假设某个分区的ISR集合中有3个副本，即一个leader副本和2个follower副本，此时分区的LEO和HW都为3。消息3和消息4从生产者发出之后会被先存入leader副本，如图16所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrnMrV.png" alt="rrnMrV.png"></p>
+<p>在消息写入leader副本之后，follower副本会发送拉取请求来拉取消息3和消息4以进行消息同步。</p>
+<p>在同步过程中，不同的follower副本的同步效率也不尽相同。如图17所示，在某一时刻follower1完全跟上了leader副本而follower2只同步了消息3，如此leader副本的LEO为5，follower1的LEO为5，follower2的LEO为4，那么当前分区的HW取最小值4，此时消费者可以消费到offset为0至3之间的消息。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrnXLV.png" alt="rrnXLV.png"></p>
+<p>写入消息（情形4）如图18所示，所有的副本都成功写入了消息3和消息4，整个分区的HW和LEO都变为5，因此消费者可以消费到offset为4的消息了。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rruuJH.png" alt="rruuJH.png"></p>
+<p>由此可见，Kafka的复制机制既不是完全的同步复制，也不是单纯的异步复制。事实上，同步复制要求所有能工作的follower副本都复制完，这条消息才会被确认为已成功提交，这种复制方式极大地影响了性能。而在异步复制方式下，follower副本异步地从leader副本中复制数据，数据只要被leader副本写入就被认为已经成功提交。在这种情况下，如果follower副本都还没有复制完而落后于leader副本，突然leader副本宕机，则会造成数据丢失。Kafka使用的这种ISR的方式则有效地权衡了数据可靠性和性能之间的关系。</p>
+<h2 id="生产者"><a href="#生产者" class="headerlink" title="生产者"></a>生产者</h2><h3 id="生产者客户端"><a href="#生产者客户端" class="headerlink" title="生产者客户端"></a>生产者客户端</h3><pre><code class="java">//代码清单3-1 生产者客户端示例代码
+public class KafkaProducerAnalysis {
+    public static final String brokerList = &quot;localhost:9092&quot;;
+    public static final String topic = &quot;topic-demo&quot;;
+
+    public static Properties initConfig(){
+        Properties props = new Properties();
+        props.put(&quot;bootstrap.servers&quot;, brokerList);
+        props.put(&quot;key.serializer&quot;,
+                &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+        props.put(&quot;value.serializer&quot;,
+                &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+        props.put(&quot;client.id&quot;, &quot;producer.client.id.demo&quot;);
+        return props;
+    }
+
+    public static void main(String[] args) {
+        Properties props = initConfig();
+        KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);
+        ProducerRecord&lt;String, String&gt; record =
+                new ProducerRecord&lt;&gt;(topic, &quot;Hello, Kafka!&quot;);
+        try {
+            producer.send(record);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>ProducerRecord，它并不是单纯意义上的消息，它包含了多个属性，原本需要发送的与业务相关的消息体只是其中的一个value属性，比如“Hello，Kafka！”只是ProducerRecord对象中的一个属性。ProducerRecord类的定义如下</p>
+<pre><code class="java">public class ProducerRecord&lt;K, V&gt; {
+    private final String topic; //主题
+    private final Integer partition; //分区号
+    private final Headers headers; //消息头部
+    private final K key; //键
+    private final V value; //值
+    private final Long timestamp; //消息的时间戳
+    //省略其他成员方法和构造方法
+}
+</code></pre>
+<p>其中topic和partition字段分别代表消息要发往的主题和分区号。headers字段是消息的头部，Kafka0.11.x版本才引入这个属性，它大多用来设定一些与应用相关的信息，如无需要也可以不用设置。key是用来指定消息的键，它不仅是消息的附加信息，还可以用来计算分区号进而可以让消息发往特定的分区。前面提及消息以主题为单位进行归类，而这个key可以让消息再进行二次归类，同一个key的消息会被划分到同一个分区中。有key的消息还可以支持日志压缩的功能。value是指消息体，一般不为空，如果为空则表示特定的消息—墓碑消息。timestamp是指消息的时间戳，它有CreateTime和LogAppendTime两种类型，前者表示消息创建的时间，后者表示消息追加到日志文件的时间。</p>
+<p>发送消息主要有三种模式：发后即忘（fireandforget）、同步（sync）及异步（async）。</p>
+<p>代码清单21中的这种发送方式就是发后即忘，它只管往Kafka中发送消息而并不关心消息是否正确到达。在大多数情况下，这种发送方式没有什么问题，不过在某些时候（比如发生不可重试异常时）会造成消息的丢失。这种发送方式的性能最高，可靠性也最差。</p>
+<p>KafkaProducer的send（）方法并非是void类型，而是Future＜RecordMetadata＞类型，send（）方法有2个重载方法，具体定义如下：</p>
+<pre><code class="java">public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record)
+public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record, 
+                                   Callback callback)
+</code></pre>
+<p>实际上send（）方法本身就是异步的，send（）方法返回的Future对象可以使调用方稍后获得发送的结果。示例中在执行send（）方法之后直接链式调用了get（）方法来阻塞等待Kafka的响应，直到消息发送成功，或者发生异常。如果发生异常，那么就需要捕获异常并交由外层逻辑处理。</p>
+<p>我们再来了解一下异步发送的方式，一般是在send（）方法里指定一个Callback的回调函数，Kafka在返回响应时调用该函数来实现异步的发送确认。有读者或许会有疑问，send（）方法的返回值类型就是Future，而Future本身就可以用作异步的逻辑处理。这样做不是不行，只不过Future里的get（）方法在何时调用，以及怎么调用都是需要面对的问题，消息不停地发送，那么诸多消息对应的Future对象的处理难免会引起代码处理逻辑的混乱。使用Callback的方式非常简洁明了，Kafka有响应时就会回调，要么发送成功，要么抛出异常。异步发送方式的示例如下：</p>
+<pre><code class="java">producer.send(record, new Callback() {
+    @Override
+    public void onCompletion(RecordMetadata metadata, Exception exception) {
+        if (exception != null) {
+            exception.printStackTrace();
+        } else {
+            System.out.println(metadata.topic() + &quot;-&quot; +
+                    metadata.partition() + &quot;:&quot; + metadata.offset());
+        }
+    }
+});
+</code></pre>
+<p>示例代码中遇到异常时（exception！=null）只是做了简单的打印操作，在实际应用中应该使用更加稳妥的方式来处理，比如可以将异常记录以便日后分析，也可以做一定的处理来进行消息重发。onCompletion（）方法的两个参数是互斥的，消息发送成功时，metadata不为null而exception为null；消息发送异常时，metadata为null而exception不为null。</p>
+<p>通常，一个KafkaProducer不会只负责发送单条消息，更多的是发送多条消息，在发送完这些消息之后，需要调用KafkaProducer的close（）方法来回收资源。close（）方法会阻塞等待之前所有的发送请求完成后再关闭KafkaProducer。</p>
+<h4 id="分区器"><a href="#分区器" class="headerlink" title="分区器"></a>分区器</h4><p>消息在通过send（）方法发往broker的过程中，有可能需要经过拦截器（Interceptor）、序列化器（Serializer）和分区器（Partitioner）的一系列作用之后才能被真正地发往broker。拦截器（下一章会详细介绍）一般不是必需的，而序列化器是必需的。消息经过序列化之后就需要确定它发往的分区，如果消息ProducerRecord中指定了partition字段，那么就不需要分区器的作用，因为partition代表的就是所要发往的分区号。</p>
+<p>如果消息ProducerRecord中没有指定partition字段，那么就需要依赖分区器，根据key这个字段来计算partition的值。分区器的作用就是为消息分配分区。</p>
+<p>Kafka中提供的默认分区器是org.apache.kafka.clients.producer.internals.DefaultPartitioner，它实现了org.apache.kafka.clients.producer.Partitioner接口，这个接口中定义了2个方法，具体如下所示。</p>
+<pre><code class="java">public int partition(String topic, Object key, byte[] keyBytes, 
+                     Object value, byte[] valueBytes, Cluster cluster);
+public void close();
+</code></pre>
+<p>其中partition（）方法用来计算分区号，返回值为int类型。partition（）方法中的参数分别表示主题、键、序列化后的键、值、序列化后的值，以及集群的元数据信息，通过这些信息可以实现功能丰富的分区器。close（）方法在关闭分区器的时候用来回收一些资源。</p>
+<p>在默认分区器DefaultPartitioner的实现中，close（）是空方法，而在partition（）方法中定义了主要的分区分配逻辑。如果key不为null，那么默认的分区器会对key进行哈希（采用MurmurHash2算法，具备高运算性能及低碰撞率），最终根据得到的哈希值来计算分区号，拥有相同key的消息会被写入同一个分区。如果key为null，那么消息将会以轮询的方式发往主题内的各个可用分区。</p>
+<p>注意：如果key不为null，那么计算得到的分区号会是所有分区中的任意一个；如果key为null，那么计算得到的分区号仅为可用分区中的任意一个，注意两者之间的差别。</p>
+<p>在不改变主题分区数量的情况下，key与分区之间的映射可以保持不变。不过，一旦主题中增加了分区，那么就难以保证key与分区之间的映射关系了。除了使用Kafka提供的默认分区器进行分区分配，还可以使用自定义的分区器，只需同DefaultPartitioner一样实现Partitioner接口即可。默认的分区器在key为null时不会选择非可用的分区，我们可以通过自定义的分区器来打破这一限制。</p>
+<h4 id="生产者拦截器"><a href="#生产者拦截器" class="headerlink" title="生产者拦截器"></a>生产者拦截器</h4><p>Kafka一共有两种拦截器：生产者拦截器和消费者拦截器。本节主要讲述生产者拦截器的相关内容</p>
+<p>生产者拦截器既可以用来在消息发送前做一些准备工作，比如按照某个规则过滤不符合要求的消息、修改消息的内容等，也可以用来在发送回调逻辑前做一些定制化的需求，比如统计类工作。</p>
+<p>生产者拦截器的使用也很方便，主要是自定义实现org.apache.kafka.clients.producer.ProducerInterceptor接口。ProducerInterceptor接口中包含3个方法：</p>
+<pre><code class="java">public ProducerRecord&lt;K, V&gt; onSend(ProducerRecord&lt;K, V&gt; record);
+public void onAcknowledgement(RecordMetadata metadata, Exception exception);
+public void close();
+</code></pre>
+<p>KafkaProducer在将消息序列化和计算分区之前会调用生产者拦截器的onSend（）方法来对消息进行相应的定制化操作。一般来说最好不要修改消息ProducerRecord的topic、key和partition等信息，如果要修改，则需确保对其有准确的判断，否则会与预想的效果出现偏差。比如修改key不仅会影响分区的计算，同样会影响broker端日志压缩（LogCompaction）的功能。</p>
+<p>KafkaProducer会在消息被应答（Acknowledgement）之前或消息发送失败时调用生产者拦截器的onAcknowledgement（）方法，优先于用户设定的Callback之前执行。这个方法运行在Producer的I/O线程中，所以这个方法中实现的代码逻辑越简单越好，否则会影响消息的发送速度。</p>
+<p>close（）方法主要用于在关闭拦截器时执行一些资源的清理工作。在这3个方法中抛出的异常都会被捕获并记录到日志中，但并不会再向上传递。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><img src="https://s3.ax1x.com/2020/12/22/rrUOVH.png" alt="rrUOVH.png"></p>
+<p>整个生产者客户端由两个线程协调运行，这两个线程分别为主线程和Sender线程（发送线程）。在主线程中由KafkaProducer创建消息，然后通过可能的拦截器、序列化器和分区器的作用之后缓存到消息累加器（RecordAccumulator，也称为消息收集器）中。Sender线程负责从RecordAccumulator中获取消息并将其发送到Kafka中。</p>
+<h2 id="消费者"><a href="#消费者" class="headerlink" title="消费者"></a>消费者</h2><p>消费者（Consumer）负责订阅Kafka中的主题（Topic），并且从订阅的主题上拉取消息。与其他一些消息中间件不同的是：在Kafka的消费理念中还有一层消费组（ConsumerGroup）的概念，每个消费者都有一个对应的消费组。当消息发布到主题后，只会被投递给订阅它的每个消费组中的一个消费者。</p>
+<p>1个partition只能被同组的一个consumer消费，同组的consumer则起到均衡效果</p>
+<ul>
+<li>如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。</li>
+<li>如果所有的消费者都隶属于不同的消费组，那么所有的消息都会被广播给所有的消费者，即每条消息会被所有的消费者处理，这就相当于发布/订阅模式的应用。</li>
+</ul>
+<h3 id="消费者多于partition"><a href="#消费者多于partition" class="headerlink" title="消费者多于partition"></a>消费者多于partition</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdmibd.png" alt="rdmibd.png"></p>
+<p>如上图，向test发送消息：1，2， 3，4，5，6，7，8，9</p>
+<p>只有C1能接收到消息，C2则不能接收到消息，即同一个partition内的消息只能被同一个组中的一个consumer消费。当消费者数量多于partition的数量时，多余的消费者空闲。</p>
+<p>也就是说如果只有一个partition你在同一组启动多少个consumer都没用，partition的数量决定了此topic在同一组中被可被均衡的程度，例如partition=4，则可在同一组中被最多4个consumer均衡消费。</p>
+<h3 id="消费者少于和等于partition"><a href="#消费者少于和等于partition" class="headerlink" title="消费者少于和等于partition"></a>消费者少于和等于partition</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdmnxS.png" alt="rdmnxS.png"></p>
+<p>消费者数量2小于partition的数量3，此时，向test2发送消息1，2，3，4，5，6，7，8，9<br>C1接收到1，3，4，6，7，9<br>C2接收到2，5，8<br>此时P1、P2对对应C1，即多个partition对应一个消费者，C1接收到消息量是C2的两倍</p>
+<p>然后，在g3组中再启动一个消费者，使得消费者数量为3等于topic2中partition的数量</p>
+<p>此时，partition和消费者是一对一关系，向test2发送消息1，2，3，4，5，6，7，8，9<br>C1接收到了：2，5，8<br>C2接收到了：3，6，9<br>C3接收到了：1，4，7<br>C1，C2，C3均分了test2的所有消息，即消息在同一个组之间的消费者之间均分了!</p>
+<h3 id="多个消费者组"><a href="#多个消费者组" class="headerlink" title="多个消费者组"></a>多个消费者组</h3><p><img src="https://s3.ax1x.com/2020/12/20/rdnKW6.png" alt="rdnKW6.png"></p>
+<p>如上图，向test2发送消息1，2，3，4，5，6，7，8，9<br>消息被g3组的消费者均分，g4组的消费者在接收到了所有的消息。<br>g3组：<br>C1接收到了：2，5，8<br>C2接收到了：3，6，9<br>C3接收到了：1，4，7<br>g4组：<br>C1接收到了：1，2，3，4，5，6，7，8，9<br>启动多个组，则会使同一个消息被消费多次</p>
+<h3 id="消费者客户端"><a href="#消费者客户端" class="headerlink" title="消费者客户端"></a>消费者客户端</h3><pre><code class="java">//代码清单8-1 消费者客户端示例
+public class KafkaConsumerAnalysis {
+    public static final String brokerList = &quot;localhost:9092&quot;;
+    public static final String topic = &quot;topic-demo&quot;;
+    public static final String groupId = &quot;group.demo&quot;;
+    public static final AtomicBoolean isRunning = new AtomicBoolean(true);
+
+    public static Properties initConfig(){
+        Properties props = new Properties();
+        props.put(&quot;key.deserializer&quot;,
+                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+        props.put(&quot;value.deserializer&quot;,
+                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+        props.put(&quot;bootstrap.servers&quot;, brokerList);
+        props.put(&quot;group.id&quot;, groupId);
+        props.put(&quot;client.id&quot;, &quot;consumer.client.id.demo&quot;);
+        return props;
+    }
+
+    public static void main(String[] args) {
+        Properties props = initConfig();
+        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);
+        consumer.subscribe(Arrays.asList(topic));
+
+        try {
+            while (isRunning.get()) {
+                ConsumerRecords&lt;String, String&gt; records = 
+                    consumer.poll(Duration.ofMillis(1000));
+                for (ConsumerRecord&lt;String, String&gt; record : records) {
+                    System.out.println(&quot;topic = &quot; + record.topic() 
+                            + &quot;, partition = &quot;+ record.partition() 
+                            + &quot;, offset = &quot; + record.offset());
+                    System.out.println(&quot;key = &quot; + record.key()
+                            + &quot;, value = &quot; + record.value());
+                    //do something to process record.
+                }
+            }
+        } catch (Exception e) {
+            log.error(&quot;occur exception &quot;, e);
+        } finally {
+            consumer.close();
+        }
+    }
+}
+</code></pre>
+<p>代码清单31中我们使用subscribe（）方法订阅了一个主题，对于这个方法而言，既可以以集合的形式订阅多个主题，也可以以正则表达式的形式订阅特定模式的主题。subscribe的几个重载方法如下：</p>
+<pre><code class="java">public void subscribe(Collection&lt;String&gt; topics, 
+    ConsumerRebalanceListener listener)
+public void subscribe(Collection&lt;String&gt; topics)
+public void subscribe(Pattern pattern, ConsumerRebalanceListener listener)
+public void subscribe(Pattern pattern)
+</code></pre>
+<p>对于消费者使用集合的方式（subscribe（Collection））来订阅主题而言，比较容易理解，订阅了什么主题就消费什么主题中的消息。如果前后两次订阅了不同的主题，那么消费者以最后一次的为准。</p>
+<p>如果消费者采用的是正则表达式的方式（subscribe（Pattern））订阅，在之后的过程中，如果有人又创建了新的主题，并且主题的名字与正则表达式相匹配，那么这个消费者就可以消费到新添加的主题中的消息。如果应用程序需要消费多个主题，并且可以处理不同的类型，那么这种订阅方式就很有效。在Kafka和其他系统之间进行数据复制时，这种正则表达式的方式就显得很常见。正则表达式的方式订阅的示例如下：</p>
+<pre><code class="java">consumer.subscribe(Pattern.compile(&quot;topic-.*&quot;));
+</code></pre>
+<p>细心的读者可能观察到在subscribe的重载方法中有一个参数类型是ConsumerRebalanceListener，这个是用来设置相应的再均衡监听器的</p>
+<p>消费者不仅可以通过KafkaConsumer.subscribe（）方法订阅主题，还可以直接订阅某些主题的特定分区，在KafkaConsumer中还提供了一个assign（）方法来实现这些功能，此方法的具体定义如下：</p>
+<pre><code class="java">public void assign(Collection&lt;TopicPartition&gt; partitions)
+</code></pre>
+<p>这个方法只接受一个参数partitions，用来指定需要订阅的分区集合。</p>
+<p>如果我们事先并不知道主题中有多少个分区怎么办？KafkaConsumer中的partitionsFor（）方法可以用来查询指定主题的元数据信息。</p>
+<pre><code class="java">public List&lt;PartitionInfo&gt; partitionsFor(String topic)
+</code></pre>
+<p>集合订阅的方式subscribe（Collection）、正则表达式订阅的方式subscribe（Pattern）和指定分区的订阅方式assign（Collection）分表代表了三种不同的订阅状态：AUTO_TOPICS、AUTO_PATTERN和USER_ASSIGNED（如果没有订阅，那么订阅状态为NONE）。然而这三种状态是互斥的，在一个消费者中只能使用其中的一种，否则会报出IllegalStateException异常</p>
+<p>Kafka中的消费是基于拉模式的。消息的消费一般有两种模式：推模式和拉模式。推模式是服务端主动将消息推送给消费者，而拉模式是消费者主动向服务端发起请求来拉取消息。</p>
+<p>Kafka中的消息消费是一个不断轮询的过程，消费者所要做的就是重复地调用poll（）方法，而poll（）方法返回的是所订阅的主题（分区）上的一组消息。</p>
+<p>对于poll（）方法而言，如果某些分区中没有可供消费的消息，那么此分区对应的消息拉取的结果就为空；如果订阅的所有分区中都没有可供消费的消息，那么poll（）方法返回为空的消息集合。</p>
+<p>poll（）方法的具体定义如下：</p>
+<pre><code class="java">public ConsumerRecords&lt;K, V&gt; poll(final Duration timeout)
+</code></pre>
+<p>注意到poll（）方法里还有一个超时时间参数timeout，用来控制poll（）方法的阻塞时间，在消费者的缓冲区里没有可用数据时会发生阻塞。</p>
+<p>消费者消费到的每条消息的类型为ConsumerRecord（注意与ConsumerRecords的区别），这个和生产者发送的消息类型ProducerRecord相对应，不过ConsumerRecord中的内容更加丰富，具体的结构参考如下代码：</p>
+<pre><code class="java">public class ConsumerRecord&lt;K, V&gt; {
+    private final String topic;
+    private final int partition;
+    private final long offset;
+    private final long timestamp;
+    private final TimestampType timestampType;
+    private final int serializedKeySize;
+    private final int serializedValueSize;
+    private final Headers headers;
+    private final K key;
+    private final V value;
+    private volatile Long checksum;
+        //省略若干方法
+}
+</code></pre>
+<p>topic和partition这两个字段分别代表消息所属主题的名称和所在分区的编号。offset表示消息在所属分区的偏移量。timestamp表示时间戳，与此对应的timestampType表示时间戳的类型。timestampType有两种类型：CreateTime和LogAppendTime，分别代表消息创建的时间戳和消息追加到日志的时间戳。headers表示消息的头部内容。key和value分别表示消息的键和消息的值，一般业务应用要读取的就是value，比如使用2.1.3节中的CompanySerializer序列化了一个Company对象，然后将其存入Kafka，那么消费到的消息中的value就是经过CompanyDeserializer反序列化后的Company对象。serializedKeySize和serializedValueSize分别表示key和value经过序列化之后的大小，如果key为空，则serializedKeySize值为1。同样，如果value为空，则serializedValueSize的值也会为1。checksum是CRC32的校验值。</p>
+<p>poll（）方法的返回值类型是ConsumerRecords，它用来表示一次拉取操作所获得的消息集，内部包含了若干ConsumerRecord，它提供了一个iterator（）方法来循环遍历消息集内部的消息</p>
+<p>到目前为止，可以简单地认为poll（）方法只是拉取一下消息而已，但就其内部逻辑而言并不简单，它涉及消费位移、消费者协调器、组协调器、消费者的选举、分区分配的分发、再均衡的逻辑、心跳等内容，在后面的章节中会循序渐进地介绍这些内容。</p>
+<h4 id="位移提交"><a href="#位移提交" class="headerlink" title="位移提交"></a>位移提交</h4><p>在每次调用poll（）方法时，它返回的是还没有被消费过的消息集（当然这个前提是消息已经存储在Kafka中了，并且暂不考虑异常情况的发生），要做到这一点，就需要记录上一次消费时的消费位移。并且这个消费位移必须做持久化保存，而不是单单保存在内存中，否则消费者重启之后就无法知晓之前的消费位移。再考虑一种情况，当有新的消费者加入时，那么必然会有再均衡的动作，对于同一分区而言，它可能在再均衡动作之后分配给新的消费者，如果不持久化保存消费位移，那么这个新的消费者也无法知晓之前的消费位移。</p>
+<p>在旧消费者客户端中，消费位移是存储在ZooKeeper中的。而在新消费者客户端中，消费位移存储在Kafka内部的主题__consumer_offsets中。这里把将消费位移存储起来（持久化）的动作称为“提交”，消费者在消费完消息之后需要执行消费位移的提交。</p>
+<p>参考图36的消费位移，x表示某一次拉取操作中此分区消息的最大偏移量，假设当前消费者已经消费了x位置的消息，那么我们就可以说消费者的消费位移为x，图中也用了lastConsumedOffset这个单词来标识它。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rr6YYF.png" alt="rr6YYF.png"></p>
+<p>不过需要非常明确的是，当前消费者需要提交的消费位移并不是x，而是x+1</p>
+<p>KafkaConsumer类提供了position（TopicPartition）和committed（TopicPartition）两个方法来分别获取上面所说的position和committedoffset的值。这两个方法的定义如下所示。</p>
+<pre><code class="java">public long position(TopicPartition partition)
+public OffsetAndMetadata committed(TopicPartition partition)
+</code></pre>
+<p>为了论证lastConsumedOffset、committedoffset和position之间的关系，我们使用上面的这两个方法来做相关演示。我们向某个主题中分区编号为0的分区发送若干消息，之后再创建一个消费者去消费其中的消息，等待消费完这些消息之后就同步提交消费位移（调用commitSync（）方法，这个方法的细节在下面详细介绍），最后我们观察一下lastConsumedOffset、committedoffset和position的值。</p>
+<pre><code class="java">//代码清单11-1 消费位移的演示
+TopicPartition tp = new TopicPartition(topic, 0);
+consumer.assign(Arrays.asList(tp));
+long lastConsumedOffset = -1;//当前消费到的位移
+while (true) {
+    ConsumerRecords&lt;String, String&gt; records = consumer.poll(1000);
+    if (records.isEmpty()) {
+        break;
+    }
+    List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords
+            = records.records(tp);
+    lastConsumedOffset = partitionRecords
+            .get(partitionRecords.size() - 1).offset();
+    consumer.commitSync();//同步提交消费位移
+}
+System.out.println(&quot;comsumed offset is &quot; + lastConsumedOffset);
+OffsetAndMetadata offsetAndMetadata = consumer.committed(tp);
+System.out.println(&quot;commited offset is &quot; + offsetAndMetadata.offset());
+long posititon = consumer.position(tp);
+System.out.println(&quot;the offset of the next record is &quot; + posititon);
+</code></pre>
+<p>示例中先通过assign（）方法订阅了编号为0的分区，然后消费分区中的消息。示例中还通过调用ConsumerRecords.isEmpty（）方法来判断是否已经消费完分区中的消息。</p>
+<p>最终的输出结果如下：</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrfqpT.png" alt="rrfqpT.png"></p>
+<p>可以看出，消费者消费到此分区消息的最大偏移量为377，对应的消费位移lastConsumedOffset也就是377。在消费完之后就执行同步提交，但是最终结果显示所提交的位移committedoffset为378，并且下一次所要拉取的消息的起始偏移量position也为378。在本示例中，position=committedoffset=lastConsumedOffset+1，当然position和committedoffset并不会一直相同，这一点会在下面的示例中有所体现。</p>
+<p>对于位移提交的具体时机的把握也很有讲究，有可能会造成重复消费和消息丢失的现象。参考图37，当前一次poll（）操作所拉取的消息集为[x+2，x+7]，x+2代表上一次提交的消费位移，说明已经完成了x+1之前（包括x+1在内）的所有消息的消费，x+5表示当前正在处理的位置。如果拉取到消息之后就进行了位移提交，即提交了x+8，那么当前消费x+5的时候遇到了异常，在故障恢复之后，我们重新拉取的消息是从x+8开始的。也就是说，x+5至x+7之间的消息并未能被消费，如此便发生了消息丢失的现象。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rrhfC6.png" alt="rrhfC6.png"></p>
+<p>再考虑另外一种情形，位移提交的动作是在消费完所有拉取到的消息之后才执行的，那么当消费x+5的时候遇到了异常，在故障恢复之后，我们重新拉取的消息是从x+2开始的。也就是说，x+2至x+4之间的消息又重新消费了一遍，故而又发生了重复消费的现象。</p>
+<p>而实际情况还会有比这两种更加复杂的情形，比如第一次的位移提交的位置为x+8，而下一次的位移提交的位置为x+4，后面会做进一步的分析。</p>
+<p>在Kafka中默认的消费位移的提交方式是自动提交，这个由消费者客户端参数enable.auto.commit配置，默认值为true。当然这个默认的自动提交不是每消费一条消息就提交一次，而是定期提交，这个定期的周期时间由客户端参数auto.commit.interval.ms配置，默认值为5秒，此参数生效的前提是enable.auto.commit参数为true。在代码清单31中并没有展示出这两个参数，说明使用的正是默认值。</p>
+<p>在默认的方式下，消费者每隔5秒会将拉取到的每个分区中最大的消息位移进行提交。自动位移提交的动作是在poll（）方法的逻辑里完成的，在每次真正向服务端发起拉取请求之前会检查是否可以进行位移提交，如果可以，那么就会提交上一次轮询的位移。</p>
+<p>在Kafka消费的编程逻辑中位移提交是一大难点，自动提交消费位移的方式非常简便，它免去了复杂的位移提交逻辑，让编码更简洁。但随之而来的是重复消费和消息丢失的问题。假设刚刚提交完一次消费位移，然后拉取一批消息进行消费，在下一次自动提交消费位移之前，消费者崩溃了，那么又得从上一次位移提交的地方重新开始消费，这样便发生了重复消费的现象（对于再均衡的情况同样适用）。我们可以通过减小位移提交的时间间隔来减小重复消息的窗口大小，但这样并不能避免重复消费的发送，而且也会使位移提交更加频繁。</p>
+<p>按照一般思维逻辑而言，自动提交是延时提交，重复消费可以理解，那么消息丢失又是在什么情形下会发生的呢？我们来看一下图38中的情形。拉取线程A不断地拉取消息并存入本地缓存，比如在BlockingQueue中，另一个处理线程B从缓存中读取消息并进行相应的逻辑处理。假设目前进行到了第y+1次拉取，以及第m次位移提交的时候，也就是x+6之前的位移已经确认提交了，处理线程B却还正在消费x+3的消息。此时如果处理线程B发生了异常，待其恢复之后会从第m此位移提交处，也就是x+6的位置开始拉取消息，那么x+3至x+6之间的消息就没有得到相应的处理，这样便发生消息丢失的现象。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rr4yz8.png" alt="rr4yz8.png"></p>
+<p>自动位移提交的方式在正常情况下不会发生消息丢失或重复消费的现象，但是在编程的世界里异常无可避免，与此同时，自动位移提交也无法做到精确的位移管理。在Kafka中还提供了手动位移提交的方式，这样可以使得开发人员对消费位移的管理控制更加灵活。很多时候并不是说拉取到消息就算消费完成，而是需要将消息写入数据库、写入本地缓存，或者是更加复杂的业务处理。在这些场景下，所有的业务处理完成才能认为消息被成功消费，手动的提交方式可以让开发人员根据程序的逻辑在合适的地方进行位移提交。开启手动提交功能的前提是消费者客户端参数enable.auto.commit配置为false。</p>
+<p>手动提交可以细分为同步提交和异步提交，对应于KafkaConsumer中的commitSync（）和commitAsync（）两种类型的方法。我们这里先讲述同步提交的方式。</p>
+<pre><code class="java">while (isRunning.get()) {
+    ConsumerRecords&lt;String, String&gt; records = consumer.poll(1000);
+    for (ConsumerRecord&lt;String, String&gt; record : records) {
+        //do some logical processing.
+    }
+    consumer.commitSync();
+}
+</code></pre>
+<p>上面的示例中将拉取到的消息存入缓存buffer，等到积累到足够多的时候，也就是示例中大于等于200个的时候，再做相应的批量处理，之后再做批量提交。这两个示例都有重复消费的问题，如果在业务逻辑处理完之后，并且在同步位移提交前，程序出现了崩溃，那么待恢复之后又只能从上一次位移提交的地方拉取消息，由此在两次位移提交的窗口中出现了重复消费的现象。</p>
+<p>commitSync（）方法会根据poll（）方法拉取的最新位移来进行提交（注意提交的值对应于图36中position的位置），只要没有发生不可恢复的错误（UnrecoverableError），它就会阻塞消费者线程直至位移提交完成。</p>
+<p>对于采用commitSync（）的无参方法而言，它提交消费位移的频率和拉取批次消息、处理批次消息的频率是一样的，如果想寻求更细粒度的、更精准的提交，那么就需要使用commitSync（）的另一个含参方法，具体定义如下：</p>
+<pre><code class="java">public void commitSync(final Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)
+</code></pre>
+<p>该方法提供了一个offsets参数，用来提交指定分区的位移。无参的commitSync（）方法只能提交当前批次对应的position值。如果需要提交一个中间值，比如业务每消费一条消息就提交一次位移，那么就可以使用这种方式</p>
+<pre><code class="java">//代码清单11-2 带参数的同步位移提交
+while (isRunning.get()) {
+    ConsumerRecords&lt;String, String&gt; records = consumer.poll(1000);
+    for (ConsumerRecord&lt;String, String&gt; record : records) {
+        //do some logical processing.
+        long offset = record.offset();
+        TopicPartition partition =
+                new TopicPartition(record.topic(), record.partition());
+        consumer.commitSync(Collections
+                .singletonMap(partition, new OffsetAndMetadata(offset + 1)));
+    }
+}
+</code></pre>
+<p>在实际应用中，很少会有这种每消费一条消息就提交一次消费位移的必要场景。commitSync（）方法本身是同步执行的，会耗费一定的性能，而示例中的这种提交方式会将性能拉到一个相当低的点。更多时候是按照分区的粒度划分提交位移的界限，这里我们就要用到了3.2.4章中提及的ConsumerRecords类的partitions（）方法和records（TopicPartition）方法</p>
+<pre><code class="java">//代码清单11-3 按分区粒度同步提交消费位移
+try {
+    while (isRunning.get()) {
+        ConsumerRecords&lt;String, String&gt; records = consumer.poll(1000);
+        for (TopicPartition partition : records.partitions()) {
+            List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords =
+                    records.records(partition);
+            for (ConsumerRecord&lt;String, String&gt; record : partitionRecords) {
+                //do some logical processing.
+            }
+            long lastConsumedOffset = partitionRecords
+                    .get(partitionRecords.size() - 1).offset();
+            consumer.commitSync(Collections.singletonMap(partition,
+                    new OffsetAndMetadata(lastConsumedOffset + 1)));
+        }
+    }
+} finally {
+    consumer.close();
+}
+</code></pre>
+<p>与commitSync（）方法相反，异步提交的方式（commitAsync（））在执行的时候消费者线程不会被阻塞，可能在提交消费位移的结果还未返回之前就开始了新一次的拉取操作。异步提交可以使消费者的性能得到一定的增强。commitAsync方法有三个不同的重载方法，具体定义如下：</p>
+<pre><code class="java">public void commitAsync()
+public void commitAsync(OffsetCommitCallback callback)
+public void commitAsync(final Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets,
+            OffsetCommitCallback callback)
+</code></pre>
+<p>关键的是这里的第二个方法和第三个方法中的callback参数，它提供了一个异步提交的回调方法，当位移提交完成后会回调OffsetCommitCallback中的onComplete（）方法。这里采用第二个方法来演示回调函数的用法，关键代码如下：</p>
+<pre><code class="java">while (isRunning.get()) {
+    ConsumerRecords&lt;String, String&gt; records = consumer.poll(1000);
+    for (ConsumerRecord&lt;String, String&gt; record : records) {
+        //do some logical processing.
+    }
+    consumer.commitAsync(new OffsetCommitCallback() {
+        @Override
+        public void onComplete(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets,
+                               Exception exception) {
+            if (exception == null) {
+                System.out.println(offsets);
+            }else {
+                log.error(&quot;fail to commit offsets {}&quot;, offsets, exception);
+            }
+        }
+    });
+}
+</code></pre>
+<p>commitAsync（）提交的时候同样会有失败的情况发生，那么我们应该怎么处理呢？读者有可能想到的是重试，问题的关键也就在这里了。如果某一次异步提交的消费位移为x，但是提交失败了，然后下一次又异步提交了消费位移为x+y，这次成功了。如果这里引入了重试机制，前一次的异步提交的消费位移在重试的时候提交成功了，那么此时的消费位移又变为了x。如果此时发生异常（或者再均衡），那么恢复之后的消费者（或者新的消费者）就会从x处开始消费消息，这样就发生了重复消费的问题。</p>
+<p>为此我们可以设置一个递增的序号来维护异步提交的顺序，每次位移提交之后就增加序号相对应的值。在遇到位移提交失败需要重试的时候，可以检查所提交的位移和序号的值的大小，如果前者小于后者，则说明有更大的位移已经提交了，不需要再进行本次重试；如果两者相同，则说明可以进行重试提交。除非程序编码错误，否则不会出现前者大于后者的情况。</p>
+<p>如果位移提交失败的情况经常发生，那么说明系统肯定出现了故障，在一般情况下，位移提交失败的情况很少发生，不重试也没有关系，后面的提交也会有成功的。重试会增加代码逻辑的复杂度，不重试会增加重复消费的概率。如果消费者异常退出，那么这个重复消费的问题就很难避免，因为这种情况下无法及时提交消费位移；如果消费者正常退出或发生再均衡的情况，那么可以在退出或再均衡执行之前使用同步提交的方式做最后的把关。</p>
+<h4 id="控制或关闭消费"><a href="#控制或关闭消费" class="headerlink" title="控制或关闭消费"></a>控制或关闭消费</h4><p>KafkaConsumer提供了对消费速度进行控制的方法，在有些应用场景下我们可能需要暂停某些分区的消费而先消费其他分区，当达到一定条件时再恢复这些分区的消费。KafkaConsumer中使用pause（）和resume（）方法来分别实现暂停某些分区在拉取操作时返回数据给客户端和恢复某些分区向客户端返回数据的操作。这两个方法的具体定义如下：</p>
+<pre><code class="java">public void pause(Collection&lt;TopicPartition&gt; partitions)
+public void resume(Collection&lt;TopicPartition&gt; partitions)
+</code></pre>
+<p>之前的示例展示的都是使用一个while循环来包裹住poll（）方法及相应的消费逻辑，如何优雅地退出这个循环也很有考究。细心的读者可能注意到有些示例代码并不是以while（true）的形式做简单的包裹，而是使用while（isRunning.get（））的方式，这样可以通过在其他地方设定isRunning.set（false）来退出while循环。还有一种方式是调用KafkaConsumer的wakeup（）方法，wakeup（）方法是KafkaConsumer中唯一可以从其他线程里安全调用的方法（KafkaConsumer是非线程安全的），调用wakeup（）方法后可以退出poll（）的逻辑，并抛出WakeupException的异常，我们也不需要处理WakeupException的异常，它只是一种跳出循环的方式。</p>
+<p>跳出循环以后一定要显式地执行关闭动作以释放运行过程中占用的各种系统资源，包括内存资源、Socket连接等。KafkaConsumer提供了close（）方法来实现关闭.</p>
+<h4 id="指定偏移量，消息回溯"><a href="#指定偏移量，消息回溯" class="headerlink" title="指定偏移量，消息回溯"></a>指定偏移量，消息回溯</h4><pre><code class="java">public void seek(TopicPartition partition, long offset)
+</code></pre>
+<p>seek（）方法中的参数partition表示分区，而offset参数用来指定从分区的哪个位置开始消费。seek（）方法只能重置消费者分配到的分区的消费位置，而分区的分配是在poll（）方法的调用过程中实现的。也就是说，在执行seek（）方法之前需要先执行一次poll（）方法，等到分配到分区之后才可以重置消费位置。seek（）方法的使用示例如代码清单35所示</p>
+<pre><code class="java">//代码清单12-1 seek方法的使用示例
+KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);
+consumer.subscribe(Arrays.asList(topic));
+consumer.poll(Duration.ofMillis(10000));                          ①
+Set&lt;TopicPartition&gt; assignment = consumer.assignment();        ②
+for (TopicPartition tp : assignment) {
+    consumer.seek(tp, 10);                                       ③
+}
+while (true) {
+    ConsumerRecords&lt;String, String&gt; records = 
+            consumer.poll(Duration.ofMillis(1000));
+    //consume the record.
+}
+</code></pre>
+<p>上面示例中第③行设置了每个分区的消费位置为10。第②行中的assignment（）方法是用来获取消费者所分配到的分区信息的，这个方法的具体定义如下：</p>
+<pre><code class="java">public Set&lt;TopicPartition&gt; assignment()
+</code></pre>
+<p>如果我们将代码清单35中第①行poll（）方法的参数设置为0，即这一行替换为：</p>
+<p><code>consumer.poll(Duration.ofMillis(0));</code></p>
+<p>在此之后，会发现seek（）方法并未有任何作用。因为当poll（）方法中的参数为0时，此方法立刻返回，那么poll（）方法内部进行分区分配的逻辑就会来不及实施。也就是说，消费者此时并未分配到任何分区，如此第②行中的assignment便是一个空列表，第③行代码也不会执行。那么这里的timeout参数设置为多少合适呢？太短会使分配分区的动作失败，太长又有可能造成一些不必要的等待。我们可以通过KafkaConsumer的assignment（）方法来判定是否分配到了相应的分区：</p>
+<pre><code class="java">//代码清单12-2 seek()方法的另一种使用示例
+KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);
+consumer.subscribe(Arrays.asList(topic));
+Set&lt;TopicPartition&gt; assignment = new HashSet&lt;&gt;();
+while (assignment.size() == 0) {//如果不为0，则说明已经成功分配到了分区
+    consumer.poll(Duration.ofMillis(100));
+    assignment = consumer.assignment();
+}
+for (TopicPartition tp : assignment) {
+    consumer.seek(tp, 10);
+}
+while (true) {
+    ConsumerRecords&lt;String, String&gt; records =
+            consumer.poll(Duration.ofMillis(1000));
+    //consume the record.
+}
+</code></pre>
+<p>如果对未分配到的分区执行seek（）方法，那么会报出IllegalStateException的异常。</p>
+<p>有时候我们并不知道特定的消费位置，却知道一个相关的时间点，比如我们想要消费昨天8点之后的消息，这个需求更符合正常的思维逻辑。此时我们无法直接使用seek（）方法来追溯到相应的位置。KafkaConsumer同样考虑到了这种情况，它提供了一个offsetsForTimes（）方法，通过timestamp来查询与此对应的分区位置。</p>
+<pre><code class="java">public Map&lt;TopicPartition, OffsetAndTimestamp&gt; offsetsForTimes(
+            Map&lt;TopicPartition, Long&gt; timestampsToSearch)
+public Map&lt;TopicPartition, OffsetAndTimestamp&gt; offsetsForTimes(
+            Map&lt;TopicPartition, Long&gt; timestampsToSearch, 
+            Duration timeout)
+</code></pre>
+<p>offsetsForTimes（）方法的参数timestampsToSearch是一个Map类型，key为待查询的分区，而value为待查询的时间戳，该方法会返回时间戳大于等于待查询时间的第一条消息对应的位置和时间戳，对应于OffsetAndTimestamp中的offset和timestamp字段。</p>
+<p>下面的示例演示了offsetsForTimes（）和seek（）之间的使用方法，首先通过offsetForTimes（）方法获取一天之前的消息位置，然后使用seek（）方法追溯到相应位置开始消费</p>
+<pre><code class="java">Map&lt;TopicPartition, Long&gt; timestampToSearch = new HashMap&lt;&gt;();
+for (TopicPartition tp : assignment) {
+    timestampToSearch.put(tp, System.currentTimeMillis()-1*24*3600*1000);
+}
+Map&lt;TopicPartition, OffsetAndTimestamp&gt; offsets =
+        consumer.offsetsForTimes(timestampToSearch);
+for (TopicPartition tp : assignment) {
+    OffsetAndTimestamp offsetAndTimestamp = offsets.get(tp);
+    if (offsetAndTimestamp != null) {
+        consumer.seek(tp, offsetAndTimestamp.offset());
+    }
+}
+</code></pre>
+<p>Kafka中的消费位移是存储在一个内部主题中的，而本节的seek（）方法可以突破这一限制：：消费位移可以保存在任意的存储介质中，例如数据库、文件系统等。以数据库为例，我们将消费位移保存在其中的一个表中，在下次消费的时候可以读取存储在数据表中的消费位移并通过seek（）方法指向这个具体的位置</p>
+<pre><code class="java">consumer.seek(tp, offsets.get(tp)+1);
+</code></pre>
+<p>seek（）方法为我们提供了从特定位置读取消息的能力，我们可以通过这个方法来向前跳过若干消息，也可以通过这个方法来向后回溯若干消息，这样为消息的消费提供了很大的灵活性。seek（）方法也为我们提供了将消费位移保存在外部存储介质中的能力，还可以配合再均衡监听器来提供更加精准的消费能力。</p>
+<h4 id="再均衡"><a href="#再均衡" class="headerlink" title="再均衡"></a>再均衡</h4><p>再均衡是指分区的所属权从一个消费者转移到另一消费者的行为，它为消费组具备高可用性和伸缩性提供保障，使我们可以既方便又安全地删除消费组内的消费者或往消费组内添加消费者。不过在再均衡发生期间，消费组内的消费者是无法读取消息的。也就是说，在再均衡发生期间的这一小段时间内，消费组会变得不可用。另外，当一个分区被重新分配给另一个消费者时，消费者当前的状态也会丢失。比如消费者消费完某个分区中的一部分消息时还没有来得及提交消费位移就发生了再均衡操作，之后这个分区又被分配给了消费组内的另一个消费者，原来被消费完的那部分消息又被重新消费一遍，也就是发生了重复消费。一般情况下，应尽量避免不必要的再均衡的发生。</p>
+<p>将全部消费组分成多个子集，每个消费组的子集在服务端对应一个GroupCoordinator对其进行管理，GroupCoordinator是Kafka服务端中用于管理消费组的组件。而消费者客户端中的ConsumerCoordinator组件负责与GroupCoordinator进行交互。</p>
+<p>ConsumerCoordinator与GroupCoordinator之间最重要的职责就是负责执行消费者再均衡的操作，包括前面提及的分区分配的工作也是在再均衡期间完成的。就目前而言，一共有如下几种情形会触发再均衡的操作：</p>
+<ul>
+<li>有新的消费者加入消费组。</li>
+<li>有消费者宕机下线。消费者并不一定需要真正下线，例如遇到长时间的GC、网络延迟导致消费者长时间未向GroupCoordinator发送心跳等情况时，GroupCoordinator会认为消费者已经下线。</li>
+<li>有消费者主动退出消费组（发送LeaveGroupRequest请求）。比如客户端调用了unsubscrible（）方法取消对某些主题的订阅。</li>
+<li>消费组所对应的GroupCoorinator节点发生了变更。·消费组内所订阅的任一主题或者主题的分区数量发生变化。</li>
+</ul>
+<p>下面就以一个简单的例子来讲解一下再均衡操作的具体内容。当有消费者加入消费组时，消费者、消费组及组协调器之间会经历一下几个阶段。</p>
+<ul>
+<li>FIND_COORDINATOR</li>
+<li>JOIN_GROUP<ul>
+<li>选举消费组的leader</li>
+<li>选举分区分配策略</li>
+</ul>
+</li>
+<li>SYNC_GROUP</li>
+<li>HEARTBEAT</li>
+</ul>
+<h4 id="多线程实现"><a href="#多线程实现" class="headerlink" title="多线程实现"></a>多线程实现</h4><p>KafkaProducer是线程安全的，然而KafkaConsumer却是非线程安全的。KafkaConsumer中定义了一个acquire（）方法，用来检测当前是否只有一个线程在操作，若有其他线程正在操作则会抛出ConcurrentModifcationException异常</p>
+<p>KafkaConsumer中的每个公用方法在执行所要执行的动作之前都会调用这个acquire（）方法，只有wakeup（）方法是个例外。acquire（）方法的具体定义如下：</p>
+<pre><code class="java">private final AtomicLong currentThread
+    = new AtomicLong(NO_CURRENT_THREAD); //KafkaConsumer中的成员变量
+
+private void acquire() {
+    long threadId = Thread.currentThread().getId();
+    if (threadId != currentThread.get() &amp;&amp;
+            !currentThread.compareAndSet(NO_CURRENT_THREAD, threadId))
+        throw new ConcurrentModificationException
+                (&quot;KafkaConsumer is not safe for multi-threaded access&quot;);
+    refcount.incrementAndGet();
+}
+</code></pre>
+<p>acquire（）方法和我们通常所说的锁（synchronized、Lock等）不同，它不会造成阻塞等待，我们可以将其看作一个轻量级锁，它仅通过线程操作计数标记的方式来检测线程是否发生了并发操作，以此保证只有一个线程在操作。acquire（）方法和release（）方法成对出现，表示相应的加锁和解锁操作。release（）方法也很简单，具体定义如下：</p>
+<pre><code class="java">private void release() {
+    if (refcount.decrementAndGet() == 0)
+        currentThread.set(NO_CURRENT_THREAD);
+}
+</code></pre>
+<p>acquire（）方法和release（）方法都是私有方法，因此在实际应用中不需要我们显式地调用，但了解其内部的机理之后可以促使我们正确、有效地编写相应的程序逻辑。</p>
+<p>KafkaConsumer非线程安全并不意味着我们在消费消息的时候只能以单线程的方式执行。如果生产者发送消息的速度大于消费者处理消息的速度，那么就会有越来越多的消息得不到及时的消费，造成了一定的延迟。除此之外，由于Kafka中消息保留机制的作用，有些消息有可能在被消费之前就被清理了，从而造成消息的丢失。我们可以通过多线程的方式来实现消息消费，多线程的目的就是为了提高整体的消费能力。多线程的实现方式有多种，第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象，如图310所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rss3s1.png" alt="rss3s1.png"></p>
+<p>一个线程对应一个KafkaConsumer实例，我们可以称之为消费线程。一个消费线程可以消费一个或多个分区中的消息，所有的消费线程都隶属于同一个消费组。这种实现方式的并发度受限于分区的实际个数，根据3.1节中介绍的消费者与分区数的关系，当消费线程的个数大于分区数时，就有部分消费线程一直处于空闲的状态。</p>
+<p>与此对应的第二种方式是多个消费线程同时消费同一个分区，这个通过assign（）、seek（）等方法实现，这样可以打破原有的消费线程的个数不能超过分区数的限制，进一步提高了消费的能力。不过这种实现方式对于位移提交和顺序控制的处理就会变得非常复杂，实际应用中使用得极少，笔者也并不推荐。</p>
+<p>如果对消息的处理非常迅速，那么poll（）拉取的频次也会更高，进而整体消费的性能也会提升；相反，如果在这里对消息的处理缓慢，比如进行一个事务性操作，或者等待一个RPC的同步响应，那么poll（）拉取的频次也会随之下降，进而造成整体消费性能的下降。一般而言，poll（）拉取消息的速度是相当快的，而整体消费的瓶颈也正是在处理消息这一块，如果我们通过一定的方式来改进这一部分，那么我们就能带动整体消费性能的提升。参考图311，考虑第三种实现方式，将处理消息模块改成多线程的实现方式</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rsstIO.png" alt="rsstIO.png"></p>
+<pre><code class="java">//代码清单14-2 第三种多线程消费实现方式
+public class ThirdMultiConsumerThreadDemo {
+    public static final String brokerList = &quot;localhost:9092&quot;;
+    public static final String topic = &quot;topic-demo&quot;;
+    public static final String groupId = &quot;group.demo&quot;;
+
+    //省略initConfig()方法，具体请参考代码清单14-1
+    public static void main(String[] args) {
+        Properties props = initConfig();
+        KafkaConsumerThread consumerThread = 
+                new KafkaConsumerThread(props, topic,
+                Runtime.getRuntime().availableProcessors());
+        consumerThread.start();
+    }
+
+    public static class KafkaConsumerThread extends Thread {
+        private KafkaConsumer&lt;String, String&gt; kafkaConsumer;
+        private ExecutorService executorService;
+        private int threadNumber;
+
+        public KafkaConsumerThread(Properties props, 
+                String topic, int threadNumber) {
+            kafkaConsumer = new KafkaConsumer&lt;&gt;(props);
+            kafkaConsumer.subscribe(Collections.singletonList(topic));
+            this.threadNumber = threadNumber;
+            executorService = new ThreadPoolExecutor(threadNumber, threadNumber,
+                    0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue&lt;&gt;(1000),
+                    new ThreadPoolExecutor.CallerRunsPolicy());
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    ConsumerRecords&lt;String, String&gt; records =
+                            kafkaConsumer.poll(Duration.ofMillis(100));
+                    if (!records.isEmpty()) {
+                        executorService.submit(new RecordsHandler(records));
+                    }     ①
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                kafkaConsumer.close();
+            }
+        }
+
+    }
+
+    public static class RecordsHandler extends Thread{
+        public final ConsumerRecords&lt;String, String&gt; records;
+
+        public RecordsHandler(ConsumerRecords&lt;String, String&gt; records) {
+            this.records = records;
+        }
+
+        @Override
+        public void run(){
+            //处理records.
+        }
+    }
+}
+</code></pre>
+<p>第三种实现方式相比第一种实现方式而言，除了横向扩展的能力，还可以减少TCP连接对系统资源的消耗，不过缺点就是对于消息的顺序处理就比较困难了。这里引入一个共享变量offsets来参与提交，如图312所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rssBQA.png" alt="rssBQA.png"></p>
+<p>每一个处理消息的RecordHandler类在处理完消息之后都将对应的消费位移保存到共享变量offsets中，KafkaConsumerThread在每一次poll（）方法之后都读取offsets中的内容并对其进行位移提交。注意在实现的过程中对offsets读写需要加锁处理，防止出现并发问题。并且在写入offsets的时候需要注意位移覆盖的问题</p>
+<p>读者可以细想一下这样实现是否万无一失？其实这种位移提交的方式会有数据丢失的风险。对于同一个分区中的消息，假设一个处理线程RecordHandler1正在处理offset为0～99的消息，而另一个处理线程RecordHandler2已经处理完了offset为100～199的消息并进行了位移提交，此时如果RecordHandler1发生异常，则之后的消费只能从200开始而无法再次消费0～99的消息，从而造成了消息丢失的现象。这里虽然针对位移覆盖做了一定的处理，但还没有解决异常情况下的位移覆盖问题。对此就要引入更加复杂的处理机制，这里再提供一种解决思路，参考图313，总体结构上是基于滑动窗口实现的。对于第三种实现方式而言，它所呈现的结构是通过消费者拉取分批次的消息，然后提交给多线程进行处理，而这里的滑动窗口式的实现方式是将拉取到的消息暂存起来，多个消费线程可以拉取暂存的消息，这个用于暂存消息的缓存大小即为滑动窗口的大小，总体上而言没有太多的变化，不同的是对于消费位移的把控</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rss2FS.png" alt="rss2FS.png"></p>
+<p>如图313所示，每一个方格代表一个批次的消息，一个滑动窗口包含若干方格，startOffset标注的是当前滑动窗口的起始位置，endOffset标注的是末尾位置。每当startOffset指向的方格中的消息被消费完成，就可以提交这部分的位移，与此同时，窗口向前滑动一格，删除原来startOffset所指方格中对应的消息，并且拉取新的消息进入窗口。滑动窗口的大小固定，所对应的用来暂存消息的缓存大小也就固定了，这部分内存开销可控。方格大小和滑动窗口的大小同时决定了消费线程的并发数：一个方格对应一个消费线程，对于窗口大小固定的情况，方格越小并行度越高；对于方格大小固定的情况，窗口越大并行度越高。不过，若窗口设置得过大，不仅会增大内存的开销，而且在发生异常（比如Crash）的情况下也会引起大量的重复消费，同时还考虑线程切换的开销，建议根据实际情况设置一个合理的值，不管是对于方格还是窗口而言，过大或过小都不合适。</p>
+<p>如果一个方格内的消息无法被标记为消费完成，那么就会造成startOffset的悬停。为了使窗口能够继续向前滑动，那么就需要设定一个阈值，当startOffset悬停一定的时间后就对这部分消息进行本地重试消费，如果重试失败就转入重试队列，如果还不奏效就转入死信队列。真实应用中无法消费的情况极少，一般是由业务代码的处理逻辑引起的，比如消息中的内容格式与业务处理的内容格式不符，无法对这条消息进行决断，这种情况可以通过优化代码逻辑或采取丢弃策略来避免。如果需要消息高度可靠，也可以将无法进行业务逻辑的消息（这类消息可以称为死信）存入磁盘、数据库或Kafka，然后继续消费下一条消息以保证整体消费进度合理推进，之后可以通过一个额外的处理任务来分析死信进而找出异常的原因。</p>
+<h3 id="事务与幂等"><a href="#事务与幂等" class="headerlink" title="事务与幂等"></a>事务与幂等</h3><p>一般而言，消息中间件的消息传输保障有3个层级，分别如下。</p>
+<ul>
+<li>at most once：至多一次。消息可能会丢失，但绝对不会重复传输。</li>
+<li>at least once：最少一次。消息绝不会丢失，但可能会重复传输。</li>
+<li>exactly once：恰好一次。每条消息肯定会被传输一次且仅传输一次。</li>
+</ul>
+<p>Kafka的消息传输保障机制非常直观。当生产者向Kafka发送消息时，一旦消息被成功提交到日志文件，由于多副本机制的存在，这条消息就不会丢失。如果生产者发送消息到Kafka之后，遇到了网络问题而造成通信中断，那么生产者就无法判断该消息是否已经提交。虽然Kafka无法确定网络故障期间发生了什么，但生产者可以进行多次重试来确保消息已经写入Kafka，这个重试的过程中有可能会造成消息的重复写入，所以这里Kafka提供的消息传输保障为at least once。</p>
+<p>对消费者而言，消费者处理消息和提交消费位移的顺序在很大程度上决定了消费者提供哪一种消息传输保障。如果消费者在拉取完消息之后，应用逻辑先处理消息后提交消费位移，那么在消息处理之后且在位移提交之前消费者宕机了，待它重新上线之后，会从上一次位移提交的位置拉取，这样就出现了重复消费，因为有部分消息已经处理过了只是还没来得及提交消费位移，此时就对应at least once。如果消费者在拉完消息之后，应用逻辑先提交消费位移后进行消息处理，那么在位移提交之后且在消息处理完成之前消费者宕机了，待它重新上线之后，会从已经提交的位移处开始重新消费，但之前尚有部分消息未进行消费，如此就会发生消息丢失，此时就对应at most once。</p>
+<p>Kafka从0.11.0.0版本开始引入了幂等和事务这两个特性，以此来实现EOS（exactly once semantics，精确一次处理语义）。</p>
+<h4 id="幂等"><a href="#幂等" class="headerlink" title="幂等"></a>幂等</h4><p>所谓的幂等，简单地说就是对接口的多次调用所产生的结果和调用一次是一致的。生产者在进行重试的时候有可能会重复写入消息，而使用Kafka的幂等性功能之后就可以避免这种情况。</p>
+<p>开启幂等性功能的方式很简单，只需要显式地将生产者客户端参数enable.idempotence设置为true即可（这个参数的默认值为false）</p>
+<p>为了实现生产者的幂等性，Kafka为此引入了producer id（以下简称PID）和序列号（sequence number）这两个概念。每个新的生产者实例在初始化的时候都会被分配一个PID，这个PID对用户而言是完全透明的。对于每个PID，消息发送到的每一个分区都有对应的序列号，这些序列号从0开始单调递增。生产者每发送一条消息就会将＜PID，分区＞对应的序列号的值加1。</p>
+<p>broker端会在内存中为每一对＜PID，分区＞维护一个序列号。对于收到的每一条消息，只有当它的序列号的值（SN_new）比broker端中维护的对应的序列号的值（SN_old）大1（即SN_new=SN_old+1）时，broker才会接收它。如果SN_new＜SN_old+1，那么说明消息被重复写入，broker可以直接将其丢弃。如果SN_new＞SN_old+1，那么说明中间有数据尚未写入，出现了乱序，暗示可能有消息丢失，对应的生产者会抛出OutOfOrderSequenceException，这个异常是一个严重的异常，后续的诸如send（）、beginTransaction（）、commitTransaction（）等方法的调用都会抛出IllegalStateException的异常。</p>
+<p>引入序列号来实现幂等也只是针对每一对＜PID，分区＞而言的，也就是说，Kafka的幂等只能保证单个生产者会话（session）中单分区的幂等。</p>
+<pre><code class="java">ProducerRecord&lt;String, String&gt; record 
+      = new ProducerRecord&lt;&gt;(topic, &quot;key&quot;, &quot;msg&quot;);
+producer.send(record);
+producer.send(record);
+</code></pre>
+<p>注意，上面示例中发送了两条相同的消息，不过这仅仅是指消息内容相同，但对Kafka而言是两条不同的消息，因为会为这两条消息分配不同的序列号。Kafka并不会保证消息内容的幂等。</p>
+<h5 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h5><p>幂等性并不能跨多个分区运作，而事务可以弥补这个缺陷。事务可以保证对多个分区写入操作的原子性。操作的原子性是指多个操作要么全部成功，要么全部失败，不存在部分成功、部分失败的可能。</p>
+<p>Kafka中的事务可以使应用程序将消费消息、生产消息、提交消费位移当作原子操作来处理，同时成功或失败，即使该生产或消费会跨多个分区。</p>
+<p>为了实现事务，应用程序必须提供唯一的transactional Id，这个transactional Id通过客户端参数transactional.id来显式设置</p>
+<p>事务要求生产者开启幂等特性，因此通过将transactional.id参数设置为非空从而开启事务特性的同时需要将enable.idempotence设置为true（如果未显式设置，则KafkaProducer默认会将它的值设置为true），如果用户显式地将enable.idempotence设置为false，则会报出ConfigException：</p>
+<p>transactional Id与PID一一对应，两者之间所不同的是transactional Id由用户显式设置，而PID是由Kafka内部分配的。另外，为了保证新的生产者启动后具有相同transactional Id的旧生产者能够立即失效，每个生产者通过transactional Id获取PID的同时，还会获取一个单调递增的producer epoch（对应下面要讲述的KafkaProducer.initTransactions（）方法）。</p>
+<p><strong>生产者</strong></p>
+<p>从生产者的角度分析，通过事务，Kafka可以保证跨生产者会话的消息幂等发送，以及跨生产者会话的事务恢复。前者表示具有相同transactional Id的新生产者实例被创建且工作的时候，旧的且拥有相同transactional Id的生产者实例将不再工作。后者指当某个生产者实例宕机后，新的生产者实例可以保证任何未完成的旧事务要么被提交（Commit），要么被中止（Abort），如此可以使新的生产者实例从一个正常的状态开始工作。</p>
+<p>KafkaProducer提供了5个与事务相关的方法，详细如下：</p>
+<pre><code class="java">void initTransactions();
+void beginTransaction() throws ProducerFencedException;
+void sendOffsetsToTransaction(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets,
+                              String consumerGroupId)
+        throws ProducerFencedException;
+void commitTransaction() throws ProducerFencedException;
+void abortTransaction() throws ProducerFencedException;
+</code></pre>
+<p>initTransactions（）方法用来初始化事务，这个方法能够执行的前提是配置了transactionalId，如果没有则会报出IllegalStateException</p>
+<p>beginTransaction（）方法用来开启事务；sendOffsetsToTransaction（）方法为消费者提供在事务内的位移提交的操作；commitTransaction（）方法用来提交事务；abortTransaction（）方法用来中止事务，类似于事务回滚。</p>
+<pre><code class="java">代码清单14-1 事务消息发送示例
+Properties properties = new Properties();
+properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, 
+        StringSerializer.class.getName());
+properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+        StringSerializer.class.getName());
+properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
+properties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);
+
+KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(properties);
+
+producer.initTransactions();
+producer.beginTransaction();
+
+try {
+    //处理业务逻辑并创建ProducerRecord
+    ProducerRecord&lt;String, String&gt; record1 = new ProducerRecord&lt;&gt;(topic, &quot;msg1&quot;);
+    producer.send(record1);
+    ProducerRecord&lt;String, String&gt; record2 = new ProducerRecord&lt;&gt;(topic, &quot;msg2&quot;);
+    producer.send(record2);
+    ProducerRecord&lt;String, String&gt; record3 = new ProducerRecord&lt;&gt;(topic, &quot;msg3&quot;);
+    producer.send(record3);
+    //处理一些其他逻辑
+    producer.commitTransaction();
+} catch (ProducerFencedException e) {
+    producer.abortTransaction();
+}
+producer.close();
+</code></pre>
+<p><strong>消费者</strong></p>
+<p>而从消费者的角度分析，事务能保证的语义相对偏弱。出于以下原因，Kafka并不能保证已提交的事务中的所有消息都能够被消费：</p>
+<ul>
+<li>对采用日志压缩策略的主题而言，事务中的某些消息有可能被清理（相同key的消息，后写入的消息会覆盖前面写入的消息）。</li>
+<li>事务中消息可能分布在同一个分区的多个日志分段（LogSegment）中，当老的日志分段被删除时，对应的消息可能会丢失。</li>
+<li>消费者可以通过seek（）方法访问任意offset的消息，从而可能遗漏事务中的部分消息。</li>
+<li>消费者在消费时可能没有分配到事务内的所有分区，如此它也就不能读取事务中的所有消息。</li>
+</ul>
+<p>在消费端有一个参数isolation.level，与事务有着莫大的关联，这个参数的默认值为“read_uncommitted”，意思是说消费端应用可以看到（消费到）未提交的事务，当然对于已提交的事务也是可见的。这个参数还可以设置为“read_committed”，表示消费端应用不可以看到尚未提交的事务内的消息。</p>
+<p><strong>实现</strong></p>
+<p>每一个生产者都会被指派一个特定的TransactionCoordinator，所有的事务逻辑包括分派PID等都是由TransactionCoordinator来负责实施的。TransactionCoordinator会将事务状态持久化到内部主题__transaction_state中。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6qUfg.png" alt="r6qUfg.png"></p>
+<h2 id="主题与分区"><a href="#主题与分区" class="headerlink" title="主题与分区"></a>主题与分区</h2><p><img src="https://s3.ax1x.com/2020/12/23/ryvhDA.png" alt="ryvhDA.png"></p>
+<h3 id="分区管理"><a href="#分区管理" class="headerlink" title="分区管理"></a>分区管理</h3><h4 id="优先副本的选举"><a href="#优先副本的选举" class="headerlink" title="优先副本的选举"></a>优先副本的选举</h4><p>分区使用多副本机制来提升可靠性，但只有leader副本对外提供读写服务，而follower副本只负责在内部进行消息的同步。如果一个分区的leader副本不可用，那么就意味着整个分区变得不可用，此时就需要Kafka从剩余的follower副本中挑选一个新的leader副本来继续对外提供服务。虽然不够严谨，但从某种程度上说，broker节点中leader副本个数的多少决定了这个节点负载的高低。</p>
+<p>在创建主题的时候，该主题的分区及副本会尽可能均匀地分布到Kafka集群的各个broker节点上，对应的leader副本的分配也比较均匀。针对同一个分区而言，同一个broker节点中不可能出现它的多个副本，即Kafka集群的一个broker中最多只能有它的一个副本，我们可以将leader副本所在的broker节点叫作分区的leader节点，而follower副本所在的broker节点叫作分区的follower节点。</p>
+<p>随着时间的更替，Kafka集群的broker节点不可避免地会遇到宕机或崩溃的问题，当分区的leader节点发生故障时，其中一个follower节点就会成为新的leader节点，这样就会导致集群的负载不均衡，从而影响整体的健壮性和稳定性。当原来的leader节点恢复之后重新加入集群时，它只能成为一个新的follower节点而不再对外提供服务。</p>
+<p>为了能够有效地治理负载失衡的情况，Kafka引入了优先副本（preferredreplica）的概念。</p>
+<p>所谓的优先副本是指在AR集合列表中的第一个副本。理想情况下，优先副本就是该分区的leader副本，所以也可以称之为preferredleader。Kafka要确保所有主题的优先副本在Kafka集群中均匀分布，这样就保证了所有分区的leader均衡分布。如果leader分布过于集中，就会造成集群负载不均衡。</p>
+<p>所谓的优先副本的选举是指通过一定的方式促使优先副本选举为leader副本，以此来促进集群的负载均衡，这一行为也可以称为“分区平衡”。</p>
+<p>在Kafka中可以提供分区自动平衡的功能，与此对应的broker端参数是auto.leader.rebalance.enable，此参数的默认值为true，即默认情况下此功能是开启的。如果开启分区自动平衡的功能，则Kafka的控制器会启动一个定时任务，这个定时任务会轮询所有的broker节点，计算每个broker节点的分区不平衡率（broker中的不平衡率=非优先副本的leader个数/分区总数）是否超过leader.imbalance.per.broker.percentage参数配置的比值，默认值为10%，如果超过设定的比值则会自动执行优先副本的选举动作以求分区平衡。执行周期由参数leader.imbalance.check.interval.seconds控制，默认值为300秒，即5分钟。</p>
+<p>不过在生产环境中不建议将auto.leader.rebalance.enable设置为默认的true，因为这可能引起负面的性能问题，也有可能引起客户端一定时间的阻塞。因为执行的时间无法自主掌控，如果在关键时期（比如电商大促波峰期）执行关键任务的关卡上执行优先副本的自动选举操作，势必会有业务阻塞、频繁超时之类的风险。</p>
+<h4 id="分区重分配"><a href="#分区重分配" class="headerlink" title="分区重分配"></a>分区重分配</h4><p>当集群中的一个节点突然宕机下线时，如果节点上的分区是单副本的，那么这些分区就变得不可用了，在节点恢复前，相应的数据也就处于丢失状态；如果节点上的分区是多副本的，那么位于这个节点上的leader副本的角色会转交到集群的其他follower副本中。总而言之，这个节点上的分区副本都已经处于功能失效的状态，Kafka并不会将这些失效的分区副本自动地迁移到集群中剩余的可用broker节点上，如果放任不管，则不仅会影响整个集群的均衡负载，还会影响整体服务的可用性和可靠性。</p>
+<p>当要对集群中的一个节点进行有计划的下线操作时，为了保证分区及副本的合理分配，我们也希望通过某种方式能够将该节点上的分区副本迁移到其他的可用节点上。</p>
+<p>当集群中新增broker节点时，只有新创建的主题分区才有可能被分配到这个节点上，而之前的主题分区并不会自动分配到新加入的节点中，因为在它们被创建时还没有这个新节点，这样新节点的负载和原先节点的负载之间严重不均衡。</p>
+<p>为了解决上述问题，需要让分区副本再次进行合理的分配，也就是所谓的分区重分配。kafka提供脚本执行分区重分配。</p>
+<h4 id="选择合适的分区数"><a href="#选择合适的分区数" class="headerlink" title="选择合适的分区数"></a>选择合适的分区数</h4><p>一般情况下，根据预估的吞吐量及是否与key相关的规则来设定分区数即可，后期可以通过增加分区数、增加broker或分区重分配等手段来进行改进。如果一定要给一个准则，则建议将分区数设定为集群中broker的倍数，即假定集群中有3个broker节点，可以设定分区数为3、6、9等，至于倍数的选定可以参考预估的吞吐量。不过，如果集群中的broker节点数有很多，比如大几十或上百、上千，那么这种准则也不太适用，在选定分区数时进一步可以引入基架等参考因素。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> mq </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mq </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[rabbit-mq 读书笔记]]></title>
       <url>/2020/12/17/rabbit/</url>
       <content type="html"><![CDATA[<p>关于消息队列</p>
 <p><a href="https://tech.meituan.com/2016/07/01/mq-design.html" target="_blank" rel="noopener">https://tech.meituan.com/2016/07/01/mq-design.html</a></p>
@@ -19211,14 +20196,14 @@ static {
       
         <categories>
             
-            <category> OAuth </category>
+            <category> 微服务 </category>
             
         </categories>
         
         
         <tags>
             
-            <tag> OAuth </tag>
+            <tag> 微服务 </tag>
             
         </tags>
         

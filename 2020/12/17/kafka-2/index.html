@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            kafka 进阶 | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,mq">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/12/17/kafka-2/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/12/17/kafka-2/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="kafka 进阶 | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="mq"> 
+
+    
+        <meta property="article:published_time" content="Thu Dec 17 2020 12:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Wed Dec 23 2020 22:52:58 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/12/17/kafka-2/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/12/17/kafka-2/index.html",
+    "headline": "kafka 进阶",
+    "datePublished": "Thu Dec 17 2020 12:00:00 GMT+0800",
+    "dateModified": "Wed Dec 23 2020 22:52:58 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",mq小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#日志存储"><span class="post-toc-number">1.</span> <span class="post-toc-text">日志存储</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#日志索引"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">日志索引</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#偏移量索引"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">偏移量索引</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#时间戳索引"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">时间戳索引</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#日志清理"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">日志清理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#磁盘存储（回答kafka为什么快）"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">磁盘存储（回答kafka为什么快）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#页缓存"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">页缓存</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#磁盘I-O流程"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">磁盘I/O流程</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#零拷贝"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">零拷贝</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#副本分析"><span class="post-toc-number">2.</span> <span class="post-toc-text">副本分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#LEO与HW"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">LEO与HW</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#为什么不支持读写分离"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">为什么不支持读写分离</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#日志同步"><span class="post-toc-number">3.</span> <span class="post-toc-text">日志同步</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#自定义ttl"><span class="post-toc-number">4.</span> <span class="post-toc-text">自定义ttl</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#kafka中的延时操作"><span class="post-toc-number">5.</span> <span class="post-toc-text">kafka中的延时操作</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#时间轮"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">时间轮</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#延时操作"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">延时操作</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#延时队列"><span class="post-toc-number">6.</span> <span class="post-toc-text">延时队列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#死信队列和重试队列"><span class="post-toc-number">7.</span> <span class="post-toc-text">死信队列和重试队列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#消息路由"><span class="post-toc-number">8.</span> <span class="post-toc-text">消息路由</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#kafka-rabbitmq对比"><span class="post-toc-number">9.</span> <span class="post-toc-text">kafka rabbitmq对比</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                kafka 进阶
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>12月 17, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACcUlEQVR42u3aMXLdMAwFwH//SzutG9EPAMkozqryjCyS+wsCA+Dz9aufDx4eHh4eHh4e3st4n/h5XO7b26f/T1aufvW4Fx4eHt4V3g9X7XLj/Cjroz/9WOWz4eHh4V3k5VuueclXa3bvbHh4eHjv5+VBIg8zeHh4eP8Db33o/Kt8BTw8PLz38PJCbS9gPK38oloLHh4eXszLi7D3/77a38PDw8MLeOWRpvjqz0NCEkIuzZTh4eHhBbwTbareatVxBDw8PLw38/K3SVCZF4u3Vanx8PDwWrzqcpO3vYZWtbyLh4eHd5qXNLHyS3kyEJAMIjSr1Hh4eHhbeZPAMCkBV3+Owo+Lh4eHd5i3KyGev902AouHh4d3mJeHh/U13UuReyXgctzDw8PD28pLru9km2SYoJrEbxsdwMPDw9vKqy6aNL2S9Xvpe7IjHh4e3ht4SYF1QxGhGISaDTA8PDy8TbxJUjsZk+q1u8opNR4eHt4BXlKoTQoQk6ZXdYCgPBmBh4eHt4mXlwl62yepc7Ww+0Ngw8PDw7vOqx4rb+3n6xcw62IEHh4e3jFeb1wgT8p7QaIanPDw8PDu8+bNrfzbSWm4PFOGh4eHd4w3H7Gqtvl7LbcNcQ8PDw9vwKs+SYurXD5oDSI0h67w8PDwxrzepZyUKnqtr2SYoJxS4+Hh4R3g5Vf5vLXfa3qNAgMeHh7eMV5vULWaOufr5yOweHh4eP8uLy+/ro+73vGvBQY8PDy8MS9vjE3S92pYwsPDw7vJy5PjHikfz6oGGzw8PLz7vGoJoNcMy8dYo9Q5nynDw8PD28r7fQ8eHh4eHh4eHt4Lnj/XK69bi419TwAAAABJRU5ErkJggg==">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/mq/">mq</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=kafka 进阶&url=http://seanthefish.com/2020/12/17/kafka-2/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/12/17/kafka-2/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=kafka 进阶&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/12/17/kafka-2/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="日志存储"><a href="#日志存储" class="headerlink" title="日志存储"></a>日志存储</h2><p>Kafka中的消息是以主题为基本单位进行归类的，各个主题在逻辑上相互独立。每个主题又可以分为一个或多个分区，分区的数量可以在主题创建的时候指定，也可以在之后修改。每条消息在发送的时候会根据分区规则被追加到指定的分区中，分区中的每条消息都会被分配一个唯一的序列号，也就是通常所说的偏移量（offset）</p>
+<p>如果分区规则设置得合理，那么所有的消息可以均匀地分布到不同的分区中，这样就可以实现水平扩展。不考虑多副本的情况，一个分区对应一个日志（Log）。为了防止Log过大，Kafka又引入了日志分段（LogSegment）的概念，将Log切分为多个LogSegment，相当于一个巨型文件被平均分配为多个相对较小的文件，这样也便于消息的维护和清理。事实上，Log和LogSegment也不是纯粹物理意义上的概念，Log在物理上只以文件夹的形式存储，而每个LogSegment对应于磁盘上的一个日志文件和两个索引文件，以及可能的其他文件（比如以“.txnindex”为后缀的事务索引文件）。在图51中又补充了Log和LogSegment的关系。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6mRFU.png" alt="r6mRFU.png"></p>
+<p>Log对应了一个命名形式为＜topic＞＜partition＞的文件夹。举个例子，假设有一个名为“topiclog”的主题，此主题中具有4个分区，那么在实际物理存储上表现为“topiclog0”“topiclog1”“topiclog2”“topiclog3”这4个文件夹：</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6nPTf.png" alt="r6nPTf.png"></p>
+<p>向Log中追加消息时是顺序写入的，只有最后一个LogSegment才能执行写入操作，在此之前所有的LogSegment都不能写入数据。为了方便描述，我们将最后一个LogSegment称为“activeSegment”，即表示当前活跃的日志分段。随着消息的不断写入，当activeSegment满足一定的条件时，就需要创建新的activeSegment，之后追加的消息将写入新的activeSegment。</p>
+<p>为了便于消息的检索，每个LogSegment中的日志文件（以“.log”为文件后缀）都有对应的两个索引文件：偏移量索引文件（以“.index”为文件后缀）和时间戳索引文件（以“.timeindex”为文件后缀）。每个LogSegment都有一个基准偏移量baseOffset，用来表示当前LogSegment中第一条消息的offset。偏移量是一个64位的长整型数，日志文件和两个索引文件都是根据基准偏移量（baseOffset）命名的，名称固定为20位数字，没有达到的位数则用0填充。比如第一个LogSegment的基准偏移量为0，对应的日志文件为00000000000000000000.log。</p>
+<p>举例说明，向主题topiclog中发送一定量的消息，某一时刻topiclog0目录中的布局如下所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6nJ1J.png" alt="r6nJ1J.png"></p>
+<p>示例中第2个LogSegment对应的基准位移是133，也说明了该LogSegment中的第一条消息的偏移量为133，同时可以反映出第一个LogSegment中共有133条消息（偏移量从0至132的消息）。</p>
+<h3 id="日志索引"><a href="#日志索引" class="headerlink" title="日志索引"></a>日志索引</h3><p>本章开头就提及了每个日志分段文件对应了两个索引文件，主要用来提高查找消息的效率。偏移量索引文件用来建立消息偏移量（offset）到物理地址之间的映射关系，方便快速定位消息所在的物理文件位置；时间戳索引文件则根据指定的时间戳（timestamp）来查找对应的偏移量信息。</p>
+<p>Kafka中的索引文件以稀疏索引（sparseindex）的方式构造消息的索引，它并不保证每个消息在索引文件中都有对应的索引项。每当写入一定量（由broker端参数log.index.interval.bytes指定，默认值为4096，即4KB）的消息时，偏移量索引文件和时间戳索引文件分别增加一个偏移量索引项和时间戳索引项，增大或减小log.index.interval.bytes的值，对应地可以增加或缩小索引项的密度。</p>
+<p>稀疏索引通过MappedByteBuffer将索引文件映射到内存中，以加快索引的查询速度。偏移量索引文件中的偏移量是单调递增的，查询指定偏移量时，使用二分查找法来快速定位偏移量的位置，如果指定的偏移量不在索引文件中，则会返回小于指定偏移量的最大偏移量。时间戳索引文件中的时间戳也保持严格的单调递增，查询指定时间戳时，也根据二分查找法来查找不大于该时间戳的最大偏移量，至于要找到对应的物理文件位置还需要根据偏移量索引文件来进行再次定位。稀疏索引的方式是在磁盘空间、内存空间、查找时间等多方面之间的一个折中。</p>
+<h4 id="偏移量索引"><a href="#偏移量索引" class="headerlink" title="偏移量索引"></a>偏移量索引</h4><p>偏移量索引项的格式如图58所示。每个索引项占用8个字节，分为两个部分。（</p>
+<ul>
+<li>relativeOffset：相对偏移量，表示消息相对于baseOffset的偏移量，占用4个字节，当前索引文件的文件名即为baseOffset的值。</li>
+<li>position：物理地址，也就是消息在日志分段文件中对应的物理位置，占用4个字节。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/23/r63IZd.png" alt="r63IZd.png"></p>
+<p>消息的偏移量（offset）占用8个字节，也可以称为绝对偏移量。索引项中没有直接使用绝对偏移量而改为只占用4个字节的相对偏移量（relativeOffset=offsetbaseOffset），这样可以减小索引文件占用的空间。举个例子，一个日志分段的baseOffset为32，那么其文件名就是00000000000000000032.log，offset为35的消息在索引文件中的relativeOffset的值为3532=3。</p>
+<p>我们以本章开头topiclog0目录下的00000000000000000000.index为例来进行具体分析，截取00000000000000000000.index部分内容如下：</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6Y8yT.png" alt="r6Y8yT.png"></p>
+<p>我们这里给出00000000000000000000.index和00000000000000000000.log的对照图来做进一步的陈述，如图59所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6tAhR.png" alt="r6tAhR.png"></p>
+<p>如果我们要查找偏移量为23的消息，那么应该怎么做呢？首先通过二分法在偏移量索引文件中找到不大于23的最大索引项，即[22，656]，然后从日志分段文件中的物理位置656开始顺序查找偏移量为23的消息。</p>
+<p>以上是最简单的一种情况。参考图510，如果要查找偏移量为268的消息，那么应该怎么办呢？首先肯定是定位到baseOffset为251的日志分段，然后计算相对偏移量relativeOffset=268251=17，之后再在对应的索引文件中找到不大于17的索引项，最后根据索引项中的position定位到具体的日志分段文件位置开始查找目标消息。那么又是如何查找baseOffset为251的日志分段的呢？这里并不是顺序查找，而是用了跳跃表的结构。Kafka的每个日志对象中使用了ConcurrentSkipListMap来保存各个日志分段，每个日志分段的baseOffset作为key，这样可以根据指定偏移量来快速定位到消息所在的日志分段。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6NkqS.png" alt="r6NkqS.png"></p>
+<p>还需要注意的是，Kafka强制要求索引文件大小必须是索引项大小的整数倍，对偏移量索引文件而言，必须为8的整数倍。如果broker端参数log.index.size.max.bytes配置为67，那么Kafka在内部会将其转换为64，即不大于67，并且满足为8的整数倍的条件。</p>
+<h4 id="时间戳索引"><a href="#时间戳索引" class="headerlink" title="时间戳索引"></a>时间戳索引</h4><p><img src="https://s3.ax1x.com/2020/12/23/r6NgJA.png" alt="r6NgJA.png"></p>
+<p>每个索引项占用12个字节，分为两个部分。</p>
+<ul>
+<li>timestamp：当前日志分段最大的时间戳。</li>
+<li>relativeOffset：时间戳所对应的消息的相对偏移量。</li>
+</ul>
+<p>时间戳索引文件中包含若干时间戳索引项，每个追加的时间戳索引项中的timestamp必须大于之前追加的索引项的timestamp，否则不予追加。如果broker端参数log.message.timestamp.type设置为LogAppendTime，那么消息的时间戳必定能够保持单调递增；相反，如果是CreateTime类型则无法保证。生产者可以使用类似ProducerRecord（Stringtopic，Integerpartition，Longtimestamp，Kkey，Vvalue）的方法来指定时间戳的值。即使生产者客户端采用自动插入的时间戳也无法保证时间戳能够单调递增，如果两个不同时钟的生产者同时往一个分区中插入消息，那么也会造成当前分区的时间戳乱序。</p>
+<p>我们已经知道每当写入一定量的消息时，就会在偏移量索引文件和时间戳索引文件中分别增加一个偏移量索引项和时间戳索引项。两个文件增加索引项的操作是同时进行的，但并不意味着偏移量索引中的relativeOffset和时间戳索引项中的relativeOffset是同一个值。</p>
+<p>我们画出00000000000000000000.timeindex的具体结构，详细参考图512左上角。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6USwF.png" alt="r6USwF.png"></p>
+<p>如果要查找指定时间戳targetTimeStamp=1526384718288开始的消息，首先是找到不小于指定时间戳的日志分段。这里就无法使用跳跃表来快速定位到相应的日志分段了，需要分以下几个步骤来完成。</p>
+<ul>
+<li>将targetTimeStamp和每个日志分段中的最大时间戳largestTimeStamp逐一对比，直到找到不小于targetTimeStamp的largestTimeStamp所对应的日志分段。日志分段中的largestTimeStamp的计算是先查询该日志分段所对应的时间戳索引文件，找到最后一条索引项，若最后一条索引项的时间戳字段值大于0，则取其值，否则取该日志分段的最近修改时间。</li>
+<li>找到相应的日志分段之后，在时间戳索引文件中使用二分查找算法查找到不大于targetTimeStamp的最大索引项，即[1526384718283，28]，如此便找到了一个相对偏移量28。</li>
+<li>在偏移量索引文件中使用二分算法查找到不大于28的最大索引项，即[26，838]。</li>
+<li>从步骤1中找到日志分段文件中的838的物理位置开始查找不小于targetTimeStamp的消息。</li>
+</ul>
+<h3 id="日志清理"><a href="#日志清理" class="headerlink" title="日志清理"></a>日志清理</h3><p>Kafka将消息存储在磁盘中，为了控制磁盘占用空间的不断增加就需要对消息做一定的清理操作。Kafka中每一个分区副本都对应一个Log，而Log又可以分为多个日志分段，这样也便于日志的清理操作。Kafka提供了两种日志清理策略。</p>
+<ul>
+<li>日志删除（LogRetention）：按照一定的保留策略直接删除不符合条件的日志分段。</li>
+<li>日志压缩（LogCompaction）：针对每个消息的key进行整合，对于有相同key的不同value值，只保留最后一个版本。</li>
+</ul>
+<h3 id="磁盘存储（回答kafka为什么快）"><a href="#磁盘存储（回答kafka为什么快）" class="headerlink" title="磁盘存储（回答kafka为什么快）"></a>磁盘存储（回答kafka为什么快）</h3><h4 id="页缓存"><a href="#页缓存" class="headerlink" title="页缓存"></a>页缓存</h4><p>页缓存是操作系统实现的一种主要的磁盘缓存，以此用来减少对磁盘I/O的操作。具体来说，就是把磁盘中的数据缓存到内存中，把对磁盘的访问变为对内存的访问。</p>
+<p>当一个进程准备读取磁盘上的文件内容时，操作系统会先查看待读取的数据所在的页（page）是否在页缓存（pagecache）中，如果存在（命中）则直接返回数据，从而避免了对物理磁盘的I/O操作；如果没有命中，则操作系统会向磁盘发起读取请求并将读取的数据页存入页缓存，之后再将数据返回给进程。同样，如果一个进程需要将数据写入磁盘，那么操作系统也会检测数据对应的页是否在页缓存中，如果不存在，则会先在页缓存中添加相应的页，最后将数据写入对应的页。被修改过后的页也就变成了脏页，操作系统会在合适的时间把脏页中的数据写入磁盘，以保持数据的一致性。</p>
+<p>Kafka中大量使用了页缓存，这是Kafka实现高吞吐的重要因素之一。</p>
+<p>虽然消息都是先被写入页缓存，然后由操作系统负责具体的刷盘任务的，但在Kafka中同样提供了同步刷盘及间断性强制刷盘（fsync）的功能。同步刷盘可以提高消息的可靠性，防止由于机器掉电等异常造成处于页缓存而没有及时写入磁盘的消息丢失。不过笔者并不建议这么做，刷盘任务就应交由操作系统去调配，消息的可靠性应该由多副本机制来保障，而不是由同步刷盘这种严重影响性能的行为来保障。</p>
+<h4 id="磁盘I-O流程"><a href="#磁盘I-O流程" class="headerlink" title="磁盘I/O流程"></a>磁盘I/O流程</h4><p>一张磁盘I/O的流程图</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6UOtH.png" alt="r6UOtH.png"></p>
+<p>一般磁盘I/O的场景有以下四种。</p>
+<ul>
+<li>用户调用标准C库进行I/O操作，数据流为：应用程序buffer→C库标准IObuffer→文件系统页缓存→通过具体文件系统到磁盘。</li>
+<li>用户调用文件I/O，数据流为：应用程序buffer→文件系统页缓存→通过具体文件系统到磁盘。</li>
+<li>用户打开文件时使用O_DIRECT，绕过页缓存直接读写磁盘。</li>
+<li>用户使用类似dd工具，并使用direct参数，绕过系统cache与文件系统直接写磁盘。</li>
+</ul>
+<p>发起I/O请求的步骤可以表述为如下的内容</p>
+<ul>
+<li>写操作：用户调用fwrite把数据写入C库标准IObuffer后就返回，即写操作通常是异步操作；数据写入C库标准IObuffer后，不会立即刷新到磁盘，会将多次小数据量相邻写操作先缓存起来合并，最终调用write函数一次性写入（或者将大块数据分解多次write调用）页缓存；数据到达页缓存后也不会立即刷新到磁盘，内核有pdflush线程在不停地检测脏页，判断是否要写回到磁盘，如果是则发起磁盘I/O请求。</li>
+<li>读操作：用户调用fread到C库标准IObuffer中读取数据，如果成功则返回，否则继续；到页缓存中读取数据，如果成功则返回，否则继续；发起I/O请求，读取数据后缓存buffer和C库标准IObuffer并返回。可以看出，读操作是同步请求。</li>
+<li>I/O请求处理：通用块层根据I/O请求构造一个或多个bio结构并提交给调度层；调度器将bio结构进行排序和合并组织成队列且确保读写操作尽可能理想：将一个或多个进程的读操作合并到一起读，将一个或多个进程的写操作合并到一起写，尽可能变随机为顺序（因为随机读写比顺序读写要慢），读必须优先满足，而写也不能等太久。</li>
+</ul>
+<p>kafka是消息顺序追加，可是实现顺序io</p>
+<h4 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h4><p>除了消息顺序追加、页缓存等技术，Kafka还使用零拷贝（ZeroCopy）技术来进一步提升性能。所谓的零拷贝是指将数据直接从磁盘文件复制到网卡设备中，而不需要经由应用程序之手。零拷贝大大提高了应用程序的性能，减少了内核和用户模式之间的上下文切换。对Linux操作系统而言，零拷贝技术依赖于底层的sendfile（）方法实现。对应于Java语言，FileChannal.transferTo（）方法的底层实现就是sendfile（）方法。</p>
+<p>单纯从概念上理解“零拷贝”比较抽象，这里简单地介绍一下它。考虑这样一种常用的情形：你需要将静态内容（类似图片、文件）展示给用户。这个情形就意味着需要先将静态内容从磁盘中复制出来放到一个内存buf中，然后将这个buf通过套接字（Socket）传输给用户，进而用户获得静态内容。这看起来再正常不过了，但实际上这是很低效的流程，我们把上面的这种情形抽象成下面的过程：</p>
+<p>首先调用read（）将静态内容（这里假设为文件A）读取到tmp_buf，然后调用write（）将tmp_buf写入Socket，如图523所示。在这个过程中，文件A经历了4次复制的过程：</p>
+<ul>
+<li>调用read（）时，文件A中的内容被复制到了内核模式下的ReadBuffer中。</li>
+<li>CPU控制将内核模式数据复制到用户模式下。</li>
+<li>调用write（）时，将用户模式下的内容复制到内核模式下的SocketBuffer中。- 将内核模式下的SocketBuffer的数据复制到网卡设备中传送。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6dOSA.png" alt="r6dOSA.png"></p>
+<p>从上面的过程可以看出，数据平白无故地从内核模式到用户模式“走了一圈”，浪费了2次复制过程：第一次是从内核模式复制到用户模式；第二次是从用户模式再复制回内核模式，即上面4次过程中的第2步和第3步。而且在上面的过程中，内核和用户模式的上下文的切换也是4次。</p>
+<p>如果采用了零拷贝技术，那么应用程序可以直接请求内核把磁盘中的数据传输给Socket，如图524所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6dvOP.png" alt="r6dvOP.png"></p>
+<p>零拷贝技术通过DMA（DirectMemoryAccess）技术将文件内容复制到内核模式下的ReadBuffer中。不过没有数据被复制到SocketBuffer，相反只有包含数据的位置和长度的信息的文件描述符被加到SocketBuffer中。DMA引擎直接将数据从内核模式中传递到网卡设备（协议引擎）。这里数据只经历了2次复制就从磁盘中传送出去了，并且上下文切换也变成了2次。零拷贝是针对内核模式而言的，数据在内核模式下实现了零拷贝。</p>
+<p>Kafka 速度的秘诀在于，它把所有的消息都变成一个批量的文件，并且进行合理的批量压缩，减少网络 IO 损耗，通过 mmap 提高 I/O 速度，写入数据的时候由于单个 Partion 是末尾添加所以速度最优；读取数据的时候配合 sendfile 直接暴力输出。</p>
+<h2 id="副本分析"><a href="#副本分析" class="headerlink" title="副本分析"></a>副本分析</h2><h3 id="LEO与HW"><a href="#LEO与HW" class="headerlink" title="LEO与HW"></a>LEO与HW</h3><p>LEO 标识每个分区中最后一条消息的下一个位置，分区的每个副本都有自己的 LEO，ISR 中最小的 LEO 即为 HW，俗称高水位，消费者只能拉取到 HW 之前的消息。</p>
+<p>消息追加过程：</p>
+<ul>
+<li>生产者客户端发送消息至 leader 副本（副本1）中。</li>
+<li>消息被追加到 leader 副本的本地日志，并且会更新日志的偏移量。</li>
+<li>follower 副本（副本2和副本3）向 leader 副本请求同步数据。</li>
+<li>leader 副本所在的服务器读取本地日志，并更新对应拉取的 follower 副本的信息。</li>
+<li>leader 副本所在的服务器将拉取结果返回给 follower 副本。</li>
+<li>follower 副本收到 leader 副本返回的拉取结果，将消息追加到本地日志中，并更新日志的偏移量信息。</li>
+</ul>
+<p>我们再来分析在这个过程中各个副本 LEO 和 HW 的变化情况。下面的示例采用同上图中相同的环境背景，如下图（左）所示，生产者一直在往 leader 副本（带阴影的方框）中写入消息。某一时刻，leader 副本的 LEO 增加至5，并且所有副本的 HW 还都为0。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6zkCV.png" alt="r6zkCV.png"></p>
+<p>之后 follower 副本（不带阴影的方框）向 leader 副本拉取消息，在拉取的请求中会带有自身的 LEO 信息。leader 副本返回给 follower 副本相应的消息，并且还带有自身的 HW 信息。</p>
+<p>此时两个 follower 副本各自拉取到了消息，并更新各自的 LEO 为3和4。与此同时，follower 副本还会更新自己的 HW，更新 HW 的算法是比较当前 LEO 和 leader 副本中传送过来的HW的值，取较小值作为自己的 HW 值。当前两个 follower 副本的 HW 都等于0（min(0,0) = 0）。</p>
+<p>接下来 follower 副本再次请求拉取 leader 副本中的消息，如下图（左）所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/r6zdUI.png" alt="r6zdUI.png"></p>
+<p>此时 leader 副本收到来自 follower 副本的 FetchRequest 请求，其中带有 LEO 的相关信息，选取其中的最小值作为新的 HW，即 min(15,3,4)=3。然后连同消息和 HW 一起返回 FetchResponse 给 follower 副本，如上图（右）所示。注意 leader 副本的 HW 是一个很重要的东西，因为它直接影响了分区数据对消费者的可见性。</p>
+<p>两个 follower 副本在收到新的消息之后更新 LEO 并且更新自己的 HW 为3（min(LEO,3)=3）。</p>
+<p>在一个分区中，leader 副本所在的节点会记录所有副本的 LEO，而 follower 副本所在的节点只会记录自身的 LEO，而不会记录其他副本的 LEO。对 HW 而言，各个副本所在的节点都只记录它自身的 HW。</p>
+<h3 id="为什么不支持读写分离"><a href="#为什么不支持读写分离" class="headerlink" title="为什么不支持读写分离"></a>为什么不支持读写分离</h3><p>在 Kafka 中，生产者写入消息、消费者读取消息的操作都是与 leader 副本进行交互的，从而实现的是一种主写主读的生产消费模型。Kafka 并不支持主写从读，这是为什么呢？</p>
+<p>这块原作者写的不太好，我的理解是基于pull模式维护副本的kafka，数据不一致的问题会更加明显。此外kafka本身就是分布式结构了，做读写分离意义不大。</p>
+<h2 id="日志同步"><a href="#日志同步" class="headerlink" title="日志同步"></a>日志同步</h2><p>在 Kafka 中动态维护着一个 ISR 集合，处于 ISR 集合内的节点保持与 leader 相同的高水位（HW），只有位列其中的副本（unclean.leader.election.enable 配置为 false）才有资格被选为新的 leader。写入消息时只有等到所有ISR集合中的副本都确认收到之后才能被认为已经提交。位于 ISR 中的任何副本节点都有资格成为 leader，选举过程简单、开销低，这也是 Kafka 选用此模型的重要因素。Kafka 中包含大量的分区，leader 副本的均衡保障了整体负载的均衡，所以这一因素也极大地影响 Kafka 的性能指标。在采用 ISR 模型和（f+1）个副本数的配置下，一个 Kafka 分区能够容忍最大f个节点失败。</p>
+<h2 id="自定义ttl"><a href="#自定义ttl" class="headerlink" title="自定义ttl"></a>自定义ttl</h2><p>通过消息的 timestamp 字段和 ConsumerInterceptor 接口的 onConsume() 方法来实现消息的 TTL 功能，还需要消息中的 headers 字段来做配合。将消息的 TTL 的设定值以键值对的形式保存在消息的 headers 字段中，这样消费者消费到这条消息的时候可以在拦截器中根据 headers 字段设定的超时时间来判断此条消息是否超时。</p>
+<p>headers 字段涉及 Headers 和 Header 两个接口，Headers 是对多个 Header 的封装，Header 接口表示的是一个键值对，具体实现如下：</p>
+<pre><code class="java">package org.apache.kafka.common.header;
+
+public interface Header {
+    String key();
+    byte[] value();
+}
+</code></pre>
+<p>可以直接使用 Kafka 提供的实现类 org.apache.kafka.common.header.internals.RecordHeaders 和 org.apache.kafka.common.header.internals.RecordHeader。这里只需使用一个 Header，key 可以固定为“ttl”，而 value 用来表示超时的秒数，超时时间一般用 Long 类型表示，但是 RecordHeader 中的构造方法 RecordHeader(String key, byte[] value) 和 value() 方法的返回值对应的 value 都是 byte[] 类型，这里还需要一个小工具实现long与 byte[] 的互转</p>
+<p>下面我们向 Kafka 中发送3条 TTL 分别为20秒、5秒和30秒的3条消息，主要代码如代码清单18-1所示。</p>
+<pre><code class="java">// 代码清单18-1 发送自定义TTL消息的主要代码
+ProducerRecord&lt;String, String&gt; record1 =
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis(),
+                null, &quot;msg_ttl_1&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(20))));
+ProducerRecord&lt;String, String&gt; record2 = //超时的消息
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis()-5*1000,
+                null, &quot;msg_ttl_2&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(5))));
+ProducerRecord&lt;String, String&gt; record3 =
+        new ProducerRecord&lt;&gt;(topic, 0, System.currentTimeMillis(),
+                null, &quot;msg_ttl_3&quot;,new RecordHeaders().add(new RecordHeader(&quot;ttl&quot;,
+                        BytesUtils.longToBytes(30))));
+producer.send(record1).get();
+producer.send(record2).get();
+producer.send(record3).get();
+</code></pre>
+<p>ProducerRecord 中包含 Headers 字段的构造方法只有2个，具体如下：</p>
+<pre><code class="java">public ProducerRecord(String topic, Integer partition, Long timestamp, K key, V value, Iterable&lt;Header&gt; headers)
+public ProducerRecord(String topic, Integer partition, K key, V value, Iterable&lt;Header&gt; headers)
+</code></pre>
+<p>代码清单18-1中指定了分区编号为0和消息 key 的值为 null，其实这个示例中我们并不需要指定这2个值，但是碍于 ProducerRecord 中只有2种与 Headers 字段有关的构造方法。其实完全可以扩展 ProducerRecord 中的构造方法.</p>
+<p>很显然代码清单18-1中的第2条消息 record2 是故意被设定为超时的，因为这条消息的创建时间为 System.currentTimeMillis()-5×1000，往前推进了5秒，而这条消息的超时时间也为5秒。如果在发送这3条消息的时候也开启了消费者，那么经过拦截器处理后应该只会收到“msg_ttl_1”和“msg_ttl_3”这两条消息。</p>
+<pre><code class="java">// 代码清单18-2 自定义TTL的拦截器关键代码实现
+@Override
+public ConsumerRecords&lt;String, String&gt; onConsume(
+        ConsumerRecords&lt;String, String&gt; records) {
+    long now = System.currentTimeMillis();
+    Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;String, String&gt;&gt;&gt; newRecords
+            = new HashMap&lt;&gt;();
+    for (TopicPartition tp : records.partitions()) {
+        List&lt;ConsumerRecord&lt;String, String&gt;&gt; tpRecords = records.records(tp);
+        List&lt;ConsumerRecord&lt;String, String&gt;&gt; newTpRecords = new ArrayList&lt;&gt;();
+        for (ConsumerRecord&lt;String, String&gt; record : tpRecords) {
+            Headers headers = record.headers();
+            long ttl = -1;
+            for (Header header : headers) {//判断headers中是否有key为“ttl”的Header
+                if (header.key().equalsIgnoreCase(&quot;ttl&quot;)) {
+                    ttl = BytesUtils.bytesToLong(header.value());
+                }
+            }
+            //消息超时判定
+            if (ttl &gt; 0 &amp;&amp; now - record.timestamp() &lt; ttl * 1000) {
+                newTpRecords.add(record); 
+            } else {//没有设置TTL，不需要超时判定
+                newTpRecords.add(record);
+            }
+        }
+        if (!newTpRecords.isEmpty()) {
+            newRecords.put(tp, newTpRecords);
+        }
+    }
+    return new ConsumerRecords&lt;&gt;(newRecords);
+}
+</code></pre>
+<p>代码清单18-2中判断每条消息的 headers 字段中是否包含 key 为“ttl”的 Header，如果包含则对其进行超时判定；如果不包含，则不需要超时判定，即无须拦截处理。</p>
+<p>使用这种方式实现自定义消息 TTL 时同样需要注意的是：使用类似中这种带参数的位移提交的方式，有可能会提交错误的位移信息。在一次消息拉取的批次中，可能含有最大偏移量的消息会被消费者拦截器过滤。不过这个也很好解决，比如在过滤之后的消息集中的头部或尾部设置一个状态消息，专门用来存放这一批消息的最大偏移量。</p>
+<h2 id="kafka中的延时操作"><a href="#kafka中的延时操作" class="headerlink" title="kafka中的延时操作"></a>kafka中的延时操作</h2><p>两个follower副本都已经拉取到了leader副本的最新位置，此时又向leader副本发送拉取请求，而leader副本并没有新的消息写入，那么此时leader副本该如何处理呢？可以直接返回空的拉取结果给follower副本，不过在leader副本一直没有新消息写入的情况下，follower副本会一直发送拉取请求，并且总收到空的拉取结果，这样徒耗资源，显然不太合理。</p>
+<p>这里就涉及到了Kafka延迟操作的概念。Kafka在处理拉取请求时，会先读取一次日志文件，如果收集不到足够多（fetchMinBytes，由参数fetch.min.bytes配置，默认值为1）的消息，那么就会创建一个延时拉取操作（DelayedFetch）以等待拉取到足够数量的消息。当延时拉取操作执行时，会再读取一次日志文件，然后将拉取结果返回给follower副本。</p>
+<p>延迟操作不只是拉取消息时的特有操作，在Kafka中有多种延时操作，比如延时数据删除、延时生产等。</p>
+<h3 id="时间轮"><a href="#时间轮" class="headerlink" title="时间轮"></a>时间轮</h3><p>JDK 中 Timer 和 DelayQueue 的插入和删除操作的平均时间复杂度为 O(nlogn) 并不能满足 Kafka 的高性能要求，而基于时间轮可以将插入和删除操作的时间复杂度都降为 O(1)。时间轮的应用并非 Kafka 独有，其应用场景还有很多，在 Netty、Akka、Quartz、ZooKeeper 等组件中都存在时间轮的踪影。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcVU4e.png" alt="rcVU4e.png"></p>
+<p>如上图所示，Kafka 中的时间轮（TimingWheel）是一个存储定时任务的环形队列，底层采用数组实现，数组中的每个元素可以存放一个定时任务列表（TimerTaskList）。TimerTaskList 是一个环形的双向链表，链表中的每一项表示的都是定时任务项（TimerTaskEntry），其中封装了真正的定时任务（TimerTask）。</p>
+<p>时间轮由多个时间格组成，每个时间格代表当前时间轮的基本时间跨度（tickMs）。时间轮的时间格个数是固定的，可用 wheelSize 来表示，那么整个时间轮的总体时间跨度（interval）可以通过公式 tickMs×wheelSize 计算得出。</p>
+<p>时间轮还有一个表盘指针（currentTime），用来表示时间轮当前所处的时间，currentTime 是 tickMs 的整数倍。currentTime 可以将整个时间轮划分为到期部分和未到期部分，currentTime 当前指向的时间格也属于到期部分，表示刚好到期，需要处理此时间格所对应的 TimerTaskList 中的所有任务。</p>
+<p>若时间轮的 tickMs 为 1ms 且 wheelSize 等于20，那么可以计算得出总体时间跨度 interval 为20ms。</p>
+<p>初始情况下表盘指针 currentTime 指向时间格0，此时有一个定时为2ms的任务插进来会存放到时间格为2的 TimerTaskList 中。随着时间的不断推移，指针 currentTime 不断向前推进，过了2ms之后，当到达时间格2时，就需要将时间格2对应的 TimeTaskList 中的任务进行相应的到期操作。此时若又有一个定时为8ms的任务插进来，则会存放到时间格10中，currentTime 再过8ms后会指向时间格10。</p>
+<p>如果同时有一个定时为19ms的任务插进来怎么办？新来的 TimerTaskEntry 会复用原来的 TimerTaskList，所以它会插入原本已经到期的时间格1。总之，整个时间轮的总体跨度是不变的，随着指针 currentTime 的不断推进，当前时间轮所能处理的时间段也在不断后移，总体时间范围在 currentTime 和 currentTime+interval 之间。</p>
+<p>如果此时有一个定时为 350ms 的任务该如何处理？直接扩充 wheelSize 的大小？Kafka 中不乏几万甚至几十万毫秒的定时任务，这个 wheelSize 的扩充没有底线，就算将所有的定时任务的到期时间都设定一个上限，比如100万毫秒，那么这个 wheelSize 为100万毫秒的时间轮不仅占用很大的内存空间，而且也会拉低效率。Kafka 为此引入了层级时间轮的概念，当任务的到期时间超过了当前时间轮所表示的时间范围时，就会尝试添加到上层时间轮中。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcZA8H.png" alt="rcZA8H.png"></p>
+<p>如上图所示，复用之前的案例，第一层的时间轮 tickMs=1ms、wheelSize=20、interval=20ms。第二层的时间轮的 tickMs 为第一层时间轮的 interval，即20ms。每一层时间轮的 wheelSize 是固定的，都是20，那么第二层的时间轮的总体时间跨度 interval 为400ms。以此类推，这个400ms也是第三层的 tickMs 的大小，第三层的时间轮的总体时间跨度为8000ms。</p>
+<p>对于之前所说的 350ms 的定时任务，显然第一层时间轮不能满足条件，所以就升级到第二层时间轮中，最终被插入第二层时间轮中时间格17所对应的 TimerTaskList。如果此时又有一个定时为 450ms 的任务，那么显然第二层时间轮也无法满足条件，所以又升级到第三层时间轮中，最终被插入第三层时间轮中时间格1的 TimerTaskList。注意到在到期时间为 [400ms,800ms) 区间内的多个任务（比如 446ms、455ms 和 473ms 的定时任务）都会被放入第三层时间轮的时间格1，时间格1对应的 TimerTaskList 的超时时间为 400ms。</p>
+<p>随着时间的流逝，当此 TimerTaskList 到期之时，原本定时为 450ms 的任务还剩下 50ms 的时间，还不能执行这个任务的到期操作。这里就有一个时间轮降级的操作，会将这个剩余时间为 50ms 的定时任务重新提交到层级时间轮中，此时第一层时间轮的总体时间跨度不够，而第二层足够，所以该任务被放到第二层时间轮到期时间为 [40ms,60ms) 的时间格中。再经历 40ms 之后，此时这个任务又被“察觉”，不过还剩余 10ms，还是不能立即执行到期操作。所以还要再有一次时间轮的降级，此任务被添加到第一层时间轮到期时间为 [10ms,11ms) 的时间格中，之后再经历 10ms 后，此任务真正到期，最终执行相应的到期操作。</p>
+<p>设计源于生活。我们常见的钟表就是一种具有三层结构的时间轮，第一层时间轮 tickMs=1s、wheelSize=60、interval=1min，此为秒钟；第二层 tickMs=1min、wheelSize=60、interval=1hour，此为分钟；第三层 tickMs=1hour、wheelSize=12、interval=12hours，此为时钟。</p>
+<p>在 Kafka 中，第一层时间轮的参数同上面的案例一样：tickMs=1ms、wheelSize=20、interval=20ms，各个层级的 wheelSize 也固定为20，所以各个层级的 tickMs 和 interval 也可以相应地推算出来。Kafka 在具体实现时间轮 TimingWheel 时还有一些小细节：</p>
+<ul>
+<li>TimingWheel 在创建的时候以当前系统时间为第一层时间轮的起始时间（startMs），这里的当前系统时间并没有简单地调用 System.currentTimeMillis()，而是调用了 Time.SYSTEM.hiResClockMs，这是因为 currentTimeMillis() 方法的时间精度依赖于操作系统的具体实现，有些操作系统下并不能达到毫秒级的精度，而 Time.SYSTEM.hiResClockMs 实质上采用了 System.nanoTime()/1_000_000 来将精度调整到毫秒级。</li>
+<li>TimingWheel 中的每个双向环形链表 TimerTaskList 都会有一个哨兵节点（sentinel），引入哨兵节点可以简化边界条件。哨兵节点也称为哑元节点（dummy node），它是一个附加的链表节点，该节点作为第一个节点，它的值域中并不存储任何东西，只是为了操作的方便而引入的。如果一个链表有哨兵节点，那么线性表的第一个元素应该是链表的第二个节点。</li>
+<li>除了第一层时间轮，其余高层时间轮的起始时间（startMs）都设置为创建此层时间轮时前面第一轮的 currentTime。每一层的 currentTime 都必须是 tickMs 的整数倍，如果不满足则会将 currentTime 修剪为 tickMs 的整数倍，以此与时间轮中的时间格的到期时间范围对应起来。修剪方法为：currentTime = startMs - (startMs % tickMs)。currentTime 会随着时间推移而推进，但不会改变为 tickMs 的整数倍的既定事实。若某一时刻的时间为 timeMs，那么此时时间轮的 currentTime = timeMs - (timeMs % tickMs)，时间每推进一次，每个层级的时间轮的 currentTime 都会依据此公式执行推进。</li>
+<li>Kafka 中的定时器只需持有 TimingWheel 的第一层时间轮的引用，并不会直接持有其他高层的时间轮，但每一层时间轮都会有一个引用（overflowWheel）指向更高一层的应用，以此层级调用可以实现定时器间接持有各个层级时间轮的引用。</li>
+</ul>
+<p>Kafka 中的定时器借了 JDK 中的 DelayQueue 来协助推进时间轮。具体做法是对于每个使用到的 TimerTaskList 都加入 DelayQueue，“每个用到的 TimerTaskList”特指非哨兵节点的定时任务项 TimerTaskEntry 对应的 TimerTaskList。DelayQueue 会根据 TimerTaskList 对应的超时时间 expiration 来排序，最短 expiration 的 TimerTaskList 会被排在 DelayQueue 的队头。</p>
+<p>Kafka 中会有一个线程来获取 DelayQueue 中到期的任务列表，有意思的是这个线程所对应的名称叫作“ExpiredOperationReaper”，可以直译为“过期操作收割机”。当“收割机”线程获取 DelayQueue 中超时的任务列表 TimerTaskList 之后，既可以根据 TimerTaskList 的 expiration 来推进时间轮的时间，也可以就获取的 TimerTaskList 执行相应的操作，对里面的 TimerTaskEntry 该执行过期操作的就执行过期操作，该降级时间轮的就降级时间轮。</p>
+<p>注意对定时任务项 TimerTaskEntry 的插入和删除操作而言，TimingWheel时间复杂度为 O(1)，性能高出 DelayQueue 很多，如果直接将 TimerTaskEntry 插入 DelayQueue，那么性能显然难以支撑。就算我们根据一定的规则将若干 TimerTaskEntry 划分到 TimerTaskList 这个组中，然后将 TimerTaskList 插入 DelayQueue，如果在 TimerTaskList 中又要多添加一个 TimerTaskEntry 时该如何处理呢？对 DelayQueue 而言，这类操作显然变得力不从心。</p>
+<p>分析到这里可以发现，Kafka 中的 TimingWheel 专门用来执行插入和删除 TimerTaskEntry 的操作，而 DelayQueue 专门负责时间推进的任务。试想一下，DelayQueue 中的第一个超时任务列表的 expiration 为 200ms，第二个超时任务为 840ms，这里获取 DelayQueue 的队头只需要 O(1) 的时间复杂度（获取之后 DelayQueue 内部才会再次切换出新的队头）。如果采用每秒定时推进，那么获取第一个超时的任务列表时执行的200次推进中有199次属于“空推进”，而获取第二个超时任务时又需要执行639次“空推进”，这样会无故空耗机器的性能资源，这里采用 DelayQueue 来辅助以少量空间换时间，从而做到了“精准推进”。Kafka 中的定时器真可谓“知人善用”，用 TimingWheel 做最擅长的任务添加和删除操作，而用 DelayQueue 做最擅长的时间推进工作，两者相辅相成。</p>
+<h3 id="延时操作"><a href="#延时操作" class="headerlink" title="延时操作"></a>延时操作</h3><p>如果在使用生产者客户端发送消息的时候将 acks 参数设置为-1，那么就意味着需要等待 ISR 集合中的所有副本都确认收到消息之后才能正确地收到响应的结果，或者捕获超时异常。</p>
+<p>如下面3张图所示，假设某个分区有3个副本：leader、follower1 和 follower2，它们都在分区的 ISR 集合中。为了简化说明，这里我们不考虑 ISR 集合伸缩的情况。Kafka 在收到客户端的生产请求（ProduceRequest）后，将消息3和消息4写入 leader 副本的本地日志文件。由于客户端设置了 acks 为-1，那么需要等到 follower1 和 follower2 两个副本都收到消息3和消息4后才能告知客户端正确地接收了所发送的消息。如果在一定的时间内，follower1 副本或 follower2 副本没能够完全拉取到消息3和消息4，那么就需要返回超时异常给客户端。生产请求的超时时间由参数 request.timeout.ms 配置，默认值为30000，即30s。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcVEn0.png" alt="rcVEn0.png"></p>
+<p>那么这里等待消息3和消息4写入 follower1 副本和 follower2 副本，并返回相应的响应结果给客户端的动作是由谁来执行的呢？在将消息写入 leader 副本的本地日志文件之后，Kafka 会创建一个延时的生产操作（DelayedProduce），用来处理消息正常写入所有副本或超时的情况，以返回相应的响应结果给客户端。</p>
+<p>延时操作需要延时返回响应的结果，首先它必须有一个超时时间（delayMs），如果在这个超时时间内没有完成既定的任务，那么就需要强制完成以返回响应结果给客户端。其次，延时操作不同于定时操作，定时操作是指在特定时间之后执行的操作，而延时操作可以在所设定的超时时间之前完成，所以延时操作能够支持外部事件的触发。</p>
+<p>就延时生产操作而言，它的外部事件是所要写入消息的某个分区的 HW（高水位）发生增长。也就是说，随着 follower 副本不断地与 leader 副本进行消息同步，进而促使HW进一步增长，HW 每增长一次都会检测是否能够完成此次延时生产操作，如果可以就执行以此返回响应结果给客户端；如果在超时时间内始终无法完成，则强制执行。</p>
+<p>延时操作创建之后会被加入延时操作管理器（DelayedOperationPurgatory）来做专门的处理。延时操作有可能会超时，每个延时操作管理器都会配备一个定时器（SystemTimer）来做超时管理，定时器的底层就是采用时间轮（TimingWheel）实现的。在第7节中提及时间轮的轮转是靠“收割机”线程 ExpiredOperationReaper 来驱动的，这里的“收割机”线程就是由延时操作管理器启动的。也就是说，定时器、“收割机”线程和延时操作管理器都是一一对应的。延时操作需要支持外部事件的触发，所以还要配备一个监听池来负责监听每个分区的外部事件—查看是否有分区的HW发生了增长。另外需要补充的是，ExpiredOperationReaper 不仅可以推进时间轮，还会定期清理监听池中已完成的延时操作。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rceR6s.png" alt="rceR6s.png"></p>
+<p>上图描绘了客户端在请求写入消息到收到响应结果的过程中与延时生产操作相关的细节，在了解相关的概念之后应该比较容易理解：如果客户端设置的 acks 参数不为-1，或者没有成功的消息写入，那么就直接返回结果给客户端，否则就需要创建延时生产操作并存入延时操作管理器，最终要么由外部事件触发，要么由超时触发而执行。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rceokT.png" alt="rceokT.png"></p>
+<h2 id="延时队列"><a href="#延时队列" class="headerlink" title="延时队列"></a>延时队列</h2><p>在发送延时消息的时候并不是先投递到要发送的真实主题（real_topic）中，而是先投递到一些 Kafka 内部的主题（delay_topic）中，这些内部主题对用户不可见，然后通过一个自定义的服务拉取这些内部主题中的消息，并将满足条件的消息再投递到要发送的真实的主题中，消费者所订阅的还是真实的主题。</p>
+<p>如果采用这种方案，那么一般是按照不同的延时等级来划分的，比如设定5s、10s、30s、1min、2min、5min、10min、20min、30min、45min、1hour、2hour这些按延时时间递增的延时等级，延时的消息按照延时时间投递到不同等级的主题中，投递到同一主题中的消息的延时时间会被强转为与此主题延时等级一致的延时时间，这样延时误差控制在两个延时等级的时间差范围之内（比如延时时间为17s的消息投递到30s的延时主题中，之后按照延时时间为30s进行计算，延时误差为13s）。虽然有一定的延时误差，但是误差可控，并且这样只需增加少许的主题就能实现延时队列的功能。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rciBPs.png" alt="rciBPs.png"></p>
+<p>如上图所示，生产者 Producer 发送若干延时时间不同的消息到主题 real_topic_A 和 real_topic_B 中，消费者 Consumer 订阅并消费主题 real_topic_A 和 real_topic_B 中的消息，对用户而言，他看到的就是这样一个流程。但是在内部，Producer 会根据不同的延时时间将消息划分为不同的延时等级，然后根据所划分的延时等级再将消息发送到对应的内部主题中，比如5s内的消息发送到 delay_topic_1，6s至10s的消息划分到 delay_topic_2 中。这段内部的转发逻辑需要开发人员对生产者客户端做一些改造封装，可以根据消息的 timestamp 字段、headers 字段（设置延时时间），以及生产者拦截器来实现具体的代码。</p>
+<p>发送到内部主题（delay<em>topic</em>*）中的消息会被一个独立的 DelayService 进程消费，这个 DelayService 进程和 Kafka broker 进程以一对一的配比进行同机部署（参考下图），以保证服务的可用性。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcicrT.png" alt="rcicrT.png"></p>
+<p>针对不同延时级别的主题，在 DelayService 的内部都会有单独的线程来进行消息的拉取，以及单独的 DelayQueue（这里用的是 JUC 中 DelayQueue）进行消息的暂存。与此同时，在 DelayService 内部还会有专门的消息发送线程来获取 DelayQueue 的消息并转发到真实的主题中。从消费、暂存再到转发，线程之间都是一一对应的关系。如下图所示，DelayService 的设计应当尽量保持简单，避免锁机制产生的隐患。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rci4i9.png" alt="rci4i9.png"></p>
+<p>为了保障内部 DelayQueue 不会因为未处理的消息过多而导致内存的占用过大，DelayService 会对主题中的每个分区进行计数，当达到一定的阈值之后，就会暂停拉取该分区中的消息。</p>
+<p>同一分区中的消息的延时级别一样，也就意味着延时时间一样，那么对同一个分区中的消息而言，也就自然而然地按照投递时间进行有序排列，那么为何还需要 DelayQueue 的存在呢？因为一个主题中一般不止一个分区，分区之间的消息并不会按照投递时间进行排序，那么可否将这些主题都设置为一个分区呢？这样虽然可以简化设计，但同时却丢弃了动态扩展性，原本针对某个主题的发送或消费性能不足时，可以通过增加分区数进行一定程度上的性能提升。</p>
+<p>前面我们也提到了，这种延时队列的实现方案会有一定的延时误差，无法做到秒级别的精确延时，不过一般应用对于延时的精度要求不会那么高，只要延时等级设定得合理，这个实现方案还是能够具备很大的应用价值。 </p>
+<p>那么有没有延时精度较高的实现方案？</p>
+<p>第一种思路，在生产者这一层面我们采取延时操作来发送消息，这样原本立刻发送出去的消息被缓存在了客户端中以等待延时条件的满足。这种思路有明显的弊端：如果生产者中缓存的消息过多，则必然引起内存的暴涨；消息可靠性也很差，如果生产者发生了异常，那么这部分消息也就丢失了，除非配套相应的重发机制。</p>
+<p>第二种思路，在 Kafka 服务中增加一个前置缓存，生产者还是正常将消息发往 Kafka 中，Kafka 在判定消息是延时消息时（可以增加一个自定义协议，与发送普通消息的 PRODUCE 协议分开，比如 DELAY_PRODUCE，作为发送延时消息的专用协议）就将消息封装成延时操作并暂存至缓存中，待延时操作触发时就会将消息发送到真实的主题中，整体架构上与上图中所描述的类似。这种思路也有消息可靠性的问题，如果缓存延时操作的那台服务器宕机，那么消息也会随之丢失，为此我们可以引入缓存多副本的机制，如下图所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcFL60.png" alt="rcFL60.png"></p>
+<p>生产者发送的消息不单单发往一个缓存中，而是发往多个缓存，待所有缓存都收到消息之后才算发送成功，这一点和 Kafka 生产者客户端参数 acks = -1 的机理相通。每个 broker 中都会有一个延时操作的清理服务，彼此之间有主从的关系，任意时刻只有一个清理服务在工作，其余的清理服务都处于冷备状态。当某个延迟操作触发时会通知清理服务去清理其他延时操作缓存中对应的延时操作。这种架构虽然可以弥补消息可靠性的缺陷，但对于分布式架构中一些老生常谈的问题（比如缓存一致性、主备切换等）需要格外注意。</p>
+<p>第二种思路还需要修改 Kafka 内核的代码，对开发人员源码的掌握能力及编程能力也是一个不小的挑战，后期系统的维护成本及 Kafka 社区的福利也是不得不考虑的问题。与此同时，这种思路和第一种思路一样会有内存暴涨的问题，单凭这个问题也可以判断出此种思路并不适合实际应用。</p>
+<p>退一步思考，我们并不需要复用 Kafka 中的延时操作的模块，而是可以选择自己开发一个精度较高的延时模块，这里就用到了第7节中提及的时间轮的概念，所不同的是，这里需要的是单层时间轮。而且延时消息也不再是缓存在内存中，而是暂存至文件中。时间轮中每个时间格代表一个延时时间，并且每个时间格也对应一个文件，整体上可以看作单层文件时间轮，如下图所示。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcev0x.png" alt="rcev0x.png"></p>
+<p>每个时间格代表1秒，若要支持2小时（也就是 2×60×60 = 7200）之内的延时时间的消息，那么整个单层时间轮的时间格数就需要7200个，与此对应的也就需要7200个文件，听上去似乎需要庞大的系统开销，就单单文件句柄的使用也会耗费很多的系统资源。</p>
+<p>其实不然，我们并不需要维持所有文件的文件句柄，只需要加载距离时间轮表盘指针（currentTime）相近位置的部分文件即可，其余都可以用类似“懒加载”的机制来维持：若与时间格对应的文件不存在则可以新建，若与时间格对应的文件未加载则可以重新加载，整体上造成的时延相比于延时等级方案而言微乎其微。随着表盘指针的转动，其相邻的文件也会变得不同，整体上在内存中只需要维持少量的文件句柄就可以让系统运转起来。</p>
+<p>这里为什么强调的是单层时间轮。试想一下，如果这里采用的是多层时间轮，那么必然会有时间轮降级的动作，那就需要将高层时间轮中时间格对应文件中的内容写入低层时间轮，高层时间格中伴随的是读取文件内容、写入低层时间轮、删除已写入的内容的操作，与此同时，高层时间格中也会有新的内容写入。</p>
+<p>如果要用多层时间轮来实现，不得不增加繁重的元数据控制信息和繁杂的锁机制。对单层时间轮中的时间格而言，其对应的要么是追加文件内容，要么是删除整个文件（到达延时时间，就可以读取整个文件中的内容做转发，并删除整个文件）。采用单层时间轮可以简化工程实践，减少出错的可能，性能上也并不会比多层时间轮差。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcm1js.png" alt="rcm1js.png"></p>
+<p>采用时间轮可以解决延时精度的问题，采用文件可以解决内存暴涨的问题，那么剩下的还有一个可靠性的问题，这里就借鉴了前面的多副本机制，如上图所示。生产者同样将消息写入多个备份（单层文件时间轮），待时间轮转动而触发某些时间格过期时就可以将时间格对应的文件内容（也就是延时消息）转发到真实主题中，并且删除相应的文件。与此同时，还会有一个后台服务专门用来清理其他时间轮中相应的时间格。</p>
+<p>单层文件时间轮的方案不需要修改 Kafka 内核的源码，与前面第二种思路相比实现较为简单。单层文件时间轮的方案与延时级别的实现方案一样可以将延时服务（上图中单层时间轮与后台服务的整合体）与Kafka进程进行一对一配比的同机部署，以保证整体服务的可用性。</p>
+<h2 id="死信队列和重试队列"><a href="#死信队列和重试队列" class="headerlink" title="死信队列和重试队列"></a>死信队列和重试队列</h2><p>由于某些原因消息无法被正确地投递，为了确保消息不会被无故地丢弃，一般将其置于一个特殊角色的队列，这个队列一般称为死信队列。后续分析程序可以通过消费这个死信队列中的内容来分析当时遇到的异常情况，进而可以改善和优化系统。</p>
+<p>与死信队列对应的还有一个“回退队列”的概念，如果消费者在消费时发生了异常，那么就不会对这一次消费进行确认，进而发生回滚消息的操作之后，消息始终会放在队列的顶部，然后不断被处理和回滚，导致队列陷入死循环。为了解决这个问题，可以为每个队列设置一个回退队列，它和死信队列都是为异常处理提供的一种机制保障。实际情况下，回退队列的角色可以由死信队列和重试队列来扮演。</p>
+<p>无论 RabbitMQ 中的队列，还是 Kafka 中的主题，其实质上都是消息的载体，换种角度看待问题可以让我们找到彼此的共通性。我们依然可以把 Kafka 中的主题看作“队列”，那么重试队列、死信队列的称谓就可以同延时队列一样沿用下来。 理解死信队列，关键是要理解死信。死信可以看作消费者不能处理收到的消息，也可以看作消费者不想处理收到的消息，还可以看作不符合处理要求的消息。比如消息内包含的消息内容无法被消费者解析，为了确保消息的可靠性而不被随意丢弃，故将其投递到死信队列中，这里的死信就可以看作消费者不能处理的消息。再比如超过既定的重试次数之后将消息投入死信队列，这里就可以将死信看作不符合处理要求的消息。</p>
+<p>至于死信队列到底怎么用，是从 broker 端存入死信队列，还是从消费端存入死信队列，需要先思考两个问题：死信有什么用？为什么用？从而引发怎么用。在 RabbitMQ 中，死信一般通过 broker 端存入，而在 Kafka 中原本并无死信的概念，所以当需要封装这一层概念的时候，就可以脱离既定思维的束缚，根据应用情况选择合适的实现方式，理解死信的本质进而懂得如何去实现死信队列的功能。</p>
+<p>重试队列其实可以看作一种回退队列，具体指消费端消费消息失败时，为了防止消息无故丢失而重新将消息回滚到 broker 中。与回退队列不同的是，重试队列一般分成多个重试等级，每个重试等级一般也会设置重新投递延时，重试次数越多投递延时就越大。举个例子：消息第一次消费失败入重试队列 Q1，Q1 的重新投递延时为5s，5s过后重新投递该消息；如果消息再次消费失败则入重试队列 Q2，Q2 的重新投递延时为10s，10s过后再次投递该消息。以此类推，重试越多次重新投递的时间就越久，为此还需要设置一个上限，超过投递次数就进入死信队列。重试队列与延时队列有相同的地方，都需要设置延时级别。它们的区别是：延时队列动作由内部触发，重试队列动作由外部消费端触发；延时队列作用一次，而重试队列的作用范围会向后传递。</p>
+<h2 id="消息路由"><a href="#消息路由" class="headerlink" title="消息路由"></a>消息路由</h2><p>Kafka 默认按照主题进行路由，也就是说，消息发往主题之后会被订阅的消费者全盘接收，这里没有类似消息路由的功能来将消息进行二级路由，这一点从逻辑概念上来说并无任何问题。从业务应用上而言，如果不同的业务流程复用相同的主题，就会出现消息接收时的混乱，这种问题可以从设计上进行屏蔽，如果需要消息路由，那么完全可以通过细粒度化切分主题来实现。</p>
+<p><img src="https://s3.ax1x.com/2020/12/23/rcmOPS.png" alt="rcmOPS.png"></p>
+<h2 id="kafka-rabbitmq对比"><a href="#kafka-rabbitmq对比" class="headerlink" title="kafka rabbitmq对比"></a>kafka rabbitmq对比</h2><table>
+<thead>
+<tr>
+<th>功 能 项</th>
+<th>Kafka（2.0.0版本）</th>
+<th>RabbitMQ（3.6.10版本）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>优先级队列</td>
+<td>不支持。不过可以改造支持，难度不大</td>
+<td>支持。建议优先级大小设置在0～10之间</td>
+</tr>
+<tr>
+<td>延时队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>死信队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>重试队列</td>
+<td>不支持。不过可以改造支持</td>
+<td>不支持。RabbitMQ中可以参考延时队列实现一个重试队列，二次封装比较简单。如果要在Kafka中实现重试队列，则得先实现延时队列的功能，相对比较复杂</td>
+</tr>
+<tr>
+<td>消费模式</td>
+<td>拉模式</td>
+<td>推模式+拉模式</td>
+</tr>
+<tr>
+<td>广播消费</td>
+<td>支持。Kafka对于广播消费的支持相对而言更加正统</td>
+<td>支持，但力度较Kafka弱</td>
+</tr>
+<tr>
+<td>回溯消费</td>
+<td>支持。Kafka支持按照offset和timestamp两种维度进行回溯消费</td>
+<td>不支持。RabbitMQ中消息一旦被确认消费就会被标记删除</td>
+</tr>
+<tr>
+<td>消息堆积</td>
+<td>支持</td>
+<td>支持。一般情况下，内存堆积达到特定阈值时会影响其性能，但这不是绝对的。如果考虑到吞吐量这个因素，Kafka的堆积效率比RabbitMQ总体上要高得多</td>
+</tr>
+<tr>
+<td>持久化</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>消息轨迹</td>
+<td>不支持，可以改造支持</td>
+<td>支持。RabbitMQ中可以采用Firehose或rabbitmq_tracing插件实现。不过开启rabbitmq_tracing插件件会大幅影响性能，不建议在生产环境中开启，反倒是可以使用Firehose与外部链路系统结合以提供高细腻度的消息轨迹支持</td>
+</tr>
+<tr>
+<td>消息审计</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>消息过滤</td>
+<td>客户端级别的支持</td>
+<td>不支持。不过可以改造支持，难度不大</td>
+</tr>
+<tr>
+<td>多租户</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>多协议支持</td>
+<td>只支持自定义协议</td>
+<td>RabbitMQ本身就是AMQP协议的实现，同时支持MQTT、STOMP等协议</td>
+</tr>
+<tr>
+<td>跨语言支持</td>
+<td>采用Scala和Java编写，支持多种语言的客户端</td>
+<td>采用Erlang编写，支持多种语言的客户端</td>
+</tr>
+<tr>
+<td>流量控制</td>
+<td>支持</td>
+<td>RabbitMQ的流控基于Credit-Based算法，是内部被动触发的保护机制，作用于生产者层面</td>
+</tr>
+<tr>
+<td>消息顺序性</td>
+<td>支持单分区级别的顺序性</td>
+<td>顺序性的条件比较苛刻，需要单线程发送、单线程消费，并且不采用延迟队列、优先级队列等一些高级功能，从某种意义上来说不算支持顺序性</td>
+</tr>
+<tr>
+<td>安全机制</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>幂等性</td>
+<td>支持单个生产者单分区单会话的幂等性</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>事务性消息</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody>
+</table>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/12/17/kafka-2/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/12/17/kafka-2/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/12/18/pgsql-1/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/12/17/kafka/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">22</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">46</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/mq/">mq<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/pgsql/">pgsql<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">24</span></a></li><li><a class="sidebar_archives-link" href="/categories/微服务/">微服务<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
