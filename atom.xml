@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-24T02:47:07.442Z</updated>
+  <updated>2020-12-24T02:50:38.672Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -15,6 +15,59 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s网络</title>
+    <link href="http://seanthefish.com/2020/12/29/k8s-2/"/>
+    <id>http://seanthefish.com/2020/12/29/k8s-2/</id>
+    <published>2020-12-29T03:00:00.000Z</published>
+    <updated>2020-12-24T02:50:38.672Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;k8s网络模型&quot;&gt;&lt;a href=&quot;#k8s网络模型&quot; class=&quot;headerlink&quot; title=&quot;k8s网络模型&quot;&gt;&lt;/a&gt;k8s网络模型&lt;/h2&gt;&lt;p&gt;Kubernetes网络模型设计的一个基础原则是: 每个Pod都拥有一个独
+        
+      
+    
+    </summary>
+    
+      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
+    
+    
+      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>k8s拾遗</title>
+    <link href="http://seanthefish.com/2020/12/28/k8s-1/"/>
+    <id>http://seanthefish.com/2020/12/28/k8s-1/</id>
+    <published>2020-12-28T02:00:00.000Z</published>
+    <updated>2020-12-24T02:50:44.103Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;接触k8s这么久，相对来说对于k8s的各种实用算是比较熟悉了，这里重读了一次《k8s权威指南》，查漏补缺，记录一下。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2020/12/18/BwVUHKoGv13j4gk.png&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
+    
+    
+      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>redis进阶之消息队列</title>
@@ -303,59 +356,6 @@
     
     
       <category term="pgsql" scheme="http://seanthefish.com/tags/pgsql/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>k8s网络</title>
-    <link href="http://seanthefish.com/2020/12/16/k8s-2/"/>
-    <id>http://seanthefish.com/2020/12/16/k8s-2/</id>
-    <published>2020-12-16T03:00:00.000Z</published>
-    <updated>2020-12-20T08:13:59.647Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h2 id=&quot;k8s网络模型&quot;&gt;&lt;a href=&quot;#k8s网络模型&quot; class=&quot;headerlink&quot; title=&quot;k8s网络模型&quot;&gt;&lt;/a&gt;k8s网络模型&lt;/h2&gt;&lt;p&gt;Kubernetes网络模型设计的一个基础原则是: 每个Pod都拥有一个独
-        
-      
-    
-    </summary>
-    
-      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
-    
-    
-      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>k8s拾遗</title>
-    <link href="http://seanthefish.com/2020/12/16/k8s-1/"/>
-    <id>http://seanthefish.com/2020/12/16/k8s-1/</id>
-    <published>2020-12-16T02:00:00.000Z</published>
-    <updated>2020-12-19T14:36:52.862Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;接触k8s这么久，相对来说对于k8s的各种实用算是比较熟悉了，这里重读了一次《k8s权威指南》，查漏补缺，记录一下。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2020/12/18/BwVUHKoGv13j4gk.png&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="k8s" scheme="http://seanthefish.com/categories/k8s/"/>
-    
-    
-      <category term="k8s" scheme="http://seanthefish.com/tags/k8s/"/>
     
   </entry>
   
