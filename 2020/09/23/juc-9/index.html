@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            juc之Exchanger | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,并发">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2020/09/23/juc-9/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2020/09/23/juc-9/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="juc之Exchanger | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="并发"> 
+
+    
+        <meta property="article:published_time" content="Wed Sep 23 2020 10:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Thu Dec 24 2020 10:39:09 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2020/09/23/juc-9/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2020/09/23/juc-9/index.html",
+    "headline": "juc之Exchanger",
+    "datePublished": "Wed Sep 23 2020 10:00:00 GMT+0800",
+    "dateModified": "Thu Dec 24 2020 10:39:09 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",并发小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#使用"><span class="post-toc-number">1.</span> <span class="post-toc-text">使用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#单槽-Exchanger"><span class="post-toc-number">2.</span> <span class="post-toc-text">单槽 Exchanger</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#数据结构"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">数据结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#exchange-方法"><span class="post-toc-number">3.</span> <span class="post-toc-text">exchange 方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#多槽-Exchanger"><span class="post-toc-number">4.</span> <span class="post-toc-text">多槽 Exchanger</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">5.</span> <span class="post-toc-text">总结</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                juc之Exchanger
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>9月 23, 2020</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACaUlEQVR42u3aS27jMBAFQN3/0sl2gIGp182PFKO0MmJLYnHBZl7z+vnq68LDw8PDw8PDw3sZ74qv8V0fX/bPt59+Of57eWx4eHh4R3g3S+1/Q0wGNH5LQq2ODQ8PD+8879OCO/7N/F0JL3kLHh4e3pt5SZGolpmEioeHh/cXeeMNdHUibgaKh4eH93pe4R/+VriwKt7dmLXg4eHhxbyZiGH356P9PTw8PLyAV73GxwjyBb1aAApPw8PDw9vM6x0dGJeW8bI+H+zePA0PDw9vMy+/eX6IyRTkG+ty3cPDw8NbxMtfn1N77bHeZzw8PLzzvOqmNmmA5Uep8k38VIyLh4eHt5k3820eSSRBQ7Xw4OHh4T3Fyx+aH0LtHdtqPhkPDw9vM6/avmo2pYIWWq8IRVkLHh4e3lJeHstWF/1ekJEEuDeThYeHh3eEV204VctDNdhNJhEPDw/vPbw8SM3vrR60yicRDw8P7zyv+tDqcPMhVpteeHh4eM/ykmU6OUww/nuvbZaXHDw8PLwzvKQA5BvlJMytbpSrW3w8PDy83bxV29nqoYFVpQgPDw/vKd5UbLpoG90rJ3h4eHhv4FUZyeBWFYlm1oKHh4e3gdc7LDUzQdVyUigheHh4eJt51StvSuVNsl6ogYeHh/cU74qvXpt/vvWVTwEeHh7eSV5SDOaPGvQW+iS8wMPDw3uKVzgSGkQDveZW9aDqgpQaDw8P7yBv1b29QBkPDw/vO3h57FuNJKZiXDw8PLxtvF4YkQyiF8tWAws8PDy8k7xeBDDf4uoVhptJwcPDw9vM+74LDw8PDw8PDw/vBdcvVWWglD8K5LAAAAAASUVORK5CYII=">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/并发/">并发</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=juc之Exchanger&url=http://seanthefish.com/2020/09/23/juc-9/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2020/09/23/juc-9/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=juc之Exchanger&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2020/09/23/juc-9/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>内容转载自 <a href="https://blog.csdn.net/u014634338/article/details/78385521" target="_blank" rel="noopener">https://blog.csdn.net/u014634338/article/details/78385521</a>  稍有改动</p>
+<p>前面分别介绍了CyclicBarrier、CountDownLatch、Semaphore，现在介绍并发工具类中的最后一个Exchange。<br>Exchanger 是一个用于线程间协作的工具类，Exchanger用于进行线程间的数据交换，它提供一个同步点，在这个同步点，两个线程可以交换彼此的数据。这两个线程通过exchange 方法交换数据，如果第一个线程先执行exchange 方法，它会一直等待第二个线程也执行exchange 方法，当两个线程都到达同步点时，这两个线程就可以交换数据。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>Exchanger 使用是非常简单的，但是实现原理和前面几种工具比较确实最难的，前面几种工具都是通过同步器或者锁来实现，而Exchanger 是一种无锁算法，和前面SynchronousQueue一样，都是通过循环 cas 来实现线程安全，因此这种方式就会显得比较抽象和麻烦。</p>
+<pre><code class="java">public class ExchangerDemo {
+
+    static Exchanger&lt;String&gt;exchanger=new Exchanger&lt;String&gt;();
+    static class Task implements Runnable{
+        @Override
+        public void run() {
+            try {
+                String result=exchanger.exchange(Thread.currentThread().getName());
+                System.out.println(&quot;this is &quot;+Thread.currentThread().getName()+&quot; receive data:&quot;+result);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void main(String[] args)throws  Exception{
+
+        Thread t1=new Thread(new Task(),&quot;thread1&quot;);
+        Thread t2=new Thread(new Task(),&quot;thread2&quot;);
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+    }
+}
+</code></pre>
+<h2 id="单槽-Exchanger"><a href="#单槽-Exchanger" class="headerlink" title="单槽 Exchanger"></a>单槽 Exchanger</h2><p>Exchanger 有单槽位和多槽位之分，单个槽位在同一时刻只能用于两个线程交换数据，这样在竞争比较激烈的时候，会影响到性能，多个槽位就是多个线程可以同时进行两个的数据交换，彼此之间不受影响，这样可以很好的提高吞吐量。<br>单槽 Exchanger相对要简单许多，我们就先从这里开始分析吧。</p>
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>槽位定义：</p>
+<pre><code class="java">@sun.misc.Contended static final class Node {
+    int index;              // arena的下标，多个槽位的时候利用
+    int bound;              // 上一次记录的Exchanger.bound；
+    int collides;           // 在当前bound下CAS失败的次数；
+    int hash;               // 用于自旋；
+    Object item;            // 这个线程的当前项，也就是需要交换的数据；
+    volatile Object match;  // 交换的数据
+    volatile Thread parked; // 线程
+}
+/**
+ * Value representing null arguments/returns from public
+ * methods. Needed because the API originally didn&#39;t disallow null
+ * arguments, which it should have.
+ * 如果交换的数据为 null,则用NULL_ITEM  代替
+ */
+private static final Object NULL_ITEM = new Object();
+
+/**
+ * Elimination array; null until enabled (within slotExchange).
+ * Element accesses use emulation of volatile gets and CAS.
+ * 多槽位节点
+ */
+private volatile Node[] arena;
+
+/**
+ * Slot used until contention detected.
+ * 单槽位节点
+ */
+private volatile Node slot;
+
+/**
+ * The index of the largest valid arena position, OR&#39;ed with SEQ
+ * number in high bits, incremented on each update.  The initial
+ * update from 0 to SEQ is used to ensure that the arena array is
+ * constructed only once.
+ * 最大槽位
+ */
+private volatile int bound;
+</code></pre>
+<p>Node 定义中，index，bound，collides 这些都是用于多槽位的，这些可以暂时不用管，item 是本线程需要交换的数据，match 是和其它线程交换后的数据，开始是为null,交换数据成功后，就是我们需要的数据了，parked记录线程，用于阻塞和唤醒线程。</p>
+<pre><code class="java">/** The number of CPUs, for sizing and spin control */
+private static final int NCPU = Runtime.getRuntime().availableProcessors();
+/**
+ * The bound for spins while waiting for a match. The actual
+ * number of iterations will on average be about twice this value
+ * due to randomization. Note: Spinning is disabled when NCPU==1.
+ */
+private static final int SPINS = 1 &lt;&lt; 10; // 自旋次数
+/**
+ * Slot used until contention detected.
+ */
+private volatile Node slot; // 用于交换数据的槽位
+</code></pre>
+<p>Node是每个线程自身用于数据交换的节点，相当于每个Node就代表了每个线程，为了保证线程安全，把线程的Node 节点 放在哪里呢，当然是ThreadLocal咯。</p>
+<pre><code class="java">/**
+ * Per-thread state  每个线程的数据，ThreadLocal 子类
+ */
+private final Participant participant;
+
+/** The corresponding thread local class */
+ static final class Participant extends ThreadLocal&lt;Node&gt; {
+     // 初始值返回Node
+     public Node initialValue() { return new Node(); }
+ }
+</code></pre>
+<p>单个槽位需要准备的知识就这么多，具体部分字段的理解，在代码中再来细看。</p>
+<h2 id="exchange-方法"><a href="#exchange-方法" class="headerlink" title="exchange 方法"></a>exchange 方法</h2><p>1、没有设定超时时间的exchange 方法</p>
+<pre><code class="java">public V exchange(V x) throws InterruptedException {
+    Object v;
+    Object item = (x == null) ? NULL_ITEM : x; // translate null args
+    if ((arena != null ||
+         (v = slotExchange(item, false, 0L)) == null) &amp;&amp;
+        ((Thread.interrupted() || // disambiguates null return
+          (v = arenaExchange(item, false, 0L)) == null)))
+        throw new InterruptedException();
+    return (v == NULL_ITEM) ? null : (V)v;
+}
+</code></pre>
+<p>2、具有超时功能的exchange 方法</p>
+<pre><code class="java">public V exchange(V x, long timeout, TimeUnit unit)
+    throws InterruptedException, TimeoutException {
+    Object v;
+    Object item = (x == null) ? NULL_ITEM : x;
+    long ns = unit.toNanos(timeout);
+    if ((arena != null ||
+         (v = slotExchange(item, true, ns)) == null) &amp;&amp;
+        ((Thread.interrupted() ||
+          (v = arenaExchange(item, true, ns)) == null)))
+        throw new InterruptedException();
+    if (v == TIMED_OUT)
+        throw new TimeoutException();
+    return (v == NULL_ITEM) ? null : (V)v;
+}
+</code></pre>
+<p>exchange 把 执行 单槽位交换还是多槽位交换，同时如果发生中断，则返回前会重设中断标志位 这几个操作通过一个语句来实现，因此看的时候可能需要仔细一点。<br>两个方法，主要的不同还是在于是否有超时时间设置，如果有超时时间设置，那么如果在指定的时间内没有交换到数据，那么就会返回（抛出超时异常），不会一直等待。<br>接下来我们就来看单槽位交换的核心方法slotExchange。</p>
+<p>slotExchange 方法</p>
+<pre><code class="java">private final Object slotExchange(Object item, boolean timed, long ns) {
+    // 得到一个初试的Node
+    Node p = participant.get();
+    // 当前线程
+    Thread t = Thread.currentThread();
+    // 如果发生中断，返回null,会重设中断标志位，并没有直接抛异常
+    if (t.isInterrupted()) // preserve interrupt status so caller can recheck
+        return null;
+
+    for (Node q;;) {
+        // 槽位 solt不为null,则说明已经有线程在这里等待交换数据了
+        if ((q = slot) != null) {
+            // 重置槽位
+            if (U.compareAndSwapObject(this, SLOT, q, null)) {
+                //获取交换的数据
+                Object v = q.item;
+                //等待线程需要的数据
+                q.match = item;
+                //等待线程
+                Thread w = q.parked;
+                //唤醒等待的线程
+                if (w != null)
+                    U.unpark(w);
+                return v; // 返回拿到的数据，交换完成
+            }
+            // create arena on contention, but continue until slot null
+            //存在竞争，其它线程抢先了一步该线程，因此需要采用多槽位模式，这个后面再分析
+            if (NCPU &gt; 1 &amp;&amp; bound == 0 &amp;&amp;
+                U.compareAndSwapInt(this, BOUND, 0, SEQ))
+                arena = new Node[(FULL + 2) &lt;&lt; ASHIFT];
+        }
+        else if (arena != null) //多槽位不为空，需要执行多槽位交换
+            return null; // caller must reroute to arenaExchange
+        else { //还没有其他线程来占据槽位
+            p.item = item;
+            // 设置槽位为p(也就是槽位被当前线程占据)
+            if (U.compareAndSwapObject(this, SLOT, null, p))
+                break; // 退出无限循环
+            p.item = null; // 如果设置槽位失败，则有可能其他线程抢先了，重置item,重新循环
+        }
+    }
+
+    //当前线程占据槽位，等待其它线程来交换数据
+    int h = p.hash;
+    long end = timed ? System.nanoTime() + ns : 0L;
+    int spins = (NCPU &gt; 1) ? SPINS : 1;
+    Object v;
+    // 直到成功交换到数据
+    while ((v = p.match) == null) {
+        if (spins &gt; 0) { // 自旋
+            h ^= h &lt;&lt; 1; h ^= h &gt;&gt;&gt; 3; h ^= h &lt;&lt; 10;
+            if (h == 0)
+                h = SPINS | (int)t.getId();
+            else if (h &lt; 0 &amp;&amp; (--spins &amp; ((SPINS &gt;&gt;&gt; 1) - 1)) == 0)
+                // 主动让出cpu,这样可以提供cpu利用率（反正当前线程也自旋等待，还不如让其它任务占用cpu）
+                Thread.yield();
+        }
+        else if (slot != p) //其它线程来交换数据了，修改了solt,但是还没有设置match,再稍等一会
+            spins = SPINS;
+        //需要阻塞等待其它线程来交换数据
+        //没发生中断，并且是单槽交换，没有设置超时或者超时时间未到 则继续执行
+        else if (!t.isInterrupted() &amp;&amp; arena == null &amp;&amp;
+                 (!timed || (ns = end - System.nanoTime()) &gt; 0L)) {
+            // cas 设置BLOCKER，可以参考Thread 中的parkBlocker
+            U.putObject(t, BLOCKER, this);
+            // 需要挂起当前线程
+            p.parked = t;
+            if (slot == p)
+                U.park(false, ns); // 阻塞当前线程
+            // 被唤醒后    
+            p.parked = null;
+            // 清空 BLOCKER
+            U.putObject(t, BLOCKER, null);
+        }
+        // 不满足前面 else if 条件，交换失败，需要重置solt
+        else if (U.compareAndSwapObject(this, SLOT, p, null)) {
+            v = timed &amp;&amp; ns &lt;= 0L &amp;&amp; !t.isInterrupted() ? TIMED_OUT : null;
+            break;
+        }
+    }
+    //清空match
+    U.putOrderedObject(p, MATCH, null);
+    p.item = null;
+    p.hash = h;
+    // 返回交换得到的数据（失败则为null）
+    return v;
+}
+</code></pre>
+<p>理解slotExchange 应该不难吧，相比前面的SynchronousQueue 之类的应该要简单多了，还是再来简述一遍：<br>当一个线程来交换数据时，如果发现槽位（solt）有数据时，说明其它线程已经占据了槽位，等待交换数据，那么当前线程就和该槽位进行数据交换，设置相应字段，如果交换失败，则说明其它线程抢先了该线程一步和槽位交换了数据，那么这个时候就存在竞争了，这个时候就会生成多槽位（area）,后面就会进行多槽位交换了。<br>如果来交换的线程发现槽位没有被占据，啊哈，这个时候自己就把槽位占据了，如果占据失败，则有可能其他线程抢先了占据了槽位，重头开始循环。<br>当来交换的线程占据了槽位后，就需要等待其它线程来进行交换数据了，首先自己需要进行一定时间的自旋，因为自旋期间有可能其它线程就来了，那么这个时候就可以进行数据交换工作，而不用阻塞等待了，如果不幸，进行了一定自旋后，没有其他线程到来，那么还是避免不了需要阻塞（如果设置了超时等待，发生了超时或中断异常，则退出，不阻塞等待），当准备阻塞线程的时候，发现槽位值变了，那么说明其它线程来交换数据了，但是还没有完全准备好数据，这个时候就不阻塞了，再稍微等那么一会，如果始终没有等到其它线程来交换，那么就挂起当前线程。<br>当其它线程到来并成功交换数据后，会唤醒被阻塞的线程，阻塞的线程被唤醒后，拿到数据（如果是超时，或中断，则数据为null）返回，结束。</p>
+<p>单槽位的交换就结束了，整个过程应该不难，如果竞争激烈，那么一个槽位显然就成了性能瓶颈了，因此就衍生出了多槽位交换，各自交换各自的，互不影响。</p>
+<h2 id="多槽-Exchanger"><a href="#多槽-Exchanger" class="headerlink" title="多槽 Exchanger"></a>多槽 Exchanger</h2><p>多槽位呢，实际就是一个Node 数组，代表了很多的槽位，对于多槽位，我个人对代码的部分理解得不是完全透彻，有些地方有点不知其所以然，在前面分析SynchronousQueue 的时候也曾遇到，但是SynchronousQueue 调试方便，跟几遍就可以很好的理解了，但是这个多槽位有点不好调试，而且一两个线程观察不出来，因此有些地方可能会说不清楚，或者有误，因此如果朋友发现有问题的，欢迎指出来，共同学习。</p>
+<pre><code class="java">@sun.misc.Contended static final class Node {
+    int index;              //arena的下标，多个槽位的时候利用
+    int bound;              // 上一次记录的Exchanger.bound；
+    int collides;           // 在当前bound下CAS失败的次数；
+    int hash;               // 用于自旋；
+    Object item;            // 这个线程的当前项，也就是需要交换的数据；
+    volatile Object match;  // 交换的数据
+    volatile Thread parked; // 线程
+}
+
+/**
+ * The byte distance (as a shift value) between any two used slots
+ * in the arena.  1 &lt;&lt; ASHIFT should be at least cacheline size.
+ * CacheLine填充
+ */
+private static final int ASHIFT = 7;
+
+/**
+ * The maximum supported arena index. The maximum allocatable
+ * arena size is MMASK + 1. Must be a power of two minus one, less
+ * than (1&lt;&lt;(31-ASHIFT)). The cap of 255 (0xff) more than suffices
+ * for the expected scaling limits of the main algorithms.
+ */
+private static final int MMASK = 0xff;
+
+/**
+ * Unit for sequence/version bits of bound field. Each successful
+ * change to the bound also adds SEQ.
+ * bound的&quot;版本号&quot;
+ */
+private static final int SEQ = MMASK + 1;
+
+/**
+ * The maximum slot index of the arena: The number of slots that
+ * can in principle hold all threads without contention, or at
+ * most the maximum indexable value.
+ */
+static final int FULL = (NCPU &gt;= (MMASK &lt;&lt; 1)) ? MMASK : NCPU &gt;&gt;&gt; 1;
+
+/**
+ * Elimination array; null until enabled (within slotExchange).
+ * Element accesses use emulation of volatile gets and CAS.
+ */
+private volatile Node[] arena;
+
+/**
+ * The index of the largest valid arena position, OR&#39;ed with SEQ
+ * number in high bits, incremented on each update.  The initial
+ * update from 0 to SEQ is used to ensure that the arena array is
+ * constructed only once.
+ */
+private volatile int bound;
+</code></pre>
+<p>为了不误导大家，重要的属性保留了源码的注释，这样有助于理解。<br>在Node 前面有个@sun.misc.Contended 的注解，这个是什么呢，这个是用来避免伪共享的（当然不仅仅是加个注解就ok了），下面的伪共享说明</p>
+<p>伪共享说明：假设一个类的两个相互独立的属性a和b在内存地址上是连续的(比如FIFO队列的头尾指针)，那么它们通常会被加载到相同的cpu cache line里面。并发情况下，如果一个线程修改了a，会导致整个cache line失效(包括b)，这时另一个线程来读b，就需要从内存里再次加载了，这种多线程频繁修改ab的情况下，虽然a和b看似独立，但它们会互相干扰，非常影响性能。</p>
+<p>ASHIFT 这个字段就是用于避免伪共享的，1 &lt;&lt; ASHIFT 可以避免两个Node在同一个共享区，这个可以从后面代码再来具体分析。</p>
+<p>在slotExchange 当存在竞争时，会构建area,现在我们再来回顾这个代码：</p>
+<pre><code class="java">if (NCPU &gt; 1 &amp;&amp; bound == 0 &amp;&amp;U.compareAndSwapInt(this, BOUND, 0, SEQ))
+      arena = new Node[(FULL + 2) &lt;&lt; ASHIFT];
+</code></pre>
+<p>初始化arena 时会设置bound为SEQ(SEQ=MMASK + 1)。MMASK 值为255，二进制：8个1<br>arena的大小为(FULL + 2) &lt;&lt; ASHIFT，因为1 &lt;&lt; ASHIFT 是用于避免伪共享的，因此实际有效的Node 只有FULL + 2 个，这个我们从后面的代码也可以得出。</p>
+<p>arenaExchange 方法</p>
+<p>多槽的交换大致思想就是：当一个线程来交换的时候，如果”第一个”槽位是空的，那么自己就在那里等待，如果发现”第一个”槽位有等待线程，那么就直接交换，如果交换失败，说明其它线程在进行交换，那么就往后挪一个槽位，如果有数据就交换，没数据就等一会，但是不会阻塞在这里，在这里等了一会，发现还没有其它线程来交换数据，那么就往“第一个”槽位的方向挪，如果反复这样过后，挪到了第一个槽位，没有线程来交换数据了，那么自己就在”第一个”槽位阻塞等待。<br>简单来说，如果有竞争冲突，那么就寻找后面的槽位，在后面的槽位等待一定时间，没有线程来交换，那么就又往前挪。</p>
+<pre><code class="java">private final Object arenaExchange(Object item, boolean timed, long ns) {
+    // 槽位数组
+    Node[] a = arena;
+    // 代表当前线程的Node
+    Node p = participant.get(); // p.index 初始值为 0
+    for (int i = p.index;;) {                      // access slot at i
+        int b, m, c; long j;                       // j is raw array offset
+        //在槽位数组中根据&quot;索引&quot; i 取出数据 j相当于是 &quot;第一个&quot;槽位
+        Node q = (Node)U.getObjectVolatile(a, j = (i &lt;&lt; ASHIFT) + ABASE);
+        // 该位置上有数据(即有线程在这里等待交换数据)
+        if (q != null &amp;&amp; U.compareAndSwapObject(a, j, q, null)) {
+            // 进行数据交换，这里和单槽位的交换是一样的
+            Object v = q.item;                     // release
+            q.match = item;
+            Thread w = q.parked;
+            if (w != null)
+                U.unpark(w);
+            return v;
+        }
+        // bound 是最大的有效的 位置，和MMASK相与，得到真正的存储数据的索引最大值
+        else if (i &lt;= (m = (b = bound) &amp; MMASK) &amp;&amp; q == null) {
+            // i 在这个范围内，该槽位也为空
+
+            // 将需要交换的数据 设置给p
+            p.item = item;                         // offer
+            // 设置该槽位数据(在该槽位等待其它线程来交换数据)
+            if (U.compareAndSwapObject(a, j, null, p)) {
+                long end = (timed &amp;&amp; m == 0) ? System.nanoTime() + ns : 0L;
+                Thread t = Thread.currentThread(); // wait
+                // 进行一定时间的自旋
+                for (int h = p.hash, spins = SPINS;;) {
+                    Object v = p.match;
+                    //在自旋的过程中，有线程来和该线程交换数据
+                    if (v != null) {
+                        //交换数据后，清空部分设置，返回交换得到的数据，over
+                        U.putOrderedObject(p, MATCH, null);
+                        p.item = null;             // clear for next use
+                        p.hash = h;
+                        return v;
+                    }
+                    else if (spins &gt; 0) {
+                        h ^= h &lt;&lt; 1; h ^= h &gt;&gt;&gt; 3; h ^= h &lt;&lt; 10; // xorshift
+                        if (h == 0)                // initialize hash
+                            h = SPINS | (int)t.getId();
+                        else if (h &lt; 0 &amp;&amp;          // approx 50% true
+                                 (--spins &amp; ((SPINS &gt;&gt;&gt; 1) - 1)) == 0)
+                            Thread.yield();        // two yields per wait
+                    }
+                    // 交换数据的线程到来，但是还没有设置好match，再稍等一会
+                    else if (U.getObjectVolatile(a, j) != p)
+                        spins = SPINS; 
+                    // 符合条件，特别注意m==0 这个说明已经到达area 中最小的存储数据槽位了
+                    // 没有其他线程在槽位等待了，所有当前线程需要阻塞在这里     
+                    else if (!t.isInterrupted() &amp;&amp; m == 0 &amp;&amp;
+                             (!timed ||
+                              (ns = end - System.nanoTime()) &gt; 0L)) {
+                        U.putObject(t, BLOCKER, this); // emulate LockSupport
+                        p.parked = t;              // minimize window
+                        // 再次检查槽位，看看在阻塞前，有没有线程来交换数据
+                        if (U.getObjectVolatile(a, j) == p) 
+                            U.park(false, ns); // 挂起
+                        p.parked = null;
+                        U.putObject(t, BLOCKER, null);
+                    }
+                    // 当前这个槽位一直没有线程来交换数据，准备换个槽位试试
+                    else if (U.getObjectVolatile(a, j) == p &amp;&amp;
+                             U.compareAndSwapObject(a, j, p, null)) {
+                        //更新bound
+                        if (m != 0)                // try to shrink
+                            U.compareAndSwapInt(this, BOUND, b, b + SEQ - 1);
+                        p.item = null;
+                        p.hash = h;
+                        // 减小索引值 往&quot;第一个&quot;槽位的方向挪动
+                        i = p.index &gt;&gt;&gt;= 1;        // descend
+                        // 发送中断，返回null
+                        if (Thread.interrupted())
+                            return null;
+                        // 超时
+                        if (timed &amp;&amp; m == 0 &amp;&amp; ns &lt;= 0L)
+                            return TIMED_OUT;
+                        break;                     // expired; restart 继续主循环
+                    }
+                }
+            }
+            else
+                //占据槽位失败，先清空item,防止成功交换数据后，p.item还引用着item
+                p.item = null;                     // clear offer
+        }
+        else { // i 不在有效范围，或者被其它线程抢先了
+            //更新p.bound
+            if (p.bound != b) {                    // stale; reset
+                p.bound = b;
+                //新bound ，重置collides
+                p.collides = 0;
+                //i如果达到了最大，那么就递减
+                i = (i != m || m == 0) ? m : m - 1;
+            }
+            else if ((c = p.collides) &lt; m || m == FULL ||
+                     !U.compareAndSwapInt(this, BOUND, b, b + SEQ + 1)) {
+                p.collides = c + 1; // 更新冲突
+                // i=0 那么就从m开始，否则递减i
+                i = (i == 0) ? m : i - 1;          // cyclically traverse
+            }
+            else
+                //递增，往后挪动
+                i = m + 1;                         // grow
+            // 更新index
+            p.index = i;
+        }
+    }
+}
+</code></pre>
+<p>理解起来应该有点抽象，当然我分析的也不一定就正确，不要全相信我的描述，结合自己理解。</p>
+<pre><code class="java">Node q = (Node)U.getObjectVolatile(a, j = (i &lt;&lt; ASHIFT) + ABASE);
+</code></pre>
+<p>对于上面这个代码，开始理解可能有点难，i &lt;&lt; ASHIFT 是用于避免伪共享的，虽然arena数组很大，但是里面并不是每个位置都利用的，还有一些是没有利用的，其间隔就是1 &lt;&lt; ASHIFT。</p>
+<pre><code class="java">Class&lt;?&gt; ak = Node[].class;
+ABASE = U.arrayBaseOffset(ak) + (1 &lt;&lt; ASHIFT);
+</code></pre>
+<p>ABASE 就是arena的起始位置上加了(1 &lt;&lt; ASHIFT) 这个偏移，相当于ABASE作为了 arena数组的其实位置，其前(1 &lt;&lt; ASHIFT)的位置没有利用。</p>
+<p>当发现槽位q 有数据的时候就交换数据，如果cas 失败，说明存在竞争，那么就会执行后面的else,更新bound 还是递增或者递减索引i。<br>如果槽位q 没有数据，并且索引 i在有效范围内，如果是”第一个”槽位，那么会占据槽位，进行一定时间的自旋，然后阻塞等待，如果不是”第一个”槽位，那么就会换个槽位等待，清空当前槽位，然后索引值减半。（如果设置了超时，需要进行超时判断，如果发生超时就返回）。</p>
+<p>对于 i &lt;= (m = (b = bound) &amp; MMASK) , m 的值肯定在[0,MMASK]之间。</p>
+<pre><code class="java">U.compareAndSwapInt(this, BOUND, b, b + SEQ + 1
+</code></pre>
+<p>上面这行代码则是在递增BOUND,SEQ+1的二进制位位：100000001，当它和MMASK 相与的结果相比原来就增加了1，因此这个是递增BOUND。</p>
+<pre><code class="java">if (m != 0)                // try to shrink
+    U.compareAndSwapInt(this, BOUND, b, b + SEQ - 1);
+</code></pre>
+<p>对于上面这行代码，SEQ - 1 就是MMASK,这个新bound和MMASK 相与的结果应该变大了，（注意m！=0 ,则说明bound低8位存在1），那么索引i 就越有可能在这个范围内，如果还是没有其他线程来交换，则会再次减小i，也就是说增大了m,反而减小了i, jdk 源码上的注释（try to shrink）则是尝试缩小,不知是不是指的这个含义。</p>
+<p>估计我描述的晕咚咚的，这个部分，我也不是特别明白，因此就不好多阐述了，后面抽空还会进行研究研究，如果朋友有新的理解，可以指教一二。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Exchanger 还是很有意思的，用于线程之间两两交换数据，在多线程下，互相交换数据的两个线程是不确定的。<br>在竞争比较小的时候，采用单槽位进行交换数据，当线程来交换数据时，发现槽位为空，则自己在这里等待，否则就和槽位进行交换数据，同时会唤醒等待的线程。</p>
+<p>在竞争比较激烈的情况下，就会转到多槽位的交换，这个多槽位的交换，其实思想还是很好理解，但是局部有些细节确实还没有理解透，同时调试也困难，只有自己脑海里不挺的模拟，但是这个可能模拟出错（哈哈）。但是对多槽位的大致思想应该还是明白了，当一个线程来交换的时候，如果”第一个”槽位是空的，那么自己就在那里等待，如果发现”第一个”槽位有等待线程，那么就直接交换，如果交换失败，说明其它线程在进行交换，那么就往后挪一个槽位，如果有数据就交换，没数据就等一会，但是不会阻塞在这里，在这里等了一会，发现还没有其它线程来交换数据，那么就往“第一个”槽位的方向挪，如果反复这样过后，挪到了第一个槽位，没有线程来交换数据了，那么自己就在”第一个”槽位阻塞等待。</p>
+<p>第一个槽位并不是指的数组中的第一个，而是逻辑第一个，因为存在伪共享，多槽位中，部分空间没有被利用。</p>
+<p>最后用一个在网上看到的段子结束此篇博客（<a href="http://brokendreams.iteye.com/blog/2253956），博主对其做了一点点修改，以便更加符合在1.8环境下的Exchanger：" target="_blank" rel="noopener">http://brokendreams.iteye.com/blog/2253956），博主对其做了一点点修改，以便更加符合在1.8环境下的Exchanger：</a></p>
+<p>其实就是”我”和”你”(可能有多个”我”，多个”你”)在一个叫Slot的地方做交易(一手交钱，一手交货)，过程分以下步骤：</p>
+<ol>
+<li>我先到一个叫做Slot的交易场所交易，发现你已经到了，那我就尝试喊你交易，如果你回应了我，决定和我交易那么进入第2步；如果别人抢先一步把你喊走了，那我就进入第5步。</li>
+<li>我拿出钱交给你，你可能会接收我的钱，然后把货给我，交易结束；也可能嫌我掏钱太慢(超时)或者接个电话(中断)，TM的不卖了，走了，那我只能再找别人买货了(从头开始)。</li>
+<li>我到交易地点的时候，你不在，那我先尝试把这个交易点给占了(一屁股做凳子上…)，如果我成功抢占了单间(交易点)，那就坐这儿等着你拿货来交易，进入第4步；如果被别人抢座了，那我只能在找别的地方儿了，进入第5步。</li>
+<li>你拿着货来了，喊我交易，然后完成交易；也可能我等了好长时间你都没来，我不等了，继续找别人交易去，走的时候我看了一眼，一共没多少人，弄了这么多单间(交易地点Slot)，太TM浪费了，我喊来交易地点管理员：一共也没几个人，搞这么多单间儿干毛，给哥撤一个！。然后再找别人买货(从头开始)；或者我老大给我打了个电话，不让我买货了(中断)。</li>
+<li>我跑去喊管理员，尼玛，就一个坑交易个毛啊，然后管理在一个更加开阔的地方开辟了好多个单间，然后我就挨个来看每个单间是否有人。如果有人我就问他是否可以交易，如果回应了我，那我就进入第2步。如果我没有人，那我就占着这个单间等其他人来交易，进入第4步。</li>
+<li>如果我尝试了几次都没有成功，我就会认为，是不是我TM选的这个单间风水不好？不行，得换个地儿继续(从头开始)；如果我尝试了多次发现还没有成功，怒了，把管理员喊来：给哥再开一个单间(Slot)，加一个凳子，这么多人就这么几个破凳子够谁用！</li>
+</ol>
+<p>看起来在并发竞争多的时候，exchanger这种先到先得的模式，无法保证与某一个特定的线程交换值。这玩意真的有使用场景么？</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2020/09/23/juc-9/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2020/09/23/juc-9/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2020/10/24/juc-10/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2020/08/22/juc-8/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">26</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">20</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/10/">十月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/09/">九月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/03/">三月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/02/">二月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/12/">十二月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/10/">十月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/09/">九月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/05/">五月 2019<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/04/">四月 2019<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/03/">三月 2019<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/mq/">mq<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/pgsql/">pgsql<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">24</span></a></li><li><a class="sidebar_archives-link" href="/categories/微服务/">微服务<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
