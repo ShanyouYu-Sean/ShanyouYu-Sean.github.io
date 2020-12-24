@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://seanthefish.com/"/>
-  <updated>2020-12-24T02:39:48.641Z</updated>
+  <updated>2020-12-24T02:47:07.442Z</updated>
   <id>http://seanthefish.com/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>juc之ForkJoinPool</title>
-    <link href="http://seanthefish.com/2020/12/25/juc-18/"/>
-    <id>http://seanthefish.com/2020/12/25/juc-18/</id>
-    <published>2020-12-25T04:00:00.000Z</published>
-    <updated>2020-12-24T02:39:48.641Z</updated>
+    <title>redis进阶之消息队列</title>
+    <link href="http://seanthefish.com/2020/12/27/redis-8/"/>
+    <id>http://seanthefish.com/2020/12/27/redis-8/</id>
+    <published>2020-12-27T13:00:00.000Z</published>
+    <updated>2020-12-24T02:47:07.442Z</updated>
     
     <summary type="html">
     
@@ -29,26 +29,25 @@
       
         
         
-          &lt;p&gt;直接看这篇文章吧，我觉得了解就好了，实际似乎用的场景很少？&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://blog.dyngr.com/blog/2016/09/15/java-forkjoinpool-internals/&quot; target=&quot;_blank&quot;
+          &lt;p&gt;文章转载自 &lt;a href=&quot;https://medium.com/@cheukfung/redis%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97-f4f75404647f&quot; target=&quot;_blank&quot;
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之ThreadPoolExecutor</title>
-    <link href="http://seanthefish.com/2020/12/25/juc-17/"/>
-    <id>http://seanthefish.com/2020/12/25/juc-17/</id>
-    <published>2020-12-25T03:00:00.000Z</published>
-    <updated>2020-12-24T02:39:45.571Z</updated>
+    <title>redis进阶之分布式锁</title>
+    <link href="http://seanthefish.com/2020/12/26/redis-7/"/>
+    <id>http://seanthefish.com/2020/12/26/redis-7/</id>
+    <published>2020-12-26T12:00:00.000Z</published>
+    <updated>2020-12-24T02:46:57.585Z</updated>
     
     <summary type="html">
     
@@ -56,25 +55,26 @@
       
         
         
-          &lt;h2 id=&quot;类图&quot;&gt;&lt;a href=&quot;#类图&quot; class=&quot;headerlink&quot; title=&quot;类图&quot;&gt;&lt;/a&gt;类图&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2020/11/25/2F5etwLdmrR9fTn.png&quot;
+          &lt;hr&gt;
+&lt;p&gt;写过一个单节点版的redis分布式锁，源码在这里 &lt;a href=&quot;https://github.com/IBM/distributed-lock-spring-boot-starter&quot; target=&quot;_blank&quot;
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之ConcurrentSkipListMap</title>
-    <link href="http://seanthefish.com/2020/12/25/juc-16/"/>
-    <id>http://seanthefish.com/2020/12/25/juc-16/</id>
-    <published>2020-12-25T02:00:00.000Z</published>
-    <updated>2020-12-24T02:39:42.978Z</updated>
+    <title>redis进阶之缓存</title>
+    <link href="http://seanthefish.com/2020/12/25/redis-6/"/>
+    <id>http://seanthefish.com/2020/12/25/redis-6/</id>
+    <published>2020-12-25T12:00:00.000Z</published>
+    <updated>2020-12-24T02:46:49.467Z</updated>
     
     <summary type="html">
     
@@ -82,25 +82,27 @@
       
         
         
-          &lt;h2 id=&quot;跳表&quot;&gt;&lt;a href=&quot;#跳表&quot; class=&quot;headerlink&quot;
+          &lt;h2 id=&quot;缓存的收益和成本&quot;&gt;&lt;a href=&quot;#缓存的收益和成本&quot; class=&quot;headerlink&quot; title=&quot;缓存的收益和成本&quot;&gt;&lt;/a&gt;缓存的收益和成本&lt;/h2&gt;&lt;p&gt;收益:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;加速读写:
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之ConcurrentHashMap</title>
-    <link href="http://seanthefish.com/2020/12/24/juc-15/"/>
-    <id>http://seanthefish.com/2020/12/24/juc-15/</id>
-    <published>2020-12-24T07:00:00.000Z</published>
-    <updated>2020-12-24T02:39:39.394Z</updated>
+    <title>redis进阶之集群</title>
+    <link href="http://seanthefish.com/2020/12/24/redis-5/"/>
+    <id>http://seanthefish.com/2020/12/24/redis-5/</id>
+    <published>2020-12-24T11:00:00.000Z</published>
+    <updated>2020-12-24T02:46:40.809Z</updated>
     
     <summary type="html">
     
@@ -108,25 +110,25 @@
       
         
         
-          &lt;p&gt;搬运自 &lt;a href=&quot;https://my.oschina.net/xiaolyuh/blog/3080609&quot; target=&quot;_blank&quot;
+          &lt;h2 id=&quot;集群&quot;&gt;&lt;a href=&quot;#集群&quot; class=&quot;headerlink&quot; title=&quot;集群&quot;&gt;&lt;/a&gt;集群&lt;/h2&gt;&lt;p&gt;Redis
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之CoryOnWriteArrayList、CopyOnWriteArraySet</title>
-    <link href="http://seanthefish.com/2020/12/24/juc-14/"/>
-    <id>http://seanthefish.com/2020/12/24/juc-14/</id>
-    <published>2020-12-24T06:01:00.000Z</published>
-    <updated>2020-12-24T02:39:35.654Z</updated>
+    <title>redis进阶之哨兵</title>
+    <link href="http://seanthefish.com/2020/12/23/redis-4/"/>
+    <id>http://seanthefish.com/2020/12/23/redis-4/</id>
+    <published>2020-12-23T10:00:00.000Z</published>
+    <updated>2020-12-24T02:46:34.229Z</updated>
     
     <summary type="html">
     
@@ -134,26 +136,25 @@
       
         
         
-          &lt;p&gt;CopyOnWrite（简称：COW）：即复制再写入，就是在添加元素的时候，先把原 List 列表复制一份，再添加新的元素&lt;/p&gt;
-&lt;p&gt;CopyOnWriteArrayList
+          &lt;h2 id=&quot;哨兵&quot;&gt;&lt;a href=&quot;#哨兵&quot; class=&quot;headerlink&quot; title=&quot;哨兵&quot;&gt;&lt;/a&gt;哨兵&lt;/h2&gt;&lt;p&gt;Redis的主从复制模式下，一旦主节点由于故障不能提供服务，需要人 工将从节点晋升为主节点，同时还要通知应用方更新主节点地址，对于很多
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之ConcurrentLinkedQueue</title>
-    <link href="http://seanthefish.com/2020/12/24/juc-13/"/>
-    <id>http://seanthefish.com/2020/12/24/juc-13/</id>
-    <published>2020-12-24T06:00:00.000Z</published>
-    <updated>2020-12-24T02:39:27.923Z</updated>
+    <title>redis进阶之优化</title>
+    <link href="http://seanthefish.com/2020/12/22/redis-3/"/>
+    <id>http://seanthefish.com/2020/12/22/redis-3/</id>
+    <published>2020-12-22T09:00:00.000Z</published>
+    <updated>2020-12-24T02:46:26.946Z</updated>
     
     <summary type="html">
     
@@ -161,25 +162,25 @@
       
         
         
-          &lt;p&gt;内容转载自 &lt;a href=&quot;https://www.beikejiedeliulangmao.top/java/concurrent/concurrent-linked-queue/&quot; target=&quot;_blank&quot;
+          &lt;h2 id=&quot;阻塞&quot;&gt;&lt;a href=&quot;#阻塞&quot; class=&quot;headerlink&quot; title=&quot;阻塞&quot;&gt;&lt;/a&gt;阻塞&lt;/h2&gt;&lt;p&gt;Redis是典型的单线程架构，所有的读写操作都是在一条主线程中完成 的。当Redis用于高并发场景时，这条线程就变成了它的生命线。如果出现
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
   <entry>
-    <title>juc之PriorityBlockingQueue</title>
-    <link href="http://seanthefish.com/2020/12/24/juc-12/"/>
-    <id>http://seanthefish.com/2020/12/24/juc-12/</id>
-    <published>2020-12-24T05:00:00.000Z</published>
-    <updated>2020-12-24T02:39:20.542Z</updated>
+    <title>redis进阶之复制</title>
+    <link href="http://seanthefish.com/2020/12/21/redis-2/"/>
+    <id>http://seanthefish.com/2020/12/21/redis-2/</id>
+    <published>2020-12-21T08:00:00.000Z</published>
+    <updated>2020-12-24T02:46:16.213Z</updated>
     
     <summary type="html">
     
@@ -187,16 +188,43 @@
       
         
         
-          &lt;p&gt;内容转载自  &lt;a href=&quot;https://www.jianshu.com/p/bf6ef56646e5&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt; https://www.jianshu.com/p/28c9d9e34b29&lt;/a&gt;  
+          &lt;h3 id=&quot;建立复制&quot;&gt;&lt;a href=&quot;#建立复制&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
-      <category term="并发" scheme="http://seanthefish.com/categories/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
     
     
-      <category term="并发" scheme="http://seanthefish.com/tags/%E5%B9%B6%E5%8F%91/"/>
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis基础</title>
+    <link href="http://seanthefish.com/2020/12/20/redis-1/"/>
+    <id>http://seanthefish.com/2020/12/20/redis-1/</id>
+    <published>2020-12-20T02:00:00.000Z</published>
+    <updated>2020-12-24T02:46:04.868Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h2 id=&quot;为啥快&quot;&gt;&lt;a href=&quot;#为啥快&quot; class=&quot;headerlink&quot; title=&quot;为啥快&quot;&gt;&lt;/a&gt;为啥快&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;纯内存访问，Redis将所有数据放在内存中，内存的响应时长大
+        
+      
+    
+    </summary>
+    
+      <category term="redis" scheme="http://seanthefish.com/categories/redis/"/>
+    
+    
+      <category term="redis" scheme="http://seanthefish.com/tags/redis/"/>
     
   </entry>
   
@@ -507,32 +535,6 @@
         
           &lt;p&gt;对 MySql 进行优化，必须对 Scheme，索引，查询语句一同优化。&lt;/p&gt;
 &lt;p&gt;通过前面的章节我们掌握了 Scheme 和
-        
-      
-    
-    </summary>
-    
-      <category term="mysql" scheme="http://seanthefish.com/categories/mysql/"/>
-    
-    
-      <category term="mysql" scheme="http://seanthefish.com/tags/mysql/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>mysql之锁和mvcc</title>
-    <link href="http://seanthefish.com/2020/12/02/mysql-3-lock/"/>
-    <id>http://seanthefish.com/2020/12/02/mysql-3-lock/</id>
-    <published>2020-12-02T04:00:00.000Z</published>
-    <updated>2020-12-13T04:32:51.255Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;参考 &lt;a href=&quot;https://draveness.me/database-concurrency-control/&quot; target=&quot;_blank&quot;
         
       
     
