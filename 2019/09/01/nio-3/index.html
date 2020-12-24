@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.6 -->
+    <script>
+        window.materialVersion = "1.5.6"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0',
+            '1.5.2',
+            '1.5.5'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+    <link rel="dns-prefetch" href="https://seanthefish.disqus.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://hm.baidu.com"/>
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com"/>
+
+
+
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            nio | 
+        
+        小鱼肖恩
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta name="keywords" content="小鱼肖恩,nio">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?NKhlKQkXw/c66TR5p4wO+w==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tomorrow-night-eighties.min.css?2LJQzURO+Kr8r/fl/T8oMA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="小鱼肖恩">
+    <meta name="msapplication-starturl" content="http://seanthefish.com/2019/09/01/nio-3/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="小鱼肖恩">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="yPRDDgFzGqTTSzJHMSTM_p8iRbLSu4ZEXY4qP5402-A" />
+    <meta name="baidu-site-verification" content="PnMjc2amR8" />
+
+    <!-- RSS -->
+    
+        
+            <link rel=alternate type="application/atom+xml" href="#">
+        
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://seanthefish.com/2019/09/01/nio-3/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="nio | 小鱼肖恩">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="我知道，是流星赞美了黑夜，鲸鱼安慰了大海">
+    <meta property="og:article:tag" content="nio"> 
+
+    
+        <meta property="article:published_time" content="Sun Sep 01 2019 13:00:00 GMT+0800">
+        <meta property="article:modified_time" content="Thu Dec 24 2020 17:08:33 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://seanthefish.com/2019/09/01/nio-3/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "http://seanthefish.com/2019/09/01/nio-3/index.html",
+    "headline": "nio",
+    "datePublished": "Sun Sep 01 2019 13:00:00 GMT+0800",
+    "dateModified": "Thu Dec 24 2020 17:08:33 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Sean Yu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.png"
+        },
+        "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "小鱼肖恩",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",nio小鱼肖恩",
+    "description": "我知道，是流星赞美了黑夜，鲸鱼安慰了大海",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-111600306-1', 'auto');ga('send', 'pageview');
+</script>
+    
+    
+        <script>
+    var _hmt = _hmt || [];
+    (function() {var hm = document.createElement('script');
+    hm.src = 'https://hm.baidu.com/hm.js?c6e0a40db670e2f36cb44d2882dfd3c5';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+    
+    
+
+    <!-- Custom Head -->
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span id="MD-burger-id" class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#基础概念"><span class="post-toc-number">1.</span> <span class="post-toc-text">基础概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Channel（通道）"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Channel（通道）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Buffer（缓冲区）"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Buffer（缓冲区）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Selector（选择器）"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Selector（选择器）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#buffer"><span class="post-toc-number">2.</span> <span class="post-toc-text">buffer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#缓冲区基础"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">缓冲区基础</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#缓冲区的存取"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">缓冲区的存取</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#缓冲区标记"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">缓冲区标记</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#channel"><span class="post-toc-number">3.</span> <span class="post-toc-text">channel</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Channel的作用"><span class="post-toc-number">4.</span> <span class="post-toc-text">Channel的作用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Scatter-Gather"><span class="post-toc-number">5.</span> <span class="post-toc-text">Scatter / Gather</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#阻塞式io"><span class="post-toc-number">6.</span> <span class="post-toc-text">阻塞式io</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#非阻塞式io"><span class="post-toc-number">7.</span> <span class="post-toc-text">非阻塞式io</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#io多路复用"><span class="post-toc-number">8.</span> <span class="post-toc-text">io多路复用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#引入多路复用的原因"><span class="post-toc-number">8.1.</span> <span class="post-toc-text">引入多路复用的原因</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Selector"><span class="post-toc-number">8.2.</span> <span class="post-toc-text">Selector</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#详解selector使用"><span class="post-toc-number">8.3.</span> <span class="post-toc-text">详解selector使用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#创建Selector"><span class="post-toc-number">8.3.1.</span> <span class="post-toc-text">创建Selector</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#将Channel注册到Selector"><span class="post-toc-number">8.3.2.</span> <span class="post-toc-text">将Channel注册到Selector</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#取消SelectionKey对象"><span class="post-toc-number">8.3.3.</span> <span class="post-toc-text">取消SelectionKey对象</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#为SelectionKey绑定附加对象"><span class="post-toc-number">8.3.4.</span> <span class="post-toc-text">为SelectionKey绑定附加对象</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#原理和实现"><span class="post-toc-number">8.4.</span> <span class="post-toc-text">原理和实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#总结一下"><span class="post-toc-number">8.4.1.</span> <span class="post-toc-text">总结一下</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#关于aio"><span class="post-toc-number">8.5.</span> <span class="post-toc-text">关于aio</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#关于nio的堆外内存分配"><span class="post-toc-number">8.6.</span> <span class="post-toc-text">关于nio的堆外内存分配</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#DirectBuffer优缺点"><span class="post-toc-number">8.6.1.</span> <span class="post-toc-text">DirectBuffer优缺点</span></a></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 23 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/title-pic-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                nio
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Sean Yu</strong>
+        <span>9月 01, 2019</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+        <button id="article-functions-qrcode-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">devices other</i>
+    <span class="visuallyhidden">devices other</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-qrcode-button">
+    <li class="mdl-menu__item">在其它设备中阅读本文章</li>
+    
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACYElEQVR42u3aMWLDIBAEQP//00mbxsouZ7DijCoXEmJUAN67x9dHXw88PDw8PDw8PLyb8R7xFQ395P5kzPypX8bBw8PDO8JLJt3yfj51PfVn71qbGx4eHt5JXjK5fHG/fmo+Ah4eHt7f4rUH6HZLwMPDw/sPvHw7yQ/QeHh4ePfnJX/4k9/XpGTzeFvWgoeHhxfz8iLT+d9H63t4eHh4Aa9uaQqaCfKGg7Y1oW66wsPDw9vAWytT5e0C7dH5BfPBw8PD28xLqC1s7f62tBaFEXh4eHhHePPFPZlKHgfn9+Dh4eGd4eXF+yT8bcdMxq8/NB4eHt4RXt4E0EYD+cdqwcXGgIeHh7eNl2wMbWQwihXWWmDx8PDwjvDahbs9KM8P2cVs8fDw8DbzJsWnNq7Ny2ZJGFGk1Hh4eHibedfD5S0Cuw/uResAHh4e3kt59V/9MrpdO5RPymB4eHh453n5QXYS4042pFHTFR4eHt6Yl0ela0fhpPlg/qHx8PDw3stLlvjr1+efINlI2gYvPDw8vN28fLFug4YENimtFTEuHh4e3gbe/PXtATqPbnMYHh4e3nnemYh2bUMq7sTDw8M7yJsv7o/4aiOPvFkBDw8PbzevvfLP0YYXyUYVRR54eHh4m3mTRbktia2VvvLQBA8PD+8kb7IZtEt8vkm8bGPAw8PD28bLF+g8kmiLWy9o88LDw8O7JS9vsZo0HCx+LDw8PLxb8ibhxVpcmxy78fDw8M7zkshgUtBqC2ZrbQR4eHh4Z3iTCCDBrzVd5REGHh4e3kne5114eHh4eHh4eHg3uL4B8EvtOWUY5ucAAAAASUVORK5CYII=">
+    
+</ul>
+
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/nio/">nio</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=nio&url=http://seanthefish.com/2019/09/01/nio-3/index.html&pic=http://seanthefish.com/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+
+    <!-- Share Facebook -->
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://seanthefish.com/2019/09/01/nio-3/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=小鱼肖恩&title=nio&summary=我知道，是流星赞美了黑夜，鲸鱼安慰了大海&pics=http://seanthefish.com/img/favicon.png&url=http://seanthefish.com/2019/09/01/nio-3/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>转载自 海纳老师的专栏 <a href="https://zhuanlan.zhihu.com/p/27296046" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/27296046</a>  但结合网上内容做了比较大的改动</p>
+<p>感谢海纳老师，我的Java进阶路上的引路人，三年前初到北京找工作的时候就看的海纳老师的专栏，三年后再看还是会有收获。</p>
+<p>本文也参考 <a href="https://www.cnblogs.com/yulinfeng/p/8095326.html" target="_blank" rel="noopener">https://www.cnblogs.com/yulinfeng/p/8095326.html</a>  <a href="https://www.jianshu.com/p/2b71ea919d49" target="_blank" rel="noopener">https://www.jianshu.com/p/2b71ea919d49</a>  <a href="https://juejin.cn/post/6844903440573792270" target="_blank" rel="noopener">https://juejin.cn/post/6844903440573792270</a></p>
+<p>关于Java io的部分我们就略过了，只需记住io主要是针对文件写入输出操作的， 分为字节流和字符流，是基于流操作的。</p>
+<p>而nio是为了解决网络编程问题诞生的。</p>
+<p>接下来对于非阻塞式输入输出（NIO）的学习以及理解首先从它的三个基础概念讲起。</p>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="Channel（通道）"><a href="#Channel（通道）" class="headerlink" title="Channel（通道）"></a>Channel（通道）</h3><p>在NIO中，你需要忘掉“流”这个概念，取而代之的是“通道”。举例在网络应用程序中有多个客户端连接，此时数据传输的概念并不是“流”而“通道”，通道与流最大的不同就是，通道是双向的，而流是单向的（例如InputStream、OutputStream）。</p>
+<p><img src="https://i.loli.net/2020/12/04/AUCaHTgQuhXWqF9.png" alt="image.png"></p>
+<h3 id="Buffer（缓冲区）"><a href="#Buffer（缓冲区）" class="headerlink" title="Buffer（缓冲区）"></a>Buffer（缓冲区）</h3><p>在NIO中并不是简单的将流的概念替换为了通道，与通道搭配的是缓冲区。在BIO的字节流中并不会使用到缓冲区，而是直接操作文件通过字节方式直接读取，而NIO则不同，它会将通道中的数据读入缓存区，或者将缓存区的数据写入通道。</p>
+<p><img src="https://i.loli.net/2020/12/04/IusoiG6dnXH3h2v.png" alt="image.png"></p>
+<h3 id="Selector（选择器）"><a href="#Selector（选择器）" class="headerlink" title="Selector（选择器）"></a>Selector（选择器）</h3><p>如果使用NIO的应用程序中只有一个Channel，选择器则是可以不需要的，而如果有多个Channel，换言之有多个连接时，此时通过选择器，在服务器端的应用程序中就只需要1个线程对多个连接进行管理。当然从最开始就说到Channel是双向的，所以在最终图的示例为下图所示：</p>
+<p><img src="https://i.loli.net/2020/12/04/1Hu48MKWqQhzOdL.png" alt="image.png"></p>
+<p>接下来进行详细的介绍</p>
+<h2 id="buffer"><a href="#buffer" class="headerlink" title="buffer"></a>buffer</h2><p>在没有使用nio之前，我们只能自己维护一个byte数组或者是char数组来进行批量读写，或者使用BufferedReader，BufferedInputStream来做读写缓冲。在nio里，就可以使用buffer了。</p>
+<h3 id="缓冲区基础"><a href="#缓冲区基础" class="headerlink" title="缓冲区基础"></a>缓冲区基础</h3><p>本质上，缓冲区是就是一个数组。所有的缓冲区都具有四个属性来提供关于其所包含的数组的信息。它们是：</p>
+<ul>
+<li>容量（Capacity） 缓冲区能够容纳的数据元素的最大数量。容量在缓冲区创建时被设定，并且永远不能被改变。</li>
+<li>上界（Limit） 缓冲区里的数据的总数，代表了当前缓冲区中一共有多少数据。</li>
+<li>位置（Position） 下一个要被读或写的元素的位置。Position会自动由相应的 get( )和 put( )函数更新。</li>
+<li>标记（Mark） 一个备忘位置。用于记录上一次读写的位置。一会儿，我会通过reset方法来说明这个属性的含义。</li>
+</ul>
+<p>我们以字节缓冲区为例，ByteBuffer是一个抽象类，不能直接通过 new 语句来创建，只能通过一个static方法 allocate 来创建：</p>
+<pre><code class="java">// allocate是堆内内存，allocateDirect是对外内存
+ByteBuffer byteBuffer = ByteBuffer.allocate(256);
+</code></pre>
+<p>以上的语句可以创建一个大小为256字节的ByteBuffer，此时，mark = -1, pos = 0, limit = 256, capacity = 256。capacity在初始化的时候确定了，运行时就不会再变化了，而另外三个变量是随着程序的执行而不断变化的。</p>
+<h3 id="缓冲区的存取"><a href="#缓冲区的存取" class="headerlink" title="缓冲区的存取"></a>缓冲区的存取</h3><p>缓冲区用于存取的方法定义主要是put , get。</p>
+<p>put 方法有多种重载，我们看其中一个：</p>
+<pre><code class="java">    public ByteBuffer put(byte x) {
+        hb[ix(nextPutIndex())] = x;
+        return this;
+    }
+
+    final int nextPutIndex() {                          // package-private
+        if (position &gt;= limit)
+            throw new BufferOverflowException();
+        return position++;
+    }
+</code></pre>
+<p>这个方法是把一个byte变量 x 放到缓冲区中去。position会加1。再来看一下get方法，也是从position的位置去取缓冲区中的一个字节：</p>
+<pre><code class="java">  public byte get() {
+        return hb[ix(nextGetIndex())];
+    }
+
+    final int nextGetIndex() {                          // package-private
+        if (position &gt;= limit)
+            throw new BufferUnderflowException();
+        return position++;
+    }
+</code></pre>
+<p>那比如，我要是想在一个Buffer中放入了数据，然后想从中读取的话，就要把position调到我想读的那个位置才行。为此，ByteBuffer上定义了一个方法：</p>
+<pre><code class="java">public final Buffer position(int newPosition) {
+        if ((newPosition &gt; limit) || (newPosition &lt; 0))
+            throw new IllegalArgumentException();
+        position = newPosition;
+        if (mark &gt; position) mark = -1;
+        return this;
+    }
+</code></pre>
+<p>这里面用到了limit，想一下上面的定义，limit代表可写或者可读的总数。一个新创建的bytebuffer，它可写的总数就是它的capacity。如果写入了一些数据以后，想从头开始读的话，这时候的limit应该就是当前ByteBuffer中数据的总长度。下面的这个图比较直观地说明了这个问题：</p>
+<p><img src="https://i.loli.net/2020/12/03/yYe7d1brWGEVpCw.png" alt="image.png"></p>
+<p>为了达到从写数据的情况变成读数据的情况，还需要修改limit，这就要用到limit方法：</p>
+<pre><code class="java">    public final Buffer limit(int newLimit) {
+        if ((newLimit &gt; capacity) || (newLimit &lt; 0))
+            throw new IllegalArgumentException();
+        limit = newLimit;
+        if (position &gt; limit) position = limit;
+        if (mark &gt; limit) mark = -1;
+        return this;
+    }
+</code></pre>
+<p>我们可以这样写，就把byteBuffer从读变成写了：</p>
+<pre><code class="java">byteBuffer.limit(byteBuffer.position())
+byteBuffer.position(0);
+</code></pre>
+<p>当然，由于这个操作非常频繁，jdk就为我们封装了一个这样的方法，叫做flip:</p>
+<pre><code class="java">    public final Buffer flip() {
+        limit = position;
+        position = 0;
+        mark = -1;
+        return this;
+    }
+</code></pre>
+<p>使用这个反转方法，思路一定要清晰，稍有不慎，就会带来莫名其妙的错误，比如，连续调用flip会对ByteBuffer有什么样的影响呢？这其实会使得Buffer的limit变成0，从而既不能读也不能写了。</p>
+<p>limit的设计确实可以加速数据溢出情况的检查，但是造成使用上和理解上的困难，我还是觉得得不偿失。我一直觉得limit这个设计很蠢（个人意见，如果有误，请各位指正）。</p>
+<h3 id="缓冲区标记"><a href="#缓冲区标记" class="headerlink" title="缓冲区标记"></a>缓冲区标记</h3><p>今天最后一个内容，是讲一下mark的作用。在理解了position的作用以后，mark就很容易理解了，它就是记住当前的位置用的：</p>
+<pre><code class="java">    public final Buffer mark() {
+        mark = position;
+        return this;
+    }
+</code></pre>
+<p>我们在调用过mark以后，再进行缓冲区的读写操作，position就会发生变化，为了再回到当初的位置，我们可以调用reset方法恢复position的值：</p>
+<pre><code class="java"> public final Buffer reset() {
+        int m = mark;
+        if (m &lt; 0)
+            throw new InvalidMarkException();
+        position = m;
+        return this;
+    }
+</code></pre>
+<h2 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h2><p>NIO中通过channel封装了对数据源的操作，通过 channel 我们可以操作数据源，但又不必关心数据源的具体物理结构。</p>
+<p>这个数据源可能是多种的。比如，可以是文件，也可以是网络socket。在大多数应用中，channel 与文件描述符或者 socket 是一一对应的。</p>
+<p>在Java IO中，基本上可以分为文件类和Stream类两大类。Channel 也相应地分为了FileChannel 和 Socket Channel，其中 socket channel 又分为三大类，一个是用于监听端口的ServerSocketChannel，第二类是用于TCP通信的SocketChannel，第三类是用于UDP通信的DatagramChannel。</p>
+<p>可以认为每建立一个channel就是建立了一个socket链接。</p>
+<h2 id="Channel的作用"><a href="#Channel的作用" class="headerlink" title="Channel的作用"></a>Channel的作用</h2><p>channel 最主要的作用还是用于非阻塞式读写。这一条我们以后会讲，今天，主要看一下如何使用Channel进行编程。</p>
+<p>Channel可以使用 ByteBuffer 进行读写，这是它的一个方便之处。我们先看一个例子，这个例子中，创建了一个ServerSocketChannel 并且在本机的8000端口上进行监听。可以看到，bind, listen这些操作，可以猜想到SocketChannel的具体实现，本质上也是对socket的一种封装而已。</p>
+<pre><code class="java">public class WebServer {
+    public static void main(String args[]) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+            SocketChannel socketChannel = ssc.accept();
+
+            ByteBuffer readBuffer = ByteBuffer.allocate(128);
+            socketChannel.read(readBuffer);
+
+            readBuffer.flip();
+            while (readBuffer.hasRemaining()) {
+                System.out.println((char)readBuffer.get());
+            }
+
+            socketChannel.close();
+            ssc.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>用静态的 open( )工厂方法创建一个新的 ServerSocketChannel 对象，将会返回同一个未绑定的 java.net.ServerSocket 关联的通道。这个相关联的 ServerSocket 可以通过在 ServerSocketChannel 上调用 socket( )方法来获取。我们在这个例子中，使用了socket().bind来实现socket的绑定。</p>
+<p>bind方法，监听这个端口上的所有coming的socket链接，源码里bind实际上是调用了Linux bind listen两个函数。</p>
+<p>accept方法，源码调用了Linux的accept函数，会阻塞当前线程，直到有socket链接coming。</p>
+<p>read方法，源码调用了Linux的read函数，会阻塞当前线程，直到socket有数据发送过来。</p>
+<p>客户端代码：</p>
+<pre><code class="java">public class WebClient {
+    public static void main(String[] args) {
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+            writeBuffer.put(&quot;hello world&quot;.getBytes());
+
+            writeBuffer.flip();
+            socketChannel.write(writeBuffer);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>新创建的 SocketChannel 虽已打开却是未连接的。在一个未连接的 SocketChannel 对象上尝试一 个 I/O 操作会导致 NotYetConnectedException 异常。我们可以通过在通道上直接调用 connect() 方法或在通道关联的 Socket 对象上调用 connect()来实现socket的连接。一旦一个 socket 通道被连接，它将保持连接状态直到被关闭。我们可以通过调用 isConnected()方法来测试某个 SocketChannel 是否已连接。</p>
+<p>本节课程所使用的ByteBuffer上一课也有讲解，如果对flip，get, put 等操作还是感到不理解的，可以去查看上一节课程。</p>
+<p>先运行服务端，再运行客户端，所得到的结果如下：</p>
+<p><img src="https://i.loli.net/2020/12/03/mK1bzr2lgt6ifpP.png" alt="image.png"></p>
+<p>就是说，我们把客户端发送过来的字符串逐字符地打印出来了。</p>
+<p>其实，熟悉Java IO的读者都知道，我们同样可以使用InputStream和OutputStream进行字节流的读写，而且看起来，ByteBuffer似乎还没有直接使用byte[] 进行读写来得直观。实际上，channel 最大的作用并不仅限于此，它的最大作用是封装了异步操作，后面我会在 selector 的地方详细解释。</p>
+<h2 id="Scatter-Gather"><a href="#Scatter-Gather" class="headerlink" title="Scatter / Gather"></a>Scatter / Gather</h2><p>Channel 提供了一种被称为 Scatter/Gather 的新功能，也称为本地矢量 I/O。Scatter/Gather 是指在多个缓冲区上实现一个简单的 I/O 操作。对于一个 write 操作而言，数据是从几个缓冲区（通常就是一个缓冲区数组）按顺序抽取（称为 gather）并使用 channel 发送出去。缓冲区本身并不需要具备这种 gather 的能力。gather 过程等效于全部缓冲区的内容被连结起来，并在发送数据前存放到一个大的缓冲区中。对于 read 操作而言，从 通道读取的数据会按顺序被散布（称为 scatter）到多个缓冲区，将每个缓冲区填满直至通道中的数据或者缓冲区的最大空间被消耗完。</p>
+<p>大多数现代操作系统都支持本地矢量 I/O（native vectored I/O）。我们在一个通道上发起一个 Scatter/Gather 操作时，该请求会被翻译为适当的本地调用来直接填充或抽取缓冲区。这是一个很大的进步，因为减少或避免了缓冲区拷贝和系统调用。Scatter/Gather 应该使用直接的 ByteBuffers 以从本地 I/O 获取最大性能优势。</p>
+<p>例如，我们可以把客户端改写成这个样子：</p>
+<pre><code class="JAVA">public class WebClient {
+    public static void main(String[] args) {
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(128);
+            ByteBuffer buffer2 = ByteBuffer.allocate(16);
+            writeBuffer.put(&quot;hello &quot;.getBytes());
+            buffer2.put(&quot;world&quot;.getBytes());
+
+            writeBuffer.flip();
+            buffer2.flip();
+            ByteBuffer[] bufferArray = {writeBuffer, buffer2};
+            socketChannel.write(bufferArray);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>这样就实现了一个Gather IO。Gather IO 在现在还看不出来有什么作用。我们后面会看到，在并发场景下，这是一个非常好用的特性。</p>
+<h2 id="阻塞式io"><a href="#阻塞式io" class="headerlink" title="阻塞式io"></a>阻塞式io</h2><p>这里直接略过了，因为上面的例子就是阻塞式io</p>
+<pre><code class="java">socketChannel = SocketChannel.open();
+socketChannel.connect(new InetSocketAddress(&quot;192.168.0.13&quot;, 8000));
+System.out.println(&quot;Hello&quot;);
+</code></pre>
+<p>你会看到，在connect没有完成之前，最后第三行的println根本不会执行。也就是说客户端会阻塞在这个地方。</p>
+<h2 id="非阻塞式io"><a href="#非阻塞式io" class="headerlink" title="非阻塞式io"></a>非阻塞式io</h2><p>在Java中要使用非阻塞非常简单，只需要在socketChannel上调用：</p>
+<p><code>socketChannel.configureBlocking(false);</code></p>
+<pre><code class="java">public class NetClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8001));
+
+            socketChannel.configureBlocking(false);
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
+            writeBuffer.put(&quot;hello world!&quot;.getBytes());
+            writeBuffer.flip();
+
+            socketChannel.write(writeBuffer);
+            socketChannel.close();
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>可以看到服务端没啥变化，实际上我们也可以把服务端改造成非阻塞，但这样就会因为buffer中收不到数据而抛出空指针异常。</p>
+<p>所以这里我们先不改造服务端，接着下面说</p>
+<h2 id="io多路复用"><a href="#io多路复用" class="headerlink" title="io多路复用"></a>io多路复用</h2><h3 id="引入多路复用的原因"><a href="#引入多路复用的原因" class="headerlink" title="引入多路复用的原因"></a>引入多路复用的原因</h3><p>实际上，在服务端与客户端一对一通信的时候，同步阻塞式地读写并不会有太大的问题，最典型的就是两个对等机器之间建立了TCP连接，并且通过TCP连接来发送一个大文件，有大量的数据传输。在这种场景中，阻塞式的写法简单高效。</p>
+<p>但是，在服务器场景下，例如，一个 Web Server，它的特点是客户端很多，连接时间很短，数据发送量很小（一个网页几十到几百K），为了让每一个用户都能得到及时的响应，我们可以使用多线程的方式来实现服务端，例如这节课的例子：多线程服务端。</p>
+<p>但是，一台服务器能创建的线程数是十分有限的，在Java中创建线程，一个线程默认就会预留1M的空间，那么1G的内存也不过只能支持1000个线程创建而已。而且，随着线程数的增多，线程之间的调度和切换，引发的资源竞争也会加剧，使整个系统变得很慢。</p>
+<p>这个问题的最佳解决方案，就是select 和 epoll/poll。</p>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><p>在Java中，Selector这个类是select/epoll/poll的外包类，在不同的平台上，底层的实现可能有所不同，但其基本原理是一样的，其原理图如下所示：</p>
+<p><img src="https://i.loli.net/2020/12/04/tEDmRAT6OhkzBI7.png" alt="image.png"></p>
+<p>所有的Channel都归Selector管理，这些channel中只要有至少一个有IO动作，就可以通过Selector.select方法检测到，并且使用selectedKeys得到这些有IO的channel，然后对它们调用相应的IO操作。</p>
+<p>我这里有一个服务端的例子：</p>
+<pre><code class="java">public class EpollServer {
+    public static void main(String[] args) {
+        try {
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.socket().bind(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            // 设置为非阻塞
+            ssc.configureBlocking(false);
+
+            Selector selector = Selector.open();
+
+            // 将selector和Channel绑定，并为该Channel注册SelectionKey.OP_ACCEPT事件,注册该事件后，
+            // 当该事件到达时，selector.select()会返回，如果该事件没到达selector.select()会一直阻塞。
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+
+            // 设置读写buffer
+            ByteBuffer readBuff = ByteBuffer.allocate(1024);
+            ByteBuffer writeBuff = ByteBuffer.allocate(128);
+            writeBuff.put(&quot;received&quot;.getBytes());
+            writeBuff.flip();
+
+            // 采用轮询的方式监听selector上是否有需要处理的事件，如果有，则进行处理
+            while (true) {
+                // 当注册的事件到达时，方法返回；否则,该方法会一直阻塞
+                selector.select();
+                // 获得selector中选中的项的迭代器，选中的项为注册的事件
+                Set&lt;SelectionKey&gt; keys = selector.selectedKeys();
+                Iterator&lt;SelectionKey&gt; it = keys.iterator();
+
+                while (it.hasNext()) {
+                    SelectionKey key = it.next();
+                    // 删除已选的key,以防重复处理
+                    it.remove();
+
+                    // 获得了客户端请求连接事件
+                    if (key.isAcceptable()) {
+                        // 获得和客户端连接的通道
+                        SocketChannel socketChannel = ssc.accept();
+                        // 设为非阻塞
+                        socketChannel.configureBlocking(false);
+                        // 把连接注册到selector上，而且，
+                        // 声明这个channel只对读操作感兴趣。
+                        socketChannel.register(selector, SelectionKey.OP_READ);
+                    }
+                    // 获得了可读的事件
+                    else if (key.isReadable()) {
+                        //  得到事件发生的Socket channel
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        readBuff.clear();
+                        socketChannel.read(readBuff);
+
+                        readBuff.flip();
+                        System.out.println(&quot;received : &quot; + Charset.forName(&quot;utf-8&quot;).decode(readBuff).toString());
+                        key.interestOps(SelectionKey.OP_WRITE);
+                    }
+                    // 获得了写的事件
+                    else if (key.isWritable()) {
+                        writeBuff.rewind();
+                        //  得到事件发生的Socket channel
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        // 向channel写入buffer
+                        socketChannel.write(writeBuff);
+                        // 告诉selector我们只对读感兴趣
+                        key.interestOps(SelectionKey.OP_READ);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>这个例子的关键点：</p>
+<ul>
+<li>创建一个ServerSocketChannel，和一个Selector，并且把这个server channel 注册到 selector上，注册的时间指定，这个channel 所感觉兴趣的事件是 SelectionKey.OP_ACCEPT，这个事件代表的是有客户端发起TCP连接请求。</li>
+<li>使用 select 方法阻塞住线程，当select 返回的时候，线程被唤醒。再通过selectedKeys方法得到所有可用channel的集合。</li>
+<li>遍历这个集合，如果其中channel 上有连接到达，就接受新的连接，然后把这个新的连接也注册到selector中去。</li>
+<li>如果有channel是读，那就把数据读出来，并且把它感兴趣的事件改成写。如果是写，就把数据写出去，并且把感兴趣的事件改成读。</li>
+</ul>
+<p>客户端：</p>
+<pre><code class="java">public class EpollClient {
+    public static void main(String[] args) {
+        try {
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.connect(new InetSocketAddress(&quot;127.0.0.1&quot;, 8000));
+
+            ByteBuffer writeBuffer = ByteBuffer.allocate(32);
+            ByteBuffer readBuffer = ByteBuffer.allocate(32);
+
+            writeBuffer.put(&quot;hello&quot;.getBytes());
+            writeBuffer.flip();
+
+            while (true) {
+                writeBuffer.rewind();
+                socketChannel.write(writeBuffer);
+                readBuffer.clear();
+                socketChannel.read(readBuffer);
+            }
+        } catch (IOException e) {
+        }
+    }
+}
+</code></pre>
+<p>这个客户端不断地向服务端发送”hello”，并且从服务端接收”received”。</p>
+<p>大家多启几个客户端程序，去连接同一个服务端，观察一下现象，动手改一下客户端代码，让它发送的更丰富一点，不要让每一个客户端发的都一样。</p>
+<h3 id="详解selector使用"><a href="#详解selector使用" class="headerlink" title="详解selector使用"></a>详解selector使用</h3><h4 id="创建Selector"><a href="#创建Selector" class="headerlink" title="创建Selector"></a>创建Selector</h4><p>Selector对象是通过调用静态工厂方法open()来实例化的，如下：</p>
+<pre><code class="java">Selector Selector=Selector.open()；
+</code></pre>
+<p>类方法open()实际上向SPI发出请求，通过默认的SelectorProvider对象获取一个新的实例。</p>
+<h4 id="将Channel注册到Selector"><a href="#将Channel注册到Selector" class="headerlink" title="将Channel注册到Selector"></a>将Channel注册到Selector</h4><p>要实现Selector管理Channel，需要将channel注册到相应的Selector上，如下：</p>
+<pre><code class="java">channel.configureBlocking(false);
+SelectionKey key= channel.register(selector,SelectionKey,OP_READ);
+</code></pre>
+<p>通过调用通道的register()方法会将它注册到一个选择器上。与Selector一起使用时，Channel必须处于非阻塞模式下，否则将抛出IllegalBlockingModeException异常，这意味着不能将FileChannel与Selector一起使用，因为FileChannel不能切换到非阻塞模式，而套接字通道都可以。另外通道一旦被注册，将不能再回到阻塞状态，此时若调用通道的configureBlocking(true)将抛出BlockingModeException异常。</p>
+<p>register()方法的第二个参数是“interest集合”，表示选择器所关心的通道操作，它实际上是一个表示选择器在检查通道就绪状态时需要关心的操作的比特掩码。比如一个选择器对通道的read和write操作感兴趣，那么选择器在检查该通道时，只会检查通道的read和write操作是否已经处在就绪状态。<br>它有以下四种操作类型：</p>
+<ul>
+<li>Connect 连接</li>
+<li>Accept 接受</li>
+<li>Read 读</li>
+<li>Write 写</li>
+</ul>
+<p>需要注意并非所有的操作在所有的可选择通道上都能被支持，比如ServerSocketChannel支持Accept，而SocketChannel中不支持。我们可以通过通道上的validOps()方法来获取特定通道下所有支持的操作集合。</p>
+<p>JAVA中定义了四个常量来表示这四种操作类型：</p>
+<pre><code class="java">SelectionKey.OP_CONNECT
+SelectionKey.OP_ACCEPT
+SelectionKey.OP_READ
+SelectionKey.OP_WRITE
+</code></pre>
+<p>如果Selector对通道的多操作类型感兴趣，可以用“位或”操作符来实现：<br><code>int interestSet=SelectionKey.OP_READ|SelectionKey.OP_WRITE;</code></p>
+<p>当通道触发了某个操作之后，表示该通道的某个操作已经就绪，可以被操作。因此，某个SocketChannel成功连接到另一个服务器称为“连接就绪”(OP_CONNECT)。一个ServerSocketChannel准备好接收新进入的连接称为“接收就绪”（OP_ACCEPT）。一个有数据可读的通道可以说是“读就绪”(OP_READ)。等待写数据的通道可以说是“写就绪”(OP_WRITE)。</p>
+<p>我们注意到register（）方法会返回一个SelectionKey对象，我们称之为键对象。该对象包含了以下四种属性：</p>
+<ul>
+<li>interest集合</li>
+<li>read集合</li>
+<li>Channel</li>
+<li>Selector</li>
+</ul>
+<p>interest集合是Selector感兴趣的集合，用于指示选择器对通道关心的操作，可通过SelectionKey对象的interestOps()获取。最初，该兴趣集合是通道被注册到Selector时传进来的值。该集合不会被选择器改变，但是可通过interestOps()改变。我们可以通过以下方法来判断Selector是否对Channel的某种事件感兴趣：</p>
+<pre><code class="java">   int interestSet=selectionKey.interestOps();
+   boolean isInterestedInAccept  = (interestSet &amp; SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT；
+</code></pre>
+<p>这里有一个需要注意的点，很重要，就是 <code>key.interestOps(SelectionKey.OP_WRITE);</code> 不仅仅是转换关注的事件状态，还会主动的将当前channel的状态进行转换，如果不主动把channel关闭，写事件会无限的被触发！</p>
+<p>为什么？这里涉及到一个边缘触发还是水平触发的问题，详见：<a href="https://www.jianshu.com/p/6bdee8cfee90" target="_blank" rel="noopener">https://www.jianshu.com/p/6bdee8cfee90</a></p>
+<p>简单来说：</p>
+<p>触发的方式有两种</p>
+<ul>
+<li>水平触发(level-triggered，也被称为条件触发)LT: 只要满足条件，就触发一个事件(只要有数据没有被获取，内核就不断通知你)</li>
+<li>边缘触发(edge-triggered)ET: 每当状态变化时，触发一个事件。<br>水平触发：</li>
+<li>对于读操作 ：只要内核缓冲区内容不为空，LT模式返回读就绪。</li>
+<li>对于写操作 ：只要内核缓冲区还不满，LT模式会返回写就绪。<br>Java NIO属于水平触发，即条件触发</li>
+</ul>
+<p>所以，如果read事件中buffer没被读完，也是会被重新触发的。</p>
+<p>再说什么时候写入channel，我们可不可以直接在read事件中写入channel呢？经实测是可以的，但为什么最好不要这么做呢？</p>
+<p>因为：</p>
+<p>如果有channel在Selector上注册了SelectionKey.OP_WRITE事件，在调用selector.select();时，系统会检查内核写缓冲区是否可写（什么时候是不可写的呢，比如缓冲区已满，channel调用了shutdownOutPut等等），如果可写，selector.select();立即返回，随后进入key.isWritable()分支。</p>
+<p>当然你在channel上可以直接调用write(…)，也可以将数据发送出去，但这样不够灵活，而且可能浪费CPU。</p>
+<p>详见：<a href="https://segmentfault.com/a/1190000017777939" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017777939</a></p>
+<p>所以正确用法：</p>
+<p>要触发写事件，需要先向 selector 注册该通道的写事件，跟注册读事件一样，当底层写缓冲区有空闲就会触发写事件了，而一般来说底层的写缓冲区大部分都是空闲的。所以一般只要注册了写事件，就会立马触发了，为了避免 cpu 空转，在写操作完成后需要把写事件取消掉，然后下次再有写操作时重新注册写事件。</p>
+<p>再说read集合：</p>
+<p>read集合是通道已经就绪的操作的集合，表示一个通道准备好要执行的操作了,可通过SelctionKey对象的readyOps()来获取相关通道已经就绪的操作。它是interest集合的子集，并且表示了interest集合中从上次调用select()以后已经就绪的那些操作。（比如选择器对通道的read,write操作感兴趣，而某时刻通道的read操作已经准备就绪可以被选择器获知了，前一种就是interest集合，后一种则是read集合。）。JAVA中定义以下几个方法用来检查这些操作是否就绪：</p>
+<pre><code class="java">    //int readSet=selectionKey.readOps()
+    selectionKey.isAcceptable()
+    selectionKey.isConnectable()
+    selectionKey.isReadable()
+    selectionKey.isWritable()
+</code></pre>
+<p>这几个方法全都调用readyOps()方法</p>
+<p>需要注意的是，通过相关的选择键的readyOps()方法返回的就绪状态指示只是一个提示，底层的通道在任何时候都会不断改变，而其他线程也可能在通道上执行操作并影响到它的就绪状态。另外，我们不能直接修改read集合。</p>
+<p>取出SelectionKey所关联的Selector和Channel<br>通过SelectionKey访问对应的Selector和Channel：</p>
+<pre><code class="java">Channel channel = selectionKey.channel();
+Selector selector = selectionKey.selector();
+</code></pre>
+<h4 id="取消SelectionKey对象"><a href="#取消SelectionKey对象" class="headerlink" title="取消SelectionKey对象"></a>取消SelectionKey对象</h4><p>我们可以通过SelectionKey对象的cancel()方法来取消特定的注册关系。该方法调用之后，该SelectionKey对象将会被”拷贝”至已取消键的集合中，该键此时已经失效，但是该注册关系并不会立刻终结。在下一次select()时，已取消键的集合中的元素会被清除，相应的注册关系也真正终结。</p>
+<p>所以SelectionKey到底谁什么？</p>
+<p>我们可以把SelectionKey理解为epoll中的监视channel（socket）返回事件的一个监控对象，每当有一个channel注册到selector中时，就会有一个SelectionKey对象生成，通过SelectionKey我们可以得到当前channel中我们关心的事件的就绪列表，通过readyOps()方法得到已经就绪的channel后，我们通过其channel()方法来获取channel并向缓冲区读写数据。</p>
+<h4 id="为SelectionKey绑定附加对象"><a href="#为SelectionKey绑定附加对象" class="headerlink" title="为SelectionKey绑定附加对象"></a>为SelectionKey绑定附加对象</h4><p>可以将一个或者多个附加对象绑定到SelectionKey上，以便容易的识别给定的通道。通常有两种方式： </p>
+<ul>
+<li>在注册的时候直接绑定：<br><code>SelectionKey key=channel.register(selector,SelectionKey.OP_READ,theObject);</code></li>
+<li>在绑定完成之后附加：<br><code>selectionKey.attach(theObject);//绑定</code></li>
+</ul>
+<p>绑定之后，可通过对应的SelectionKey取出该对象:<br><code>selectionKey.attachment();</code><br>如果要取消该对象，则可以通过该种方式:<br><code>selectionKey.attach(null);</code></p>
+<p>需要注意的是如果附加的对象不再使用，一定要人为清除，因为垃圾回收器不会回收该对象，若不清除的话会成内存泄漏。</p>
+<p>需要注意的是attachment并不是epoll中的方法，我们来看一下attachment的解释：</p>
+<p>通常，我们需要将某个应用程序的特定数据与某个selectionKey相关联，例如表示http 状态的对象，我们在得到了一个读事件（一个http request）后，会首先将这个读事件进行解析，并把需要保存的数据和状态保存到attachment中，以供处理写事件时处理。在我们解析完读事件后，我们会继续调用interestOps()方法将其转换成写事件，并在写事件中得到这个attachment，并进行状态转换，写入channel返回。</p>
+<p>ps：一个用nio实现的http server：<a href="https://cloud.tencent.com/developer/article/1109637" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1109637</a></p>
+<p>多个并发线程可安全地使用selectionKey。一般情况下，读取和写入 interest 集合的操作将与selector的某些操作保持同步。具体如何执行该同步与实现有关：在一般实现中，如果正在进行某个selector操作，那么读取或写入 interest 集合可能会无限期地阻塞；在高性能的实现中，可能只会暂时阻塞。无论在哪种情况下，selector操作将始终使用该操作开始时当前的 interest 集合值。</p>
+<p>一个单独的通道可被注册到多个选择器中，有些时候我们需要通过isRegistered（）方法来检查一个通道是否已经被注册到任何一个选择器上。 通常来说，我们并不会这么做。</p>
+<h3 id="原理和实现"><a href="#原理和实现" class="headerlink" title="原理和实现"></a>原理和实现</h3><p>先复习一下epoll的函数</p>
+<pre><code class="c">//创建一个eventpoll,返回它的文件描述符，内有一颗红黑树，用来保存监听的socket
+int epoll_create(int size);
+//用来添加，删除以及修改监听的socket（修改红黑树的节点）
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+//等待监听的socket返回，进行后续操作
+//它的主体是ep_poll()，该函数在for循环中检查epitem（完成队列）中有没有已经完成的事件 
+//有的话就把结果返回
+//没有的话调用schedule_timeout()进入休眠，直到进程被再度唤醒或者超时。
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+</code></pre>
+<p>实现Java nio版本epoll的核心逻辑就在Selector，Selector内封装了大部分epoll的操作。</p>
+<p>先看一下Selector#open()</p>
+<pre><code class="java"> public static Selector open() throws IOException {
+        return SelectorProvider.provider().openSelector();
+    }
+</code></pre>
+<p>其实就是对应着不同os的SelectorProvider，这里以Linux下的EPollSelectorImpl为例：</p>
+<pre><code class="java">// File descriptors used for interrupt
+protected int fd0;
+protected int fd1;
+
+// The poll object
+EPollArrayWrapper pollWrapper;
+
+// Maps from file descriptors to keys
+private Map&lt;Integer,SelectionKeyImpl&gt; fdToKey;
+
+EPollSelectorImpl(SelectorProvider sp) throws IOException {
+        super(sp);
+        long pipeFds = IOUtil.makePipe(false);
+        fd0 = (int) (pipeFds &gt;&gt;&gt; 32);
+        fd1 = (int) pipeFds;
+        try {
+            pollWrapper = new EPollArrayWrapper();
+            pollWrapper.initInterrupt(fd0, fd1);
+            fdToKey = new HashMap&lt;&gt;();
+        } catch (Throwable t) {
+            try {
+                FileDispatcherImpl.closeIntFD(fd0);
+            } catch (IOException ioe0) {
+                t.addSuppressed(ioe0);
+            }
+            try {
+                FileDispatcherImpl.closeIntFD(fd1);
+            } catch (IOException ioe1) {
+                t.addSuppressed(ioe1);
+            }
+            throw t;
+        }
+    }
+
+void initInterrupt(int fd0, int fd1) {
+    outgoingInterruptFD = fd1;
+    incomingInterruptFD = fd0;
+    epollCtl(epfd, EPOLL_CTL_ADD, fd0, EPOLLIN);
+}
+</code></pre>
+<p>EPollSelectorImpl构造函数完成：</p>
+<ul>
+<li>EPollArrayWrapper的构建，EpollArrayWapper将Linux的epoll相关系统调用封装成了native方法供EpollSelectorImpl使用。<ul>
+<li>EPollArrayWrapper会初始化epoll的文件描述符，并构建了一个用于存放epoll_wait返回结果的epoll_event数组。</li>
+</ul>
+</li>
+<li>通过EPollArrayWrapper向epoll注册中断事件。fd0是incomingInterruptFD，fd1是outgoingInterruptFD，并调用Linux的epollCtl函数，并调用epoll_ctl, 添加这个epoll的文件描述符</li>
+<li>初始化fdToKey：构建文件描述符-SelectionKeyImpl映射表，所有注册到selector的channel（socket）对应的SelectionKey和与之对应的文件描述符都会放入到该映射表中。</li>
+</ul>
+<p>再来看serverChannel#register(selector, SelectionKey.OP_ACCEPT);</p>
+<pre><code class="java">    public final SelectionKey register(Selector sel, int ops,
+                                       Object att)
+        throws ClosedChannelException
+    {
+        synchronized (regLock) {
+            if (!isOpen())
+                throw new ClosedChannelException();
+            if ((ops &amp; ~validOps()) != 0)
+                throw new IllegalArgumentException();
+            if (blocking)
+                throw new IllegalBlockingModeException();
+            SelectionKey k = findKey(sel);
+            if (k != null) {
+                k.interestOps(ops);
+                k.attach(att);
+            }
+            if (k == null) {
+                // New registration
+                synchronized (keyLock) {
+                    if (!isOpen())
+                        throw new ClosedChannelException();
+                    k = ((AbstractSelector)sel).register(this, ops, att);
+                    addKey(k);
+                }
+            }
+            return k;
+        }
+    }
+
+        protected final SelectionKey register(AbstractSelectableChannel ch,
+                                          int ops,
+                                          Object attachment)
+    {
+        if (!(ch instanceof SelChImpl))
+            throw new IllegalSelectorException();
+        SelectionKeyImpl k = new SelectionKeyImpl((SelChImpl)ch, this);
+        k.attach(attachment);
+        synchronized (publicKeys) {
+            implRegister(k);
+        }
+        k.interestOps(ops);
+        return k;
+    }
+</code></pre>
+<ul>
+<li>构建代表channel(socket)和selector间关系的SelectionKey对象</li>
+<li>implRegister(k)将channel(socket)注册到epoll中</li>
+<li>k.interestOps(int) 完成下面两个操作：<ul>
+<li>会将注册的感兴趣的事件和其对应的文件描述存储到EPollArrayWrapper对象的eventsLow或eventsHigh中，这是给底层实现epoll_wait时使用的。</li>
+<li>同时该操作还会将设置SelectionKey的interestOps字段，这是给我们程序员获取使用的。</li>
+</ul>
+</li>
+</ul>
+<p>EPollSelectorImpl#implRegister</p>
+<pre><code class="java">    protected void implRegister(SelectionKeyImpl ski) {
+        if (closed)
+            throw new ClosedSelectorException();
+        SelChImpl ch = ski.channel;
+        int fd = Integer.valueOf(ch.getFDVal());
+        fdToKey.put(fd, ski);
+        pollWrapper.add(fd);
+        keys.add(ski);
+    }
+</code></pre>
+<ul>
+<li>将channel对应的fd(文件描述符)和对应的SelectionKeyImpl放到fdToKey映射表中。</li>
+<li>将channel对应的fd(文件描述符)添加到EPollArrayWrapper中，并强制初始化fd的事件为0 ( 强制初始更新事件为0，因为该事件可能存在于之前被取消过的注册中。)</li>
+<li>将selectionKey放入到keys集合中。</li>
+</ul>
+<p>Selection操作</p>
+<p>selection操作有3中类型：</p>
+<ul>
+<li>select()：该方法会一直阻塞直到至少一个channel被选择(即，该channel注册的事件发生了)为止，除非当前线程发生中断或者selector的wakeup方法被调用。</li>
+<li>select(long time)：该方法和select()类似，该方法也会导致阻塞直到至少一个channel被选择(即，该channel注册的事件发生了)为止，除非下面3种情况任意一种发生：<ul>
+<li>设置的超时时间到达；</li>
+<li>当前线程发生中断；</li>
+<li>selector的wakeup方法被调用</li>
+</ul>
+</li>
+<li>selectNow()：该方法不会发生阻塞，如果没有一个channel被选择也会立即返回。</li>
+</ul>
+<p>这里我们主要关注select()所调用的EPollSelectorImpl#doSelect方法</p>
+<pre><code class="java">    protected int doSelect(long timeout) throws IOException {
+        if (closed)
+            throw new ClosedSelectorException();
+        // 从cancelledKeys集合中依次取出注销的SelectionKey，执行注销操作
+        // 将处理后的SelectionKey从cancelledKeys集合中移除。
+        // 执行processDeregisterQueue()后cancelledKeys集合会为空。
+        // 这里会对EPollArrayWrapper进行操作，把这些不再关心的channel（socket）从EPollArrayWrapper的数据结构中移出，并修改fdToKey映射
+        // 注意直到这里，我们都还没有调用过epoll_ctl去对epoll中的红黑树进行修改，这里只是修改Java中保存的channel
+        processDeregisterQueue();
+        try {
+            begin();
+            // 看后面，这里实际上是会阻塞线程
+            pollWrapper.poll(timeout);
+        } finally {
+            end();
+        }
+        processDeregisterQueue();
+        // 通过EPollArrayWrapper pollWrapper 以及 fdToKey( 构建文件描述符-SelectorKeyImpl映射表 )来获取有事件触发的SelectionKeyImpl对象，
+        // 然后将SelectionKeyImpl放到selectedKey集合( 有事件触发的selectionKey集合，可以通过selector.selectedKeys()方法获得 )中，即selectedKeys。
+        // 并重新设置SelectionKeyImpl中相关的readyOps值。
+        int numKeysUpdated = updateSelectedKeys();
+        if (pollWrapper.interrupted()) {
+            // Clear the wakeup pipe
+            pollWrapper.putEventOps(pollWrapper.interruptedIndex(), 0);
+            synchronized (interruptLock) {
+                pollWrapper.clearInterrupted();
+                IOUtil.drain(fd0);
+                interruptTriggered = false;
+            }
+        }
+        return numKeysUpdated;
+    }
+</code></pre>
+<ul>
+<li>先处理注销的selectionKey队列</li>
+<li>进行底层的epoll_wait操作</li>
+<li>再次对注销的selectionKey队列进行处理</li>
+<li>更新被选择的selectionKey</li>
+</ul>
+<p>接着我们来看EPollArrayWrapper#poll(timeout)：</p>
+<pre><code class="java">    int poll(long timeout) throws IOException {
+        updateRegistrations();
+        updated = epollWait(pollArrayAddress, NUM_EPOLLEVENTS, timeout, epfd);
+        for (int i=0; i&lt;updated; i++) {
+            if (getDescriptor(i) == incomingInterruptFD) {
+                interruptedIndex = i;
+                interrupted = true;
+                break;
+            }
+        }
+        return updated;
+    }
+</code></pre>
+<ul>
+<li>updateRegistrations()方法会将已经注册到该selector的事件(events, 就是SelectionKey的option，也是epoll中的epoll_events)通过调用epollCtl(epfd, opcode, fd, events); 注册到epoll的红黑树中</li>
+<li>这里epollWait就会调用linux底层的epoll_wait方法，并返回在epoll_wait期间有事件触发的channel的个数</li>
+</ul>
+<h4 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h4><p>Selector中封装了Linux epoll的操作，当调用selector.select();时，当前线程会阻塞（体现同步io操作），这个select方法实际上是调用epoll中的epoll_wait方法，来监听不同的channel（socket）是否有事件返回，通过一个selector线程来监听多个channel（socket），并且不用阻塞住channel（socket）（操作系统帮我们处理），这体现了非阻塞的概念。所以说，epoll是同步非阻塞的模型。（我的理解，实际上就是一个事件驱动的模型）</p>
+<h3 id="关于aio"><a href="#关于aio" class="headerlink" title="关于aio"></a>关于aio</h3><p>看这里 <a href="https://www.pdai.tech/md/java/io/java-io-aio.html" target="_blank" rel="noopener">https://www.pdai.tech/md/java/io/java-io-aio.html</a></p>
+<p>简单来说，就是通过订阅-通知模式，由channel通道直接到操作系统注册监听，来监听多个channel上的数据，主线程不再阻塞。当操作系统发生IO事件，并且准备好数据后，在主动通知应用程序，触发相应的回调函数。使用“AsynchronousServerSocketChannel”（服务器监听通道）、“AsynchronousSocketChannel”（socket套接字通道）。</p>
+<h3 id="关于nio的堆外内存分配"><a href="#关于nio的堆外内存分配" class="headerlink" title="关于nio的堆外内存分配"></a>关于nio的堆外内存分配</h3><p>如果说，我们使用普通的ByteBuffer，那么这个ByteBuffer就会在Java堆内，被JVM所管理：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocate(1024);
+</code></pre>
+<p>当 buf 被JVM所管理时，它会在变成垃圾以后，自动被回收，这个不需要我们来操心。但它有个问题，后面会讲到，在执行GC的时候，JVM实际上会做一些整理内存的工作，也就说buf这个对象在内存中的实际地址是会发生变化的。有些时候，ByteBuffer里都是大量的字节，这些字节在JVM GC整理内存时就显得很笨重，把它们在内存中拷来拷去显然不是一个好主意。</p>
+<p>那这时候，我们就会想能不能给我一块内存，可以脱离JVM的管理呢？在这样的背景下，就有了DirectBuffer。先看一下用法：</p>
+<pre><code class="java">ByteBuffer buf = ByteBuffer.allocateDirect(1024);
+</code></pre>
+<p>我们对比一下，allocate方法和allocateDirect方法就知道了：</p>
+<pre><code class="java">public static ByteBuffer allocateDirect(int capacity) {
+        return new DirectByteBuffer(capacity);
+    }
+
+    public static ByteBuffer allocate(int capacity) {
+        if (capacity &lt; 0)
+            throw new IllegalArgumentException();
+        return new HeapByteBuffer(capacity, capacity);
+    }
+</code></pre>
+<p>其中allocate中所创建的HeapByteBuffer刚好就是我们前边所介绍的，在堆里分配一个ByteBuffer，而DirectBuffer则是在堆外分配，使用了unsafe.allocateMemory来分配内存.</p>
+<h4 id="DirectBuffer优缺点"><a href="#DirectBuffer优缺点" class="headerlink" title="DirectBuffer优缺点"></a>DirectBuffer优缺点</h4><p>堆外内存的申请与普通的Java对象是有巨大的差别的。在以后的课程里，大家会发现，Java对象在Java堆里申请内存的时候，实际上是比malloc(堆外内存)要快的，所以DirectBuffer的创建效率往往是比Heap Buffer差的。</p>
+<p>但是，如果进行网络读写或者文件读写的时候，DirectBuffer就会比较快了，说起来好笑，这个快是因为JDK故意把非DirectBuffer的读写搞慢的，我们看一下JDK的源代码。</p>
+<p>share/classes/sun/nio/ch/IOUtil.java</p>
+<pre><code class="java">    static int write(FileDescriptor fd, ByteBuffer src, long position,
+                     NativeDispatcher nd) 
+        throws IOException
+    {   
+        if (src instanceof DirectBuffer)
+            return writeFromNativeBuffer(fd, src, position, nd);
+
+        // Substitute a native buffer
+        int pos = src.position();
+        int lim = src.limit();
+        assert (pos &lt;= lim);
+        int rem = (pos &lt;= lim ? lim - pos : 0); 
+        ByteBuffer bb = Util.getTemporaryDirectBuffer(rem);
+        try {
+            bb.put(src);
+            bb.flip();
+        // ................略
+</code></pre>
+<p>关键点在这个方法的第一行，如果src是DirectBuffer，就直接调用writeFromNativeBuffer，如果不是，则要先创建一个临时的DirectBuffer，把src拷进去，然后再调用真正的写操作。为什么要这么干呢？还是要从DirectBuffer不会被GC移动说起。</p>
+<p>writeFromNativeBuffer的实现，最终会把Buffer的address传给操作系统，让操作系统把address开始的那一段内存发送到网络上。这就要求在操作系统进行发送的时候，这块内存是不能动的。而我们知道，GC是会乱搬Java堆里的东西的，所以无奈，我们必须得弄一块地址不会变化的内存，然后把这个地址发给操作系统。(回头再把这部分堆外内存给拿掉)</p>
+<p>DirectBuffer当然还有一个直观的优点，不被GC管理，所以发生GC的时候，整理内存的压力就会小。当然，我后面也会讲，它并不是完全不被GC管理，它还是能被回收的，但是在GC平常整理内存的时候确实是不会去管它的。</p>
+<p>堆外内存的管理，我在jvm的章节介绍过了。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 30px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #757575;
+            text-shadow: 0;
+            display: none
+        }
+</style>
+	
+<div class="btn_click_load"> 
+    <button class="disqus_click_btn">阅读评论（请确保 disqus 可以正常加载）</button>
+</div>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://seanthefish.com/2019/09/01/nio-3/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://seanthefish.com/2019/09/01/nio-3/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/ls-javascript" id="disqus-lazy-load-script">
+    $.ajax({
+        url: 'https://disqus.com/next/config.json',
+        timeout: 4000,
+        type: 'GET',
+        success: (function() {
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+            $('.disqus_click_btn').css('display','none');
+        })(),
+        error: function() {
+          $('.disqus_click_btn').css('display','block');
+        }
+    });
+    $('.btn_click_load').click(function() {  //click to load comments
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document;
+            var s = d.createElement('script');
+            s.src = '//seanthefish.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', + new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        $('.disqus_click_btn').css('display','none');
+    });
+</script>
+  	
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2019/09/17/rabbit/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2019/09/01/nio-2/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Sean Yu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        a728976009@hotmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: a728976009@hotmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2020/12/">十二月 2020<span class="sidebar_archives-count">23</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/11/">十一月 2020<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/10/">十月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/09/">九月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/03/">三月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/02/">二月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/12/">十二月 2019<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/11/">十一月 2019<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/10/">十月 2019<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2019/09/">九月 2019<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">27</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/06/">六月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/04/">四月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                分类
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/Java-9/">Java 9<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/OAuth/">OAuth<span class="sidebar_archives-count">30</span></a></li><li><a class="sidebar_archives-link" href="/categories/jpa/">jpa<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/jvm/">jvm<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/k8s/">k8s<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/mq/">mq<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/categories/mysql/">mysql<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/categories/network/">network<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/nio/">nio<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/pgsql/">pgsql<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/raft/">raft<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/redis/">redis<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/categories/spring/">spring<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/台词/">台词<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/categories/基础/">基础<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/并发/">并发<span class="sidebar_archives-count">24</span></a></li><li><a class="sidebar_archives-link" href="/categories/微服务/">微服务<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/categories/设计模式/">设计模式<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/ShanyouYu-Sean" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+
+    <!-- V2EX -->
+    
+
+    <!-- Segmentfault -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;<span year></span>&nbsp;小鱼肖恩
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?Bn9UzEm8RrBSxqyZB0zPjA==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+    
+        <script>lsloader.load("sm_js","/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+    
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    var copyrightNow = new Date().getFullYear();
+    var textContent = document.querySelector('span[year]')
+
+    copyrightSince = 0000;
+    if (copyrightSince === copyrightNow||copyrightSince === 0000) {
+        textContent.textContent = copyrightNow
+    } else {
+        textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
+
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.6 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
